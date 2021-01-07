@@ -21,7 +21,7 @@ function h = fcn_Path_plotTraversalsYaw(data,varargin)
 %
 % EXAMPLES:
 %      
-%       See the script: script_test_fcn_Path_plotPathYaw.m for a full test
+%       See the script: script_test_fcn_Path_plotTraversalsYaw.m for a full test
 %       suite. 
 %
 % This function was written on 2020_11_12 by S. Brennan

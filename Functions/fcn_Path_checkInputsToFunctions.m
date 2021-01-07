@@ -72,7 +72,7 @@ function fcn_Path_checkInputsToFunctions(...
 %      -- fixed errors in comments as 'traversals' description was missing
 %      -- created 'path' and 'paths' checks
 
-flag_do_debug = 0; % Flag to debug the results
+flag_do_debug = 1; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
 flag_check_inputs = 1; % Flag to perform input checking
 

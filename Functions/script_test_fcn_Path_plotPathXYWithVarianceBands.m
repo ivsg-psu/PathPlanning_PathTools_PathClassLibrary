@@ -4,6 +4,9 @@
 % Revision history:
 % 2021_01_05
 % -- first write of the code
+% 2021_01_07
+% -- fixed naming convention on functions to reflect change from path to
+% traversal notation
 
 close all
 clc
@@ -15,7 +18,7 @@ clear all_traversals
 paths = fcn_Path_fillSamplePaths;
 
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertXYtoTraversalStructure(paths{1}(:,1),paths{1}(:,2));
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
 all_traversals.traversal{1} = reference_traversal;
 
 
@@ -52,7 +55,7 @@ title(sprintf('Standard deviation: %.0d meters',std_deviation));
 fig_num = 4;
 std_deviation = 2;
 for i_Path = 1:length(paths)
-    reference_traversal = fcn_Path_convertXYtoTraversalStructure(paths{i_Path}(:,1),paths{i_Path}(:,2));
+    reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
     fcn_Path_plotPathXYWithVarianceBands(reference_traversal,...
         std_deviation,fig_num);
 end

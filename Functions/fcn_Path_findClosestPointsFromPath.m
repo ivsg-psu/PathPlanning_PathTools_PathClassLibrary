@@ -161,7 +161,11 @@ for index_reference_path = 1:length(reference_traversal.X) % loop through all th
         X_tra = data.traversal{i_traversal}.X(index_in_station_range);
         Y_tra = data.traversal{i_traversal}.Y(index_in_station_range);
         Z_tra = data.traversal{i_traversal}.Z(index_in_station_range);
-        Yaw_tra = data.traversal{i_traversal}.Yaw(index_in_station_range);
+        
+        % Yaw index cannot be larger than N-1
+        length_Yaw = length(data.traversal{i_traversal}.Yaw);
+        yaw_index_in_station_range = min(index_in_station_range,length_Yaw);
+        Yaw_tra = [data.traversal{i_traversal}.Yaw(yaw_index_in_station_range)];
         
         path = [X_tra, Y_tra, Z_tra];
         path_dist = sum(diff(path).^2,2).^0.5;

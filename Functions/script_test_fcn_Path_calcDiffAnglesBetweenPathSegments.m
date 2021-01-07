@@ -15,7 +15,7 @@ clear all_traversals
 paths = fcn_Path_fillSamplePaths;
 
 % Pick first path as reference_traversal structure
-path_to_check = paths{1};
+paths_to_check = paths{1};
 
 % Pick first path as reference_traversal structure
 traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths{1});
@@ -32,4 +32,4 @@ end
 
 %% Test case 1: basic call
 fig_num = 1;
-diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(path_to_check,fig_num);
+diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,fig_num);

@@ -8,6 +8,7 @@
 %      -- code clean-up to remove unneeded yaw function
 %     2021_01_07
 %     -- renamed function to show that traversals being used, not path
+%     -- fixed small typo in function name
 
 close all
 clc
@@ -19,7 +20,7 @@ paths = fcn_Path_fillSamplePaths;
 
 % Convert paths into traversals
 for i_traveral = 1:length(paths)
-    traversal = fcn_Path_convertPathtoTraversalStructure(paths{i_traveral});
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_traveral});
     data.traversal{i_traveral} = traversal;
 end
 

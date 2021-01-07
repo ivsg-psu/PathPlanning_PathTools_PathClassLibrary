@@ -5,7 +5,10 @@
 %      2020_11_12 
 %      -- first wrote the code
 %      2021_01_06
-%      -- a bit more comments, renamed function
+%      -- a bit more comments, renamed function to be traversals, not path
+%      2021_01_07
+%      -- fixed typos in arguments for function calls, based on recent
+%      edits
 
 clc
 close all
@@ -16,7 +19,7 @@ paths = fcn_Path_fillSamplePaths;
 
 % Convert paths into traversals
 for i_traveral = 1:length(paths)
-    traversal = fcn_Path_convertXYtoTraversalStructure(paths{i_traveral}(:,1),paths{i_traveral}(:,2));
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_traveral});
     data.traversal{i_traveral} = traversal;
 end
 

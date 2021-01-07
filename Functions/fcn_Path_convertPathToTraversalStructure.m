@@ -25,7 +25,6 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 %            - Yaw: the calculated yaw angle (radians) of each path segment
 %            (note: there are N-1 segments if there are N points, thus
 %            there are N-1 Yaw points)
-%            (thus - it is front-padded with NaN)
 %
 %      (OPTIONAL INPUTS)
 %
@@ -50,6 +49,8 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 %     2021_01_07
 %     -- changed input to path type, not X, Y separately
 %     -- cleaned up comments
+%     -- fixed error in comment about Yaw being front-padded. It is an
+%     (N-1) x 1 vector now, not N x 1
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % Flag to plot the final results

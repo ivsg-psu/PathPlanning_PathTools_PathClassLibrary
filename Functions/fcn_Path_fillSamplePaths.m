@@ -13,8 +13,7 @@ function paths = fcn_Path_fillSamplePaths
 %
 % OUTPUTS:
 %
-%      X: an N x 1 vector of X positions
-%      Y: an N x 1 vector of Y positions
+%      paths: an class vector of paths
 %
 %
 % EXAMPLES:
@@ -31,6 +30,7 @@ function paths = fcn_Path_fillSamplePaths
 %      -- wrote the code
 %      2021_01_07 
 %      -- minor updates to comments
+%      -- fixed errors in the header definition example
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

@@ -1,8 +1,8 @@
 TO_DO List
 
 FINISH input argument checking functions
-script_main_laneChange.m - clean this up
-create function from switch-back subfunction within path averaging
+script_main_laneChange.m - clean this up by taking Guangwei's functions and adding them into these functions too
+create function from switch-back subfunction within path averaging function, pull out that function
 
 LATER:
 Weighted averaging of paths (so we can add paths collected later)
