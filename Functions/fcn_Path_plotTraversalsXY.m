@@ -33,7 +33,7 @@ function h = fcn_Path_plotTraversalsXY(traversals,varargin)
 %     2021_01_06
 %     -- added functions for input checking
 %     2021_01_07
-%     -- renamed function to show that traversals being used, not path
+%     -- renamed function to show that traversals being used, not paths
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

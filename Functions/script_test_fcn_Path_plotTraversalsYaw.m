@@ -8,7 +8,7 @@
 %      -- a bit more comments, renamed function to be traversals, not path
 %      2021_01_07
 %      -- fixed typos in arguments for function calls, based on recent
-%      edits
+%      edits 
 
 clc
 close all

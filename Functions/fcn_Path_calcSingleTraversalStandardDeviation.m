@@ -3,7 +3,9 @@ function std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference
 % calculates the standard deviation in the offsets of a single traversal by
 % analyzing the variance in angles along a reference_traversal, then
 % multiplying these by the average segment length in the reference
-% traversal
+% traversal. The resulting standard deviation approximates the
+% variance in lateral offset that occurs at the end of each segment, versus
+% a line projected from the previous segment.
 %
 % FORMAT:
 %
@@ -28,9 +30,9 @@ function std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_findClosestPointsFromPath
-%      fcn_Path_findTraversalWithMostData
-%      fcn_Path_plotPathXY
+%      fcn_Path_checkInputsToFunctions
+%      fcn_Path_calcDiffAnglesBetweenPathSegments
+%      fcn_Path_plotTraversalXYWithVarianceBands
 %
 % EXAMPLES:
 %
@@ -46,7 +48,7 @@ function std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference
 %     2021_01_06:
 %     -- added functions for input checking
 %     2021_01_07:
-%     -- fixed typos in comments
+%     -- fixed typos in comments, and in header
 
 
 flag_do_debug = 0; % Flag to show the results for debugging
@@ -145,7 +147,7 @@ std_deviation = std_angles*mean_segment_length;
 if flag_do_plots
        
     % Plot the results
-    fcn_Path_plotPathXYWithVarianceBands(reference_traversal,...
+    fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
     std_deviation,fig_num);
     title(sprintf('Standard deviation found to be: %.2f',std_deviation));
     xlabel('X [m]');

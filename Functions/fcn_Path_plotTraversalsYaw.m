@@ -35,7 +35,7 @@ function h = fcn_Path_plotTraversalsYaw(data,varargin)
 %      -- renamed function for traversals
 %      -- fixed error in yaw plotting (yaw is shorter than station!)
 %      2021_01_07
-%      -- fixed error in yaw plotting
+%      -- fixed error in yaw plotting 
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

@@ -4,7 +4,7 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 % in the path, there are N-1 segments and thus N-2 angles between segments.
 %
 % Note that this method uses the dot product and the cross product to avoid
-% errors caused by angle rollover.
+% errors caused by angle rollover that occur with arctan calculations.
 %
 % FORMAT: 
 %
@@ -15,6 +15,7 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 %      Path: an N x 2 vector with [X Y] data in each row. N must be >= 3.
 %
 %      (OPTIONAL INPUTS)
+%
 %      fig_num: a figure number to plot results.
 %
 % OUTPUTS:
@@ -36,7 +37,7 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 %     2021_01_06
 %     -- fixed typos in the comments
 %     2021_01_07
-%     -- fixed typos in the comments
+%     -- fixed typos in the comments, minor header clean-ups
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

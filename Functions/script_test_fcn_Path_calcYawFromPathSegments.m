@@ -6,6 +6,7 @@
 %      -- first write of the code
 %      2021_01_07
 %      -- updated function calls to reflect paths vs traversals
+%      -- minor comment clean-ups
 
 close all
 clc
@@ -14,13 +15,13 @@ clc
 clear all_traversals
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
+paths_array = fcn_Path_fillSamplePaths;
 
 % Pick first path as reference_traversal structure
-path_to_check = paths{1};
+path_to_check = paths_array{1};
 
 % Pick first path as reference_traversal structure
-traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths{1});
+traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 all_traversals.traversal{1} = traversal_to_check;
 
 
@@ -32,21 +33,21 @@ if 1==1
     fcn_Path_plotTraversalsXY(all_traversals,fig_num);
 end
 
-%% Test case 1: basic call with one path
+%% Test case 1: Basic call with one path
 fig_num = 1;
-yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num);
+yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num); %#ok<*NASGU>
 
 
 %% Test case 2: Multiple paths
 close all;
 clc
 
-for i_path = 1:length(paths)
+for i_path = 1:length(paths_array)
     % Pick first path as reference_traversal structure
-    path_to_check = paths{i_path};
+    path_to_check = paths_array{i_path};
     
     % Pick first path as reference_traversal structure
-    traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths{i_path});
+    traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths_array{i_path});
     all_traversals.traversal{i_path} = traversal_to_check;
     
     fig_num = 2222;

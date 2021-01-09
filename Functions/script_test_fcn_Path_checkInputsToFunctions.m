@@ -6,8 +6,136 @@
 %      -- first write of the code
 %      2021_01_07:
 %      -- denoted sections with figlets
-%      -- created 'path' and 'paths' checks
+%      -- created 'path' and 'paths' variable types
+%      2021_01_09
+%      -- separated out the pass and fail conditions
 
+%% Station
+%    _____ _        _   _             
+%   / ____| |      | | (_)            
+%  | (___ | |_ __ _| |_ _  ___  _ __  
+%   \___ \| __/ _` | __| |/ _ \| '_ \ 
+%   ____) | || (_| | |_| | (_) | | | |
+%  |_____/ \__\__,_|\__|_|\___/|_| |_|
+%                                     
+                                    
+
+%% Test the station type (success)
+station_test = 4;
+fcn_Path_checkInputsToFunctions(station_test, 'station');
+
+
+
+%% Stations
+% 
+%    _____ _        _   _                 
+%   / ____| |      | | (_)                
+%  | (___ | |_ __ _| |_ _  ___  _ __  ___ 
+%   \___ \| __/ _` | __| |/ _ \| '_ \/ __|
+%   ____) | || (_| | |_| | (_) | | | \__ \
+%  |_____/ \__\__,_|\__|_|\___/|_| |_|___/
+%                                         
+%                                         
+
+
+%% Test the stations type (success)
+station_test = [4; 2];
+fcn_Path_checkInputsToFunctions(station_test, 'stations');
+
+
+
+%% Path
+% 
+%   _____      _   _     
+%  |  __ \    | | | |    
+%  | |__) |_ _| |_| |__  
+%  |  ___/ _` | __| '_ \ 
+%  | |  | (_| | |_| | | |
+%  |_|   \__,_|\__|_| |_|
+%                        
+%                        
+
+
+%% Test the path type (success)
+clc;
+path_test = [4 1; 2 1];
+fcn_Path_checkInputsToFunctions(path_test, 'path');
+
+
+
+%% Paths
+% 
+%   _____      _   _         
+%  |  __ \    | | | |        
+%  | |__) |_ _| |_| |__  ___ 
+%  |  ___/ _` | __| '_ \/ __|
+%  | |  | (_| | |_| | | \__ \
+%  |_|   \__,_|\__|_| |_|___/
+%                            
+%                            
+
+
+%% Test the paths type (success)
+clc;
+paths_test = [4 1; 2 1; 3 2];
+fcn_Path_checkInputsToFunctions(paths_test, 'paths');
+
+
+
+%% Traversal
+% 
+%   _______                                 _ 
+%  |__   __|                               | |
+%     | |_ __ __ ___   _____ _ __ ___  __ _| |
+%     | | '__/ _` \ \ / / _ \ '__/ __|/ _` | |
+%     | | | | (_| |\ V /  __/ |  \__ \ (_| | |
+%     |_|_|  \__,_| \_/ \___|_|  |___/\__,_|_|
+%                                             
+%                                             
+
+
+%% Test the traversal type (success)
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    test_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    all_traversals.traversal{i_Path} = test_traversal;
+end
+fcn_Path_checkInputsToFunctions(test_traversal, 'traversal');
+
+
+
+%% Traversals
+% 
+%   _______                                 _     
+%  |__   __|                               | |    
+%     | |_ __ __ ___   _____ _ __ ___  __ _| |___ 
+%     | | '__/ _` \ \ / / _ \ '__/ __|/ _` | / __|
+%     | | | | (_| |\ V /  __/ |  \__ \ (_| | \__ \
+%     |_|_|  \__,_| \_/ \___|_|  |___/\__,_|_|___/
+%                                                 
+%                                                 
+
+%% Test the traversals type (success)
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    test_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    test_traversals.traversal{i_Path} = test_traversal;
+end
+clc;
+fcn_Path_checkInputsToFunctions(test_traversals, 'traversals');
+
+
+
+
+
+%% Fail conditions
+ if 1==0
 %% Station
 %    _____ _        _   _             
 %   / ____| |      | | (_)            
@@ -219,3 +347,4 @@ test_traversals_bad.traversal{2} = test_traversal_bad;
 fcn_Path_checkInputsToFunctions(test_traversals_bad, 'traversals');
 
 
+ end

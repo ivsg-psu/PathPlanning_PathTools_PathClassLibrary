@@ -1,10 +1,13 @@
 function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal, varargin)
 % fcn_Path_fillRandomTraversalsAboutTraversal
 % fills in random traversals about a reference traversal. Points are
-% generated via orthogonal projection using normal random distribution with
-% either a default variance or user-defined variance. The station points
-% can also be user-specified as randomly distributed uniformly. The first
-% and last stations are forced to be the same as the reference_traversal.
+% generated via orthogonal projection using random normal distribution with
+% either a default variance or optional user-defined variance. The station
+% points can also be user-specified as randomly distributed uniformly, or
+% default to the station points in the reference_traversal if no optional
+% inputs are given. The first and last stations are forced to be the same
+% as the reference_traversal to prevent the route from randomly becoming
+% shorter with repeated calls to this function.
 %
 % FORMAT:
 %
@@ -65,9 +68,11 @@ function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(referen
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_findClosestPointsFromPath
-%      fcn_Path_findTraversalWithMostData
-%      fcn_Path_plotPathXY
+%      fcn_Path_checkInputsToFunctions
+%      fcn_Path_calcSingleTraversalStandardDeviation
+%      fcn_Path_findOrthogonalTraversalVectorsAtStations
+%      fcn_Path_convertPathToTraversalStructure
+%      fcn_Path_plotTraversalsXY
 %
 % EXAMPLES:
 %
@@ -83,6 +88,9 @@ function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(referen
 %     2021_01_07
 %     -- added functionalized input checking
 %     -- fixed typos in comments, plotting at end
+%     2021_01_09
+%     -- fixed function calls that were misnamed due to class edits
+%     -- updated dependencies
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % % Flag to plot the final results
@@ -222,8 +230,9 @@ end
 % Define useful variables used in several sections below
 maxStation = Station_reference(end);
     
-%% Fill in the array of stations.
+%% Fill in the array of reference station points
 % Each column corresponds to one trajectory.
+
 if flag_generate_random_stations
     % Randomize the station reference points
     reference_station_points = maxStation*rand(num_points,num_trajectories);
@@ -302,7 +311,7 @@ for ith_trajectory =1:num_trajectories
     
     % Find the unit normal vectors at each of the station points
     [unit_normal_vector_start, unit_normal_vector_end] = ...
-        fcn_Path_FindOrthogonalPathVectorsAtStations(...
+        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
         reference_station_points(:,ith_trajectory),reference_traversal,flag_rounding_type);
     unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
     

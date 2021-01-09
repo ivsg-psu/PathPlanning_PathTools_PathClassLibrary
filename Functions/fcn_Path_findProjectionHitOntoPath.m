@@ -51,15 +51,17 @@ function [distance,location] = fcn_Path_findProjectionHitOntoPath(path,sensor_ve
 % Questions or comments? sbrennan@psu.edu 
 
 % Revision history:
-%     2020_11_14 
-%     - wrote the code
-%     2020_12_29 
-%     - fixed bug with missing sensor vector if starts on a path
-%     - added better comments
-%     2020_12_31 
-%     - fixed the input arguments so that they are more clear (start/end)
-%     - fixed the incorrect location of the debug echo at top of the code
-%     - fixed flag usage to decouple plotting with debugging
+%      2020_11_14 
+%      - wrote the code
+%      2020_12_29 
+%      - fixed bug with missing sensor vector if starts on a path
+%      - added better comments
+%      2020_12_31 
+%      - fixed the input arguments so that they are more clear (start/end)
+%      - fixed the incorrect location of the debug echo at top of the code
+%      - fixed flag usage to decouple plotting with debugging
+%      2021_01_08 
+%      -- Added input check on path type
  
 
 %% Set up for debugging
@@ -93,6 +95,8 @@ if flag_check_inputs == 1
         error('Incorrect number of input arguments.')
     end
     
+    % Check path input
+    fcn_Path_checkInputsToFunctions(path, 'path');    
 end
 
 if 4 <= nargin

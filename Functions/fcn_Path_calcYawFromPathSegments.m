@@ -48,6 +48,8 @@ function yaw_angles_in_radians = fcn_Path_calcYawFromPathSegments(Path,varargin)
 % Revision history:
 %     2021_01_06
 %       -- wrote the code
+%     2021_01_06
+%       -- minor comment clean-ups
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

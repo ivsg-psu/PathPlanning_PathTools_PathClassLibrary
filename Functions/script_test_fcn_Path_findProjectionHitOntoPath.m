@@ -1,11 +1,18 @@
 % script_test_fcn_Path_findProjectionHitOntoPath
 % This is a script to exercise the function: fcn_Path_findProjectionHitOntoPath.m
 % This function was written on 2020_11_10 by S. Brennan
-%     Modification history:
-%     2020_12_31
-%     - updated for new argument list
 % Questions or comments? sbrennan@psu.edu
+
+% Modification history:
+%      2020_12_31
+%      -- updated for new argument list
+%      2021_01_08
+%      -- updated comments
+%     2020_01_09
+%     -- added more comments during clean-up
+
 clc
+close all
 
 %% Simple test 1 - a simple intersection
 fprintf(1,'Simple intersection result: \n');

@@ -30,6 +30,12 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 %
 %      fig_num: a figure number to plot results.
 %
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
+%      fcn_Path_calcYawFromPathSegments
+%      fcn_Path_plotTraversalsXY
+%
 % EXAMPLES:
 %      
 %       See the script:
@@ -50,7 +56,7 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 %     -- changed input to path type, not X, Y separately
 %     -- cleaned up comments
 %     -- fixed error in comment about Yaw being front-padded. It is an
-%     (N-1) x 1 vector now, not N x 1
+%     (N-1) x 1 vector now, not N x 1. 
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % Flag to plot the final results
@@ -110,7 +116,7 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Fill in the fields
+% Fill in the fields typically required on a traversal
 traversal.X = path(:,1);
 traversal.Y = path(:,2);
 traversal.Z = 0*path(:,1);
@@ -136,6 +142,8 @@ if flag_do_plots
     figure(fig_num); 
     data.traversal{1} = traversal;
     fcn_Path_plotTraversalsXY(data,fig_num);
+    xlabel('X [m]');
+    ylabel('Y [m]');
     
     
     % Plot the yaw plot

@@ -6,7 +6,8 @@
 %      -- first write of the code
 %      2021_01_07
 %      -- cleared up function calls for traversals vs paths
-
+%      2021_01_09
+%      -- cleared up a few function names in the script
 close all
 clc
 
@@ -14,10 +15,10 @@ clc
 clear all_traversals
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
+paths_array = fcn_Path_fillSamplePaths;
 
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 all_traversals.traversal{1} = reference_traversal;
 
 

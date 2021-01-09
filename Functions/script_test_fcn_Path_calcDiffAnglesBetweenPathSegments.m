@@ -2,8 +2,10 @@
 % Tests fcn_Path_calcDiffAnglesBetweenPathSegments
        
 % Revision history:
-% 2021_01_03
-% -- first write of the code
+%      2021_01_03
+%      -- first write of the code
+%      2021_01_07
+%      -- fixed typos in the comments, minor header clean-ups
 
 close all
 clc
@@ -12,13 +14,13 @@ clc
 clear all_traversals
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
+paths_array = fcn_Path_fillSamplePaths;
 
 % Pick first path as reference_traversal structure
-paths_to_check = paths{1};
+paths_to_check = paths_array{1};
 
 % Pick first path as reference_traversal structure
-traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths{1});
+traversal_to_check = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 all_traversals.traversal{1} = traversal_to_check;
 
 

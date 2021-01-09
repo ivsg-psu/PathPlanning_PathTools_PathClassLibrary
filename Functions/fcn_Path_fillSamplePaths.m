@@ -1,11 +1,11 @@
-function paths = fcn_Path_fillSamplePaths
+function paths_array = fcn_Path_fillSamplePaths
 % fcn_Path_fillSamplePaths
 % Produces dummy sample paths. Note: can go into the function and change
 % flag to allow user-selected paths.
 %
 % FORMAT:
 %
-%       paths = fcn_Path_fillSamplePaths
+%       paths_array = fcn_Path_fillSamplePaths
 %
 % INPUTS:
 %
@@ -13,7 +13,7 @@ function paths = fcn_Path_fillSamplePaths
 %
 % OUTPUTS:
 %
-%      paths: an class vector of paths
+%      paths_array: an cell array of paths
 %
 %
 % EXAMPLES:
@@ -83,9 +83,9 @@ if 1==flag_grab_user_inputs
     
     % Get a set of starting points
     [X1,Y1] = ginput;
-    paths{1} = [X1 Y1];
+    paths_array{1} = [X1 Y1];
 else
-    paths{1} = [
+    paths_array{1} = [
         8.1797    8.6006
         8.4101   15.8892
         10.0230   25.5102
@@ -151,9 +151,9 @@ if 1==flag_grab_user_inputs
 
     % Show prior results
     clf; hold on;
-    for i_Path = 1:length(paths)
-        plot(paths{i_Path}(:,1),paths{i_Path}(:,2),'-');
-        text(paths{i_Path}(1,1),paths{i_Path}(1,2),'Start');
+    for i_Path = 1:length(paths_array)
+        plot(paths_array{i_Path}(:,1),paths_array{i_Path}(:,2),'-');
+        text(paths_array{i_Path}(1,1),paths_array{i_Path}(1,2),'Start');
     end
     
     axis([0 100 0 100]);
@@ -161,9 +161,9 @@ if 1==flag_grab_user_inputs
     % Get a set of starting points
     [X2,Y2] = ginput;
     plot(X2,Y2)
-    paths{2} = [X2 Y2];
+    paths_array{2} = [X2 Y2];
 else
-    paths{2} = [
+    paths_array{2} = [
         9.1014    9.7668
         8.6406   17.0554
         8.6406   26.0933
@@ -233,9 +233,9 @@ if 1==flag_grab_user_inputs
 
     % Show prior results
     clf; hold on;
-    for i_Path = 1:length(paths)
-        plot(paths{i_Path}(:,1),paths{i_Path}(:,2),'-');
-        text(paths{i_Path}(1,1),paths{i_Path}(1,2),'Start');
+    for i_Path = 1:length(paths_array)
+        plot(paths_array{i_Path}(:,1),paths_array{i_Path}(:,2),'-');
+        text(paths_array{i_Path}(1,1),paths_array{i_Path}(1,2),'Start');
     end
    
     axis([0 100 0 100]);
@@ -244,9 +244,9 @@ if 1==flag_grab_user_inputs
     % Get a set of starting points
     [X3,Y3] = ginput;
     plot(X3,Y3)
-    paths{3} = [X3 Y3];
+    paths_array{3} = [X3 Y3];
 else
-    paths{3} = [
+    paths_array{3} = [
         9.7926   10.6414
         9.7926   15.8892
         9.5622   19.0962
@@ -388,9 +388,9 @@ if flag_do_debug
     grid minor;
     
     % Show result
-    for i_Path = 1:length(paths)
-        plot(paths{i_Path}(:,1),paths{i_Path}(:,2),'-');
-        text(paths{i_Path}(1,1),paths{i_Path}(1,2),'Start');
+    for i_Path = 1:length(paths_array)
+        plot(paths_array{i_Path}(:,1),paths_array{i_Path}(:,2),'-');
+        text(paths_array{i_Path}(1,1),paths_array{i_Path}(1,2),'Start');
     end
 
 end

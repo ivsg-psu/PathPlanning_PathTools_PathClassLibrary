@@ -8,7 +8,7 @@
 %      -- code clean-up to remove unneeded yaw function
 %     2021_01_07
 %     -- renamed function to show that traversals being used, not path
-%     -- fixed small typo in function name
+%     -- fixed small typo in function name 
 
 close all
 clc

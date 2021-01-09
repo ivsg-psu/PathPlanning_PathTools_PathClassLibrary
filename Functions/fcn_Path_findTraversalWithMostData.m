@@ -62,12 +62,8 @@ if flag_check_inputs == 1
         error('Incorrect number of input arguments')
     end
     
-    % Check the traversal type
-    try
-        testX = data.traversal{1}.X; %#ok<NASGU>
-    catch
-        error('X subfield not found within first traversal field');
-    end
+    % Check the data input
+    fcn_Path_checkInputsToFunctions(data, 'traversals');
 
 end
 

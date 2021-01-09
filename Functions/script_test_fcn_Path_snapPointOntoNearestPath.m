@@ -1,19 +1,33 @@
 % script_test_fcn_Path_snapPointOntoNearestPath.m
 % This is a script to exercise the function: fcn_Path_snapPointOntoNearestPath.m
-% This function was written on 2020_10_10 by S. Brennan
-%     Modified on 2020_11_12 to prep for Path class
-% Questions or comments? sbrennan@psu.edu 
+% This function was written on 2020_10_10 by S. Brennan, sbrennan@psu.edu
+
+% Revision history:
+%     2020_10_10 
+%     -- first write of the code
+%     2020_11_10 
+%     -- changed function names in prep for DataClean class
+%     2020_12_03 
+%     -- updated some of the plotting/debug details to improve
+%     2020_11_12 
+%     -- modified to prep for Path class
+%     2021_01_08 
+%     -- cleaned up comments
+%     -- added argument checking
+%     -- cleaned up notation to show path vs pathSXY
+%     2021_01_09
+%     -- completely converted code to path form, not pathSXY
+
 
 close all;
 
 %% BASIC example 1
 point = [0.5 0.2];
 pathXY = [0 0; 1 0; 2 0; 2 1];
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 111;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -22,14 +36,13 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 1.2 - works
 point = [1.4 1.3]; % Define the query point
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2)); % Convert to SXY path
 fignum = 112; % Define the figure number
 
 % Snap the point onto the path
 [closest_path_point,s_coordinate,...
     first_path_point_index,second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',fignum);
@@ -45,7 +58,6 @@ fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 %% BASIC example 1.3 - breaks
 point = [1.5 1];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 113;
 
@@ -53,7 +65,7 @@ fignum = 113;
 [closest_path_point,s_coordinate,...
     first_path_point_index,second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',fignum);
@@ -69,7 +81,6 @@ fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 %% BASIC example 1.4 - breaks and shows that it is on neither segement
 point = [0.9 1.4]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 114;
 
@@ -77,7 +88,7 @@ fignum = 114;
 [closest_path_point,s_coordinate,...
     first_path_point_index,second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',fignum);
@@ -92,7 +103,6 @@ fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 %% BASIC example 1.5 - works, but is on BOTH segments
 point = [1 0.5]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 115;
 
@@ -100,7 +110,7 @@ fignum = 115;
 [closest_path_point,s_coordinate,...
     first_path_point_index,second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',fignum);
@@ -115,7 +125,6 @@ fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 %% BASIC example 2 - negative s-coords (before path starts)
 point = [-0.5 0.2];
 pathXY = [0 0; 1 0; 2 0; 2 1];
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 222;
 % [closest_path_point,s_coordinate] = ...
@@ -123,7 +132,7 @@ fignum = 222;
 % fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -133,7 +142,6 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 3 - positive s-coords (after path ends)
 point = [4 0.2];
 pathXY = [0 0; 1 0; 2 0];
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 333;
 % [closest_path_point,s_coordinate] = ...
@@ -141,7 +149,7 @@ fignum = 333;
 % fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -150,7 +158,6 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 4 - an example of percentage along segment greater than 100% even though "inside" path
 point = [0.8 1.3];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-pathSXY = fcn_Path_convertXYtoSXY(pathXY(:,1),pathXY(:,2));
 
 fignum = 444;
 % [closest_path_point,s_coordinate] = ...
@@ -158,7 +165,7 @@ fignum = 444;
 % fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -224,11 +231,6 @@ path1 = [
     5.1843   86.7347
     4.2627   88.4840
     3.8018   89.0671];
-X1 = path1(:,1);
-Y1 = path1(:,2);
-path1_dist = sum(diff(path1).^2,2).^0.5;
-path1_S = [0; cumsum(path1_dist)];
-pathSXY1 = [path1_S path1];
 
 figure(111); plot(path1(:,1),path1(:,2),'r-o');
 text(path1(1,1),path1(1,2),'Start');
@@ -237,7 +239,7 @@ text(path1(1,1),path1(1,2),'Start');
 fignum = 2222;
 point = [75 45];
 [closest_path_point,s_coordinate] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathSXY1,fignum);
+    fcn_Path_snapPointOntoNearestPath(point, path1,fignum);
 fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 
 
@@ -253,13 +255,10 @@ for i_test = 1:Ntests
     
     pathXY = [cumsum(rand_x),cumsum(rand_y)];
     point = mean(pathXY,1);
-    distances = sum(diff(pathXY).^2,2).^0.5;
-    path_s = [0; cumsum(distances)];
     
-    path = [path_s pathXY];
     fignum = i_test;
     [closest_path_point,s_coordinate] = ...
-        fcn_Path_snapPointOntoNearestPath(point, path,fignum);
+        fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
     fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 end
 
