@@ -1,6 +1,3 @@
-% Authors: Dr. Brennan, Guangwei, Liming
-% Revision history
-
 %%
 % This main script is used to test the DataClean functions. It was
 % originally written to process and plot the mapping van DGPS data
@@ -54,7 +51,8 @@
 %  2021_01_07 
 %       -- started new DataClean class funtionality, code works now ONLY
 %       for mapping van data 
-
+%  2021_01_08
+%       -- create a function to query data from database or load from file
 
 % Known issues:
 %  (as of 2019_10_04) - Odometry on the rear encoders is quite wonky. For
@@ -93,7 +91,7 @@
 
 %% TO_DO LIST
 % *) Integrate the updated database query as a stand-alone function, to clean
-% up large amount of code at top of this script
+% up large amount of code at top of this script(Done by Liming, 2021-01-10)
 %
 % *) Add geoplot capability to results so that we can see XY plots on the map
 % automatically
@@ -121,10 +119,8 @@ clear all %#ok<CLALL>
 
 % Make sure we can see the utilities folder 
 addpath '../Utilities';
-
-
-% Add driver for database
-%javaaddpath('C:\Users\Guangwei Zhou\AppData\Roaming\MathWorks\MATLAB\R2020a\drivers\postgresql-42.2.9.jar')
+addpath '../data'; % add the data path
+addpath('./fcn_DataClean_loadRawData/'); % all the functions and wrapper class
 
 %% ======================= Load the raw data=========================
 % This data will have outliers, be unevenly sampled, have multiple and
@@ -132,102 +128,35 @@ addpath '../Utilities';
 % raw data. It can be loaded either from a database or a file - details are
 % in the function below.
 
-flag.DBquery = false; %set to true if you want to query raw data from database insteading of loading from default *.mat file
+flag.DBquery = true; %set to true if you want to query raw data from database insteading of loading from default *.mat file
 try
     fprintf('Starting the code using variable rawData of length: %d\n', length(rawData));
 catch
-    if flag.DBquery == true
-        
-        %---- Step1 :CONNECT TO  DATABASE ------------------------ %
-        % choose different database name to connect to them
-        database_name = 'mapping_van_raw';
-        
-        % Connect raw data database
-        MDB = MapDatabase(database_name); % instance of MapDatabase Class
-        % MDB.db.db_connection % show connection details
-        
-        % show all tables schema in the database
-        tables = MDB.db.ShowTables();
-        
-        %---- Step2 :show all trips and pick the ones you want to query --------- %
-        
-        % query parameters
-        MDB.zero_time = 0;  % offset the timestamps starting from zero
-        MDB.verbose = 1;  % show the code processing details
-        MDB.convert_GPS_to_ENU = 1; % you can choose the reference point by assign value to options.ENU_ref 
-        MDB.separate_by_lap = 0; % default is 0
-        
-        % check all the trips
-        trips = MDB.fetchTrips();
-        
-        % ----> pick trips you want to query(choose from trips table manually)
-        % trip_names = {'Test Track Decision Points with Lane Change MappingVan 2020-03-13','Test Track MappingVan 2019-10-19'};
-        trip_names = {'Test Track Decision Points with Lane Change MappingVan 2020-03-13'};
-       
-        prompt = ['Are you going to query the data of trip : \n' trip_names '\n?[y/n]'];
-        User_input = input(strjoin(prompt),'s'); 
-        
-        if strcmpi(User_input,'y')
-            fprintf(1,'Thanks. Let''s query it...\n');
-        else
-            fprintf(1,'Query is aborted. \nYou can Re-pick the trips name.\n');
-            return
-        end
-        
-        %---- Step3 :query data by trips ------------------------ %
-        % quey trips id according to the trip name
-        trip_id = [];
-        for i = 1:length(trip_names)
-            trip_id = cat(1,trip_id,trips.id(strcmp(trips.name, trip_names(i))));
-        end
-        
-        % Pick sensors you want to query. 1 means query data from that sensor
-        options = {};
-        options.sensors.base_station = 1;  % default is 1
-        options.sensors.hemisphere_gps = 1; % default is 1
-        options.sensors.NovAtel_gps = 1; % default is 1
-        options.sensors.garmin_gps = 1; % default is 1
-        options.sensors.garmin_velocity = 1; % default is 0
-        options.sensors.steering_angle =1; % default is 1
-        options.sensors.NovAtel_imu = 1;% default is 1
-        options.sensors.adis_imu = 1;% default is 1
-        options.sensors.encoder_left_right = 1;% default is 1
-        options.sensors.laser = 0; % default is 0
-        options.sensors.front_left_camera = 0; % default is 0
-        options.sensors.front_right_camera = 0; % default is 0
-        options.sensors.front_center_camera = 0; % default is 0
-        options.ENU_ref = 0; % 0 use default setting in database, 1 test track, 2 LTI, Larson  Transportation Institute
-        
-        % fetchByTripID
-        result = MDB.fetchByTripID(trip_id,options);
-        % disconnect with DB
-        MDB.disconnect();
-        %---- Step4 :pre process the data ------------------------ %
-        % Notes: need Guangwei's help
-        rawData = fcn_preProcessQueryResult(result);
+    
+    if flag.DBquery == true     
+%       database_name = 'mapping_van_raw';
+%       queryCondition = 'trip'; % raw data can be queried by 'trip', 'date', or 'driver'
+        rawData = fcn_DataClean_queryRawData(flag.DBquery,'mapping_van_raw','trip'); % more query condition can be set in the function 
         
     else
-        % add the data path
-        addpath '../Data';
+        % Load the raw data from file
+        % test one
+        %filename  = 'MappingVan_DecisionMaking_03132020.mat';
+        %variable_names = 'MappingVan_DecisionMaking_03132020';
+        % test two
+        filename  = 'Route_Wahba.mat';
+        variable_names = 'Route_WahbaLoop';
         
-        
-        % Load the raw data
-        % This data will have outliers, be unevenly sampled, have multiple
-        % and inconsistent measurements of the same variable.
-        filename  = 'MappingVan_DecisionMaking_03132020.mat';
-        variable_names = 'MappingVan_DecisionMaking_03132020';
-        rawData = fcn_DataClean_loadRawData(filename,variable_names);
+        rawData = fcn_DataClean_queryRawData(flag.DBquery,filename,variable_names); % more query condition can be set in the function 
 
     end
-    
 end
 
+%% ======================= Raw Data Clean and Merge =========================
 
 rawDataTimeFixed = fcn_DataClean_removeTimeGapsFromRawData(rawData);
 %fcn_DataClean_searchAllFieldsForNaN(rawDataTimeFixed)
 
-
-% Data clean and merge
 % Fill in the sigma values for key fields. This just calculates the sigma
 % values for key fields (velocities, accelerations, angular rates in
 % particular), useful for doing outlier detection, etc. in steps that
@@ -391,9 +320,9 @@ plottingFlags.flag_plot_Garmin = 0;
 
 % Define which sensors to plot individually
 plottingFlags.SensorsToPlotIndividually = [...
-    %    {'GPS_Hemisphere'}...
-        {'GPS_Novatel'}...
-    %    {'MergedGPS'}...
+        {'GPS_Hemisphere'}...
+    %    {'GPS_Novatel'}...
+        {'MergedGPS'}...
     %    {'VelocityProjectedByYaw'}...
     %     {'GPS_Garmin'}...
     %     {'IMU_Novatel'}...
@@ -449,7 +378,7 @@ fcn_DataClean_plotStructureData(rawData,plottingFlags);
 %fcn_DataClean_plotStructureData(timeFilteredData,plottingFlags);
 %fcn_DataClean_plotStructureData(mergedData,plottingFlags);
 %fcn_DataClean_plotStructureData(mergedDataNoJumps,plottingFlags);
-%fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
+fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 
 % The following function allows similar plots, made when there are repeated
 % uncommented versions above, to all scroll/zoom in unison.
