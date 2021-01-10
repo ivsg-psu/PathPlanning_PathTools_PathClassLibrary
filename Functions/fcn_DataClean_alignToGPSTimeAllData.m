@@ -202,6 +202,11 @@ elseif (target_ROS_Npoints == (target_GPS_Npoints-3))
     % inward on both ends
     cleanAndTimeAlignedData.Clocks.startTimeGPS   = cleanAndTimeAlignedData.Clocks.startTimeGPS + max_decimation;
     cleanAndTimeAlignedData.Clocks.endTimeGPS   = cleanAndTimeAlignedData.Clocks.endTimeGPS - 2*max_decimation;
+elseif (target_ROS_Npoints == (target_GPS_Npoints-4))
+    % Case 6: there are 4 more GPS points than ROS points - nudge GPS points
+    % inward on both ends
+    cleanAndTimeAlignedData.Clocks.startTimeGPS   = cleanAndTimeAlignedData.Clocks.startTimeGPS + 2*max_decimation;
+    cleanAndTimeAlignedData.Clocks.endTimeGPS   = cleanAndTimeAlignedData.Clocks.endTimeGPS - 2*max_decimation;
 else
     error('Time vectors do not align sufficiently between ROS and GPS time. Unable to continue');
 end
