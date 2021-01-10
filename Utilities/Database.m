@@ -8,6 +8,8 @@
 %======== to do list ============
 % 1. figure out the usage of default vlues of properties (done, 04/16/2020)
 % 2. for bulk insert, extend the values from numeric matrix to cell
+% 3. finish function bulkInsertByFile
+% 
 
 classdef Database < handle
     
@@ -16,8 +18,8 @@ classdef Database < handle
         database_name
         ip_address = '130.203.223.234' %  'localhost'; %Ip address of server host 
         port = 5432;  % port number 
-        username = 'brennan'   % user name for the server
-        password = 'password' % password
+        username = 'ivsg_db_user'   % user name for the server
+        password = 'ivsg@DB320' % password
         
         db_connection  % database connection, this is assigned in  constructor function 
         
@@ -318,6 +320,45 @@ classdef Database < handle
             close(curs);
             
         end
+        
+        function bulkInsertByFile(obj, table, fields, values)
+            
+            % Export Data Using Bulk Insert,https://www.mathworks.com/help/database/ug/export-data-using-bulk-insert.html
+            
+            % insert into MYsql
+            A = {100000.00,'KGreen','06/22/2011','Challengers'};
+            A = A(ones(10000,1),:);
+            
+            A = values;
+            
+            fid = fopen('tmp.txt','wt');
+            for i = 1:size(A,1)
+                fprintf(fid,'%10.2f \t %s \t %s \t %s \n', ...
+                    A{i,1},A{i,2},A{i,3},A{i,4});
+            end
+            fclose(fid);
+            
+            % Run the bulk insert functionality. The SQL statement uses the statement LOCAL INFILE for error handling. For details about this statement, consult the MySQL database documentation.
+            
+            execute(obj.db_connection,['LOAD DATA LOCAL INFILE ' ...
+                ' ''C:\\temp\\tmp.txt'' INTO TABLE ' table  '' ...
+                'FIELDS TERMINATED BY ''\t'' LINES TERMINATED ' ...
+                'BY ''\n'''])
+            
+            % Confirm the number of variables in BULKTEST.
+            
+            results = fetch(conn,'SELECT * FROM BULKTEST');
+            results.Properties.VariableNames
+            
+            % Slight change of plan I am now getting a matrix instead of text file. Sometimes the size of the matrix is large over 100K x 116. Here is my current logic.
+            % Steps 1 to 3 are done in in batches of 500 rows per iteration. I am still investigating the optimal way of doing this.
+            % 1) Convert the matrix into a string using sprintf.
+            % 2) strrep(matrix_to_string, 'NaN', 'NULL'); To replace NaN with Null
+            % 3). Write to a text file fprintf statement.
+            % 4) Read the text file and perform a Bulk Insert
+            
+        end
+        
         
         function updateGISColumn(obj, table)
            
