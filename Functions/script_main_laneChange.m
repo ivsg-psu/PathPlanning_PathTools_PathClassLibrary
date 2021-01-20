@@ -383,6 +383,10 @@ end
 yaw_error_diff = diff(yaw_error_lap_unwrapped);
 yaw_error_std = std(yaw_error_lap_unwrapped')';
 
+% Run a classifier on lane to force short segments to be ignored. The
+% repelem function counts how many replecations of a designation occur in a
+% sequence. We require 100 data points or more in order for a segment to be
+% classified as 1 lane or 2 lanes.
 
 is_one_lane = yaw_error_std < 1.2;
 d1 = [true; diff(is_one_lane) ~= 0; true]; % TRUE if values change
@@ -411,6 +415,7 @@ lane_classification = zeros(length(x_mean), 1); % Identify the road segment to b
 lane_classification(is_one_lane == 1) = 1;
 lane_classification(is_two_lane == 1) = 2;
 
+% Do the classifications here
 one_lane_area = find(lane_classification == 1);
 two_lane_area = find(lane_classification == 2);
 transition_area = find(lane_classification == 0);
@@ -423,7 +428,11 @@ two_lane_end = [];
 transition_start = [];
 transition_end = [];
 
+% Store the classification into vectors, storing the "start" locations for
+% one-lane, the "end" locations for one lane, etc.
+
 for i = 1:length(lane_classification)
+    % Store the start locations
     if i == 1 || lane_classification(i) ~= lane_classification(i-1)
         if lane_classification(i) == 1
             one_lane_start = [one_lane_start; i];
@@ -434,6 +443,8 @@ for i = 1:length(lane_classification)
         end
     end
     
+    
+    % Store the end locations
     if i == length(lane_classification) || lane_classification(i) ~= lane_classification(i+1)
         if lane_classification(i) == 1
             one_lane_end = [one_lane_end; i];
@@ -446,15 +457,17 @@ for i = 1:length(lane_classification)
 end
 
 
-%% Use Histogram Bincount to Determine Lane Positions
+%% Use Histogram Bincount to Determine Lane Positions (find the WIDTH of the lanes)
+% For 2-lane area, there will be two peaks for the 2 histograms in this
+% area. The peaks should correspond to the center of each lane.
 % Select the data in all_error that corresponds to 2 Lane area
+% The highest positive bin represents location of the right lane
+% The highest negative bin represents location of the left lane
 
 all_error_two_lane = error_lap(two_lane_start:two_lane_end, :);
 all_error_two_lane = all_error_two_lane(:); % convert to 1D array
 
-%The highest positive bin represents location of the right lane
-%The highest negative bin represents location of the left lane
-
+% Grab the histogram counts so that we can analyze the data
 [counts, edge] = histcounts(all_error_two_lane, 75); % length of edge is always 1 more than count, fix by finding center of bin
 
 % find the center location of each bin
