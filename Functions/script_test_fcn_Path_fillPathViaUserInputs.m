@@ -9,7 +9,9 @@
 %     -- First write of the code
 %     2021_01_11
 %     -- Modified to make the code reentrant for stand-alone operation
-
+%     2021_01_20
+%     -- Fixed minor error in character being used as a number, and missing
+%     argument on fprintf function
 
 close all;
 clc
@@ -26,8 +28,10 @@ if 1==0  % Intentionally comment this out so that doesn't autorun. Forces user t
     num_iterations = input('How many paths do you want to draw? [Hit enter for default of 3]:','s');
     if isempty(num_iterations)
         num_iterations = 3;
+    else
+        num_iterations = str2double(num_iterations);
     end
-    fprintf(1,'\n Filling in %.0d paths.\n');
+    fprintf(1,'\n Filling in %.0d paths.\n',num_iterations);
     fprintf(1,'Instructions: \n');
     fprintf(1,'Left click on the plot to create points. \n');
     fprintf(1,'Right click on the plot to remove points \n');

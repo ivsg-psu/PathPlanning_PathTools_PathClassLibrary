@@ -7,7 +7,7 @@
 %     2021_01_07
 %     -- cleanup to include trajectories functions
 
-clear all
+close all
 clc
 
 % Call the function

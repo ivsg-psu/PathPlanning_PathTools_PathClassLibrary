@@ -22,7 +22,7 @@ all_traversals.traversal{1} = reference_traversal;
 
 
 % Plot the results? (Note: they are plotted below as well)
-if 1==0
+if 1==1
     fig_num = 12;
     fcn_Path_plotTraversalsYaw(all_traversals,fig_num);
     fig_num = 13;
