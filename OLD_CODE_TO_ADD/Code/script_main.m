@@ -1,3 +1,5 @@
+% TODO: Add comments, create test files (use function to generate paths), 
+
 %% Clear the command window
 clc
 
@@ -7,7 +9,7 @@ try
     fprintf('Starting the code using variable raawData of length: %d\n', length(rawData));
 catch
     % add the data path
-    addpath '../data';
+    %addpath '../data';
     % Load the raw data
     filename  = 'MappingVan_DecisionMaking_02242020.mat';
     variable_names = 'MappingVan_DecisionMakingTestTrack_02242020';
@@ -81,10 +83,14 @@ mergedByKFData.MergedGPS.yNorth_Sigma = sigma_x;
 
 
 %% Separate Data into 5 Different Loops
-% The start and end index are gotten from script_determineSeparationPoints
+% At this point, data is cleaned and aligned, but all the GPS data points
+% are stored in a single structure. Need to break them into separate loops
+% by defining the starting and ending index of each loop
 start_idx = [1,     15600, 42600, 56500, 68000];
 end_idx   = [15370, 38550, 56500, 67500, 85950];
 
+% Define a structure for each loop, initially being a copy of all the data
+% (to be indexed later)
 loop_1.Clocks = mergedByKFData.Clocks;
 loop_1.MergedGPS = mergedByKFData.MergedGPS;
 loop_2.Clocks = mergedByKFData.Clocks;
@@ -96,10 +102,10 @@ loop_4.MergedGPS = mergedByKFData.MergedGPS;
 loop_5.Clocks = mergedByKFData.Clocks;
 loop_5.MergedGPS = mergedByKFData.MergedGPS;
 
-
 loops = [loop_1, loop_2, loop_3, loop_4, loop_5];
 fields = ["loop_1","loop_2", "loop_3", "loop_4", "loop_5"];
 
+% The purpose of this for loop is to 
 main_branchPts = [];
 for i = 1:length(loops)
     subplot(2,3,i)
@@ -123,14 +129,7 @@ for i = 1:length(loops)
     y_mean.(field_i) = mean_Data.mean_yNorth;
     % calculate sigma
     sigma.(field_i) = fcn_OLDcalculateSigma(aligned_Data_ByStation,mean_Data,numLaps);
-    
-    %{
-    % create field names for lapData (lap1, lap2, ...)
-    lap_names = [];
-    for k = 1:numLaps
-        lap_names = [lap_names, string(['lap_',int2str(k)])];
-    end
-    %}
+ 
     loopsDataInLaps{i} = aligned_Data_ByStation.traversal;
     
     title(['Loop ', num2str(i), ' Data']);
@@ -177,15 +176,24 @@ box on
 %% Save Branching Points Data
 figure
 hold on
-
-
+% At this point, all the decision  points are found, but there are
+% also very likely to be more than one point for each loop, which is wrong. 
+% Therefore, we need to eliminate "fake" decision points and keep the
+% real ones. Do this by finding "branching points" and checking the 
+% distance between them and the found decision points. 
+% T
 main_branch_pts = [];
 
 for i = 1:6
+    % Find the branching points
     [x_branch, y_branch] = fcn_branchingPointOfPaths(loopsDataInLaps{1}{i}.MergedGPS.xEast,loopsDataInLaps{1}{i}.MergedGPS.yNorth, ...
     loopsDataInLaps{2}{i}.MergedGPS.xEast, loopsDataInLaps{2}{i}.MergedGPS.yNorth);
+
+    % Find the distance between each decision point and the branching point.
     d1 = ((x_branch - x_decision_12(1)).^2 + (y_branch - y_decision_12(1)).^2).^0.5;
     d2 = ((x_branch - x_decision_12(2)).^2 + (y_branch - y_decision_12(2)).^2).^0.5;
+    
+    % If distance is smaller than 25, they are valid decision points
     for j = 1:length(d1)
         if d1(j)< 25 | d2(j) <25
             main_branch_pts = [main_branch_pts; x_branch(j), y_branch(j)];
@@ -238,7 +246,8 @@ plot(x_mean.loop_2, y_mean.loop_2)
 plot(x_mean.loop_5(500:900), y_mean.loop_5(500:900))
 plot(main_branch_pts(:,1), main_branch_pts(:,2), 'ko')
 
-save('main_branch_pts.mat', 'main_branch_pts')
+%save('main_branch_pts.mat', 'main_branch_pts')
+
 %{
 %% Clear the workspace
 clc, clear
