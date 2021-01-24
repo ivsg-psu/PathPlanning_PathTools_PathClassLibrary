@@ -1,10 +1,10 @@
-function [distance,location] = fcn_Path_findProjectionHitOntoPath(path,sensor_vector_start,sensor_vector_end,varargin)   
+function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(path,sensor_vector_start,sensor_vector_end,varargin)   
 % fcn_Path_findProjectionHitOntoPath calculates hits between a sensor
 % projection and a path, returning the distance and location of the hit.
 %
 % FORMAT: 
 %
-%      [distance,location] = ...
+%      [distance,location,path_segment] = ...
 %         fcn_Path_findProjectionHitOntoPath(path,...
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_type),(fig_num))  
@@ -32,6 +32,10 @@ function [distance,location] = fcn_Path_findProjectionHitOntoPath(path,sensor_ve
 %            be negative if the nearest intersection is in the opposite
 %            direction of the given sensor vector.
 %
+%            2: returns distances and locations as M x 1 and M x 2 vectors
+%            respectively, where the M rows represent all the detected
+%            intersections.
+%
 %      fig_num: a figure number to plot results. Turns debugging on.
 %
 % OUTPUTS:
@@ -40,6 +44,9 @@ function [distance,location] = fcn_Path_findProjectionHitOntoPath(path,sensor_ve
 %      intersection of the sensor with the path
 %
 %      location: a 1 x 2 vector of the X,Y location of intersection point
+%
+%      path_segment: the segment number of the path that was hit (1 is the
+%      first segment, 2 is the second, etc)
 %
 % EXAMPLES:
 %      
@@ -62,7 +69,16 @@ function [distance,location] = fcn_Path_findProjectionHitOntoPath(path,sensor_ve
 %      - fixed flag usage to decouple plotting with debugging
 %      2021_01_08 
 %      -- Added input check on path type
- 
+%      2021_01_23
+%      -- Added flag_search_type = 2 option, to allow multiple cross points
+%      to be returned
+%      -- Fixed bug with partially overlapping vectors not returning a
+%      result
+%      -- Added path segment output so that we can ID which segment was hit
+%      2021_01_24
+%      -- Fixed bug with overlapping colinear where two path segments
+%      identified when there is only one
+
 
 %% Set up for debugging
 flag_do_debug = 0; % Flag to plot the results for debugging
@@ -99,18 +115,23 @@ if flag_check_inputs == 1
     fcn_Path_checkInputsToFunctions(path, 'path');    
 end
 
+% Does user wish to specify search type?
 if 4 <= nargin
     flag_search_type = varargin{1};
 end
 
+
+% Does user want to show the plots?
 if 5 == nargin
     fig_num = varargin{2};
     figure(fig_num);
     flag_do_plot = 1;
-end
-
-if flag_do_debug
-    flag_do_plot = 1;
+else
+    if flag_do_debug
+        fig = figure;
+        fig_num = fig.Number;
+        flag_do_plot = 1;
+    end
 end
 
 
@@ -127,6 +148,7 @@ end
 % Define each path as a set of walls that can be hit
 wall_start = [path(1:end-1,1) path(1:end-1,2)];
 wall_end   = [path(2:end,1) path(2:end,2)];
+path_segments = (1:length(wall_start(:,1)))';
 
 % Define p, q, r and s vectors
 p = wall_start;
@@ -141,9 +163,55 @@ q_minus_p_cross_s = crossProduct(q_minus_p,s);
 q_minus_p_cross_r = crossProduct(q_minus_p,r);
 
 % Are any of these parallel?
-parallel_indices = find(0==r_cross_s);
-if any(parallel_indices)
-    r_cross_s(parallel_indices) = 1; % They are colinear or parallel, so make dummy length
+parallel_non_intersecting_indices = find((0==r_cross_s).*(0~=q_minus_p_cross_r));
+if any(parallel_non_intersecting_indices)
+    r_cross_s(parallel_non_intersecting_indices) = 1; % They are colinear or parallel, so make dummy length
+end
+
+% Are any of these colinear?
+colinear_indices = find((0==r_cross_s).*(0==q_minus_p_cross_r));
+if any(colinear_indices)
+    r_cross_s(colinear_indices) = 1; % They are colinear or parallel, so make dummy length
+    r_dot_r = sum(r.*r,2);
+    q_minus_p_dot_r = sum(q_minus_p.*r,2);
+    s_dot_r = sum(s.*r,2);
+    t0 = q_minus_p_dot_r./r_dot_r;
+    t1 = t0 + s_dot_r./r_dot_r;
+    
+    % Keep only the good indices
+    %     % For debugging:
+    %     conditions = [-0.5 -0.4; -0.5 0; -0.5 .2; 0 0.2; 0.2 0.4; 0.2 1; 0.2 1.2; 1 1.2; 1.2 1.3; -0.5 1.2]
+    %     t0 = conditions(:,1);
+    %     t1 = conditions(:,2);
+    %     t0_inside = (t0>=0)&(t0<=1);
+    %     t1_inside = (t1>=0)&(t1<=1);
+    %     t0_t1_surround = (t0<0)&(t1>1) | (t1<0)&(t0>1);
+    %     any_within = t0_inside | t1_inside | t0_t1_surround;
+    %     fprintf(1,'t0 inside flag:\n');
+    %     [conditions t0_inside]
+    %     fprintf(1,'t1 inside flag:\n');
+    %     [conditions t1_inside]
+    %     fprintf(1,'surround flag:\n');
+    %     [conditions t0_t1_surround]
+    %     fprintf(1,'any_wighin flag:\n');
+    %     [conditions any_within]
+    
+    % Check whether there is overlap by seeing of the t0 and t1 values are
+    % within the interval of [0 1], endpoint inclusive
+    t0_inside = (t0>=0)&(t0<=1);
+    t1_inside = (t1>=0)&(t1<=1);
+    t0_t1_surround = (t0<0)&(t1>1) | (t1<0)&(t0>1);
+    any_within = t0_inside | t1_inside | t0_t1_surround;
+    good_indices = find(any_within);
+    good_colinear_indices = intersect(colinear_indices,good_indices);
+    
+    % Fix the ranges to be within 0 and 1
+    t0(good_colinear_indices) = max(0,t0(good_colinear_indices));
+    t0(good_colinear_indices) = min(1,t0(good_colinear_indices));
+
+    t1(good_colinear_indices) = max(0,t1(good_colinear_indices));
+    t1(good_colinear_indices) = min(1,t1(good_colinear_indices));
+
 end
 
 % Calculate t and u, where t is distance along the path, and u is distance
@@ -152,10 +220,36 @@ end
 t = q_minus_p_cross_s./r_cross_s; % Distance along the path
 u = q_minus_p_cross_r./r_cross_s; % Distance along the sensor
 
-% Fix any situations that are parallel, as these will give wrong
-% calculations
-t(parallel_indices) = inf;
-u(parallel_indices) = inf;
+% Fix any situations that are parallel and non-intersecting, as these will
+% give wrong calculation results from the t and u calculations above
+t(parallel_non_intersecting_indices) = inf;
+u(parallel_non_intersecting_indices) = inf;
+
+% Fix any situations that are colinear. For these, we save the start point
+% as the point where overlap starts, and the end point where overlap ends.
+% Note that this creates NEW intersections beyond the number of segements
+if any(colinear_indices)
+    % Shut off colinear ones to start
+    t(colinear_indices) = inf;
+    u(colinear_indices) = inf;
+    
+    % Correct the t values
+    u(good_colinear_indices) = 1;
+    t(good_colinear_indices) = t0(good_colinear_indices);
+
+    % Do we need to add more hit points?
+    indices_hit_different_point = find(t0~=t1);
+    more_indices = intersect(indices_hit_different_point,good_colinear_indices);
+         
+    % Make p and r, t and u longer so that additional hit points are
+    % calculated in special case of overlaps
+    p = [p; p(more_indices,:)];
+    r = [r; r(more_indices,:)];
+    u = [u; u(more_indices)];
+    t = [t; t1(more_indices)];   
+    path_segments = [path_segments; path_segments(more_indices)];
+
+end
 
 % Initialize all intersections to infinity
 intersections = NaN*ones(length(p(:,1)),2);
@@ -167,10 +261,13 @@ if 0 == flag_search_type
     good_vector = ((0<=t).*(1>=t).*(0<=u).*(1>=u));
 elseif 1 == flag_search_type
     good_vector = ((0<=t).*(1>=t));
+elseif 2 == flag_search_type
+    good_vector = ((0<=t).*(1>=t).*(0<=u).*(1>=u));
 else
     error('Incorrect flag_search_type entered');
 end
 
+% Keep only the indices that work
 good_indices = find(good_vector>0);
 
 if ~isempty(good_indices)
@@ -183,12 +280,20 @@ end
 % calculate t*r as a length
 distances_squared = sum((intersections - sensor_vector_start).^2,2);
 
-% Keep just the minimum distance
-[closest_distance_squared,closest_index] = min(distances_squared);
-
-distance = closest_distance_squared^0.5*sign(u(closest_index));
-location = intersections(closest_index,:);
-
+if flag_search_type ~=2
+    % Keep just the minimum distance
+    [closest_distance_squared,closest_index] = min(distances_squared);
+    
+    distance = closest_distance_squared^0.5*sign(u(closest_index));
+    location = intersections(closest_index,:);
+    path_segment = path_segments(closest_index);
+else
+    % Return all the results
+    good_indices = find(~isnan(distances_squared));
+    distance = distances_squared(good_indices).^0.5.*sign(u(good_indices));
+    location = intersections(good_indices,:);
+    path_segment = path_segments(good_indices);
+end
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -211,7 +316,7 @@ if flag_do_plot
     grid on; grid minor;
     
     % Plot the path in black
-    plot(path(:,1),path(:,2),'k.-','Linewidth',1);
+    plot(path(:,1),path(:,2),'k.-','Linewidth',5);
     handle_text = text(path(1,1),path(1,2),'Path');
     set(handle_text,'Color',[0 0 0]);
        
@@ -224,9 +329,11 @@ if flag_do_plot
     y_range = axis_size(4)-axis_size(3);
         
     % Plot any hits in blue
-    plot(location(:,1),location(:,2),'bo','Markersize',30);
-    handle_text = text(location(:,1),location(:,2)-0.05*y_range,sprintf('Hit at distance: %.2f',distance));
-    set(handle_text,'Color',[0 0 1]);
+    for i_result = 1:length(distance)
+        plot(location(i_result,1),location(i_result,2),'bo','Markersize',30);
+        handle_text = text(location(i_result,1),location(i_result,2)-0.05*y_range,sprintf('Hit at distance: %.2f',distance(i_result)));
+        set(handle_text,'Color',[0 0 1]);
+    end
     
 end
 
