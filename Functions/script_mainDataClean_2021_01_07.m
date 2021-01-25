@@ -417,3 +417,6 @@ geobasemap satellite
 % eval([cleaned_fileName,'=mergedByKFData'])
 % save(strcat(dir.datafiles,cleaned_fileName,'.mat'),cleaned_fileName)
 
+% fields = {'Yaw_deg';'Yaw_deg_Sigma';'velMagnitude_Sigma';'xEast_increments';'xEast_increments_Sigma';'yNorth_increments';'yNorth_increments_Sigma';'xEast_Sigma';'yNorth_Sigma';'zUp_Sigma';};
+% I99_Altoona33_to_StateCollege73 = rmfield(mergedByKFData.MergedGPS,fields);
+% save('I99_Altoona33_to_StateCollege73.mat','I99_Altoona33_to_StateCollege73')
