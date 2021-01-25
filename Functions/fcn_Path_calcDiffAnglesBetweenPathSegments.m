@@ -118,7 +118,7 @@ b_mag = sum(b_vector.^2,2).^0.5;
 
 % Calculate the change in angle using the dot product
 %diff_angles = [acos(a_dot_b./(a_mag.*b_mag)); 0];
-diff_angles = sign(a_cross_b).*[acos(a_dot_b./(a_mag.*b_mag))];
+diff_angles = sign(a_cross_b).*(acos(a_dot_b./(a_mag.*b_mag)));
 
 
 %% Any debugging?
