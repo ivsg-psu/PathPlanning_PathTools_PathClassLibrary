@@ -1,8 +1,8 @@
-% script_test_fcn_GPS_lla2enuPath.m
-% Tests fcn_GPS_lla2enuPath
+% script_test_fcn_GPS_lla2enuPathVectorized.m
+% Tests fcn_GPS_lla2enuPathVectorized
 
 % Revision history:
-%   2021_01_14:
+%   2021_01_25:
 %       -- wrote the code
 
 close all
@@ -14,10 +14,10 @@ path_LLA = [40.7934, -77.8600, 351.7392;...
              40.52, -78.39, 355];
 reference_LLA = [40.7934, -77.8600, 351.7392];
 fig_num = 12345;
-path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, fig_num); %#ok<NASGU>
+path_ENU = fcn_GPS_lla2enuPathVectorized(path_LLA, reference_LLA, fig_num); %#ok<NASGU>
 
 %% Test case 2: basic call with just multiple points
 path_LLA = readmatrix('sample_path_LLA_data.csv');
 reference_LLA = [40.7934, -77.8600, 351.7392];
 fig_num = 12346;
-path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, fig_num);
+path_ENU = fcn_GPS_lla2enuPathVectorized(path_LLA, reference_LLA, fig_num);

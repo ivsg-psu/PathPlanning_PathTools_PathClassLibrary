@@ -1,25 +1,27 @@
 function path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, varargin)
-% fcn_GPS_lla2xyz.m
-% transforms a point in Geodetic coordinate system to ENU coordinate
+% fcn_GPS_lla2enuPath.m
+% transforms a path(s) in Geodetic coordinate system to ENU coordinate
 % system. This is written to test the GPS class.
 %
 % FORMAT:
-%   path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, varargin)
+%   path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA)
 %
 % INPUTS:
-%   path_LLA: a point as Nx3 vector in Geodetic coordinate system
+%   path_LLA: a path(s) as Nx3 vector in Geodetic coordinate system
+%   reference_LLA: a reference point as 1x3 vector in Geodetic coordinate
+%   system
 %
 % OUTPUTS:
-%   path_ENU: a point as Nx3 vector in ENU coordinate system
+%   path_ENU: a path(s) as Nx3 vector in ENU coordinate system
 %
 % EXAMPLES:
-%   See the script: script_test_fcn_GPS_lla2enuPath.m for a full test suite.
+%   See the script: script_test_fcn_GPS_lla2enu.m for a full test suite.
 %
-% This function was written on 2021_01_25 by Satya Prasad
+% This function was written on 2021_01_14 by Satya Prasad
 % Questions or comments? szm888@psu.edu
 
 % Revision history:
-%   2021_01_25:
+%   2021_01_14:
 %       - wrote the code
 
 flag_do_debug = 0; % Flag to plot the results for debugging
@@ -109,48 +111,12 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Defining parameters
-factor_deg2rad = pi/180; % multiplying factor to convert degrees into radians
-GPS.semi_major_axis = 6378137; % semi-major axis of the earth [meters]
-GPS.flattening = 1/298.257223563; % flattening of the earth
-GPS.first_eccentricity_squared = (2 - GPS.flattening) * GPS.flattening; % square of the first eccentricity of the ellipsoid
+path_ENU = NaN(size(path_LLA,1),3);
 
-% Read input data into separate variables
-latitude  = [reference_LLA(1,1); path_LLA(:,1)];
-longitude = [reference_LLA(1,2); path_LLA(:,2)];
-altitude  = [reference_LLA(1,3); path_LLA(:,3)];
-
-% Transformation process
-slat = sin(factor_deg2rad*latitude); % sine of latitude
-clat = cos(factor_deg2rad*latitude); % cosine of latitude
-
-slon = sin(factor_deg2rad*longitude); % sine of longitude
-clon = cos(factor_deg2rad*longitude); % cosine of longitude
-
-primal_vertical_radius_of_curvature = GPS.semi_major_axis ./ sqrt(1 - GPS.first_eccentricity_squared * slat.^2); % primal vertical radius of curvature [meters]
-
-% ECEF coordinate system
-path_XYZ = [ (primal_vertical_radius_of_curvature + altitude) .* clat .* clon, ...
-             (primal_vertical_radius_of_curvature + altitude) .* clat .* slon, ...
-             ((1 - GPS.first_eccentricity_squared) * primal_vertical_radius_of_curvature + altitude) .* slat ];
-
-% First element corresponds to reference_LLA
-reference_XYZ = path_XYZ(1,:); % reference point for ENU coordinate system
-diffxyz = path_XYZ(2:end,:) - reference_XYZ; % Shift the origin of ECEF to the reference
-
-rotation_matrix = eye(3);
-rotation_matrix(1,1) = -slon(1);
-rotation_matrix(1,2) = clon(1);
-rotation_matrix(2,1) = -slat(1) * clon(1);
-rotation_matrix(2,2) = -slat(1) * slon(1);
-rotation_matrix(2,3) = clat(1);
-rotation_matrix(3,1) = clat(1) * clon(1);
-rotation_matrix(3,2) = clat(1) * slon(1);
-rotation_matrix(3,3) = slat(1);
-
-path_ENU = [ sum(rotation_matrix(1,:).*diffxyz, 2), ...
-             sum(rotation_matrix(2,:).*diffxyz, 2), ...
-             sum(rotation_matrix(3,:).*diffxyz, 2) ];
+for i = 1:size(path_LLA,1)
+    point_XYZ = fcn_GPS_lla2xyz(path_LLA(i,:)); % Geodetic to ECEF transformation
+    path_ENU(i,:) = fcn_GPS_xyz2enu(point_XYZ, reference_LLA); % ECEF to ENU transformation
+end
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
