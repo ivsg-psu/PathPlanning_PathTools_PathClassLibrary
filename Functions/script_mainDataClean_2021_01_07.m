@@ -393,11 +393,14 @@ fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 %fcn_plotAxesLinkedTogetherByField;
 
 %% geoplot 
-
-
-% step2: 
-
-
+figure(123)
+clf
+geoplot(mergedByKFData.GPS_Hemisphere.Latitude,mergedByKFData.GPS_Hemisphere.Longitude,'b', ...
+mergedByKFData.MergedGPS.latitude,mergedByKFData.MergedGPS.longitude,'r','LineWidth',2)
+% geolimits([45 62],[-149 -123])
+legend('GPS_Hemisphere','Merged')
+geobasemap satellite
+%geobasemap street
 %% OLD STUFF
  
 % %% Export results to Google Earth?
