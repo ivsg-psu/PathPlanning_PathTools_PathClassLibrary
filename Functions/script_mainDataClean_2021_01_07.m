@@ -384,6 +384,10 @@ fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 % uncommented versions above, to all scroll/zoom in unison.
 %fcn_plotAxesLinkedTogetherByField;
 
+%% geoplot 
+
+
+
 %% OLD STUFF
  
 % %% Export results to Google Earth?
