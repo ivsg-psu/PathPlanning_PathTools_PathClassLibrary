@@ -115,7 +115,6 @@ rotation_matrix(3,1) = clat * clon;
 rotation_matrix(3,2) = clat * slon;
 rotation_matrix(3,3) = slat;
 
-
 reference_XYZ = fcn_GPS_lla2xyz(reference_LLA); % Transform reference_LLA into ECEF coordinates
 diffXYZ = point_XYZ - reference_XYZ; % Shift the origin of ECEF to the reference
 
