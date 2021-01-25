@@ -136,16 +136,22 @@ catch
     if flag.DBquery == true     
 %       database_name = 'mapping_van_raw';
 %       queryCondition = 'trip'; % raw data can be queried by 'trip', 'date', or 'driver'
-        rawData = fcn_DataClean_queryRawData(flag.DBquery,'mapping_van_raw','trip'); % more query condition can be set in the function 
+        [rawData,~,~,base_station] = fcn_DataClean_queryRawData(flag.DBquery,'mapping_van_raw','trip'); % more query condition can be set in the function 
         
     else
         % Load the raw data from file
         % test one
         %filename  = 'MappingVan_DecisionMaking_03132020.mat';
         %variable_names = 'MappingVan_DecisionMaking_03132020';
+        %base_station.id = 2;%1:test track, 2: LTI, Larson  Transportation Institute
+        
         % test two
         filename  = 'Route_Wahba.mat';
         variable_names = 'Route_WahbaLoop';
+        base_station.id = 2;%1:test track, 2: LTI, Larson  Transportation Institute
+        base_station.latitude= 40.8068919389;
+        base_station.longitude= -77.8497968306;
+        base_station.altitude= 337.665496826; 
         
         rawData = fcn_DataClean_queryRawData(flag.DBquery,filename,variable_names); % more query condition can be set in the function 
 
@@ -231,8 +237,10 @@ nameString = 'yNorth';
 mergedByKFData.MergedGPS.yNorth = x_kf;
 mergedByKFData.MergedGPS.yNorth_Sigma = sigma_x;
 
-
-
+% convert  ENU to LLA
+[mergedByKFData.MergedGPS.latitude,mergedByKFData.MergedGPS.longitude,mergedByKFData.MergedGPS.altitude] ...
+    = enu2geodetic(mergedByKFData.MergedGPS.xEast,mergedByKFData.MergedGPS.yNorth,mergedByKFData.MergedGPS.zUp,...
+      base_station.latitude,base_station.longitude, base_station.altitude,wgs84Ellipsoid);
 
 % Probably can delete the following if statement (VERY old)
 if 1==0
@@ -385,7 +393,7 @@ fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 %fcn_plotAxesLinkedTogetherByField;
 
 %% geoplot 
-% step1: convert the cleaned ENU to LLA
+
 
 % step2: 
 
