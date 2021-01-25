@@ -385,7 +385,9 @@ fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 %fcn_plotAxesLinkedTogetherByField;
 
 %% geoplot 
+% step1: convert the cleaned ENU to LLA
 
+% step2: 
 
 
 %% OLD STUFF
