@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%  Function fcn_mappingVanRawQuery %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%  Function fcn_DataClean_queryRawData %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Purpose:
 %      query raw data from a *.mat file or from mapping_van_raw database
 %
@@ -78,6 +78,7 @@ if DBqueryFlag == true
     rawData = fcn_DataClean_loadRawData(flag_do_debug,result); %% try to use the anonymous function https://www.youtube.com/watch?v=kE4SUA392_I&feature=youtu.be
     varargout{1} = trip_name; % output trip name
     varargout{2} = trip_ids; % output trip id
+    varargout{3} = result.base_station; % used for LLA and ENU conversion
 else
     
     % Load the raw data from file
