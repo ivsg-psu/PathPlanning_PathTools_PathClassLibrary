@@ -23,6 +23,8 @@ function path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, varargin)
 % Revision history:
 %   2021_01_14:
 %       - wrote the code
+% 2021_01_25:
+%       - Added function to check inputs
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_do_plots = 0; % Flag to plot the final results
@@ -51,39 +53,8 @@ if flag_check_inputs
         error('Incorrect number of input arguments')
     end
     
-    % INPUT: path_LLA
-    % Check the size of inputs
-    if 1 > size(path_LLA,1) || 3 ~= size(path_LLA,2)
-        error('Input(path_LLA) must be a Nx3 vector.')
-    end
-    
-    % Check the type and validity of inputs
-    if ~isnumeric(path_LLA) || any(isnan(path_LLA),'all')
-        error('Input(path_LLA) must be numeric data.')
-    end
-    
-    % Check the domain of inputs (latitude and longitude)
-    if (any(-90.0 > path_LLA(:,1)) || any(90.0 < path_LLA(:,1)) || ...
-            any(-180.0 > path_LLA(:,2)) || any(180.0 < path_LLA(:,2)))
-        error('WGS lat or WGS lon are out of range');
-    end
-    
-    % INPUT: reference_LLA
-    % Check the size of inputs
-    if 1 ~= size(reference_LLA,1) || 3 ~= size(reference_LLA,2)
-        error('Input(reference_LLA) must be a 1x3 vector.')
-    end
-    
-    % Check the type and validity of inputs
-    if ~isnumeric(reference_LLA) || any(isnan(reference_LLA))
-        error('reference_LLA must be numeric data.')
-    end
-    
-    % Check the domain of inputs (latitude and longitude)
-    if ((-90.0 > reference_LLA(1,1)) || (90.0 < reference_LLA(1,1)) || ...
-            (-180.0 > reference_LLA(1,2)) || (180.0 < reference_LLA(1,2)))
-        error('WGS lat or WGS lon are out of range');
-    end
+    fcn_GPS_checkInputsToFunctions(path_LLA, 'path_LLA')
+    fcn_GPS_checkInputsToFunctions(reference_LLA, 'point_LLA')
 end
 
 %% Check for variable argument inputs (varargin)

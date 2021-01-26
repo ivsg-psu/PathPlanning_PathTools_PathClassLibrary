@@ -11,3 +11,4 @@ a function to find where paths cross
 a function to find where paths diverage?
 pull out the spatial smoothing of offsets within function: fcn_Path_fillRandomTraversalsAboutTraversal into another stand-alone function: fcn_Path_filterOffsetsViaSpatialLowPassFilter(offsets,samplingDistance, smoothingDistance)
 clean up fcn_Path_findAverageTraversalViaStationAlignment to match the inputs/header/style of ortho and closest functions
+can we define Nth yaw angle same as N-1 th yaw angle?

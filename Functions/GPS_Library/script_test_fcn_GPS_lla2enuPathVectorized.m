@@ -11,7 +11,7 @@ clear all %#ok<CLALL> % Clear any old variables
 
 %% Test case 1: basic call with just two points
 path_LLA = [40.7934, -77.8600, 351.7392;...
-             40.52, -78.39, 355];
+            40.52, -78.39, 355];
 reference_LLA = [40.7934, -77.8600, 351.7392];
 fig_num = 12345;
 path_ENU = fcn_GPS_lla2enuPathVectorized(path_LLA, reference_LLA, fig_num); %#ok<NASGU>

@@ -22,6 +22,8 @@ function point_LLA = fcn_GPS_xyz2lla(point_XYZ)
 % Revision history:
 %   2021_01_14:
 %       - wrote the code
+% 2021_01_25:
+%       - Added function to check inputs
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_check_inputs = 1; % Flag to perform input checking
@@ -49,15 +51,7 @@ if flag_check_inputs == 1
         error('Incorrect number of input arguments.')
     end
     
-    % Check the size of inputs
-    if 1 ~= size(point_XYZ,1) || 3 ~= size(point_XYZ,2)
-        error('Input(point_XYZ) must be a 1x3 vector.')
-    end
-    
-    % Check the type and validity of inputs
-    if ~isnumeric(point_XYZ) || any(isnan(point_XYZ))
-        error('Input(point_XYZ) must be numeric data.')
-    end
+    fcn_GPS_checkInputsToFunctions(point_XYZ, 'point_ECEF')
 end
 
 %% Convert from ECEF to Geodetic coordinates

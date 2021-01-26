@@ -12,7 +12,7 @@ clear all %#ok<CLALL> % Clear any old variables
 %% Test case 1: basic call with just two points
 path_ENU = [-44915.4256, -30226.1806, -226.4526;...
              0, 0, 0];
-reference_LLA = [40.7934, -77.8600, 351.7392];
+reference_LLA = [140.7934, -77.8600, 351.7392];
 fig_num = 12345;
 path_LLA = fcn_GPS_enu2llaPath(path_ENU, reference_LLA, fig_num); %#ok<NASGU>
 

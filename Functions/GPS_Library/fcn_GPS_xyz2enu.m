@@ -50,33 +50,8 @@ if flag_check_inputs
         error('Incorrect number of input arguments.')
     end
     
-    % INPUT: point_XYZ
-    % Check the size of inputs
-    if 1 ~= size(point_XYZ,1) || 3 ~= size(point_XYZ,2)
-        error('Input(point_XYZ) must be a 1x3 vector.')
-    end
-    
-    % Check the type and validity of inputs
-    if ~isnumeric(point_XYZ) || any(isnan(point_XYZ))
-        error('Input(point_XYZ) must be numeric data.')
-    end
-    
-    % INPUT: reference_LLA
-    % Check the size of inputs
-    if 1 ~= size(reference_LLA,1) || 3 ~= size(reference_LLA,2)
-        error('Input(reference_LLA) must be a 1x3 vector.')
-    end
-
-    % Check the type and validity of inputs
-    if ~isnumeric(reference_LLA) || any(isnan(reference_LLA))
-        error('reference_LLA must be numeric data.')
-    end
-
-    % Check the domain of inputs (latitude and longitude)
-    if ((-90.0 > reference_LLA(1,1)) || (90.0 < reference_LLA(1,1)) || ...
-            (-180.0 > reference_LLA(1,2)) || (180.0 < reference_LLA(1,2)))
-        error('WGS lat or WGS lon are out of range');
-    end
+    fcn_GPS_checkInputsToFunctions(point_XYZ, 'point_ECEF')
+    fcn_GPS_checkInputsToFunctions(reference_LLA, 'point_LLA')
 end
 
 %% Convert from ECEF to ENU coordinates
