@@ -322,6 +322,8 @@ if flag_do_plot
        
     % Plot the sensor vector
     quiver(q(:,1),q(:,2),s(:,1),s(:,2),'r','Linewidth',3);
+    plot(sensor_vector_end(:,1),sensor_vector_end(:,2),'r.','Markersize',10);
+    
     handle_text = text(q(:,1),q(:,2),'Sensor');
     set(handle_text,'Color',[1 0 0]);
     
