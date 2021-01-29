@@ -1,18 +1,19 @@
-function point_ENU = fcn_GPS_xyz2enu(point_XYZ, reference_LLA)
+function path_ENU = fcn_GPS_xyz2enu(path_XYZ, reference_LLA, varargin)
 % fcn_GPS_xyz2enu.m
-% transforms a point in ECEF coordinate system to ENU coordinate system. 
+% transforms a path(s) in ECEF coordinate system to ENU coordinate system. 
 % This is written to test the GPS class.
 %
 % FORMAT:
-%   point_ENU = fcn_GPS_xyz2enu(point_XYZ, reference_LLA)
+%   path_ENU = fcn_GPS_xyz2enu(path_XYZ, reference_LLA, fig_num)
 %
 % INPUTS:
-%   point_XYZ: a point as 1x3 vector in ECEF coordinate system
+%   path_XYZ: a path(s) as Nx3 vector in ECEF coordinate system
 %   reference_LLA: a reference point as 1x3 vector in Geodetic coordinate
 %   system
+%   varargin: figure number for debugging or plotting
 %
 % OUTPUTS:
-%   point_ENU: a point as 1x3 vector in ENU coordinate system
+%   path_ENU: a path(s) as Nx3 vector in ENU coordinate system
 %
 % EXAMPLES:
 %   See the script: script_test_fcn_GPS_xyz2enu.m for a full test suite.
@@ -23,8 +24,13 @@ function point_ENU = fcn_GPS_xyz2enu(point_XYZ, reference_LLA)
 % Revision history:
 %   2021_01_14:
 %       - wrote the code
+%   2021_01_25:
+%       - Added function to check inputs
+%   2021_01_28:
+%       - Vectorized the function
 
-flag_do_debug = 0; % Flag to plot the results for debugging
+flag_do_debug     = 0; % Flag to plot the results for debugging
+flag_do_plots     = 0; % Flag to plot the final results
 flag_check_inputs = 1; % Flag to perform input checking
 
 if flag_do_debug
@@ -46,12 +52,27 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_check_inputs
     % Are there the right number of inputs?
-    if 2 ~= nargin
+    if  2 > nargin || 3 < nargin
         error('Incorrect number of input arguments.')
     end
     
-    fcn_GPS_checkInputsToFunctions(point_XYZ, 'point_ECEF')
+    fcn_GPS_checkInputsToFunctions(path_XYZ, 'path_ECEF')
     fcn_GPS_checkInputsToFunctions(reference_LLA, 'point_LLA')
+end
+
+%% Check for variable argument inputs (varargin)
+
+% Does user want to show the plots?
+if 3 == nargin
+    fig_num = varargin{1};
+    figure(fig_num);
+    flag_do_plots = 1;
+else
+    if flag_do_debug
+        fig = figure;
+        fig_num = fig.Number;
+        flag_do_plots = 1;
+    end
 end
 
 %% Convert from ECEF to ENU coordinates
@@ -67,7 +88,7 @@ end
 % Defining constants
 factor_deg2rad = pi/180; % multiplying factor to convert degrees into radians
 
-% Transformation process
+% Transformation process begins here
 % Read input data into separate variables
 reference_latitude  = reference_LLA(1,1);
 reference_longitude = reference_LLA(1,2);
@@ -91,9 +112,11 @@ rotation_matrix(3,2) = clat * slon;
 rotation_matrix(3,3) = slat;
 
 reference_XYZ = fcn_GPS_lla2xyz(reference_LLA); % Transform reference_LLA into ECEF coordinates
-diffXYZ = point_XYZ - reference_XYZ; % Shift the origin of ECEF to the reference
+diffXYZ       = path_XYZ - reference_XYZ; % Shift the origin of ECEF to the reference
 
-point_ENU = (rotation_matrix * diffXYZ')';
+path_ENU = [ sum(rotation_matrix(1,:).*diffXYZ, 2), ...
+             sum(rotation_matrix(2,:).*diffXYZ, 2), ...
+             sum(rotation_matrix(3,:).*diffXYZ, 2) ];
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,6 +129,29 @@ point_ENU = (rotation_matrix * diffXYZ')';
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if flag_do_plots
+    figure(fig_num)
+    clf
+    tiledlayout(2,1)
+    
+    % Tile 1
+    nexttile
+    plot(path_XYZ(:,1), path_XYZ(:,2))
+    grid on
+    axis equal
+    title('Path in ECEF Coordinate System')
+    xlabel('X-direction (m)')
+    ylabel('Y-direction (m)')
+    
+    % Tile 2
+    nexttile
+    plot(path_ENU(:,1), path_ENU(:,2))
+    grid on
+    axis equal
+    title('Path in ENU Coordinate System')
+    xlabel('East (m)')
+    ylabel('North (m)')
+end
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n', st(1).name, st(1).file);
