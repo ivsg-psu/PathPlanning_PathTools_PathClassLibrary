@@ -1,4 +1,4 @@
-function path_LLA = fcn_GPS_enu2llaPath(path_ENU, reference_LLA, varargin)
+function path_LLA = fcn_GPS_enu2lla(path_ENU, reference_LLA, varargin)
 % fcn_GPS_enu2llaPath.m
 % transforms a path(s) in ENU coordinate system to Geodetic coordinate
 % system. This is written to test the GPS class.
@@ -25,6 +25,8 @@ function path_LLA = fcn_GPS_enu2llaPath(path_ENU, reference_LLA, varargin)
 %       - wrote the code
 % 2021_01_25:
 %       - Added function to check inputs
+% 2021_01_28:
+%       - For loop is removed as it is moved to fcn_GPS_xyz2lla.M
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_do_plots = 0; % Flag to plot the final results
@@ -82,12 +84,8 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-path_LLA = NaN(size(path_ENU,1),3);
-
-for i = 1:size(path_ENU,1)
-    point_XYZ = fcn_GPS_enu2xyz(path_ENU(i,:), reference_LLA); % ENU to ECEF transformation
-    path_LLA(i,:) = fcn_GPS_xyz2lla(point_XYZ); % ECEF to Geodetic transformation
-end
+point_XYZ = fcn_GPS_enu2xyz(path_ENU, reference_LLA); % ENU to ECEF transformation
+path_LLA  = fcn_GPS_xyz2lla(point_XYZ); % ECEF to Geodetic transformation
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,7 +98,6 @@ end
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 if flag_do_plots
     figure(fig_num)
     clf
@@ -111,6 +108,7 @@ if flag_do_plots
     plot(path_ENU(:,1), path_ENU(:,2))
     grid on
     axis equal
+    title('Path in ENU Coordinate System')
     xlabel('East (m)')
     ylabel('North (m)')
     
