@@ -22,7 +22,7 @@ function path_XYZ = fcn_GPS_lla2xyz(path_LLA, varargin)
 % Revision history:
 %   2021_01_14:
 %       - wrote the code
-% 2021_01_25:
+%   2021_01_25:
 %       - Added function to check inputs
 %   2021_01_28:
 %       - Vectorized the function
@@ -133,6 +133,7 @@ if flag_do_plots
     plot(path_XYZ(:,1), path_XYZ(:,2))
     grid on
     axis equal
+    title('Path in ECEF Coordinate System')
     xlabel('X-direction (m)')
     ylabel('Y-direction (m)')
 end
