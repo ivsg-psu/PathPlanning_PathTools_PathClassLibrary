@@ -17,6 +17,11 @@ function path_LLA = fcn_GPS_enu2lla(path_ENU, reference_LLA, varargin)
 % EXAMPLES:
 %   See the script: script_test_fcn_GPS_enu2lla.m for a full test suite.
 %
+% Dependencies:
+%       fcn_GPS_checkInputsToFunctions
+%       fcn_GPS_enu2xyz
+%       fcn_GPS_xyz2lla
+%
 % This function was written on 2021_01_14 by Satya Prasad
 % Questions or comments? szm888@psu.edu
 

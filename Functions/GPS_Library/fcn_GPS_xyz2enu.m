@@ -18,6 +18,10 @@ function path_ENU = fcn_GPS_xyz2enu(path_XYZ, reference_LLA, varargin)
 % EXAMPLES:
 %   See the script: script_test_fcn_GPS_xyz2enu.m for a full test suite.
 %
+% Dependencies:
+%       fcn_GPS_checkInputsToFunctions
+%       fcn_GPS_lla2xyz
+%
 % This function was written on 2021_01_14 by Satya Prasad
 % Questions or comments? szm888@psu.edu
 

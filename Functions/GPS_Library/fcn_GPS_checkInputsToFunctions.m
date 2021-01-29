@@ -122,12 +122,12 @@ variable_type_string = lower(variable_type_string);
 if strcmpi(variable_type_string,'path_LLA')
     % Check the size of inputs
     if 1 > size(variable,1) || 3 ~= size(variable,2)
-        error('The %s input must be a path type (Geodetic), namely an N x 3 vector with N >= 1', variable_name);
+        error('The %s input must be a path type (Geodetic), namely a N x 3 vector with N >= 1', variable_name);
     end
     
     % Check the type and validity of inputs
     if ~isnumeric(variable) || any(isnan(variable),'all')
-        error('The %s input must be a path type (Geodetic), namely an N x 3 vector with N >= 1', variable_name);
+        error('The %s input must be a path type (Geodetic), namely a N x 3 vector with N >= 1', variable_name);
     end
     
     % Check the domain of inputs (latitude and longitude)
@@ -137,16 +137,29 @@ if strcmpi(variable_type_string,'path_LLA')
     end
 end
 
-%% A path in ENU coordinate system
-if strcmpi(variable_type_string,'path_ENU')
+%% A path in ECEF coordinate system
+if strcmpi(variable_type_string,'path_ECEF')
     % Check the size of inputs
     if 1 > size(variable,1) || 3 ~= size(variable,2)
-        error('The %s input must be a path type (ENU), namely an N x 3 vector with N >= 1', variable_name);
+        error('The %s input must be a path type (ECEF), namely a N x 3 vector with N >= 1', variable_name);
     end
     
     % Check the type and validity of inputs
     if ~isnumeric(variable) || any(isnan(variable),'all')
-        error('The %s input must be a path type (ENU), namely an N x 3 vector with N >= 1', variable_name);
+        error('The %s input must be a path type (ECEF), namely a N x 3 vector with N >= 1', variable_name);
+    end
+end
+
+%% A path in ENU coordinate system
+if strcmpi(variable_type_string,'path_ENU')
+    % Check the size of inputs
+    if 1 > size(variable,1) || 3 ~= size(variable,2)
+        error('The %s input must be a path type (ENU), namely a N x 3 vector with N >= 1', variable_name);
+    end
+    
+    % Check the type and validity of inputs
+    if ~isnumeric(variable) || any(isnan(variable),'all')
+        error('The %s input must be a path type (ENU), namely a N x 3 vector with N >= 1', variable_name);
     end
 end
 
@@ -218,4 +231,3 @@ if flag_do_debug
 end
 
 end % Ends the function
-

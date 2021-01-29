@@ -16,6 +16,9 @@ function path_XYZ = fcn_GPS_lla2xyz(path_LLA, varargin)
 % EXAMPLES:
 %   See the script: script_test_fcn_GPS_lla2xyz.m for a full test suite.
 %
+% Dependencies:
+%       fcn_GPS_checkInputsToFunctions
+%
 % This function was written on 2021_01_14 by Satya Prasad
 % Questions or comments? szm888@psu.edu
 

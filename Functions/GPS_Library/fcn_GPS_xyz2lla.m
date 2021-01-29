@@ -15,6 +15,9 @@ function path_LLA = fcn_GPS_xyz2lla(path_XYZ, varargin)
 % EXAMPLES:
 %   See the script: script_test_fcn_GPS_xyz2lla.m for a full test suite.
 %
+% Dependencies:
+%       fcn_GPS_checkInputsToFunctions
+%
 % This function was written on 2021_01_14 by Satya Prasad
 % Questions or comments? szm888@psu.edu
 % Reference: http://read.pudn.com/downloads559/sourcecode/others/2303011/gps_matlab/Wgsxyz2lla.m__.htm
