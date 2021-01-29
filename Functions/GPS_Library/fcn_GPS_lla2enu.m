@@ -1,15 +1,16 @@
-function path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, varargin)
-% fcn_GPS_lla2enuPath.m
+function path_ENU = fcn_GPS_lla2enu(path_LLA, reference_LLA, varargin)
+% fcn_GPS_lla2enu.m
 % transforms a path(s) in Geodetic coordinate system to ENU coordinate
 % system. This is written to test the GPS class.
 %
 % FORMAT:
-%   path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA)
+%   path_ENU = fcn_GPS_lla2enu(path_LLA, reference_LLA, fig_num)
 %
 % INPUTS:
 %   path_LLA: a path(s) as Nx3 vector in Geodetic coordinate system
 %   reference_LLA: a reference point as 1x3 vector in Geodetic coordinate
 %   system
+%   varargin: figure number for debugging or plotting
 %
 % OUTPUTS:
 %   path_ENU: a path(s) as Nx3 vector in ENU coordinate system
@@ -23,8 +24,10 @@ function path_ENU = fcn_GPS_lla2enuPath(path_LLA, reference_LLA, varargin)
 % Revision history:
 %   2021_01_14:
 %       - wrote the code
-% 2021_01_25:
+%   2021_01_25:
 %       - Added function to check inputs
+%   2021_01_28:
+%       - Vectorized the function
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_do_plots = 0; % Flag to plot the final results
@@ -82,12 +85,8 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-path_ENU = NaN(size(path_LLA,1),3);
-
-for i = 1:size(path_LLA,1)
-    point_XYZ = fcn_GPS_lla2xyz(path_LLA(i,:)); % Geodetic to ECEF transformation
-    path_ENU(i,:) = fcn_GPS_xyz2enu(point_XYZ, reference_LLA); % ECEF to ENU transformation
-end
+path_XYZ = fcn_GPS_lla2xyz(path_LLA); % Geodetic to ECEF transformation
+path_ENU = fcn_GPS_xyz2enu(path_XYZ, reference_LLA); % ECEF to ENU transformation
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,7 +99,6 @@ end
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 if flag_do_plots
     figure(fig_num)
     clf
@@ -116,6 +114,7 @@ if flag_do_plots
     plot(path_ENU(:,1), path_ENU(:,2))
     grid on
     axis equal
+    title('Path in ENU Coordinate System')
     xlabel('East (m)')
     ylabel('North (m)')
 end
