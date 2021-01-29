@@ -2,16 +2,18 @@ function fcn_GPS_checkInputsToFunctions(...
     variable,variable_type_string)
 
 % fcn_GPS_checkInputsToFunctions
-% Checks the variable types commonly used in the Path class to ensure that
+% Checks the variable types commonly used in the GPS class to ensure that
 % they are correctly formed. This function is typically called at the top
-% of most Path class functions. The input is a variable and a string
+% of most GPS class functions. The input is a variable and a string
 % defining the "type" of the variable. This function checks to see that
-% they are compatible. For example, the 'path' type variables in the class
-% function are N x 2 arrays of [x y] pairs; if someone had a path variable
-% called "path_example", they could check that this fit the path type by
-% calling fcn_Path_checkInputsToFunctions(path_example,'path'). This
-% function would then check that the array was N x 2, and if it was not, it
-% would send out an error warning.
+% they are compatible. For example, the 'path_LLA' type variables in the 
+% class function are N x 3 arrays of [latitude longitude altitude] pairs; 
+% if someone had a path_LLA variable called "path_LLA_example", they could 
+% check that this fit the path type by calling 
+% fcn_Path_checkInputsToFunctions(path_LLA_example,'path_LLA'). This
+% function would then check that the array was N x 3, and if it was not, it
+% would send out an error warning. In this case, it also checks for domain
+% of latitude and longitude.
 %
 % FORMAT:
 %
@@ -25,20 +27,25 @@ function fcn_GPS_checkInputsToFunctions(...
 %      variable_type_string: a string representing the variable type to
 %      check. The current strings include:
 %
-%            'station' - checks that the station type is N x 1 and is a
+%            'path_LLA' - checks that the path_LLA type is N x 3 and is a
+%            number. It also checks for the domain of latitude and
+%            longitude.
+%
+%            'path_ECEF' - checks that the path_ECEF type is N x 3 and is a
 %            number.
 %
-%            'stations' - checks that the station type is N x 1 and is a
-%            number, with N >= 2
+%            'path_ENU' - checks that the path_ENU type is N x 3 and is a
+%            number.
 %
-%            'path'  - checks that the path type is N x 2 with N>=2
+%            'point_LLA' - checks that the point_LLA type is 1 x 3 and is a
+%            number. It also checks for the domain of latitude and
+%            longitude.
 %
-%            'paths'  - checks that the path type is N x 2 with N>=3
+%            'point_ECEF' - checks that the point_ECEF type is 1 x 3 and is
+%            a number.
 %
-%            'traversal' - checks if a structure with X, Y, and Station,
-%            and that each has an N x 1 vector within all of same length.
-%            Further, the Station field must be strictly increasing.
-%
+%            'point_ENU' - checks that the point_ENU type is 1 x 3 and is a
+%            number.
 %
 %      Note that the variable_type_string is not case sensitive: for
 %      example, 'station' and 'Station' or 'STAtion' all give the same
@@ -49,10 +56,6 @@ function fcn_GPS_checkInputsToFunctions(...
 %      No explicit outputs, but produces MATLAB error outputs if conditions
 %      not met, with explanation within the error outputs of the problem.
 %
-% EXAMPLES:
-%
-% See the script: script_test_fcn_Path_checkInputsToFunctions
-% for a full test suite.
 %
 % DEPENDENCIES:
 %
@@ -63,17 +66,16 @@ function fcn_GPS_checkInputsToFunctions(...
 
 % Revision history:
 %      2021_01_25:
-%      -- first write of the code moving this functionality out of
+%      -- first write of the code moving this functionality out of all
+%      functions
 
 flag_do_debug = 0; % Flag to debug the results
-flag_do_plot = 0; % Flag to plot the results
 flag_check_inputs = 1; % Flag to perform input checking
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
 end
-
 
 %% check input arguments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,7 +89,6 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 if flag_check_inputs == 1   
     % Are there the right number of inputs?
     if 2 ~= nargin
@@ -111,7 +112,6 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % Grab the variable name
 variable_name = inputname(1);
 
@@ -219,10 +219,6 @@ end
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_plot
-    % Nothing to plot here
-end % Ends the flag_do_plot if statement
-
 if flag_do_debug
     fprintf(1,'The variable: %s was checked that it meets type: %s, and no errors were detected.\n',variable_name,variable_type_string);
 end
