@@ -420,3 +420,21 @@ geobasemap satellite
 % fields = {'Yaw_deg';'Yaw_deg_Sigma';'velMagnitude_Sigma';'xEast_increments';'xEast_increments_Sigma';'yNorth_increments';'yNorth_increments_Sigma';'xEast_Sigma';'yNorth_Sigma';'zUp_Sigma';};
 % I99_Altoona33_to_StateCollege73 = rmfield(mergedByKFData.MergedGPS,fields);
 % save('I99_Altoona33_to_StateCollege73_20210123.mat','I99_Altoona33_to_StateCollege73')
+
+% extract TestTrack data
+% fields = {'Yaw_deg';'Yaw_deg_Sigma';'velMagnitude_Sigma';'xEast_increments';'xEast_increments_Sigma';'yNorth_increments';'yNorth_increments_Sigma';'xEast_Sigma';'yNorth_Sigma';'zUp_Sigma';};
+% TestTrack_all = rmfield(mergedByKFData.MergedGPS,fields);
+% TestTrack_all_table = struct2table(TestTrack_all);
+% TestTrack_table = TestTrack_all_table(6000:9398,:);
+% TestTrack = table2struct(TestTrack_table,'ToScalar',true);
+% save('TestTrack.mat','TestTrack')
+% 
+% figure(1234)
+% clf
+% geoplot(TestTrack.latitude,TestTrack.longitude,'b', ...
+% TestTrack.latitude(1),TestTrack.longitude(1),'r.',...
+% TestTrack.latitude(end),TestTrack.longitude(end),'g.','LineWidth',2)
+% % geolimits([45 62],[-149 -123])
+% legend('Merged')
+% geobasemap satellite
+
