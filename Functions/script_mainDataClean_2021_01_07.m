@@ -53,7 +53,13 @@
 %       for mapping van data 
 %  2021_01_08
 %       -- create a function to query data from database or load from file
-
+%  2021-01-10
+%       -- Integrate the updated database query as a stand-alone function, to clean
+%       up large amount of code at top of this script(Done by Liming)
+%  2021-01-10
+%       -- Add geoplot capability to results so that we can see XY plots on the map
+%       automatically (Done by Liming)
+% 
 % Known issues:
 %  (as of 2019_10_04) - Odometry on the rear encoders is quite wonky. For
 %  some reason, need to do absolute value on speeds - unclear why. And the
@@ -90,12 +96,6 @@
 % fcn_loadRawData line 255, and maybe add a flag for this type of error
 
 %% TO_DO LIST
-% *) Integrate the updated database query as a stand-alone function, to clean
-% up large amount of code at top of this script(Done by Liming, 2021-01-10)
-%
-% *) Add geoplot capability to results so that we can see XY plots on the map
-% automatically
-%
 % *) Go through the functions and add headers / comments to each, and if
 % possible, add argument checking (similar to Path class library)
 % 
@@ -109,8 +109,8 @@
 % *) Save the "print" results and key plots automatically to a PDF document
 % to log the data processing results
 %
-% 
-
+% *) Create a KF function to hold all the KF merge sub-functions
+% *) Add the lidar data process 
 %% Prep the workspace
 
 % Clear the command window and workspace
@@ -129,6 +129,8 @@ addpath('./fcn_DataClean_loadRawData/'); % all the functions and wrapper class
 % in the function below.
 
 flag.DBquery = true; %set to true if you want to query raw data from database insteading of loading from default *.mat file
+flag.DBinsert = true; %set to true if yoi want to insert cleaned data to cleaned data database 
+
 try
     fprintf('Starting the code using variable rawData of length: %d\n', length(rawData));
 catch
@@ -136,7 +138,7 @@ catch
     if flag.DBquery == true     
 %       database_name = 'mapping_van_raw';
 %       queryCondition = 'trip'; % raw data can be queried by 'trip', 'date', or 'driver'
-        [rawData,~,~,base_station] = fcn_DataClean_queryRawData(flag.DBquery,'mapping_van_raw','trip'); % more query condition can be set in the function 
+        [rawData,trip_name,trip_id_cleaned,base_station] = fcn_DataClean_queryRawData(flag.DBquery,'mapping_van_raw','trip'); % more query condition can be set in the function 
         
     else
         % Load the raw data from file
@@ -159,21 +161,22 @@ catch
 end
 
 %% ======================= Raw Data Clean and Merge =========================
-
+% Step 1: we check if the time is incrementing uniformly. If it does not,
+% the data around this is set to NaN. In later steps, this is interpolated.
 rawDataTimeFixed = fcn_DataClean_removeTimeGapsFromRawData(rawData);
 %fcn_DataClean_searchAllFieldsForNaN(rawDataTimeFixed)
 
+% Step 2: assign to each data a measured or calculated variance.
 % Fill in the sigma values for key fields. This just calculates the sigma
 % values for key fields (velocities, accelerations, angular rates in
 % particular), useful for doing outlier detection, etc. in steps that
 % follow.
 rawDataWithSigmas = fcn_DataClean_loadSigmaValuesFromRawData(rawDataTimeFixed);
 
-
 % NOTE: the following function changes the yaw angles to wind (correctly)
 % up or down)
 
-% Remove outliers on key fields via median filtering
+% Step 3: Remove outliers on key fields via median filtering
 % This removes outliers by median filtering key values.
 rawDataWithSigmasAndMedianFiltered = fcn_DataClean_medianFilterFromRawAndSigmaData(rawDataWithSigmas);
 
@@ -182,20 +185,29 @@ rawDataWithSigmasAndMedianFiltered = fcn_DataClean_medianFilterFromRawAndSigmaDa
 % figure(3); plot(mod(rawDataWithSigmasAndMedianFiltered.GPS_Novatel.Yaw_deg,360),'k')
 % figure(4); plot(rawDataWithSigmasAndMedianFiltered.GPS_Novatel.Yaw_deg,'r')
 
-% Clean the raw data
+% Step 4: Remove additional data artifacts such as yaw angle wrapping. This
+% is the cleanData structure. This has to be done before filtering to avoid
+% smoothing these artificial discontinuities. Clean the raw data
 cleanData = fcn_DataClean_cleanRawDataBeforeTimeAlignment(rawDataWithSigmasAndMedianFiltered);
 
-% Align all time vectors, and make time a "sensor" field
+% Step 5: Time align the data to GPS time. and make time a "sensor" field This step aligns
+% all the time vectors to GPS time, and ensures that the data has an even time sampling.
 cleanAndTimeAlignedData = fcn_DataClean_alignToGPSTimeAllData(cleanData);
 
-% Time filter the signals
+% Step 6: Time filter the signals
 timeFilteredData = fcn_DataClean_timeFilterData(cleanAndTimeAlignedData);
 
-% Calculate merged data via Baysian averaging across same state
+% Step 7: Merge each signal by those that are common along the same state.
+% This is in the structure mergedData. Calculate merged data via Baysian
+% averaging across same state
 mergedData = fcn_DataClean_mergeTimeAlignedData(timeFilteredData);
 
 % Remove jumps from merged data caused by DGPS outages
 mergedDataNoJumps = fcn_DataClean_removeDGPSJumpsFromMergedData(mergedData,rawData);
+% convert  ENU to LLA
+[mergedDataNoJumps.MergedGPS.latitude,mergedDataNoJumps.MergedGPS.longitude,mergedDataNoJumps.MergedGPS.altitude] ...
+    = enu2geodetic(mergedDataNoJumps.MergedGPS.xEast,mergedDataNoJumps.MergedGPS.yNorth,mergedDataNoJumps.MergedGPS.zUp,...
+      base_station.latitude,base_station.longitude, base_station.altitude,wgs84Ellipsoid);
 
 % Calculate the KF fusion of single signals
 mergedByKFData = mergedDataNoJumps;  % Initialize the structure with prior data
@@ -211,7 +223,6 @@ nameString = 'Yaw_deg';
 [x_kf,sigma_x] = fcn_DataClean_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
 mergedByKFData.MergedGPS.Yaw_deg = x_kf;
 mergedByKFData.MergedGPS.Yaw_deg_Sigma = sigma_x;
-
 
 % KF the xEast_increments and xEast together
 t_x1 = mergedByKFData.MergedGPS.GPS_Time;
@@ -329,7 +340,7 @@ plottingFlags.flag_plot_Garmin = 0;
 % Define which sensors to plot individually
 plottingFlags.SensorsToPlotIndividually = [...
         {'GPS_Hemisphere'}...
-    %    {'GPS_Novatel'}...
+        {'GPS_Novatel'}...
         {'MergedGPS'}...
     %    {'VelocityProjectedByYaw'}...
     %     {'GPS_Garmin'}...
@@ -385,7 +396,7 @@ fcn_DataClean_plotStructureData(rawData,plottingFlags);
 %fcn_DataClean_plotStructureData(cleanAndTimeAlignedData,plottingFlags);
 %fcn_DataClean_plotStructureData(timeFilteredData,plottingFlags);
 %fcn_DataClean_plotStructureData(mergedData,plottingFlags);
-%fcn_DataClean_plotStructureData(mergedDataNoJumps,plottingFlags);
+fcn_DataClean_plotStructureData(mergedDataNoJumps,plottingFlags);
 fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 
 % The following function allows similar plots, made when there are repeated
@@ -396,9 +407,11 @@ fcn_DataClean_plotStructureData(mergedByKFData,plottingFlags);
 figure(123)
 clf
 geoplot(mergedByKFData.GPS_Hemisphere.Latitude,mergedByKFData.GPS_Hemisphere.Longitude,'b', ...
-mergedByKFData.MergedGPS.latitude,mergedByKFData.MergedGPS.longitude,'r','LineWidth',2)
+mergedByKFData.MergedGPS.latitude,mergedByKFData.MergedGPS.longitude,'r',...
+mergedDataNoJumps.MergedGPS.latitude,mergedDataNoJumps.MergedGPS.longitude,'g', 'LineWidth',2)
+
 % geolimits([45 62],[-149 -123])
-legend('GPS_Hemisphere','Merged')
+legend('mergedByKFData.GPS\_Hemisphere','mergedByKFData.MergedGPS','mergedDataNoJumps.MergedGPS')
 geobasemap satellite
 %geobasemap street
 %% OLD STUFF
@@ -443,3 +456,116 @@ save('I99_StateCollege73_to_Altoona33_20210123.mat','I99_StateCollege73_to_Altoo
 % legend('Merged')
 % geobasemap satellite
 
+
+%% ======================= Insert Cleaned Data to 'mapping_van_cleaned' database =========================
+
+%% ------------------------ CONNECT TO  DATABASE ------------------------ %
+% choose different da name to connect to them 
+database_name = 'mapping_van_cleaned';
+%
+% create a instance 
+DB = Database(database_name);
+
+%%show tables 
+tables = DB.ShowTables();
+
+%assign PRIVILEGES
+if 1==0
+    exec(DB.db_connection,'ALTER role ivsg_db_user LOGIN;');
+    exec(DB.db_connection,['grant CONNECT ON DATABASE ' database_name ' TO ivsg_db_user;']);
+    for i_table= 1:height(tables)
+        sql_grant_privilege = ['grant SELECT on ' tables.Table{i_table} ' to ivsg_db_user ;'];
+        exec(DB.db_connection,sql_grant_privilege);
+        sql_grant_privilege = ['grant INSERT on ' tables.Table{i_table} ' to ivsg_db_user ;'];
+        exec(DB.db_connection,sql_grant_privilege);
+    end
+    results_trips = fetch(DB.db_connection,'SELECT * from trips;');
+    
+end
+
+%---
+flag.basicInsert = false;
+%% 1)vehicle
+if flag.basicInsert
+    database_name = 'mapping_van_raw';
+    % create a instance
+    DB_raw = Database(database_name);
+    
+    [result_table, result_struct, column_names] = DB_raw.select('vehicle', {'id','name'});
+    sqlwrite(DB.db_connection,'vehicle',result_table);
+    
+    data = sqlread(DB.db_connection,'vehicle','MaxRows',10);
+    
+end
+
+%% 2)base_station
+if flag.basicInsert
+    database_name = 'mapping_van_raw';
+    % create a instance
+    DB_raw = Database(database_name);
+    fields = {'id','name','latitude','longitude','altitude','geography','latitude_std','longitude_std','altitude_std','timestamp'};
+    [result_table, result_struct, column_names] = DB_raw.select('base_stations', fields);
+    sqlwrite(DB.db_connection,'base_stations',result_table);
+    
+    data = sqlread(DB.db_connection,'base_stations','MaxRows',10);
+    
+end
+
+%% 3)trips
+if isempty(DB.db_connection.Message) % check if the connection is successful
+    % {'id','vehicle_id','base_stations_id','name','description','date','driver','passengers','notes'}
+    if trip_id_cleaned == 8
+        trips.id = trip_id_cleaned;
+        trips.vehicle_id = 1;
+        trips.base_stations_id = base_station.id;
+        trips.name = trip_name;
+        trips.description = {'Map I99 from Altoona (exit 33) to State College(exit 73)'};
+        trips.date = {'2021-01-23 15:00:00'};
+        trips.driver = {'Wushuang Bai'};
+        trips.passengers = {'Liming Gao'};
+        trips.notes = {'Mapping from Altoona (exit 33) to State College(exit 73) through I-99. Nexver lost DGPS mode except for passing below bridge or traffic sign. Drving on the right lane.'};
+    else 
+        error("Wrong Trip ID");
+    end
+    
+    trips_table = struct2table(trips);
+    
+    sqlwrite(DB.db_connection,'trips',trips_table);
+    
+    data = sqlread(DB.db_connection,'trips','MaxRows',10);
+end
+
+%% 4)merged_gps
+
+%{'id','trips_id','latitude','longitude','altitude','geography','xeast','xeast_sigma','ynorth','ynorth_sigma','zup','zup_sigma','velocity_magnitude','velocity_magnitude_sigma','xeast_increments','xeast_increments_sigma','ynorth_increments','ynorth_increments_sigma','yaw_deg','yaw_deg_sigma','gps_time','timestamp'}
+
+
+
+merged_gps.latitude = lat;
+merged_gps.longitude = lon;
+merged_gps.altitude = h;
+
+merged_gps.trips_id = trip_id_cleaned*ones(length(merged_gps.latitude),1);
+
+
+merged_gps_table = struct2table(merged_gps);
+%%step5: insert data into road_segment_reference
+if flag.DBinsert
+    insert_rows = 100000;
+    Split = ceil(height(road_segment_reference_table)/insert_rows); % insert 100,000 rows each loop,40seconds
+    tic
+    for i= 1:Split
+        row_index_start = insert_rows*i -insert_rows+1;
+        row_index_end = min(insert_rows*i,height(road_segment_reference_table));
+        road_segment_reference_insert = road_segment_reference_table(row_index_start:row_index_end,:);
+        fprintf(1,' Insert: segment_id %.2f , %.2f  to %.2f rows\n',road_segment_id,row_index_start,row_index_end);
+        sqlwrite(DB.db_connection,'road_segment_reference',road_segment_reference_insert)
+        toc
+    end
+    fprintf(1,' Insert: segment_id %.2f completed.\n',road_segment_id);
+    toc
+end
+
+clear road_segment_reference lane_node
+
+    
