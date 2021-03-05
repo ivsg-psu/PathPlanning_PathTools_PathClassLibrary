@@ -86,7 +86,7 @@ if strcmp(queryCondition(1:4),'trip') % query by trip
     prompt_choose_trip = ['Which trip are you going to process? ' newline strjoin(trip_withDate,'\n') newline 'Input trip number: '];
     
     User_input = input(prompt_choose_trip);
-    
+    User_input_trip_ID = User_input;
     % pick the trip name
     trip_name = trip_names(User_input);
     
@@ -131,6 +131,7 @@ if strcmp(queryCondition(1:4),'trip') % query by trip
     %
     varargout{1} = trip_name; % output trip name
     varargout{2} = trip_id; % output trip id
+    varargout{3} = User_input_trip_ID; % trip id will be used at the cleaned data database
     % disconnect with DB
     MDB.disconnect();
     
