@@ -9,6 +9,8 @@
 %      -- created 'path' and 'paths' variable types
 %      2021_01_09
 %      -- separated out the pass and fail conditions
+%      2021_03_06
+%      -- created 'elevatedPath' type
 
 %% Station
 %    _____ _        _   _             
@@ -62,6 +64,19 @@ path_test = [4 1; 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
 
 
+%% Elevated Path
+%   ______ _                 _           _   _____      _   _     
+%  |  ____| |               | |         | | |  __ \    | | | |    
+%  | |__  | | _____   ____ _| |_ ___  __| | | |__) |_ _| |_| |__  
+%  |  __| | |/ _ \ \ / / _` | __/ _ \/ _` | |  ___/ _` | __| '_ \ 
+%  | |____| |  __/\ V / (_| | ||  __/ (_| | | |  | (_| | |_| | | |
+%  |______|_|\___| \_/ \__,_|\__\___|\__,_| |_|   \__,_|\__|_| |_|
+%                                                                 
+%                                                                 
+%% Test the elevated path type (success)
+clc;
+elevated_path_test = [4 1 0.1; 2 1 0.2];
+fcn_Path_checkInputsToFunctions(elevated_path_test, 'elevated_path');
 
 %% Paths
 % 

@@ -33,6 +33,9 @@ function fcn_Path_checkInputsToFunctions(...
 %
 %            'path'  - checks that the path type is N x 2 with N>=2
 %
+%            'elevated_path'  - checks that the elevated path type is N x 3 
+%            with N>=2
+%
 %            'paths'  - checks that the path type is N x 2 with N>=3
 %
 %            'traversal' - checks if a structure with X, Y, and Station,
@@ -71,6 +74,8 @@ function fcn_Path_checkInputsToFunctions(...
 %      2021_01_07:
 %      -- fixed errors in comments as 'traversals' description was missing
 %      -- created 'path' and 'paths' checks
+%      2021_03_06:
+%      -- created 'elevated_path' checks
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -157,6 +162,20 @@ if strcmpi(variable_type_string,'path')
     % Check the paths input row length
     if length(variable(:,1))<2
         error('The %s input must be a path type, namely an N x 2 vector with N>=2',variable_name);
+    end
+end
+
+%% Elevated Path
+% Must be a N x 3 with N>=2
+if strcmpi(variable_type_string,'elevated_path')
+    % Check the elevated paths input type (e.g. elevated paths must be a matrix of numbers)
+    if (length(variable(1,:))~=3) || ~isnumeric(variable)
+        error('The %s input must be a elevated path type, namely an N x 3 vector with N>=2',variable_name);
+    end
+    
+    % Check the paths input row length
+    if length(variable(:,1))<2
+        error('The %s input must be a elevated path type, namely an N x 3 vector with N>=2',variable_name);
     end
 end
 
