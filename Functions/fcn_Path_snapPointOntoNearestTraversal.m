@@ -239,8 +239,9 @@ if flag_do_debug
     
     % Plot the closest point on path
     plot(closest_path_point(:,1),closest_path_point(:,2),'go','Markersize',20);
+    quiver(closest_path_point(1), closest_path_point(2), ...
+           cos(path_point_yaw), sin(path_point_yaw), 0.3, 'g', 'Linewidth', 3);
     text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
-    
     
     % Connect closest point on path to query point
     plot(...
