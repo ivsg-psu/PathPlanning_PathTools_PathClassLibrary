@@ -2,24 +2,15 @@
 % Revision history
 % 2020_05_20 - fixed bug on the yaw angle plots
 % 2020_06_20 - add raw data query functions
-
-
-
-%% Prep the workspace
-
-% Clear the command window and workspace
+%% Clear the command window and workspace
 clc
 clear all %#ok<CLALL>
 
-% Make sure we can see the utilities folder 
-addpath '../Utilities';
-
-
 % Add driver for database
-%javaaddpath('C:\Users\Guangwei Zhou\AppData\Roaming\MathWorks\MATLAB\R2020a\drivers\postgresql-42.2.9.jar')
+javaaddpath('C:\Users\Guangwei Zhou\AppData\Roaming\MathWorks\MATLAB\R2020a\drivers\postgresql-42.2.9.jar')
 
 %%
-flag.DBquery = false; %set to true if you want to query raw data from database insteading of loading from default *.mat file
+flag.DBquery = true; %set to true if you want to query raw data from database insteading of loading from default *.mat file
 try
     fprintf('Starting the code using variable rawData of length: %d\n', length(rawData));
 catch
@@ -95,24 +86,23 @@ catch
         
     else
         % add the data path
-        addpath '../Data';
-        
+        addpath '../data'
         
         % Load the raw data
         % This data will have outliers, be unevenly sampled, have multiple and inconsistent measurements of the same variable.
         filename  = 'MappingVan_DecisionMaking_03132020.mat';
         variable_names = 'MappingVan_DecisionMaking_03132020';
-        rawData = fcn_DataClean_loadRawData(filename,variable_names);
+        rawData = fcn_loadRawData(filename,variable_names);
 
     end
     
-    rawDataTimeFixed = fcn_DataClean_removeTimeGapsFromRawData(rawData);
+    rawDataTimeFixed = fcn_removeTimeGapsFromRawData(rawData);
 end
 
 % Data clean and merge
 % Fill in the sigma values for key fields. This just calculates the sigma values for key fields (velocities,
 % accelerations, angular rates in particular), useful for doing outlier detection, etc. in steps that follow.
-rawDataWithSigmas = fcn_DataClean_loadSigmaValuesFromRawData(rawDataTimeFixed);
+rawDataWithSigmas = fcn_loadSigmaValuesFromRawData(rawDataTimeFixed);
 
 
 % NOTE: the following function changes the yaw angles to wind (correctly)
@@ -120,7 +110,7 @@ rawDataWithSigmas = fcn_DataClean_loadSigmaValuesFromRawData(rawDataTimeFixed);
 
 % Remove outliers on key fields via median filtering
 % This removes outliers by median filtering key values.
-rawDataWithSigmasAndMedianFiltered = fcn_DataClean_medianFilterFromRawAndSigmaData(rawDataWithSigmas);
+rawDataWithSigmasAndMedianFiltered = fcn_medianFilterFromRawAndSigmaData(rawDataWithSigmas);
 
 % PLOTS to show winding up or down:
 % figure(2); plot(mod(rawDataWithSigmas.GPS_Novatel.Yaw_deg,360),'b')
@@ -128,19 +118,19 @@ rawDataWithSigmasAndMedianFiltered = fcn_DataClean_medianFilterFromRawAndSigmaDa
 % figure(4); plot(rawDataWithSigmasAndMedianFiltered.GPS_Novatel.Yaw_deg,'r')
 
 % Clean the raw data
-cleanData = fcn_DataClean_cleanRawDataBeforeTimeAlignment(rawDataWithSigmasAndMedianFiltered);
+cleanData = fcn_cleanRawDataBeforeTimeAlignment(rawDataWithSigmasAndMedianFiltered);
 
 % Align all time vectors, and make time a "sensor" field
-cleanAndTimeAlignedData = fcn_DataClean_alignToGPSTimeAllData(cleanData);
+cleanAndTimeAlignedData = fcn_alignToGPSTimeAllData(cleanData);
 
 % Time filter the signals
-timeFilteredData = fcn_DataClean_timeFilterData(cleanAndTimeAlignedData);
+timeFilteredData = fcn_timeFilterData(cleanAndTimeAlignedData);
 
 % Calculate merged data via Baysian averaging across same state
-mergedData = fcn_DataClean_mergeTimeAlignedData(timeFilteredData);
+mergedData = fcn_mergeTimeAlignedData(timeFilteredData);
 
 % Remove jumps from merged data caused by DGPS outages
-mergedDataNoJumps = fcn_DataClean_removeDGPSJumpsFromMergedData(mergedData,rawData);
+mergedDataNoJumps = fcn_removeDGPSJumpsFromMergedData(mergedData,rawData);
 
 % Calculate the KF fusion of single signals
 mergedByKFData = mergedDataNoJumps;  % Initialize the structure with prior data
@@ -153,7 +143,7 @@ t_x1dot = mergedByKFData.MergedIMU.GPS_Time;
 x1dot = mergedByKFData.MergedIMU.ZGyro*180/pi;
 x1dot_Sigma = mergedByKFData.MergedIMU.ZGyro_Sigma*180/pi;
 nameString = 'Yaw_deg';
-[x_kf,sigma_x] = fcn_DataClean_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
+[x_kf,sigma_x] = fcn_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
 mergedByKFData.MergedGPS.Yaw_deg = x_kf;
 mergedByKFData.MergedGPS.Yaw_deg_Sigma = sigma_x;
 
@@ -166,7 +156,7 @@ t_x1dot = mergedByKFData.MergedGPS.GPS_Time;
 x1dot = mergedByKFData.MergedGPS.xEast_increments/0.05;  % The increments are raw changes, not velocities. Have to divide by time step.
 x1dot_Sigma = mergedByKFData.MergedGPS.xEast_increments_Sigma/0.05;
 nameString = 'xEast';
-[x_kf,sigma_x] = fcn_DataClean_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
+[x_kf,sigma_x] = fcn_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
 mergedByKFData.MergedGPS.xEast = x_kf;
 mergedByKFData.MergedGPS.xEast_Sigma = sigma_x;
 
@@ -178,44 +168,28 @@ t_x1dot = mergedByKFData.MergedGPS.GPS_Time;
 x1dot = mergedByKFData.MergedGPS.yNorth_increments/0.05;  % The increments are raw changes, not velocities. Have to divide by time step.
 x1dot_Sigma = mergedByKFData.MergedGPS.yNorth_increments_Sigma/0.05;
 nameString = 'yNorth';
-[x_kf,sigma_x] = fcn_DataClean_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
+[x_kf,sigma_x] = fcn_KFmergeStateAndStateDerivative(t_x1,x1,x1_Sigma,t_x1dot,x1dot,x1dot_Sigma,nameString);
 mergedByKFData.MergedGPS.yNorth = x_kf;
 mergedByKFData.MergedGPS.yNorth_Sigma = sigma_x;
 
 
-
-
-
-
-
-
-
-
-
-
-
 %% Merge data together by laps
-% Create a structure called lane_change - this will contain only the
-% mergedGPS information, so we copy the structure over
-clear lane_change;
 lane_change.Clocks = mergedByKFData.Clocks;
 lane_change.MergedGPS = mergedByKFData.MergedGPS;
-% % % The following does not seem to be necessary (just copies over or is
-% % % unused)
-% loops = lane_change;
-% fn = fieldnames(lane_change.MergedGPS);
-% for j = 1:length(fn)
-%     fn_str = string(fn(j));
-%     lane_change.MergedGPS.(fn_str) = lane_change.MergedGPS.(fn_str)(1:end);
-% end
+loops = lane_change;
+fn = fieldnames(lane_change.MergedGPS);
+for j = 1:length(fn)
+    fn_str = string(fn(j));
+    lane_change.MergedGPS.(fn_str) = lane_change.MergedGPS.(fn_str)(1:end);
+end
 
 % define parameters of s-coordinate (start point and etc.)
 % Deinfe the start and end point of one loop
-RouteStructure = fcn_RouteSegments_defineRouteStartStop("lane_change_full_loop");
+RouteStructure = fcn_defineRouteStructure("lane_change_full_loop");
 
 
 %% Break loop data into laps
-[lap_data, num_laps] = fcn_RouteSegments_breakTraversalIntoLaps(lane_change, RouteStructure);% lapData only contains lane-change segment?
+[lap_data, num_laps] = fcn_breakFilteredDataIntoLaps(lane_change, RouteStructure);% lapData only contains lane-change segment?
 
 % FOR DEBUGGING on 2020_05_29 - delete later if no longer needed
 % figure(333332);
@@ -227,25 +201,19 @@ RouteStructure = fcn_RouteSegments_defineRouteStartStop("lane_change_full_loop")
 %     %legend_string{i_Laps} = sprintf('Lap %d',i_Laps);
 % end
 
-% FOR DEBUGGING
-if 1==1
-    figure(2)
-    clf
-    hold on
-    for i_path= 1:num_laps
-        plot(lap_data{i_path}.MergedGPS.xEast,lap_data{i_path}.MergedGPS.yNorth)
-    end
-    
-    title('path')
-    xlabel('x [m]')
-    ylabel('y [m]')
+%% Apply the Algorithm in script_test_path_averaging
+figure(2)
+clf
+hold on
+for i_path= 1:num_laps
+    plot(lap_data{i_path}.MergedGPS.xEast,lap_data{i_path}.MergedGPS.yNorth)
 end
 
+title('path')
+xlabel('x [m]')
+ylabel('y [m]')
 
-%% Apply the Algorithm in script_test_path_averaging
-% Pick the trajectory with the most data points so that the average path
-% converges faster. Use this "most points" path as the reference trajectory
-% for average calculations.
+% Pick the trajectory with the most data points so that the average path converges faster
 data_length = zeros(1, num_laps);
 for i_path = 1:num_laps
     data_length(i_path) = length(lap_data{i_path}.MergedGPS.xEast);
@@ -253,8 +221,8 @@ end
 [~,initital_reference_path_id] = max(data_length);
 path = lap_data{initital_reference_path_id}; %initial reference path
 
-
-fprintf(1,'\n Average path is generating ...\n');
+% run the simulation
+fprintf(1,'\nAverage path is generating ...\n');
 % profile off
 average_start = tic;
 % profile on -timer 'performance'
@@ -415,6 +383,10 @@ end
 yaw_error_diff = diff(yaw_error_lap_unwrapped);
 yaw_error_std = std(yaw_error_lap_unwrapped')';
 
+% Run a classifier on lane to force short segments to be ignored. The
+% repelem function counts how many replecations of a designation occur in a
+% sequence. We require 100 data points or more in order for a segment to be
+% classified as 1 lane or 2 lanes.
 
 is_one_lane = yaw_error_std < 1.2;
 d1 = [true; diff(is_one_lane) ~= 0; true]; % TRUE if values change
@@ -443,6 +415,7 @@ lane_classification = zeros(length(x_mean), 1); % Identify the road segment to b
 lane_classification(is_one_lane == 1) = 1;
 lane_classification(is_two_lane == 1) = 2;
 
+% Do the classifications here
 one_lane_area = find(lane_classification == 1);
 two_lane_area = find(lane_classification == 2);
 transition_area = find(lane_classification == 0);
@@ -455,7 +428,11 @@ two_lane_end = [];
 transition_start = [];
 transition_end = [];
 
+% Store the classification into vectors, storing the "start" locations for
+% one-lane, the "end" locations for one lane, etc.
+
 for i = 1:length(lane_classification)
+    % Store the start locations
     if i == 1 || lane_classification(i) ~= lane_classification(i-1)
         if lane_classification(i) == 1
             one_lane_start = [one_lane_start; i];
@@ -466,6 +443,8 @@ for i = 1:length(lane_classification)
         end
     end
     
+    
+    % Store the end locations
     if i == length(lane_classification) || lane_classification(i) ~= lane_classification(i+1)
         if lane_classification(i) == 1
             one_lane_end = [one_lane_end; i];
@@ -478,15 +457,17 @@ for i = 1:length(lane_classification)
 end
 
 
-%% Use Histogram Bincount to Determine Lane Positions
+%% Use Histogram Bincount to Determine Lane Positions (find the WIDTH of the lanes)
+% For 2-lane area, there will be two peaks for the 2 histograms in this
+% area. The peaks should correspond to the center of each lane.
 % Select the data in all_error that corresponds to 2 Lane area
+% The highest positive bin represents location of the right lane
+% The highest negative bin represents location of the left lane
 
 all_error_two_lane = error_lap(two_lane_start:two_lane_end, :);
 all_error_two_lane = all_error_two_lane(:); % convert to 1D array
 
-%The highest positive bin represents location of the right lane
-%The highest negative bin represents location of the left lane
-
+% Grab the histogram counts so that we can analyze the data
 [counts, edge] = histcounts(all_error_two_lane, 75); % length of edge is always 1 more than count, fix by finding center of bin
 
 % find the center location of each bin
@@ -500,146 +481,69 @@ path_lane_width(one_lane_area) = lane_width;
 path_lane_width(transition_area) = 1.5*lane_width;
 path_lane_width(two_lane_area) = 2*lane_width;
 
-
-
-
 %% First Subplot: plot of lap data and average path
 figure(1234);
-
 subplot(2,3,1)
 hold on
-box on
-%test_idx = 200;
-grid on;
+test_idx = 200;
+
 % This is a plot of all the data separated into laps
-legend_mat = zeros(1,2);
+legend_string = ''; % Initialize an empty string for legends
 for i_laps = 1:num_laps
-    legend_mat(1) = plot(closestXs(:,i_laps), closestYs(:,i_laps), 'r');
-    %plot(closestXs(test_idx,i_laps), closestYs(test_idx,i_laps), 'ko')
-    %legend_string{i_laps} = sprintf('Lap %d',i_laps);
+    plot(closestXs(:,i_laps), closestYs(:,i_laps))
+    plot(closestXs(test_idx,i_laps), closestYs(test_idx,i_laps), 'ko')
+    legend_string{i_laps} = sprintf('Lap %d',i_laps);
 end
 
-legend_mat(2) = plot(x_mean,y_mean,'k','LineWidth',2);
-%plot(x_mean(test_idx),y_mean(test_idx),'ro','LineWidth',2);
-title('Step 1');
+plot(x_mean,y_mean,'k','LineWidth',2)
+plot(x_mean(test_idx),y_mean(test_idx),'ro','LineWidth',2);
 
-xlabel('x [m]') %set  x label 
-ylabel('y [m]') % set y label 
+
+xlabel('GPS x Coordinate [m]') %set  x label 
+ylabel('GPS y Coordinate [m]') % set y label 
 %legend(legend_string);
-legend(legend_mat, 'Vehicle Trajectory','Average Path', 'location', 'northwest')
+grid minor;
 
-% Second Subplot: position error
+%% Second Subplot: Plot of all yaw error with respect to data index
 subplot(2,3,2)
-box on
-for i = 1:num_laps
-    plot(error_lap(:, i));
-    hold on;
-end
-xlim([0,1025]);
-xlabel("Data Index");
-ylabel("Position Error from Average Path [m]");
-grid on
-title('Step 2');
-
-% Third Subplot: Plot of all yaw error with respect to data index
-subplot(2,3,3)
-box on
 %xlim([0, length(all_yaw_error_unwrapped)]);
 for i = 1:num_laps
-    plot(yaw_error_lap_unwrapped(:, i));
+    plot(yaw_error_lap_unwrapped(:, i));% All yaw angle plot
     hold on;
 end
-xlim([0,1025]);
+
 xlabel("Data Index");
-ylabel("Yaw Error from Average Path [deg]");
-grid on
-title('Step 3');
+ylabel("Yaw Angle Error from Mean [Degree]");
 
 
-% Fourth Subplot: plot standard deviation of the yaw error and lane classification boundaries
-subplot(2,3,4)
-box on
-hold on;
-%plot(yaw_error_std)
+%% Third Subplot: plot standard deviation of the yaw error and lane classification boundaries
+subplot(2,3,3)
+plot(yaw_error_std)
 xlim([0, length(yaw_error_std)]);
 xlabel("Data Index");
-ylabel("Standard Deviation of Yaw Angle Error [deg]");
-grid on
+ylabel("Standard Deviation of Yaw Angle Error [Degree]");
+grid minor;
+hold on;
 
 %plot of Lane Classification
-o1 = line(1:113, yaw_error_std(1:113));
-o1.Color = 'red';
-o1.LineWidth = 3;
-o2 = line(731:1022, yaw_error_std(731:1022));
-o2.Color = 'red';
-o2.LineWidth = 3;
+p(1) = plot(one_lane_area, zeros(length(one_lane_area),1), 'r.', 'MarkerSize',10);
+p(2) = plot(two_lane_area, zeros(length(two_lane_area),1), 'g.', 'MarkerSize',10);
+p(3) = plot(transition_area, zeros(length(transition_area),1), 'b.', 'MarkerSize',10);
+legend(p(1:3), 'One Lane Area', 'Two Lane Area', 'Transition Area')
 
-tw1 = line(222:633, yaw_error_std(222:633));
-tw1.Color = 'green';
-tw1.LineWidth = 3;
-
-tr1 = line(113:222, yaw_error_std(113:222));
-tr1.Color = 'blue';
-tr1.LineWidth = 3;
-tr2 = line(633:731, yaw_error_std(633:731));
-tr2.Color = 'blue';
-tr2.LineWidth = 3;
-
-legend_mat = [o1,tw1,tr1];
-legend(legend_mat, 'One Lane', 'Two Lanes', 'Transition')
-title('Step 4');
-
-
-
-% Fifth Subplot: Lateral Offset histogram
-subplot(2,3,5)
-box on
+%% Forth Subplot: Lateral Offset histogram
+subplot(2,3,4)
 histogram(all_error_two_lane,75); 
-grid on;
-% Get information about the same histogram by returning arguments
-[n,x] = hist(all_error_two_lane,75);
-% Create strings for each bar count
-barstring_n = num2str(n');
-barstring_x = num2str(x');
-%barstrings = strcat('Count:', barstring_n, 'Position:', barstring_x);
-barstrings = strcat('Position:', barstring_x);
-% Create text objects at each location
-text(x(23),n(23),barstrings(23,:),'horizontalalignment','center','verticalalignment','bottom')
-text(x(62),n(62),barstrings(62,:),'horizontalalignment','center','verticalalignment','bottom')
-xlabel("Error Relative to Average Path [m]")
+title("75 Bins")
+xlabel("Error Relative to Path [m]")
 ylabel("Count")
-xlim([-2.7, 2.7]);
-title('Step 5');
 
-
-% Sixth Subplot: Polygons that indicate the lane classifications
-subplot(2,3,6)
-box on
+%% Fifth Subplot: Polygons that indicate the lane classifications
+subplot(2,3,5)
 hold on
-grid on
+fcn_plotPathWithVarianceShading(x_mean(one_lane_area),y_mean(one_lane_area),'y', path_lane_width(one_lane_area),1);
+fcn_plotPathWithVarianceShading(x_mean(two_lane_area),y_mean(two_lane_area),'r', path_lane_width(two_lane_area),1);
+fcn_plotPathWithVarianceShading(x_mean(transition_area),y_mean(transition_area),'g', path_lane_width(transition_area),1);
 for i_laps = 1:num_laps
-    plot(closestXs(:,i_laps), closestYs(:,i_laps), 'k')
+    plot(closestXs(:,i_laps), closestYs(:,i_laps))
 end
-xlabel('x [m]')
-ylabel('y [m]')
-xlim([1150,1450]);
-ylim([6420, 6520]);
-
-fcn_plotPathWithVarianceShading(x_mean(one_lane_area),y_mean(one_lane_area),'r', path_lane_width(one_lane_area),1);
-fcn_plotPathWithVarianceShading(x_mean(two_lane_area),y_mean(two_lane_area),'g', path_lane_width(two_lane_area),1);
-fcn_plotPathWithVarianceShading(x_mean(transition_area),y_mean(transition_area),'b', path_lane_width(transition_area),1);
-
-% for legend only
-o1 = line(1:113, yaw_error_std(1:113));
-o1.Color = 'red';
-o1.LineWidth = 3;
-tw1 = line(222:633, yaw_error_std(222:633));
-tw1.Color = 'green';
-tw1.LineWidth = 3;
-tr1 = line(113:222, yaw_error_std(113:222));
-tr1.Color = 'blue';
-tr1.LineWidth = 3;
-title('Step 6');
-
-legend_mat = [o1,tw1,tr1];
-legend(legend_mat, 'One Lane', 'Two Lanes', 'Transition', 'location', 'Northwest')
