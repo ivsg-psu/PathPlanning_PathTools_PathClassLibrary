@@ -18,9 +18,11 @@ classdef Database < handle
         database_name
         ip_address = '130.203.223.234' %  'localhost'; %Ip address of server host 
         port = 5432;  % port number 
-        username = 'ivsg_db_user'   % user name for the server
-        password = 'ivsg@DB320' % password
-        
+%         username = 'ivsg_db_user'   % user name for the server
+%         password = 'ivsg@DB320' % password
+username = 'brennan'; % user name for the server
+password = 'ivsg@Reber320'; % password
+
         db_connection  % database connection, this is assigned in  constructor function 
         
         % Use the PostgreSQL Matlab database driver if you setup the
