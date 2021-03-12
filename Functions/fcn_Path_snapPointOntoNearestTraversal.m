@@ -36,6 +36,11 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 %
 %     fcn_Path_checkInputsToFunctions
 %
+% EXAMPLES:
+%
+% See the script: script_test_fcn_Path_snapPointOntoNearestTraversal
+% for a full test suite.
+%
 % This function was written on 2021_01_29 by Satya Prasad based on
 % fcn_snapPointOntoNearestPath written by S. Brennan
 % Questions or comments? szm888@psu.edu 
