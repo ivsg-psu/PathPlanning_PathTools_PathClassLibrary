@@ -4,10 +4,15 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
     percent_along_length] = ...
     fcn_Path_snapPointOntoNearestTraversal(point, traversal, varargin)
 % fcn_Path_snapPointOntoNearestTraversal
-% Finds location on a traversal that is closest to a given point, e.g. snapping
-% the point onto the traversal
+% Finds location on a traversal that is closest to a given point, 
+% e.g. snapping the point onto the traversal.
+% This function usually finds the orthogonal point on the path.
+% At times, the orthogonal point lies off the path at corners. In such
+% cases, the nearest neigbour is taken as the corner.
+% 'path_point_yaw' gives orientation of the path at
+% 'first_path_point_index'.
 % 
-% FORMAT: 
+% FORMAT:
 %
 %      [closest_path_point,s_coordinate] = ...
 %      fcn_Path_snapPointOntoNearestTraversal(point, traversal, varargin)
