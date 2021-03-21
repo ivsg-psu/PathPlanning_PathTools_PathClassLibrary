@@ -4,8 +4,19 @@ function [closest_path_point,s_coordinate,...
     percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, path,varargin)
 % fcn_Path_snapPointOntoNearestPath
-% Finds location on a path that is closest to a given point, e.g. snapping
-% the point onto the path
+% Finds location on a path that is closest to a given query point, e.g.
+% snapping the point onto the path.
+%
+% The solution method is as follows:
+%  1. Find the closest point on the path to the query point
+%  2. Find path points behind and ahead of the closest point from step 1
+%   -> Check for end cases. For start/end, use the adjacent points.
+%  3. Find percentage of travel on both the segments using dot products
+%  4. Find projected point on the segment that has percentage of travel
+%  between 0 and 1
+%  5. If percentage of travel is not between 0 and 1 for both the segments,
+%  then choose the snap point as closest point, e.g. the result from step 1
+
 % 
 % FORMAT: 
 %
@@ -14,10 +25,11 @@ function [closest_path_point,s_coordinate,...
 %
 % INPUTS:
 %
-%      point: a 1x2 vector containing the [X Y] location of the point
+%      point: a 1x2 vector containing the [X Y] location of the point or
+%             a 1x3 vector containing the [X Y Z] location of the point
 %
-%      path: a Nx2 vector of [X Y] path points, where N is the number of
-%      points the points on the path, N >= 2. 
+%      path: a Nx2 or Nx3 vector of [X Y (Z)] path points, where N is the
+%      number of points the points on the path, N >= 2.
 %
 %      (optional inputs) 
 %
@@ -25,8 +37,9 @@ function [closest_path_point,s_coordinate,...
 %
 % OUTPUTS:
 %
-%      closest_path_point: a 1x2 vector containing the [X Y] location of
-%      the nearest point on the path
+%      closest_path_point: a 1x2 or 1x3 vector containing the [X Y] or [X Y
+%      Z] location of the nearest point on the path
+%
 %      s_coordinate: a scalar (1x1) representing the s-coordinate distance
 %      along the path
 %
@@ -52,6 +65,10 @@ function [closest_path_point,s_coordinate,...
 %     -- added argument checking
 %     2021_01_09
 %     -- cleaned up header
+%     2021_03_21
+%     -- modified to allow 3D snapping (!!!)
+%     -- changed input checks to include 3D paths
+%     -- updated plotting to allow 3D
 
 % TO-DO:
 % Allow multiple points, e.g.
@@ -82,7 +99,12 @@ if flag_check_inputs == 1
     end
     
     % Check the data input
-    fcn_Path_checkInputsToFunctions(path, 'path');
+    fcn_Path_checkInputsToFunctions(path, 'path2or3D');
+    
+    % Check that the dimension of the point and path match
+    if length(point(1,:)) ~= length(path(1,:))
+        error('The dimension of the query point, in number of columns, must match the dimension of the path, in number of columnts');
+    end
 end
 
 % Does user want to show the plots?
@@ -111,13 +133,13 @@ end
 
 % The solution method is as follows:
 %  1. Find the closest point on the path to the query point
-%   -> Check for end cases
-%  2. Find path points behind and ahead of the closest point from 1
+%  2. Find path points behind and ahead of the closest point from step 1
+%   -> Check for end cases. For start/end, use the adjacent points.
 %  3. Find percentage of travel on both the segments using dot products
 %  4. Find projected point on the segment that has percentage of travel
 %  between 0 and 1
 %  5. If percentage of travel is not between 0 and 1 for both the segments,
-%  then choose the projected point as closest point from 1
+%  then choose the projected point as closest point from step 1
 
 
 traversal = fcn_Path_convertPathToTraversalStructure(path);
@@ -223,37 +245,80 @@ if flag_do_debug
     figure(fig_num);
     hold on;
     grid on;
-    % Plot the path
-    plot(path(:,1),path(:,2),'r-','Linewidth',5);       
-    plot(path(:,1),path(:,2),'ro','Markersize',20);       
     
-    axis equal;
-    
-    % Plot the query point
-    plot(point(:,1),point(:,2),'ko');
-    text(point(:,1),point(:,2),'Query point');
-    
-    % Plot the closest path points;
-    plot(...
-        path(first_path_point_index:second_path_point_index,1),...
-        path(first_path_point_index:second_path_point_index,2),'r*');       
-    
-    % % Label the points with distances?
-    % for i_point = 1:length(path(:,1))
-    %     text(path(i_point,2),path(i_point,3),sprintf('%.2f',distances_point_to_path(i_point)));
-    % end
-    
-    % Plot the closest point on path
-    plot(closest_path_point(:,1),closest_path_point(:,2),'go','Markersize',20);
-    text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
-    
-    
-    % Connect closest point on path to query point
-    plot(...
-        [point(:,1) closest_path_point(:,1)],...
-        [point(:,2) closest_path_point(:,2)],'g-','Linewidth',2);
-    
-    
+    % Is this a 2-D query
+    if length(path(1,:))==2
+        % Plot the path
+        plot(path(:,1),path(:,2),'r-','Linewidth',5);
+        plot(path(:,1),path(:,2),'ro','Markersize',20);
+        
+        axis equal;
+        
+        % Plot the query point
+        plot(point(:,1),point(:,2),'ko');
+        text(point(:,1),point(:,2),'Query point');
+        
+        % Plot the closest path points;
+        plot(...
+            path(first_path_point_index:second_path_point_index,1),...
+            path(first_path_point_index:second_path_point_index,2),'r*');
+        
+        % % Label the points with distances?
+        % for i_point = 1:length(path(:,1))
+        %     text(path(i_point,2),path(i_point,3),sprintf('%.2f',distances_point_to_path(i_point)));
+        % end
+        
+        % Plot the closest point on path
+        plot(closest_path_point(:,1),closest_path_point(:,2),'go','Markersize',20);
+        text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
+        
+        
+        % Connect closest point on path to query point
+        plot(...
+            [point(:,1) closest_path_point(:,1)],...
+            [point(:,2) closest_path_point(:,2)],'g-','Linewidth',2);
+        
+    elseif length(path(1,:))==3
+        
+        % Plot the path
+        plot3(path(:,1),path(:,2),path(:,3),'r-','Linewidth',5);
+        plot3(path(:,1),path(:,2),path(:,3),'ro','Markersize',20);
+        
+        axis equal;
+        
+        % Plot the query point
+        plot3(point(:,1),point(:,2),point(:,3),'ko');
+        text( point(:,1),point(:,2),point(:,3),'Query point');
+        
+        % Plot the closest path points;
+        plot3(...
+            path(first_path_point_index:second_path_point_index,1),...
+            path(first_path_point_index:second_path_point_index,2),...
+            path(first_path_point_index:second_path_point_index,3),'r*');
+        
+        
+        % Plot the closest point on path
+        plot3(...
+            closest_path_point(:,1),...
+            closest_path_point(:,2),...
+            closest_path_point(:,3),...
+            'go','Markersize',20);
+        text(...
+            closest_path_point(:,1),...
+            closest_path_point(:,2),...
+            closest_path_point(:,3),...
+            'Snap Point on Path');
+        
+        
+        % Connect closest point on path to query point
+        plot3(...
+            [point(:,1) closest_path_point(:,1)],...
+            [point(:,2) closest_path_point(:,2)],...
+            [point(:,3) closest_path_point(:,3)],...
+            'g-','Linewidth',2);
+        
+
+    end
 end % Ends the flag_do_debug if statement
 
 

@@ -11,6 +11,8 @@
 %      -- separated out the pass and fail conditions
 %      2021_03_06
 %      -- created 'elevatedPath' type
+%      2021_03_20
+%      -- created 'path2or3D' type
 
 %% Station
 %    _____ _        _   _             
@@ -62,6 +64,25 @@ fcn_Path_checkInputsToFunctions(station_test, 'stations');
 clc;
 path_test = [4 1; 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
+
+%% path2or3D
+% 
+%               _   _     ___           ____  _____  
+%              | | | |   |__ \         |___ \|  __ \ 
+%   _ __   __ _| |_| |__    ) |___  _ __ __) | |  | |
+%  | '_ \ / _` | __| '_ \  / // _ \| '__|__ <| |  | |
+%  | |_) | (_| | |_| | | |/ /| (_) | |  ___) | |__| |
+%  | .__/ \__,_|\__|_| |_|____\___/|_| |____/|_____/ 
+%  | |                                               
+%  |_|                                               
+
+%% Test the path2or3D type (success)
+clc;
+path_test = [4 1; 2 1];
+fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
+
+path_test = [4 1 0; 2 1 4];
+fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
 
 %% Elevated Path
@@ -223,6 +244,36 @@ fcn_Path_checkInputsToFunctions(path_test, 'path');
 clc
 path_test = [4 2];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
+
+%% path2or3D
+% 
+%               _   _     ___           ____  _____  
+%              | | | |   |__ \         |___ \|  __ \ 
+%   _ __   __ _| |_| |__    ) |___  _ __ __) | |  | |
+%  | '_ \ / _` | __| '_ \  / // _ \| '__|__ <| |  | |
+%  | |_) | (_| | |_| | | |/ /| (_) | |  ___) | |__| |
+%  | .__/ \__,_|\__|_| |_|____\___/|_| |____/|_____/ 
+%  | |                                               
+%  |_|                                               
+
+%% Test the path2or3D type (success)
+clc;
+path_test = [4 1; 2 1];
+fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
+
+path_test = [4 1 0; 2 1 4];
+fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
+
+%% Test the path type (fail since only one column)
+clc
+path_test = [4; 2];
+fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
+
+%% Test the path type (fail since only one row)
+clc
+path_test = [4 2 1];
+fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
+
 
 %% Paths
 % 

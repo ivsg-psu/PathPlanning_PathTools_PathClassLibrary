@@ -17,6 +17,9 @@
 %     -- cleaned up notation to show path vs pathSXY
 %     2021_01_09
 %     -- completely converted code to path form, not pathSXY
+%     2021_03_21
+%     -- modified to allow 3D snapping
+%     -- changed input checks to include 3D paths
 
 
 close all;
@@ -172,6 +175,43 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     s_coordinate, percent_along_length);
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ____  _____       _____                     _______        _       
+%  |___ \|  __ \     / ____|                   |__   __|      | |      
+%    __) | |  | |   | (___  _ __   __ _ _ __      | | ___  ___| |_ ___ 
+%   |__ <| |  | |    \___ \| '_ \ / _` | '_ \     | |/ _ \/ __| __/ __|
+%   ___) | |__| |    ____) | | | | (_| | |_) |    | |  __/\__ \ |_\__ \
+%  |____/|_____/    |_____/|_| |_|\__,_| .__/     |_|\___||___/\__|___/
+%                                      | |                             
+%                                      |_|                             
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% BASIC example 3D - simple 3D snapping onto a vertex
+point = [0.8 1.3 2.1];
+pathXYZ = [0 0 0; 0.5 0.2 0.4; 0.9 0.9 0.8; 3 0 1];
+
+fignum = 3331;
+
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXYZ,fignum);
+fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length);
+
+%% BASIC example 3D - simple 3D snapping onto a vertex
+point = [2 1.3 2.1];
+pathXYZ = [0 0 0; 0.5 0.2 0.4; 0.9 0.9 0.8; 3 0 1];
+
+fignum = 3332;
+
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXYZ,fignum);
+fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length);
 
 %% ADVANCED example
 % Create some paths:

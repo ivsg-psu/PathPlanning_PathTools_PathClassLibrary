@@ -12,6 +12,8 @@
 %      -- more descriptive comments
 %      2021_01_09
 %      -- added another example to illustrate station errors
+%      2021_03_21
+%      -- added examples to illustrate 2D and 3D basic plotting
 
 close all
 clc
@@ -19,9 +21,33 @@ clc
 % Fill in some dummy data
 paths_array = fcn_Path_fillSamplePaths;
 
-%% Example 1 - show how it works
+
+%% Example 1.1 - show how it works for 2D
+% Basic call 
+fig_num = 11;
+path_simple_2D = [1 1; 1 2; 3 4; 4 5; 7 7];
+traversal = fcn_Path_convertPathToTraversalStructure(path_simple_2D,fig_num);
+simple_example.traversal{1} = traversal;
+
+fcn_Path_plotTraversalsXY(simple_example,fig_num);
+xlabel('X [m]');
+ylabel('Y [m]');
+
+%% Example 1.2 - show how it works for 3D
+% Basic call 
+fig_num = 12;
+path_simple_3D = [1 1 1; 1 2 2; 3 4 3; 4 5 3; 7 7 4];
+traversal = fcn_Path_convertPathToTraversalStructure(path_simple_3D,fig_num);
+simple_example.traversal{1} = traversal;
+
+fcn_Path_plotTraversalsXY(simple_example,fig_num);
+xlabel('X [m]');
+ylabel('Y [m]');
+
+%% Example 1.3 - show how it works
+
 % Basic call with a figure option to plot output repeatedly onto figure
-fig_num = 1;
+fig_num = 13;
 for i_traveral = 1:length(paths_array)
     traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_traveral},fig_num);
     data.traversal{i_traveral} = traversal;
@@ -51,7 +77,7 @@ fcn_Path_plotTraversalsXY(data,fig_num);
 xlabel('X [m]');
 ylabel('Y [m]');
 
-for i_traveral = 1:length(paths)
+for i_traveral = 1:length(data.traversal)
     traversal_stations = data.traversal{i_traveral}.Station;
     for i_station = Station_step:Station_step:traversal_stations(end)
         index = find(traversal_stations >= i_station,1);

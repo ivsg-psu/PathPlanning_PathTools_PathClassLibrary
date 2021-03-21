@@ -95,19 +95,36 @@ Npoints = length(path(:,1)); % number of points in the path
 % 1) indices of nearest neighbor that is behind the points of path
 % 2) indices of nearest neighbor that is ahead of the points of path
 % 3) percentage of travel of point on the path
-vector_first_path_point_index  = NaN(Npoints,1);
-vector_second_path_point_index = NaN(Npoints,1);
-vector_percent_along_length    = NaN(Npoints,1);
+vector_first_path_point_index   = NaN(Npoints,1);
+vector_second_path_point_index  = NaN(Npoints,1);
+vector_percent_along_length     = NaN(Npoints,1);
+closest_point_on_reference_path = NaN(Npoints,3);
+
+Ndimensions = length(path(1,:));
 
 for i = 1:Npoints
-    [~, ~, vector_first_path_point_index(i), ...
+    %     [closest_point_on_reference_path(i,:), ~, vector_first_path_point_index(i), ...
+    %         vector_second_path_point_index(i), vector_percent_along_length(i)] ...
+    %         = fcn_Path_snapPointOntoNearestPath(path(i,:), reference_elevated_path(:,[1,2]));
+    
+    if 2 == Ndimensions
+        query_point = [path(i,:) 0];
+    elseif 3 == Ndimensions
+        query_point = path(i,:);
+    else
+        error('Number of columns in the path must be 2 or 3, e.g. for 2D points or 3D points');
+    end
+
+    [closest_point_on_reference_path(i,:), ~, vector_first_path_point_index(i), ...
         vector_second_path_point_index(i), vector_percent_along_length(i)] ...
-        = fcn_Path_snapPointOntoNearestPath(path(i,:), reference_elevated_path(:,[1,2]));
+        = fcn_Path_snapPointOntoNearestPath(query_point, reference_elevated_path);
 end
-% estimate the elevation as an average
-elevation = (1-vector_percent_along_length).*reference_elevated_path(vector_first_path_point_index,3)+...
-             vector_percent_along_length.*reference_elevated_path(vector_second_path_point_index,3);
-elevated_path = [path, elevation];
+% % estimate the elevation as an average
+% elevation = (1-vector_percent_along_length).*reference_elevated_path(vector_first_path_point_index,3)+...
+%              vector_percent_along_length.*reference_elevated_path(vector_second_path_point_index,3);
+% elevated_path = [path, elevation];
+
+elevated_path = [path, closest_point_on_reference_path(:,3)];
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -126,10 +143,33 @@ if flag_do_debug
     hold on
     % Plot the path
     plot3(reference_elevated_path(:,1),reference_elevated_path(:,2),...
-          reference_elevated_path(:,3),'r','Linewidth',2)
-    plot3(path(:,1),path(:,2),zeros(Npoints,1),'b','Linewidth',2)
-    plot3(elevated_path(:,1),elevated_path(:,2),elevated_path(:,3),'g*',...
-          'Markersize',20)
+          reference_elevated_path(:,3),'r.-','Linewidth',2,'Markersize',20);
+    plot3(path(:,1),path(:,2),zeros(Npoints,1),'b.-','Linewidth',2,'Markersize',20);
+    plot3(elevated_path(:,1),elevated_path(:,2),elevated_path(:,3),'g.-',...
+        'Linewidth',2,'Markersize',20);
+    plot3(...
+        closest_point_on_reference_path(:,1),...
+        closest_point_on_reference_path(:,2),...
+        closest_point_on_reference_path(:,3),'k.',...
+        'Linewidth',2,'Markersize',20);
+    
+    
+    for ith_point = 1:length(path)
+        % Plot dotted lines from the path to elevated path
+        plot3(...
+            [path(ith_point,1)   elevated_path(ith_point,1)],...
+            [path(ith_point,2)   elevated_path(ith_point,2)],...
+            [0                   elevated_path(ith_point,3)],...
+            'k--','Linewidth',2);
+        
+        % Plot dotted lines from the reference to elevated path
+        plot3(...
+            [closest_point_on_reference_path(ith_point,1)   elevated_path(ith_point,1)],...
+            [closest_point_on_reference_path(ith_point,2)   elevated_path(ith_point,2)],...
+            [closest_point_on_reference_path(ith_point,3)   elevated_path(ith_point,3)],...
+            'k--','Linewidth',2);
+    end
+    
     legend('Reference Path', 'Input Path', 'Elevated Path')
     xlabel('xEast')
     ylabel('yNorth')

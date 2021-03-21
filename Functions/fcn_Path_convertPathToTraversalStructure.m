@@ -8,21 +8,24 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 %
 % INPUTS:
 %
-%      path: an N x 2 vector of [X Y] positions, with N>=2
+%      path: an N x 2 vector of [X Y] positions, with N>=2 OR
+%            an N x 3 vector of [X Y Z] positions, with N>=2
 %
 % OUTPUTS:
 %
 %      traversal: a sttructure containing the following fields
 %            - X: an N x 1 vector that is a duplicate of the input X
 %            - Y: an N x 1 vector that is a duplicate of the input Y
-%            - Z: an N x 1 vector that is a zero array the same length as
-%            the input X
-%            - Diff: a [N x 2] array that is the change in X and Y
-%            (front-padded with [0 0])
-%            - Station: the XY distance as an N x 1 vector, representing
+%            - Z: an N x 1 vector that is a duplicate of the input Z (if 3D) OR
+%                 an N x 1 vector that is a zero array the same length as X
+%                 (if 2D)
+%            - Diff: a [N x 2] or [N x 3] array that is the change in X and Y
+%            (front-padded with [0 0 (0)])
+%            - Station: the XYZ distance as an N x 1 vector, representing
 %            the distance traveled up to the current point (starting with 0
 %            at the first point)
-%            - Yaw: the calculated yaw angle (radians) of each path segment
+%            - Yaw: the calculated yaw angle (radians) of each path
+%            segment, where yaw calculations are in the XY plane
 %            (note: there are N-1 segments if there are N points, thus
 %            there are N-1 Yaw points)
 %
@@ -57,6 +60,9 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 %     -- cleaned up comments
 %     -- fixed error in comment about Yaw being front-padded. It is an
 %     (N-1) x 1 vector now, not N x 1. 
+%     2021_03_20
+%     -- changed input checking to allow 3D path types
+%     -- fixed possible bug in diff calculation
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % Flag to plot the final results
@@ -88,7 +94,7 @@ if flag_check_inputs == 1
     end
     
     % Check the path input
-    fcn_Path_checkInputsToFunctions(path, 'path');
+    fcn_Path_checkInputsToFunctions(path, 'path2or3D');
 
 end
 
@@ -119,11 +125,20 @@ end
 % Fill in the fields typically required on a traversal
 traversal.X = path(:,1);
 traversal.Y = path(:,2);
-traversal.Z = 0*path(:,1);
-traversal.Diff = [[0 0]; diff(path)];
+
+% Calculate the station differences, and force the diff operation to occur
+% along rows, not columns
+if length(path(1,:))==3
+    traversal.Z = path(:,3);
+    traversal.Diff = [[0 0 0]; diff(path,1,1)];
+else
+    traversal.Z = 0*path(:,1);
+    traversal.Diff = [[0 0]; diff(path,1,1)];
+end
+
 traversal.Station = cumsum(sqrt(sum(traversal.Diff.^2,2)));
 traversal.Yaw = ...
-    fcn_Path_calcYawFromPathSegments(path); % NOTE: Yaw should be (N-1) x 1
+    fcn_Path_calcYawFromPathSegments(path(:,1:2)); % NOTE: Yaw should be (N-1) x 1
 
 
 %% Any debugging?

@@ -33,6 +33,8 @@ function fcn_Path_checkInputsToFunctions(...
 %
 %            'path'  - checks that the path type is N x 2 with N>=2
 %
+%            'path2or3D'  - checks that the path type is N x 2 or N x 3, with N>=2
+%
 %            'elevated_path'  - checks that the elevated path type is N x 3 
 %            with N>=2
 %
@@ -76,6 +78,10 @@ function fcn_Path_checkInputsToFunctions(...
 %      -- created 'path' and 'paths' checks
 %      2021_03_06:
 %      -- created 'elevated_path' checks
+%      2021_03_20:
+%      -- created 'path2or3D' checks
+%      -- updated traversal type to allow above as type, added comments
+
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -165,6 +171,20 @@ if strcmpi(variable_type_string,'path')
     end
 end
 
+%% path2or3D
+% Must be an N x 2 or N x 3, with N>=2
+if strcmpi(variable_type_string,'path2or3D')
+    % Check the paths input type (e.g. paths must be a matrix of numbers)
+    if (length(variable(1,:))~=2 && length(variable(1,:))~=3) || ~isnumeric(variable)
+        error('The %s input must be a path2or3D type, namely an N x 2 or N x 3 vector with N>=2',variable_name);
+    end
+    
+    % Check the paths input row length
+    if length(variable(:,1))<2
+        error('The %s input must be a path2or3D type, namely an N x 2 or N x 3 vector with N>=2',variable_name);
+    end
+end
+
 %% Elevated Path
 % Must be a N x 3 with N>=2
 if strcmpi(variable_type_string,'elevated_path')
@@ -199,23 +219,28 @@ if strcmpi(variable_type_string,'traversal')
     try
         X_central = variable.X;
         Y_central = variable.Y;
+        Z_central = variable.Z;
         Station_central = variable.Station;
     catch
-        error('The %s input must be a traversal type, namely being a structure with fields X, Y, and Station, each N x 1 numeric arrays. The fields were not found. ',variable_name);
+        error('The %s input must be a traversal type, namely being a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. The fields were not found. ',variable_name);
     end
     
-    if  ~isnumeric(X_central) ||  ~isnumeric(Y_central) ||  ~isnumeric(Station_central) 
-        error('The %s input must be a traversal type, namely a structure with fields X, Y, and Station, each N x 1 numeric arrays. At least one data field is non-numeric.',variable_name);
+    % Check that all are numeric
+    if  ~isnumeric(X_central) ||  ~isnumeric(Y_central) ||  ~isnumeric(Z_central) ||  ~isnumeric(Station_central) 
+        error('The %s input must be a traversal type, namely a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. At least one data field is non-numeric.',variable_name);
     end
     
-    if (length(X_central(1,:))~=1) || (length(Y_central(1,:))~=1) || (length(Station_central(1,:))~=1)
-        error('The %s input must be a traversal type, namely a structure with fields X, Y, and Station, each N x 1 numeric arrays. At least one data field has multiple columns.',variable_name);
+    % Check that all are 1-dimensional columns
+    if (length(X_central(1,:))~=1) || (length(Y_central(1,:))~=1) || (length(Z_central(1,:))~=1) ||  (length(Station_central(1,:))~=1)
+        error('The %s input must be a traversal type, namely a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. At least one data field has multiple columns.',variable_name);
     end
     
-    if (length(X_central(:,1))~=length(Y_central(:,1))) || ((length(X_central(:,1))~=length(Station_central(:,1))))
-        error('The %s input must be a traversal type, namely a structure with fields X, Y, and Station, each N x 1 numeric arrays. The lengths do not match.',variable_name);
+    % Check that their lengths are all the same
+    if (length(X_central(:,1))~=length(Y_central(:,1))) || ((length(X_central(:,1))~=length(Z_central(:,1))))  || ((length(X_central(:,1))~=length(Station_central(:,1))))
+        error('The %s input must be a traversal type, namely a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. The lengths do not match.',variable_name);
     end
        
+    % Make sure the station field is sorted
     if ~issorted(Station_central,'strictascend')
         error('The Station field on the %s input must be strictly increasing',variable_name);
     end
