@@ -233,7 +233,7 @@ if flag_do_plot
     clf;
     hold on;
     grid on;
-    xlabel(' X[m]');
+    xlabel('X[m]');
     ylabel('Y [m]');
     axis equal;
     
