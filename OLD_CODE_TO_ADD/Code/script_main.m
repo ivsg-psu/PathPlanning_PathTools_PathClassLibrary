@@ -11,7 +11,7 @@ catch
     % add the data path
     %addpath '../data';
     % Load the raw data
-    filename  = 'MappingVan_DecisionMaking_02242020.mat';
+    filename  = 'MappingVan_DecisionMakingTestTrack_02242020.mat';
     variable_names = 'MappingVan_DecisionMakingTestTrack_02242020';
     rawData = fcn_loadRawData(filename,variable_names);
     rawDataTimeFixed = fcn_removeTimeGapsFromRawData(rawData);
