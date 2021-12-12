@@ -20,8 +20,8 @@ function [closest_path_point,s_coordinate,...
 % 
 % FORMAT: 
 %
-%      [clfosest_path_point,s_coordinate] = ...
-%      fcn_Path_snapPointOntoNearestPath(point, path,varargin)
+%      [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+%      fcn_Path_snapPointOntoNearestPath(point, path,{fig_num})
 %
 % INPUTS:
 %
@@ -29,7 +29,7 @@ function [closest_path_point,s_coordinate,...
 %             a 1x3 vector containing the [X Y Z] location of the point
 %
 %      path: a Nx2 or Nx3 vector of [X Y (Z)] path points, where N is the
-%      number of points the points on the path, N >= 2.
+%      number of points the points on the path, with N >= 2.
 %
 %      (optional inputs) 
 %
@@ -42,6 +42,15 @@ function [closest_path_point,s_coordinate,...
 %
 %      s_coordinate: a scalar (1x1) representing the s-coordinate distance
 %      along the path
+%
+%      first_path_point_index: a scalar (1x1) representing the index of the
+%      starting "row" of the path where the closest point landed.
+%
+%      second_path_point_index: a scalar (1x1) representing the index of the
+%      ending "row" of the path where the closest point landed.
+%
+%      percent_along_length: a scalar (1x1) of the percent along the
+%      segment of the path where the closest point landed.
 %
 % EXAMPLES:
 %      
@@ -69,6 +78,8 @@ function [closest_path_point,s_coordinate,...
 %     -- modified to allow 3D snapping (!!!)
 %     -- changed input checks to include 3D paths
 %     -- updated plotting to allow 3D
+%     2021_12_10
+%     -- updated header for clarity
 
 % TO-DO:
 % Allow multiple points, e.g.

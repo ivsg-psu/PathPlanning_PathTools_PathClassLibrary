@@ -4,7 +4,7 @@ function h = fcn_Path_plotTraversalsYaw(data,varargin)
 %
 % FORMAT: 
 %
-%       h = fcn_Path_plotTraversalsYaw(data,varargin)
+%       h = fcn_Path_plotTraversalsYaw(data,{fig_num})
 %
 % INPUTS:
 %
@@ -18,6 +18,10 @@ function h = fcn_Path_plotTraversalsYaw(data,varargin)
 % OUTPUTS:
 %
 %      h: a handle to the resulting figure
+%
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
 %
 % EXAMPLES:
 %      
@@ -36,6 +40,8 @@ function h = fcn_Path_plotTraversalsYaw(data,varargin)
 %      -- fixed error in yaw plotting (yaw is shorter than station!)
 %      2021_01_07
 %      -- fixed error in yaw plotting 
+%     2021_12_10
+%     -- updated header for clarity
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

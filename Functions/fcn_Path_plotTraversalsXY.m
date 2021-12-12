@@ -4,7 +4,7 @@ function h = fcn_Path_plotTraversalsXY(traversals,varargin)
 %
 % FORMAT: 
 %
-%       h = fcn_Path_plotTraversalsXY(traversals,varargin)
+%       h = fcn_Path_plotTraversalsXY(traversals,{fig_num})
 %
 % INPUTS:
 %
@@ -18,6 +18,10 @@ function h = fcn_Path_plotTraversalsXY(traversals,varargin)
 % OUTPUTS:
 %
 %      h: a handle to the resulting figure
+%
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
 %
 % EXAMPLES:
 %      
@@ -34,7 +38,8 @@ function h = fcn_Path_plotTraversalsXY(traversals,varargin)
 %     -- added functions for input checking
 %     2021_01_07
 %     -- renamed function to show that traversals being used, not paths
-
+%     2021_12_10
+%     -- updated header for clarity
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_this_is_a_new_figure = 1; % Flag to check to see if this is a new figure
