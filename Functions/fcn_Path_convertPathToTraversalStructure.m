@@ -36,6 +36,7 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 % DEPENDENCIES:
 %
 %      fcn_Path_checkInputsToFunctions
+%      fcn_Path_calcDiffAnglesBetweenPathSegments
 %      fcn_Path_calcYawFromPathSegments
 %      fcn_Path_plotTraversalsXY
 %

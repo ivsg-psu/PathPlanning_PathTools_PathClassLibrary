@@ -101,18 +101,6 @@ flag_search_type = 0;
 print_results(distance,location);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 %% Simple test 7 - identically overlapping colinear 
 fprintf(1,'identically overlapping colinear result: \n');
 path = [0 10; 10 10];

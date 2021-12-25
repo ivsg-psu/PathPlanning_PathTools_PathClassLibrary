@@ -1,10 +1,13 @@
 function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 % fcn_Path_calcDiffAnglesBetweenSegments
-% Calculates the change in angles between segments. If there are N points
-% in the path, there are N-1 segments and thus N-2 angles between segments.
+% Calculates the change in angles between path segments. If there are N
+% points in the path, there are N-1 segments and thus N-2 angles between
+% segments.
 %
 % Note that this method uses the dot product and the cross product to avoid
-% errors caused by angle rollover that occur with arctan calculations.
+% errors caused by angle rollover that occur with arctan calculations. The
+% arctan calculation gives the wrong answer with path segments are pointed
+% near or at the -180 degree crossover point.
 %
 % FORMAT: 
 %
@@ -21,6 +24,10 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 % OUTPUTS:
 %
 %      diff_angles: tan (N-2) x 1 vector of the change in angles in radians
+%
+% DEPENDENCIES
+%
+%      (none)
 %
 % EXAMPLES:
 %      

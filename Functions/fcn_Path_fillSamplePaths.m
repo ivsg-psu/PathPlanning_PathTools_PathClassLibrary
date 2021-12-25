@@ -15,6 +15,9 @@ function paths_array = fcn_Path_fillSamplePaths
 %
 %      paths_array: an cell array of paths
 %
+% DEPENDENCIES:
+%
+%      (none)
 %
 % EXAMPLES:
 %
