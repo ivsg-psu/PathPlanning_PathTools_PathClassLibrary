@@ -66,6 +66,9 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %      of the end point of the unit vector. On both outputs, there are N
 %      rows, one row for each station.
 %
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
 %
 % EXAMPLES:
 %      
@@ -80,7 +83,9 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %      -- first write of the code via modification from 
 %      fcn_Path_FindOrthogonalHitFromPathToPath
 %      2021_01_07
-%      -- renamed to transition from path to traversal notation
+%      -- renamed to transition from path to traversal notation 
+%      2021_12_27:
+%      -- corrected dependencies in comments
 
 % TO DO:
 % Define search radius - need to let user define this as an input!

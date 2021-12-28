@@ -36,7 +36,11 @@ flag_search_type = 0;
     flag_search_type,fig_debugging);
 print_results(distance,location);
 
-%% Simple test 2 - no intersections
+%% Simple test 2 - no intersections, returns NaN
+% No intersection result: 
+% Distance 	 Location X 	 Location Y 
+% NaN 		 NaN 			 NaN
+
 fprintf(1,'No intersection result: \n');
 path = [-4 10; 2 10];
 sensor_vector_start = [0 0]; 
@@ -49,7 +53,7 @@ flag_search_type = 0;
     flag_search_type,fig_debugging);
 print_results(distance,location);
 
-%% Simple test 3 - multiple intersections
+%% Simple test 3 - multiple intersections, returns only the first one
 fprintf(1,'Multiple intersections result: \n');
 path = [0 10; 10 10; 0 6; 10 6; 0 2];
 sensor_vector_start = [0 0]; 
@@ -378,7 +382,8 @@ flag_search_type = 0;
     flag_search_type,fig_debugging);
 print_results(distance,location);
 
-
+% Test showing that a sensor pointing away from a path "hits" the path with
+% a negative distance
 fig_debugging = 2346;
 flag_search_type = 1;
 [distance,location] = ...
@@ -398,6 +403,18 @@ print_results(distance,location);
 
 
 %% Advanced test 2 - multiple intersections
+fprintf(1,'Single intersections reporting only first result: \n');
+path = [0 10; 10 10; 0 6; 10 6; 0 2];
+sensor_vector_start = [0 0]; 
+sensor_vector_end   = [5 12];
+fig_debugging = 23487;
+flag_search_type = 0;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
 fprintf(1,'Multiple intersections reporting all results: \n');
 path = [0 10; 10 10; 0 6; 10 6; 0 2];
 sensor_vector_start = [0 0]; 

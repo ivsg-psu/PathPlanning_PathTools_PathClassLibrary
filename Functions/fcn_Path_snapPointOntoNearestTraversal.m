@@ -14,8 +14,11 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 % 
 % FORMAT:
 %
-%      [closest_path_point,s_coordinate] = ...
-%      fcn_Path_snapPointOntoNearestTraversal(point, traversal, varargin)
+%      [closest_path_point,s_coordinate,path_point_yaw,....
+%      first_path_point_index,...
+%      second_path_point_index,...
+%      percent_along_length] = ...
+%      fcn_Path_snapPointOntoNearestTraversal(point, traversal, (fig_num))
 %
 % INPUTS:
 %
@@ -33,9 +36,21 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 %
 %      closest_path_point: a 1x2 vector containing the [X Y] location of
 %      the nearest point on the traversal
+%
 %      s_coordinate: a scalar (1x1) representing the s-coordinate distance
 %      along the traversal
+% 
+%      path_point_yaw: a scalar (1x1) representing the yaw angle (rad) of
+%      the path segment in the traversal to which the point snapped.
 %
+%      first_path_point_index: (1x1) scalar integer which is the index of
+%      starting the path segment to which the point snapped
+%
+%      second_path_point_index: (1x1) scalar integer which is the index of
+%      the ending point of the path segment to which the point snapped.
+%
+%      percent_along_length: (1x1) scalar representing the fraction (from 0
+%      to 1) along the path segment to which the point snapped
 %
 % DEPENDENCIES:
 %
@@ -52,6 +67,7 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 
 % Revision history:
 %     2020_01_29 - first write of the code
+%     2021_12_27 - improved the comments, fixed input argument comments
 
 % TO-DO:
 % Allow multiple points, e.g.

@@ -5,10 +5,13 @@ function [closestXs, closestYs, closestDistances] = ...
 
 % fcn_Path_findOrthoScatterFromTraversalToTraversals
 % Given a central traversal and a set of stations along that traversal,
-% finds the location on a nearby traversal that is closest to the central
+% finds the locations on the nearby traversals that are closest to the central
 % traveral at each station point. Closest is defined via an orthogonal
 % projection (or modifications of orthogonal projections) from the central
-% traversal outward toward nearby traversals.
+% traversal outward toward nearby traversals. Note that this function is
+% essentially the multi-traversal version of:
+% fcn_Path_findOrthogonalHitFromTraversalToTraversal, which is called
+% internally over/over for each traversal.
 %
 % FORMAT:
 %
@@ -82,15 +85,17 @@ function [closestXs, closestYs, closestDistances] = ...
 %      direction
 %
 %
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
+%      fcn_Path_findOrthogonalHitFromTraversalToTraversal
+%      fcn_Path_findOrthogonalTraversalVectorsAtStations
+%      fcn_Path_plotTraversalsXY
+%
 % EXAMPLES:
 %
 % See the script: script_test_fcn_Path_findOrthoScatterFromTraversalToTraversals
 % for a full test suite.
-%
-% DEPENDENCIES:
-%
-%      fcn_Path_FindOrthogonalHitFromTraversalToTraversals
-%      fcn_Path_findOrthogonalTraversalVectorsAtStations
 %
 % This function was written on 2021_01_02 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
@@ -103,6 +108,9 @@ function [closestXs, closestYs, closestDistances] = ...
 %      -- renamed function to clarify paths versus traversals
 %      2021_01_09:
 %      -- corrected terminology in comments
+%     2021_12_27:
+%     -- corrected dependencies in comments
+%     -- fixed name fcn_Path_findOrthogonalHitFromTraversalToTraversal
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -203,7 +211,7 @@ for ith_traversal = 1:Ntraversals
     nearby_traversal = all_traversals.traversal{ith_traversal};
     
     [closest_path_points,closest_distances] = ...
-        fcn_Path_findOrthogonalHitFromTraversalToTraversals(...
+        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
         reference_station_points,...
         reference_traversal,...
         nearby_traversal,...
@@ -243,26 +251,37 @@ if flag_do_plot
     % Plot the paths
     fcn_Path_plotTraversalsXY(all_traversals,fig_num);
         
-    % Plot the station points
+    % Setup to plot the station points (red) and sensor vectors (green
+    % arrows)
     % Find the unit normal vectors at each of the station points
     [unit_normal_vector_start, unit_normal_vector_end] = ...
         fcn_Path_findOrthogonalTraversalVectorsAtStations(...
         reference_station_points,reference_traversal,flag_rounding_type);
 
-    plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'r.','Markersize',35);
+    unit_vector_displacement = unit_normal_vector_end - unit_normal_vector_start;
+    sensor_vector_start = unit_normal_vector_start;
+    postive_sensor_vector_end = unit_normal_vector_start + unit_vector_displacement*search_radius;
+    negative_sensor_vector_end = unit_normal_vector_start - unit_vector_displacement*search_radius;
     
+    % Plot the sensor vector origin as red dots
+    plot(sensor_vector_start(:,1),sensor_vector_start(:,2),'r.','Markersize',35);
+       
+    % Show the sensor vectors as green arrows
+    positive_normal_vectors_at_stations = ...
+        postive_sensor_vector_end - sensor_vector_start;
+    negative_normal_vectors_at_stations = ...
+        negative_sensor_vector_end - sensor_vector_start;
 
-    % Plot the results
+    quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
+        positive_normal_vectors_at_stations(:,1),positive_normal_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
+    quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
+        negative_normal_vectors_at_stations(:,1),negative_normal_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
+
+    % Plot the hits
     for i_point = 1:length(closestXs(:,1))
-        plot(closestXs(i_point,:),closestYs(i_point,:),'bo-','Markersize',15,'Linewidth',3);
+        INTERNAL_plot_only_hits(closestXs(i_point,:),closestYs(i_point,:));
     end
-    
-    % Show the unit vectors
-    normal_unit_vectors_at_stations = ...
-        unit_normal_vector_end - unit_normal_vector_start;
-    quiver(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),...
-        normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
-        
+
     
 end % Ends the flag_do_plot if statement
 
@@ -272,3 +291,14 @@ end
 
 end % Ends the function
 
+function INTERNAL_plot_only_hits(xdata,ydata)
+
+% Find indices that are not NaN
+good_x_indices = find(~isnan(xdata));
+good_y_indices = find(~isnan(ydata));
+good_indices = intersect(good_x_indices,good_y_indices);
+
+
+plot(xdata(good_indices),ydata(good_indices),'bo-','Markersize',15,'Linewidth',3);
+
+end

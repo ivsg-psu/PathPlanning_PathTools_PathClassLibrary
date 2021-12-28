@@ -72,8 +72,9 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % DEPENDENCIES:
 %
 %      fcn_Path_checkInputsToFunctions
-%      fcn_Path_findClosestPointsFromPath
 %      fcn_Path_findTraversalWithMostData
+%      fcn_Path_findOrthoScatterFromTraversalToTraversals
+%      fcn_Path_cleanPathFromForwardBackwardJogs
 %      fcn_Path_plotTraversalsXY
 %
 % EXAMPLES:
@@ -103,6 +104,8 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %     2021_01_09:
 %     -- corrected terminology in comments
 %     -- fixed the input argument notation to be traversals
+%     2021_12_27:
+%     -- corrected dependencies in comments
 
 % TO DO
 % Pull out the last function that checks jogs

@@ -23,18 +23,21 @@ function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(p
 %      (OPTIONAL INPUTS)
 %      flag_search_type: an integer specifying the type of search.
 %
-%            0: return distance and location only if the given
-%            sensor_vector overlaps the path (this is the default)
+%            0: return distance and location of first intersection only if
+%            the given sensor_vector overlaps the path (this is the
+%            default)
 %
-%            1: return distane and location if any projection of the sensor
-%            vector, in any direction, hits the path (in other words, if
-%            there is any intersection). Note that distance returned will
-%            be negative if the nearest intersection is in the opposite
-%            direction of the given sensor vector.
+%            1: return distane and location of first intersection if any
+%            projection of the sensor vector, in any direction, hits the
+%            path (in other words, if there is any intersection). Note that
+%            distance returned will be negative if the nearest intersection
+%            is in the opposite direction of the given sensor vector.
 %
 %            2: returns distances and locations as M x 1 and M x 2 vectors
-%            respectively, where the M rows represent all the detected
-%            intersections.
+%            respectively, where the M rows represent ALL the detected
+%            intersections. In cases where the sensor vector completely
+%            overlaps a path segment, the start and end of overlap are
+%            given.
 %
 %      fig_num: a figure number to plot results. Turns debugging on.
 %
@@ -47,6 +50,11 @@ function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(p
 %
 %      path_segment: the segment number of the path that was hit (1 is the
 %      first segment, 2 is the second, etc)
+%
+
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
 %
 % EXAMPLES:
 %      
@@ -78,7 +86,8 @@ function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(p
 %      2021_01_24
 %      -- Fixed bug with overlapping colinear where two path segments
 %      identified when there is only one
-
+%      2021_12_27
+%      -- Added better comments on flags
 
 %% Set up for debugging
 flag_do_debug = 0; % Flag to plot the results for debugging

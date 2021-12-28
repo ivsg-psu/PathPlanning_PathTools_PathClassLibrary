@@ -1,5 +1,5 @@
-% script_test_fcn_Path_findOrthogonalHitFromTraversalToTraversals.m
-% This is a script to exercise the function: fcn_Path_findOrthogonalHitFromTraversalToTraversals.m
+% script_test_fcn_Path_findOrthogonalHitFromTraversalToTraversal.m
+% This is a script to exercise the function: fcn_Path_findOrthogonalHitFromTraversalToTraversal.m
 % This function was written on 2020_11_14 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
 
@@ -35,7 +35,7 @@ fig_num = 1;
 
 % Calculate the closest point and distance on the nearby path
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
@@ -55,7 +55,7 @@ fig_num = 2;
 
 % Calculate the closest point and distance on the nearby path
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
@@ -76,7 +76,7 @@ fig_num = 3;
 
 % Calculate the closest point and distance on the nearby path
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
@@ -96,7 +96,7 @@ fig_num = 4;
 
 % Calculate the closest point and distance on the nearby path
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
@@ -117,7 +117,7 @@ fig_num = 5;
 
 % Calculate the closest point and distance on the nearby path
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
@@ -137,7 +137,7 @@ nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 
 % Calculate the closest point and distance on the nearby path
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
@@ -153,44 +153,49 @@ central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 stations = [0; 1; 2^0.5-0.1; 2^0.5; 2^0.5+.1; 2; central_traversal.Station(end)];
+search_radius = 20; % Distance to search for nearby segments
 
 % AVERAGING example 1 - default setting
+fig_num = 1;
 flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via prior segment (default, flag=1)');
 
 % AVERAGING example 2 - use following segment
+fig_num = 2;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2)');
 
 % AVERAGING example 3 - use average of both segments
+fig_num = 3;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
 % AVERAGING example 4 - use average always
+fig_num = 4;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging everywhere (flag=4)');
 
@@ -205,6 +210,7 @@ central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 stations = [0; 1.5; 3; 3.5; 18^0.5-0.1; 18^0.5; 18^0.5+.1; 5; 5.5; 6.5; central_traversal.Station(end)];
+search_radius = 20;
 
 % NEGATIVE example 1 - default setting
 flag_rounding_type = 1;  % use orthogonal projection of prior segment
@@ -212,7 +218,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via prior segment (default, flag=1)');
 
@@ -222,7 +228,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2)');
 
@@ -232,7 +238,7 @@ title('Vertex projection via following segment (flag=2)');
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
@@ -242,10 +248,120 @@ title('Vertex projection via averaging prior and following segment at vertex (fl
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging everywhere (flag=4)');
 
+%% AVERAGING examples with search radius limitation
+
+% Set up data
+close all
+central_path = [0 0; 1 1; 2 0];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+nearby_path = [-1 0.5; 0 2.5; 0.5 2; 1.5 2; 2 1; 3 3; 3 0.5];
+nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
+stations = [0; 1; 2^0.5-0.1; 2^0.5; 2^0.5+.1; 2; central_traversal.Station(end)];
+search_radius = 1.5; % Distance to search for nearby segments
+
+% AVERAGING example 1 - default setting
+fig_num = 1111;
+flag_rounding_type = 1;  % use orthogonal projection of prior segment
+% flag_rounding_type = 2;  % use orthogonal projection of following segment
+% flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+% flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via prior segment (default, flag=1), search radius limited to 1.5');
+
+% AVERAGING example 2 - use following segment
+fig_num = 2222;
+% flag_rounding_type = 1;  % use orthogonal projection of prior segment
+flag_rounding_type = 2;  % use orthogonal projection of following segment
+% flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+% flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via following segment (flag=2), search radius limited to 1.5');
+
+% AVERAGING example 3 - use average of both segments
+fig_num = 3333;
+% flag_rounding_type = 1;  % use orthogonal projection of prior segment
+% flag_rounding_type = 2;  % use orthogonal projection of following segment
+flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+% flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via averaging prior and following segment at vertex (flag=3), search radius limited to 1.5');
+
+% AVERAGING example 4 - use average always
+fig_num = 4444;
+% flag_rounding_type = 1;  % use orthogonal projection of prior segment
+% flag_rounding_type = 2;  % use orthogonal projection of following segment
+% flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via averaging everywhere (flag=4), search radius limited to 1.5');
+
+
+%% NEGATIVE examples with search radius limitation
+
+% Prep the example and workspace
+close all;
+central_path = [-2 1; 1 4; 3 2];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5];
+nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
+stations = [0; 1.5; 3; 3.5; 18^0.5-0.1; 18^0.5; 18^0.5+.1; 5; 5.5; 6.5; central_traversal.Station(end)];
+search_radius = 1.5;
+
+% NEGATIVE example 1 - default setting
+fig_num = 11112;
+flag_rounding_type = 1;  % use orthogonal projection of prior segment
+% flag_rounding_type = 2;  % use orthogonal projection of following segment
+% flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+% flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via prior segment (default, flag=1)');
+
+% NEGATIVE example 2 - using following
+fig_num = 22223;
+% flag_rounding_type = 1;  % use orthogonal projection of prior segment
+flag_rounding_type = 2;  % use orthogonal projection of following segment
+% flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+% flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via following segment (flag=2)');
+
+% NEGATIVE example 3 - using average at apex only
+fig_num = 33334;
+% flag_rounding_type = 1;  % use orthogonal projection of prior segment
+% flag_rounding_type = 2;  % use orthogonal projection of following segment
+flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+% flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
+
+% NEGATIVE example 4 - using average always
+fig_num = 44445;
+% flag_rounding_type = 1;  % use orthogonal projection of prior segment
+% flag_rounding_type = 2;  % use orthogonal projection of following segment
+% flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
+flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+print_results(stations,closest_path_point,distances);
+title('Vertex projection via averaging everywhere (flag=4)');
 
 %% MULTICROSS examples
 close all;
@@ -260,43 +376,47 @@ stations = sort([[0:step_size:central_traversal.Station(end)]'; central_traversa
 stations = unique(stations);
 
 % MULTICROSS example 1 - default setting
+fig_num = 111;
 flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via prior segment (default)');
 
 % MULTICROSS example 2 - using following
+fig_num = 222;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via following segment');
 
 % MULTICROSS example 3 - using average at apex only
+fig_num = 333;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via averaging of prior and following segment only at apex');
 
 
 % MULTICROSS example 4 - using average always
+fig_num = 444;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via averaging of prior and following segment always');
 
@@ -330,7 +450,7 @@ for i_Path = 1:length(paths_array)
     nearby_traversal  = data.traversal{i_Path};
 
     [closest_path_point,distances] = ...
-        fcn_Path_findOrthogonalHitFromTraversalToTraversals(stations,central_traversal,nearby_traversal,flag_rounding_type,30,fig_num);
+        fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type,30,fig_num);
 end
 
 
