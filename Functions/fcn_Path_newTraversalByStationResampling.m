@@ -160,7 +160,7 @@ if flag_do_plots
     plot(input_traversal.X,input_traversal.Y,'b.-','Linewidth',4,'Markersize',30);
     plot(new_traversal.X,new_traversal.Y,'r.-','Linewidth',2,'Markersize',20);
     legend('Input traversal','New traversal');
-    title('original paths and final average path');
+    title('original traversal and resampled traversal');
     xlabel('x [m]');
     ylabel('y [m]');
     

@@ -122,11 +122,13 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %     2022_01_06:
 %     -- refactored code, added weighted averaging to prevent iteration
 %     bouncing
+%     2022_01_10:
+%     -- shut off debugging commentsclose
 
 % TO DO
 % Need to clean up the code - lots of code "lint"
 
-flag_do_debug = 1; % Flag to show the results for debugging
+flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % Flag to plot the final results
 flag_check_inputs = 1; % Flag to perform input checking
 

@@ -1146,6 +1146,8 @@ data.traversal{1} = nearby_traversal;
 
 % MULTICROSS example 1 - default setting
 fig_num = 13425;
+flag_yaw = 1;
+flag_3D = 0;
 [closestXs,closestYs,closestZs] = ...
     fcn_Path_findClosestPointsToTraversal(central_traversal,data,flag_yaw,flag_3D,fig_num);
 
@@ -1188,7 +1190,7 @@ fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n
 basic_path = [0 0; 10 0; 20 0];
 input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
 
-fig_num = 2344;
+fig_num = 23444;
 
 % Redecimate the traversal at 1-meter increments
 interval = 1;
@@ -1200,7 +1202,7 @@ new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_st
 paths_array = fcn_Path_fillSamplePaths;
 input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-fig_num = 2345;
+fig_num = 23445;
 
 % Redecimate the traversal at 1-meter increments
 interval = 10;
