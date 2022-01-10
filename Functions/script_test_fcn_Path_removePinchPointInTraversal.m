@@ -46,6 +46,7 @@ traversal_with_pinch_point = fcn_Path_convertPathToTraversalStructure(path);
     fcn_Path_removePinchPointInTraversal(...
     traversal_with_pinch_point,...
     fig_num);
+axis([-2 4 -2 6]);
 
 
 

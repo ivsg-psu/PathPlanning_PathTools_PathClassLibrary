@@ -9,7 +9,12 @@ function [closest_path_points,closest_distances] = ...
 % finds the location on nearby traversals that are closest to the central
 % traveral at each station point. Closest is defined via an orthogonal
 % projection (or modifications of orthogonal projections) from the central
-% traversal outward toward nearby traversals.
+% traversal outward toward nearby traversals. Both positive and negative
+% projections are included. Positive projections are those that, in the
+% cross-product between the station direction and sensor
+% projection, have a positive result. If a distance is in the positive
+% direction, it is reported as positive. In the negative direction, it is
+% reported as negative.
 %
 % FORMAT:
 %
@@ -103,9 +108,13 @@ function [closest_path_points,closest_distances] = ...
 %      2021_12_27
 %      -- changed name to singular traversal since code only works with one
 %      traversal at a time
+%      2022_01_03
+%      -- found a bug in the constrainted search functionality, 
+%      -- updated plotting function to show both positive and neg vectors
+%      -- fixed typo in variable name
+%      -- fixed inequality which was cause of bug
+%      -- made distance outputs positive and neg, based on directionality
 
-% TO DO:
-% Define search radius - need to know when a loop is going backward!
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -149,8 +158,12 @@ if flag_check_inputs == 1
     fcn_Path_checkInputsToFunctions(nearby_traversal, 'traversal');
         
     % Check cases specific to this function
-    if any(query_stations<central_traversal.Station(1)) || any(query_stations>central_traversal.Station(end,1))
-        error('The station query locations must be within the range of stations within the central_traversal');
+    if any(query_stations<central_traversal.Station(1,1)) || any(query_stations>central_traversal.Station(end,1))
+        fprintf(1,'Min of central_traversal stations: %.2f\n',central_traversal.Station(1));
+        fprintf(1,'Min of query stations: %.2f\n',min(query_stations));
+        fprintf(1,'Max of central_traversal stations: %.2f\n',central_traversal.Station(end,1));
+        fprintf(1,'Max of query stations: %.2f\n',max(query_stations));        
+        error('The station query locations must be within the full range of stations within the central_traversal');
     end
        
 end
@@ -191,7 +204,7 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% query_stations = [44; 45]; % For debugging
 
 Nstations = length(query_stations(:,1));
 
@@ -203,8 +216,9 @@ unit_vector_displacement = unit_normal_vector_end - unit_normal_vector_start;
 
 %% Define the sensor vector from the unit vector
 sensor_vector_start = unit_normal_vector_start;
-postive_sensor_vector_end = unit_normal_vector_start + unit_vector_displacement*search_radius;
+positive_sensor_vector_end = unit_normal_vector_start + unit_vector_displacement*search_radius;
 negative_sensor_vector_end = unit_normal_vector_start - unit_vector_displacement*search_radius;
+
 
 %% Define the path we are searching from the nearby traversal
 % Need to constrain this to be only within a small range of the s-distance?
@@ -242,7 +256,7 @@ for i_station=1:Nstations
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
-            postive_sensor_vector_end(i_station,:),0,222222);
+            positive_sensor_vector_end(i_station,:),0,222222);
         
         [negative_distance,negative_location] = ...
             fcn_Path_findProjectionHitOntoPath(...
@@ -256,13 +270,16 @@ for i_station=1:Nstations
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
-            postive_sensor_vector_end(i_station,:),0);
+            positive_sensor_vector_end(i_station,:),0);
         [negative_distance,negative_location] = ...
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
             negative_sensor_vector_end(i_station,:),0);
     end
+    
+    % make distance outputs positive and neg, based on directionality
+    negative_distance = -1*negative_distance;
     
     % Check that the distances are not NaN values
     if all(isnan(positive_distance))
@@ -276,10 +293,11 @@ for i_station=1:Nstations
 
     % Fill in distances
     if ~isnan(positive_distance) && ~isnan(negative_distance)
-        if positive_distance >= negative_distance
+        % Both positive and negative distances are real values
+        if abs(positive_distance) <= abs(negative_distance)  % Positive side is closer
             locations_of_hits(i_station,:) = positive_location;
             distances_of_hits(i_station,1) = positive_distance;
-        else
+        else % Negative side is closer
             locations_of_hits(i_station,:) = negative_location;
             distances_of_hits(i_station,1) = negative_distance;
         end
@@ -316,6 +334,7 @@ closest_distances = distances_of_hits;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
     figure(fig_num);
+    clf;
     hold on;
     grid on;
     
@@ -329,12 +348,17 @@ if flag_do_plot
     
     axis equal;
     
-    % Plot the station points
+    % Plot the station points that originate the query
     plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'k.','Markersize',35);
-       
-    % Plot hit locations
-    plot(locations_of_hits(:,1),locations_of_hits(:,2),'r.','Markersize',25);
-       
+    
+    if flag_do_debug
+        % Add text to indicate station values
+        text_locations = sensor_vector_start;
+        for ith_station = 1:length(query_stations(:,1))
+            text(text_locations(ith_station,1),text_locations(ith_station,2),sprintf('%.0f',query_stations(ith_station,1)),'Color',[0 0 0]);
+        end
+    end
+    
     %     % Show the unit vectors
     %     normal_unit_vectors_at_stations = ...
     %         unit_normal_vector_end - unit_normal_vector_start;
@@ -343,21 +367,28 @@ if flag_do_plot
     %
     %
     %     legend('Central traversal','Path to check','Station query points','Hit locations','Unit vectors');
+
     
     % Show the sensor vectors
-    sensor_vectors_at_stations = ...
-        search_radius*(unit_normal_vector_end - unit_normal_vector_start);
-    quiver(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),...
-        sensor_vectors_at_stations(:,1),sensor_vectors_at_stations(:,2),0,'g','Linewidth',3);
+    positive_sensor_vector = positive_sensor_vector_end - sensor_vector_start;
+    negative_sensor_vector = negative_sensor_vector_end - sensor_vector_start;
     
+    quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
+        positive_sensor_vector(:,1),positive_sensor_vector(:,2),0,'g','Linewidth',3);  
+    quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
+        negative_sensor_vector(:,1),negative_sensor_vector(:,2),0,'c','Linewidth',3);
+        
+    % Plot hit locations
+    plot(locations_of_hits(:,1),locations_of_hits(:,2),'r.','Markersize',30);
+       
+    % Add a legend
+    legend('Central traversal','Path to check','Station query points','Sensor vectors (+)','Sensor vectors (-)','Hit locations');
     
-    legend('Central traversal','Path to check','Station query points','Hit locations','Sensor vectors');
-    
-    
-    % % Label the points with distances?
-    % for i_point = 1:length(path(:,1))
-    %     text(path(i_point,2),path(i_point,3),sprintf('%.2f',distances_point_to_path(i_point)));
-    % end
+    % Add text to indicate distance result
+    text_locations = sensor_vector_start + unit_vector_displacement.*closest_distances/2;
+    for ith_distance = 1:length(closest_distances)
+        text(text_locations(ith_distance,1),text_locations(ith_distance,2),sprintf('%.2f',closest_distances(ith_distance,1)),'Color',[1 0 0]);
+    end
     
     
     

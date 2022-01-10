@@ -237,6 +237,11 @@ if strcmpi(variable_type_string,'traversal')
     
     % Check that their lengths are all the same
     if (length(X_central(:,1))~=length(Y_central(:,1))) || ((length(X_central(:,1))~=length(Z_central(:,1))))  || ((length(X_central(:,1))~=length(Station_central(:,1))))
+        warning('The %s input has variables whose lengths do not match. See the workspace for variable information.',variable_name);        
+        fprintf(1,'\tX length is: %.0d.\n',length(X_central(:,1)));        
+        fprintf(1,'\tY length is: %.0d.\n',length(Y_central(:,1)));      
+        fprintf(1,'\tZ length is: %.0d.\n',length(Z_central(:,1)));
+        fprintf(1,'\tStation length is: %.0d.\n',length(Station_central(:,1)));
         error('The %s input must be a traversal type, namely a structure with fields X, Y, Z, and Station, each N x 1 numeric arrays. The lengths do not match.',variable_name);
     end
        

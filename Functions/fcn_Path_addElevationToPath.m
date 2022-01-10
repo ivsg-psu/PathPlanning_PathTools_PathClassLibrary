@@ -7,7 +7,7 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 % FORMAT:
 %
 %      elevated_path = fcn_Path_addElevationToPath(path, ...
-%                      reference_elevated_path, varargin)
+%                      reference_elevated_path, (fig_num))
 %
 % INPUTS:
 %
@@ -37,7 +37,13 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 %
 % This function was written on 2021_03_06 by Satya Prasd
 % Questions or comments? sbrennan@psu.edu
-%
+
+% Revision history:
+%      2021_03_06 
+%      -- wrote the code
+%      2022_01_07
+%      -- updated header to fix input definitions
+
 % TODO:
 %   Remove the for loop after fcn_snapPointOntoNearestPath is vectorized
 

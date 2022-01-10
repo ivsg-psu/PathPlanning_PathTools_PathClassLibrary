@@ -1,7 +1,7 @@
 function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, varargin)
 % fcn_Path_fillOffsetTraversalsAboutTraversal
 % fills in an array of traversals about a reference traversal at
-% user-defined offsets
+% user-defined offset distances.
 %
 % FORMAT:
 %
@@ -52,7 +52,8 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 %      2021_01_24
 %      -- first write of the code, using
 %      fcn_Path_fillRandomTraversalsAboutTraversal as a template
-
+%      2022_01_03
+%      -- minor updates to comments
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % % Flag to plot the final results

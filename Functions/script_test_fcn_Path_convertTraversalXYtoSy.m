@@ -40,9 +40,33 @@ fig_num = 1;
        fcn_Path_convertTraversalXYtoSy(...
        reference_station_points, reference_traversal, all_traversals,...
        flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+
+%% Test case 2: basic call with different reference
+reference_traversal = all_traversals.traversal{1};
+reference_station_points = (0:10:reference_traversal.Station(end))';
+flag_rounding_type = 3;
+search_radius = 40;
+fig_num = 111;
+
+[closestXs, closestYs, closestDistances] = ...
+       fcn_Path_convertTraversalXYtoSy(...
+       reference_station_points, reference_traversal, all_traversals,...
+       flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+   
+reference_traversal = all_traversals.traversal{3};
+reference_station_points = (0:10:reference_traversal.Station(end))';
+flag_rounding_type = 3;
+search_radius = 40;
+fig_num = 222;
+
+[closestXs, closestYs, closestDistances] = ...
+       fcn_Path_convertTraversalXYtoSy(...
+       reference_station_points, reference_traversal, all_traversals,...
+       flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+   
    
 
-%% Test case 2: basic call with finer resolution
+%% Test case 3: basic call 1 with finer resolution
 reference_traversal = all_traversals.traversal{2};
 reference_station_points = (0:1:reference_traversal.Station(end))';
 flag_rounding_type = 3;

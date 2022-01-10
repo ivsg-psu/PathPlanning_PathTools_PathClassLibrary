@@ -51,7 +51,7 @@ fig_num = 4;
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
 offsets = (-10:1:10)'; 
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
-
+axis equal;
 
 %% Test case 5: Show how offsets can link lane markers
 fig_num = 5;
@@ -80,8 +80,8 @@ plot(right_intersection_points(:,1),right_intersection_points(:,2),'ro','Markers
     fcn_Path_findIntersectionsBetweenTraversals(...
     offset_traversal_1.traversal{1},...
     offset_traversal_2.traversal{2});
-plot(left_intersection_points(:,1),left_intersection_points(:,2),'ro','Markersize',10);
-
+plot(left_intersection_points(:,1),left_intersection_points(:,2),'bo','Markersize',10);
+title('Illustration of how to use offsets to link lane edge designations');
 
 
 

@@ -30,9 +30,11 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_findClosestPointsFromPath
-%      fcn_Path_findTraversalWithMostData
-%      fcn_Path_plotPathXY
+%      fcn_Path_checkInputsToFunctions
+%      fcn_Path_convertPathToTraversalStructure
+%      fcn_Path_calcSingleTraversalStandardDeviation
+%      fcn_Path_findOrthogonalTraversalVectorsAtStations
+%      fcn_Path_plotTraversalXYWithUpperLowerBands
 %
 % EXAMPLES:
 %
@@ -47,6 +49,10 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 %     -- wrote the code originally
 %     2021_01_08:
 %     -- added input checking
+%     2022_01_03:
+%     -- corrected dependency list of functions
+%     -- broke out fcn_Path_plotTraversalXYWithUpperLowerBands into
+%     separate functionality (it is very useful for other functions!)
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 1; % % Flag to plot the final results
@@ -95,8 +101,6 @@ if flag_check_inputs
 end
 
 % Grab key variables
-X_reference = reference_traversal.X;
-Y_reference = reference_traversal.Y;
 Station_reference = reference_traversal.Station;
 Nstations = length(Station_reference(:,1));
 
@@ -162,44 +166,13 @@ unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
 %% Calculate random path and traversal and save into final structure
 top_path = unit_normal_vector_start + unit_vectors.*offsets_from_reference(:,1);
 bottom_path = unit_normal_vector_start - unit_vectors.*offsets_from_reference(:,1);
+upper_traversal = fcn_Path_convertPathToTraversalStructure(top_path);
+lower_traversal = fcn_Path_convertPathToTraversalStructure(bottom_path);
+
+%% plot the final XY result
+fcn_Path_plotTraversalXYWithUpperLowerBands( reference_traversal, upper_traversal, lower_traversal, fig_num);
 
 
-
-% plot the final XY result
-figure(fig_num);
-
-% Check to see if the hold was on?
-flag_hold_was_off = 0;
-if ~ishold
-    flag_hold_was_off = 1;
-    hold on;
-end
-
-% Plot the reference trajectory first
-main_plot_handle = plot(X_reference,Y_reference,'.-','Linewidth',4,'Markersize',20);
-plot_color = get(main_plot_handle,'Color');
-
-% % Now make the patch as one object (THIS ONLY WORKS IF NO CROSSINGS)
-% x_vector = [top_path(:,1)', fliplr(bottom_path(:,1)')];
-% y_vector = [top_path(:,2)', fliplr(bottom_path(:,2)')];
-% patch = fill(x_vector, y_vector,[128 193 219]./255);
-% set(patch, 'edgecolor', 'none');
-% set(patch, 'FaceAlpha', 0.5);
-
-% Now make the patch segment by segment
-for i_patch = 2:Nstations
-    x_vector = [top_path((i_patch-1):i_patch,1)', fliplr(bottom_path((i_patch-1):i_patch,1)')];
-    y_vector = [top_path((i_patch-1):i_patch,2)', fliplr(bottom_path((i_patch-1):i_patch,2)')];
-    patch = fill(x_vector, y_vector,plot_color);
-    %patch = fill(x_vector, y_vector,(plot_color*0.8 + 0.2*[1 1 1]));
-    set(patch, 'edgecolor', 'none');
-    set(patch, 'FaceAlpha', 0.2);
-end
-
-% Put hold back to the original state
-if flag_hold_was_off
-    hold off;
-end
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _

@@ -12,7 +12,7 @@ function [closestXs, closestYs, closestDistances] = ...
 % presented as an array of lateral offsets.
 %
 % NOTE: this is just a reformulation of the function:
-% fcn_Path_findOrthoScatterFromTraversalToTraversals
+% fcn_Path_FindOrthogonalHitFromTraversalToTraversal
 % The main difference is the final plotting result, but otherwise it uses
 % the same functionality.
 %
@@ -105,6 +105,10 @@ function [closestXs, closestYs, closestDistances] = ...
 %      2021_03_21:
 %      -- first write of the code moving this functionality out of
 %      fcn_Path_findOrthoScatterFromTraversalToTraversals.m
+%      2022_01_07:
+%      -- edited header to rename:
+%      fcn_Path_findOrthoScatterFromTraversalToTraversals to
+%      fcn_Path_FindOrthogonalHitFromTraversalToTraversal
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -203,9 +207,9 @@ closestDistances = zeros(Nstations,Ntraversals);
 
 for ith_traversal = 1:Ntraversals
     nearby_traversal = all_traversals.traversal{ith_traversal};
-    
+   
     [closest_path_points,closest_distances] = ...
-        fcn_Path_findOrthogonalHitFromTraversalToTraversals(...
+        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
         reference_station_points,...
         reference_traversal,...
         nearby_traversal,...

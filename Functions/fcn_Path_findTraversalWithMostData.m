@@ -1,11 +1,11 @@
-function  index_of_longest = fcn_Path_findTraversalWithMostData(data,varargin)
+function  index_of_longest = fcn_Path_findTraversalWithMostData(data)
 % fcn_Path_findTraversalWithMostData.m
 % finds the traversal index with the most amount of data (determined as the
 % most elements in the X array)
 %
 % FORMAT: 
 %
-%        = fcn_Path_findTraversalWithMostData.m(data,varargin)
+%      index_of_longest = fcn_Path_findTraversalWithMostData(data)
 %
 % INPUTS:
 %
@@ -32,6 +32,8 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data,varargin)
 %       - wrote the code
 %       2021_01_02
 %       - added more checks to traversal type
+%     2022_01_06:
+%     -- fixed comments in header
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging

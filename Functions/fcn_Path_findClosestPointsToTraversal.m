@@ -10,7 +10,8 @@ function [closestXs,closestYs,closestZs,closestYaws] = ...
 % FORMAT:
 %
 %      [closestXs,closestYs,closestZs,closestYaws] = ...
-%      fcn_Path_findClosestPointsToTraversal(path,data,flag_yaw)
+%      fcn_Path_findClosestPointsToTraversal(path,data,...
+%        (flag_yaw), (flag_3D),(fig_num))
 %
 % INPUTS:
 %

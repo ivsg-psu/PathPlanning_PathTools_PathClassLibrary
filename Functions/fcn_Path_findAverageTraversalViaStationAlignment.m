@@ -1,12 +1,54 @@
 function [aligned_Data_ByStation,mean_Data] = fcn_Path_findAverageTraversalViaStationAlignment(data)
-%%calculate mean station by laps for signle sensor 
+% fcn_Path_findAverageTraversalViaStationAlignment
+% finds the average traversal of several traversals by averaging the
+% lateral offsets at the same stations.
+%
+% FORMAT: 
+%
+%      [aligned_Data_ByStation,mean_Data] = fcn_Path_findAverageTraversalViaStationAlignment(data);
+%
+% INPUTS:
+%
+%      data: a traversals type data structure, namely a structure
+%      containing a cell array of traversals, each with subfields of X, Y,
+%      etc. in the following form
+%           data.traversal{i_path}.X
+%      Note that i_path denotes an index into a different traversal. Each
+%      traversal will be compared separately. It is assumed there are M
+%      traversals, with M >=1.
+%
+%      (OPTIONAL INPUTS)
+%
+%      (NONE YET!) NEED TO ADD-->fig_num: a figure number to plot results.
+%
+%
+% OUTPUTS:
+%
+%      (fill in)
+%
+% DEPENDENCIES:
+%
+%      (fill in)
+%
+% EXAMPLES:
+%      
+%     See the script: 
+%     script_test_fcn_Path_findAverageTraversalViaStationAlignment
+%     script_test_fcn_Path_findAveragePath
+%     for a full test suite.
+%
+% This function was written on 2020_05_29 by S. Brennan
+% Questions or comments? sbrennan@psu.edu 
 
+% Revision history:
 %     2020_05_29:
 %     -- fixed mod issue in yaw angle
 %     2020_11_14
 %     -- changed name to fcn_Path_findAveragePathViaStationAlignment
-%     2020_01_02
+%     2021_01_02
 %     -- changed input arguments for consistency
+%     2022_01_03
+%     -- updated header to more modern format
 
 % for i = 1:numLaps % data structure convert
 %     data.traversal{i} = lapData{i};      

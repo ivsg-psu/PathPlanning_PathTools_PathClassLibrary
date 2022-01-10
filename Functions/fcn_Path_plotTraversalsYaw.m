@@ -74,7 +74,7 @@ if flag_check_inputs == 1
     end
         
     % Check the Path variables        
-    fcn_Path_checkInputsToFunctions(data, 'traversals');
+    %fcn_Path_checkInputsToFunctions(data, 'traversals');
 
 end
 

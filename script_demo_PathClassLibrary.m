@@ -15,7 +15,7 @@ if ~exist('flag_paths_were_added_already','var')
     
     % add necessary directories for Utilities to the path
     if(exist([pwd, filesep,  'Utilities'],'dir'))
-        addpath(genpath([pwd, ilesep, 'Utilities']))  % This is where GPS utilities are stored
+        addpath(genpath([pwd, filesep, 'Utilities']))  % This is where GPS utilities are stored
     else
         error('No Utilities directory exists to be added to the path. Please create one (see README.md) and run again.');
     end
@@ -50,6 +50,17 @@ paths_array = fcn_Path_fillSamplePaths;
 % We can even save one of these as a single "path"
 single_path = paths_array{1};
 
+%% Allow the user to self-select a path, fcn_Path_fillPathViaUserInputs
+% fcn_Path_fillPathViaUserInputs
+% A function for the user to click on the figure to generate XY path.
+% Points are collected and plotted until the user double clicks. If the
+% user right-clicks anywhere in the plot, the last point is deleted. Once
+% the user double-clicks, the results are output from the function.
+%
+% FORMAT: 
+%
+%      pathXY = fcn_Path_fillPathViaUserInputs(fig_num)
+
 %% Show how to calculate the relative angle changes between path segments, fcn_Path_calcDiffAnglesBetweenPathSegments
 % Avoids the use of atan function since this breaks near -180 degree point
 
@@ -64,7 +75,7 @@ diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,fig_num)
 
 % Basic call with one path
 fig_num = 22222;
-yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num); %#ok<*NASGU>
+yaw_angles = fcn_Path_calcYawFromPathSegments(paths_to_check,fig_num); %#ok<*NASGU>
 
 
 % Multiple paths
@@ -251,6 +262,56 @@ flag_search_type = 2;
 % 15.000 		 0.000 		     	 10.000 		 1
 % 1.000 		 14.000 			 10.000 		 4
 
+%% Finding the intersection of traversals, fcn_Path_findIntersectionsBetweenTraversals
+% fcn_Path_findIntersectionsBetweenTraversals
+% Given two traversals, finds the intersection points between the traverals
+% and returns the results as points, station coordinates in 1, and station
+% coordinates in 2
+
+% BASIC example 5 - two crossings of 1 onto 2
+fig_num = 5;
+
+% Create a dummy path and convert it to traversal_1
+traversal_1_path = [0 -1; 2 2;  5 -3];  
+traversal_1 = fcn_Path_convertPathToTraversalStructure(traversal_1_path);
+
+% Create a dummy path and convert it to traversal_2
+traversal_2_path = [0 0; 7 2];  
+traversal_2 = fcn_Path_convertPathToTraversalStructure(traversal_2_path);
+
+
+% Calculate the function output
+[intersection_points,...
+    s_coordinates_in_traversal_1,...
+    s_coordinates_in_traversal_2] = ...
+    fcn_Path_findIntersectionsBetweenTraversals(...
+    traversal_1,...
+    traversal_2, ...
+    fig_num);
+
+
+% BASIC example 14 - Traversal 2 is on top of traversal 1 for two areas
+fig_num = 14;
+
+% Create a dummy path and convert it to traversal_1
+traversal_1_path = [0 0; 8 2];  
+traversal_1 = fcn_Path_convertPathToTraversalStructure(traversal_1_path);
+
+% Create a dummy path and convert it to traversal_2
+traversal_2_path = [1 1; 2 0.5; 4 1; 5 3; 6 1.5; 7 1.75; 9 1];  
+traversal_2 = fcn_Path_convertPathToTraversalStructure(traversal_2_path);
+
+
+% Calculate the function output
+[intersection_points,...
+    s_coordinates_in_traversal_1,...
+    s_coordinates_in_traversal_2] = ...
+    fcn_Path_findIntersectionsBetweenTraversals(...
+    traversal_1,...
+    traversal_2, ...
+    fig_num);
+
+
 %% Show how to snap a point onto a path, fcn_Path_snapPointOntoNearestPath
 % This can be tricky when the point is not on a perpendicular projection of
 % any path segment. Examples are given in the documentation PPT.
@@ -345,6 +406,69 @@ fprintf(1,...
 title('Normal query - Test case #1');
 
 
+%% The following function can remove "pinch points", fcn_Path_removePinchPointInTraversal
+% Given a traversal with a pinch point - an area where the traversal
+% suddenly bends back on itself before continuing - this function removes
+% the pinch point
+
+% Pinch points are where a path crosses back onto itself, creating a loop.
+% The minimum traversal along the path to go from start to end is to NOT go
+% through the loop, but to jump at the "pinch point", thereby avoiding the
+% loop or self-crossing area. The resulting path is one without "pinch
+% points". This function is very useful to clean up weird polytopes that
+% are self-crossing when traversing around an edge, or to remove weird jogs
+% in data such as when projecting orthogonally.
+
+% Advanced test case 3: show a pinch point in practice
+fig_num = 1111;
+figure(fig_num);
+clf;
+axis equal
+
+% Clear any old variables
+clear all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Pick first path 1s reference_traversal structure
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
+all_traversals.traversal{1} = reference_traversal;
+
+
+% Plot the results? (Note: they are plotted below as well)
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(all_traversals,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+end
+
+% Grab the "curve" of the path
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
+offsets = (0:1:10)'; 
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+
+% Fill in an array of "fixed" traversals
+clear fixed_traversals
+for ith_traversal = 1:length(offset_traversals.traversal)
+    traversal_with_pinch_point = offset_traversals.traversal{ith_traversal};
+    [traversal_no_pinch_point] = ...
+        fcn_Path_removePinchPointInTraversal(...
+        traversal_with_pinch_point);
+    fixed_traversals.traversal{ith_traversal} = traversal_no_pinch_point; 
+end
+
+% Plot the results
+fixed_fig_num = 2222;
+figure(fixed_fig_num);
+clf;
+axis equal
+hold on;
+plot(reference_traversal.X,reference_traversal.Y,'b','Linewidth',3);
+fcn_Path_plotTraversalsXY(fixed_traversals,fixed_fig_num)
+
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % See http://patorjk.com/software/taag/#p=display&f=Big&t=Projection%20of%20Paths
@@ -358,6 +482,7 @@ title('Normal query - Test case #1');
 %                 _/ |                                                                   
 %                |__/                                                                    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %% Project orthogonal vectors at user-defined stations, fcn_Path_findOrthogonalTraversalVectorsAtStations
 % Given a central traversal and a set of stations along that traversal,
@@ -432,66 +557,122 @@ fig_num = 14;  % Define the figure
 %% Find how close one traversal is to another at specific station points, fcn_Path_findOrthogonalHitFromTraversalToTraversal
 % fcn_Path_findOrthogonalHitFromTraversalToTraversals
 % Given a central traversal and a set of stations along that traversal,
-% finds the location on a nearby traversal that is closest to the central
+% finds the location on nearby traversals that are closest to the central
 % traveral at each station point. Closest is defined via an orthogonal
 % projection (or modifications of orthogonal projections) from the central
-% traversal outward toward nearby traversals.
+% traversal outward toward nearby traversals. Both positive and negative
+% projections are included. Positive projections are those that, in the
+% cross-product between the station direction and sensor
+% projection, have a positive result. If a distance is in the positive
+% direction, it is reported as positive. In the negative direction, it is
+% reported as negative.
+
+%% BASIC example 1 - parallel lines, query is in middle area
+stations = 1; % Define the station
+
+% Create a dummy central path and convert it to a traversal
+central_path = [0 0; 2 0];  
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+% Define a "nearby" path and convert it to a traversal
+nearby_path = [0 4; 2 4];
+nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
+
+% Set default values
+flag_rounding_type = 3;
+search_radius = 5;
+fig_num = 1;
+
+% Calculate the closest point and distance on the nearby path
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
+    central_traversal,nearby_traversal,...
+    flag_rounding_type,search_radius,fig_num);
+
+% Make sure function worked
+assert(isequal(round(closest_path_point,4),[1     4]));
+assert(isequal(round(distances,4),[4])); %#ok<*NBRAK>
 
 
+% BASIC example 1.5 - parallel lines, negative
+stations = 1; % Define the station
+
+% Create a dummy central path and convert it to a traversal
+central_path = [0 0; 2 0];  
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+% Define a "nearby" path and convert it to a traversal
+nearby_path = [0 -4; 2 -4];
+nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
+
+% Set default values
+flag_rounding_type = 3;
+search_radius = 5;
+fig_num = 1;
+
+% Calculate the closest point and distance on the nearby path
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
+    central_traversal,nearby_traversal,...
+    flag_rounding_type,search_radius,fig_num);
+
+% Make sure function worked
+assert(isequal(round(closest_path_point,4),[1     -4]));
+assert(isequal(round(distances,4),[-4]));
+
+
+
+
+% Example showing effect of flags
 % Set up data
-close all
 central_path = [0 0; 1 1; 2 0];
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 stations = [0; 1; 2^0.5-0.1; 2^0.5; 2^0.5+.1; 2; central_traversal.Station(end)];
-search_radius = 20; % Distance to search for nearby segments
+search_radius = 1.5; % Distance to search for nearby segments
 
 % AVERAGING example 1 - default setting
-fig_num = 1;
+fig_num = 11;
 flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
-print_results(stations,closest_path_point,distances);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num); %#ok<*ASGLU>
 title('Vertex projection via prior segment (default, flag=1)');
 
 % AVERAGING example 2 - use following segment
-fig_num = 2;
+fig_num = 12;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
-print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2)');
 
 % AVERAGING example 3 - use average of both segments
-fig_num = 3;
+fig_num = 13;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
-print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
 % AVERAGING example 4 - use average always
-fig_num = 4;
+fig_num = 14;
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
-print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging everywhere (flag=4)');
 
-%% Find closest distance of many traversals to one central taversal, fcn_Path_findOrthoScatterFromTraversalToTraversals
+%% Find closest distance of many traversals to one central traversal, fcn_Path_findOrthoScatterFromTraversalToTraversals
 % Given a central traversal and a set of stations along that traversal,
 % finds the locations on the nearby traversals that are closest to the central
 % traveral at each station point. Closest is defined via an orthogonal
@@ -518,6 +699,74 @@ if 1==0
     fcn_Path_plotTraversalsXY(all_traversals,fig_num);
 end
 
+
+% Test case 1: basic call
+reference_traversal = all_traversals.traversal{2};
+reference_station_points = (0:10:reference_traversal.Station(end))';
+flag_rounding_type = 3; % Use average of projections at end points
+search_radius = 7;
+fig_num = 1;
+
+[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals( reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,fig_num); 
+   
+figure(11);
+histogram([closestDistances(:,1);closestDistances(:,3)],30);
+title('Histogram of all orthogonal distance projections');
+
+%% Find offset traversals from a traversal, fcn_Path_fillOffsetTraversalsAboutTraversal
+% fills in an array of traversals about a reference traversal at
+% user-defined offset distances.
+%
+% Clear any old variables
+clear all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Test case 4: show how "pinching" can happen
+fig_num = 4;
+% Grab the "curve" of the path
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
+offsets = (-10:1:10)'; 
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+axis equal;
+
+%% Convert one traversal's XY coordinates into SY coordinates using a reference traversal
+% fcn_Path_convertTraversalXYtoSy
+% Given a reference traversal and a set of stations along that traversal,
+% finds the location on each nearby traversal that is closest to the central
+% traveral at each station point. Closest is defined via an orthogonal
+% projection (or modifications of orthogonal projections) from the central
+% traversal outward toward nearby traversals. The results are then
+% presented as an array of lateral offsets.
+%
+% NOTE: this is just a reformulation of the function:
+% fcn_Path_findOrthogonalHitFromTraversalToTraversals
+% The main difference is the final plotting result, but otherwise it uses
+% the same functionality.
+
+clear all_traversals
+close all;
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = ...
+        fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    all_traversals.traversal{i_Path} = traversal;
+end
+
+% Plot the results? (Note: they are plotted below as well)
+if 1==1
+    %     fig_num = 12;
+    %     fcn_Path_plotTraversalsYaw(all_traversals,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+    title('Original paths in XY');
+end
+
 % Test case 1: basic call
 reference_traversal = all_traversals.traversal{2};
 reference_station_points = (0:10:reference_traversal.Station(end))';
@@ -526,10 +775,512 @@ search_radius = 40;
 fig_num = 1;
 
 [closestXs, closestYs, closestDistances] = ...
-       fcn_Path_findOrthoScatterFromTraversalToTraversals(...
+       fcn_Path_convertTraversalXYtoSy(...
        reference_station_points, reference_traversal, all_traversals,...
        flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
    
-figure(11);
-histogram([closestDistances(:,1);closestDistances(:,3)],30);
-title('Histogram of all orthogonal distance projections');
+   
+%% Find random traversals (with varying smoothness) about traversal:
+% fcn_Path_fillRandomTraversalsAboutTraversal
+% fills in random traversals about a reference traversal. Points are
+% generated via orthogonal projection using random normal distribution with
+% either a default variance or optional user-defined variance. The station
+% points can also be user-specified as randomly distributed uniformly, or
+% default to the station points in the reference_traversal if no optional
+% inputs are given. The first and last stations are forced to be the same
+% as the reference_traversal to prevent the route from randomly becoming
+% shorter with repeated calls to this function.
+
+% Clear any old variables
+clear all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Pick first path 1s reference_traversal structure
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
+all_traversals.traversal{1} = reference_traversal;
+
+
+% Plot the results? (Note: they are plotted below as well)
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(all_traversals,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+end
+
+% Test case 1: basic call for one trajectory
+random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal);
+
+figure(1212);
+plot(random_traversals.traversal{1}.X,random_traversals.traversal{1}.Y,'r.-','Linewidth',3);
+
+
+% Test case 4: show effects of spatial smoothness with many trajectories
+%      random_traversals = ...
+%      fcn_Path_fillRandomTraversalsAboutTraversal(...
+%            reference_traversal,...
+%            (std_deviation),...
+%            (num_trajectories),...
+%            (num_points),...
+%            (flag_generate_random_stations),...
+%            (spatial_smoothness),...
+%            (fig_num));
+emtpy_value = [];
+flag_generate_random_stations = 0;
+num_trajectories = 5;
+
+fig_num = 41;
+spatial_smoothness = 2;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    emtpy_value,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title('Spatial smoothness: 2 meters (generates warning)');
+
+fig_num = 42;
+spatial_smoothness = 5;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    emtpy_value,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
+
+
+fig_num = 43;
+spatial_smoothness = 10;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    emtpy_value,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
+
+fig_num = 44;
+spatial_smoothness = 15;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    emtpy_value,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
+
+fig_num = 45;
+spatial_smoothness = 25;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    emtpy_value,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
+
+
+% Test case 5: show effects of standard deviation
+%      random_traversals = ...
+%      fcn_Path_fillRandomTraversalsAboutTraversal(...
+%            reference_traversal,...
+%            (std_deviation),...
+%            (num_trajectories),...
+%            (num_points),...
+%            (flag_generate_random_stations),...
+%            (spatial_smoothness),...
+%            (fig_num));
+emtpy_value = [];
+flag_generate_random_stations = 0;
+num_trajectories = 5;
+spatial_smoothness = 7;  % Units are meters
+
+fig_num = 51;
+std_deviation = 1;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    std_deviation,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Standard deviation: %.0d meters',std_deviation));
+
+fig_num = 52;
+std_deviation = 2;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    std_deviation,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Standard deviation: %.0d meters',std_deviation));
+
+fig_num = 53;
+std_deviation = 5;  % Units are meters
+random_traversals = ...
+    fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal,...
+    std_deviation,... % (std_deviation),...
+    num_trajectories,... % (num_trajectories),...
+    emtpy_value,... % (num_points),...
+    flag_generate_random_stations,... % (flag_generate_random_stations),...
+    spatial_smoothness,... % (spatial_smoothness),...
+    fig_num);
+title(sprintf('Standard deviation: %.0d meters',std_deviation));
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% See http://patorjk.com/software/taag/#p=display&f=Big&t=Statistical%20Analysis%20of%20Paths
+%    _____ _        _   _     _   _           _                        _           _              __   _____      _   _         
+%   / ____| |      | | (_)   | | (_)         | |     /\               | |         (_)            / _| |  __ \    | | | |        
+%  | (___ | |_ __ _| |_ _ ___| |_ _  ___ __ _| |    /  \   _ __   __ _| |_   _ ___ _ ___    ___ | |_  | |__) |_ _| |_| |__  ___ 
+%   \___ \| __/ _` | __| / __| __| |/ __/ _` | |   / /\ \ | '_ \ / _` | | | | / __| / __|  / _ \|  _| |  ___/ _` | __| '_ \/ __|
+%   ____) | || (_| | |_| \__ \ |_| | (_| (_| | |  / ____ \| | | | (_| | | |_| \__ \ \__ \ | (_) | |   | |  | (_| | |_| | | \__ \
+%  |_____/ \__\__,_|\__|_|___/\__|_|\___\__,_|_| /_/    \_\_| |_|\__,_|_|\__, |___/_|___/  \___/|_|   |_|   \__,_|\__|_| |_|___/
+%                                                                         __/ |                                                 
+%                                                                        |___/                                                  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Plotting a band around a traversal, fcn_Path_plotTraversalXYWithUpperLowerBands
+% Plots a traversal with a band defined by an upper and lower traversal.
+% All traversals must have the same data length. 
+
+% Test case 1: basic call for one trajectory
+fig_num = 23333;
+middle_path = [0 0; 1 1; 4 0; 5 0.5];
+upper_path = [0 2; 1 2; 3.9 3; 4.9 1.5];
+lower_path = [0 -1; 0.9 0; 4.1 -3; 5.1 0];
+middle_traversal = fcn_Path_convertPathToTraversalStructure(middle_path);
+upper_traversal = fcn_Path_convertPathToTraversalStructure(upper_path);
+lower_traversal = fcn_Path_convertPathToTraversalStructure(lower_path);
+
+fcn_Path_plotTraversalXYWithUpperLowerBands( middle_traversal, upper_traversal, lower_traversal, fig_num);
+
+%% Approximating the lateral variance of a traversal, fcn_Path_calcSingleTraversalStandardDeviation
+% fcn_Path_calcSingleTraversalStandardDeviation
+% calculates the standard deviation in the offsets of a single traversal by
+% analyzing the variance in angles along a reference_traversal, then
+% multiplying these by the average segment length in the reference
+% traversal. The resulting standard deviation approximates the
+% variance in lateral offset that occurs at the end of each segment, versus
+% a line projected from the previous segment.
+% Clear any old variables
+clear all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Pick first path 1s reference_traversal structure
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
+all_traversals.traversal{1} = reference_traversal;
+
+
+% Test case 1: basic call for one trajectory
+fig_num = 252525;
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal,fig_num);
+
+%% Plotting variance bands about a traversal, fcn_Path_plotTraversalXYWithVarianceBands
+% fcn_Path_plotTraversalXYWithVarianceBands
+% Plots a traversal with a variance band around the path
+
+% Clear any old variables
+clear all_traversals
+
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Test case 4: advanced call for multiple trajectories
+fig_num = 444444;
+std_deviation = 2;
+for i_Path = 1:length(paths)
+    reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
+        std_deviation,fig_num);
+end
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% See http://patorjk.com/software/taag/#p=display&f=Big&t=Path%20Averaging%20Methods
+%   _____      _   _                                        _               __  __      _   _               _     
+%  |  __ \    | | | |         /\                           (_)             |  \/  |    | | | |             | |    
+%  | |__) |_ _| |_| |__      /  \__   _____ _ __ __ _  __ _ _ _ __   __ _  | \  / | ___| |_| |__   ___   __| |___ 
+%  |  ___/ _` | __| '_ \    / /\ \ \ / / _ \ '__/ _` |/ _` | | '_ \ / _` | | |\/| |/ _ \ __| '_ \ / _ \ / _` / __|
+%  | |  | (_| | |_| | | |  / ____ \ V /  __/ | | (_| | (_| | | | | | (_| | | |  | |  __/ |_| | | | (_) | (_| \__ \
+%  |_|   \__,_|\__|_| |_| /_/    \_\_/ \___|_|  \__,_|\__, |_|_| |_|\__, | |_|  |_|\___|\__|_| |_|\___/ \__,_|___/
+%                                                      __/ |         __/ |                                        
+%                                                     |___/         |___/                                         
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+clc;
+
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
+% Plot the results?
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(data,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(data,fig_num);
+end
+
+%% Averaging by station, fcn_Path_findAverageTraversalViaStationAlignment
+% fcn_Path_findAverageTraversalViaStationAlignment
+% finds the average traversal of several traversals by averaging the
+% lateral offsets at the same stations.
+
+[aligned_Data_ByStation,mean_Data] = ...
+    fcn_Path_findAverageTraversalViaStationAlignment(data);
+
+% Plot the final XY result of mean station
+path_points_fig = 11111;
+fcn_Path_plotTraversalsXY(data,path_points_fig);
+hold on
+plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
+title('Original paths and final average path via station averaging')
+xlabel('X [m]')
+ylabel('Y [m]')
+
+
+%% Averaging by closest point, fcn_Path_findAverageTraversalViaClosestPoint
+% fcn_Path_findAverageTraversalViaClosestPoint
+% finds the average of several traversals by taking a reference traversal
+% (or, if one is not given, using the traversal with longest number of
+% points) and for each point in the traversal finding the nearest point in
+% other traversals. The nearest point is determined by the "snap" of the
+% reference traversal vertices to the closest location of each path. Thus,
+% the resulting projection is orthogonal to each individual nearby path
+% (and not usually orthogonal to the reference path).
+
+path_average_final2 = fcn_Path_findAverageTraversalViaClosestPoint(data);
+
+% Plot the final XY result of closest point
+path_points_fig = 22222;
+fcn_Path_plotTraversalsXY(data,path_points_fig);
+hold on
+plot(path_average_final2.X,path_average_final2.Y,'Linewidth',4);
+title('Original paths and final average path via closest point averaging')
+xlabel('X [m]')
+ylabel('Y [m]')
+
+%% Averaging by orthogonal projection, fcn_Path_findAverageTraversalViaOrthoProjection
+% fcn_Path_findAverageTraversalViaOrthoProjection
+% finds the average traversal of several traversals by taking a reference
+% traversal or, if of a referemce traversal is not given, it uses as a
+% reference the traversal with longest number of points. 
+%
+% As additional outputs, for each point in the traversal, this function
+% also finds the intersection point in other traversals via orthogonal
+% projection, and saves these points into arrays to denote the closest X
+% and Y coordinates, and the distances. These X, Y, and distance arrays
+% have M columns, one for each traversal, and N rows, one for each station
+% in the reference traversal.
+
+path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data);
+
+% Plot the final XY result of orthogonal
+path_points_fig = 33333;
+fcn_Path_plotTraversalsXY(data,path_points_fig);
+hold on
+plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
+title('Original paths and final average path via orthogonal projections')
+xlabel('X [m]')
+ylabel('Y [m]')
+
+
+%% Plot the final XY results of all three
+path_points_fig = 123;
+figure(path_points_fig);
+clf;
+hold on
+plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
+plot(path_average_final2.X,path_average_final2.Y,'Linewidth',4);
+plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
+fcn_Path_plotTraversalsXY(data,path_points_fig);
+title('Original paths and final average paths');
+legend('Average Station','Closest point','Orthogonal projection','Paths')
+xlabel('X [m]')
+ylabel('Y [m]')
+
+%% The following are sub-functions that are used in the averaging methods
+
+
+%% Find closest points on other traversals to a traversal, fcn_Path_findClosestPointsToTraversal
+% [closestXs,closestYs,closestZs,closestYaws] = fcn_Path_findClosestPointsToTraversal(...
+%    reference_traversal,data,varargin)
+% This function finds the projection point on each traversal from a
+% reference path by snapping each vertex of the reference traversal onto
+% the nearby traversals. Each "snap" calculates the nearest point within
+% each other traversal by measuring the orthogonal distance from the nearby
+% traversal, to the point on the reference_traversal.
+
+% Setup
+clear data
+central_path = [-2 1; 1 4; 3 2; 5 2; 6 3; 7 2];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5; 4 3; 5 4; 6 3; 7 1];
+nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
+data.traversal{1} = nearby_traversal;
+
+% MULTICROSS example 1 - default setting
+fig_num = 13425;
+[closestXs,closestYs,closestZs] = ...
+    fcn_Path_findClosestPointsToTraversal(central_traversal,data,flag_yaw,flag_3D,fig_num);
+
+
+%% Finding the traversal with the most data, fcn_Path_findTraversalWithMostData
+% finds the traversal index with the most amount of data (determined as the
+% most elements in the X array)
+
+% Fill in some dummy data
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths into traversals
+for i_traveral = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_traveral});
+    data.traversal{i_traveral} = traversal;
+end
+
+index_of_longest = fcn_Path_findTraversalWithMostData(data);
+fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n',...
+    length(data.traversal),...
+    index_of_longest,...
+    length(data.traversal{index_of_longest}.X));
+
+%% Generating a new traversal via station resampling, fcn_Path_newTraversalByStationResampling
+% fcn_Path_newTraversalByStationResampling
+% creates a new traversal by resampling a given traversal at given station
+% points. 
+%
+% Note: if the stations are intended to align in space between the
+% input_traversal and new_traversal traversals, then the first station
+% point must be zero.
+%
+% If the stations are outside the station range of the input traversal,
+% then extraploation is used to extend the input_traversal linearly
+% outward. This can result in bad data if the path is not approximately
+% linear at the endpoints.
+
+% Basic example 1 - start at zero
+% Fill in sample paths (as a starter)
+basic_path = [0 0; 10 0; 20 0];
+input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
+
+fig_num = 2344;
+
+% Redecimate the traversal at 1-meter increments
+interval = 1;
+new_stations    = (0:interval:5)';
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+
+% ADVANCED EXAMPLE
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
+
+fig_num = 2345;
+
+% Redecimate the traversal at 1-meter increments
+interval = 10;
+new_stations    = (0:interval:input_traversal.Station(end))';
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+
+
+%% Remove forward/backward jogs from paths, fcn_Path_cleanPathFromForwardBackwardJogs
+% fcn_Path_cleanPathFromForwardBackwardJogs
+% Finds and removes situations where the path is jumping forward and
+% backward. This is detected by finding situations where the angle between
+% segments is more than a threshold (currently pi/4), and then taking these
+% segments, and the one before and after, and removing them. It then
+% re-scans the path (up to 3 times) to again check for these situations.
+
+% Example 1: Basic call 
+fig_num = 1;
+path_with_jogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.7; 3.5 3.6; 5 5];
+clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (path_with_jogs,fig_num);
+
+plot(path_with_jogs(:,1), path_with_jogs(:,2),'.-','Linewidth',2,'Markersize',25);
+plot(clean_path(:,1), clean_path(:,2),'.-','Linewidth',2,'Markersize',25);
+title('Original path with jogs and cleaned path')
+xlabel('X [m]')
+ylabel('Y [m]')
+
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% See http://patorjk.com/software/taag/#p=display&f=Big&t=Elevated%20Paths
+%   ______ _                 _           _   _____      _   _         
+%  |  ____| |               | |         | | |  __ \    | | | |        
+%  | |__  | | _____   ____ _| |_ ___  __| | | |__) |_ _| |_| |__  ___ 
+%  |  __| | |/ _ \ \ / / _` | __/ _ \/ _` | |  ___/ _` | __| '_ \/ __|
+%  | |____| |  __/\ V / (_| | ||  __/ (_| | | |  | (_| | |_| | | \__ \
+%  |______|_|\___| \_/ \__,_|\__\___|\__,_| |_|   \__,_|\__|_| |_|___/
+%                                                                     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Add elevation to a path by finding 2 nearest neighbors, fcn_Path_addElevationToPath 
+% fcn_Path_addElevationToPath
+% Adds elevation to the 2-dimensional 'path' based on the nearest neighbors
+% in a 3-dimesional 'reference_elevated_path'
+% 
+% FORMAT:
+%
+%      elevated_path = fcn_Path_addElevationToPath(path, ...
+%                      reference_elevated_path, (fig_num))
+
+% BASIC example 1.3
+point = [0.5 0.2; 1.4 1.3]; % Define the query point as an XY
+reference_elevated_path = [0 0 0.1; 0.25 0.2 0.2; 0.9 0.9 0.3; 1.1 1.1 0.4; 2.3 2.7 0.5]; % Define an XYZ path
+fignum = 113; % Define the figure number
+
+% Snap the point onto the path
+elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fignum);
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% See http://patorjk.com/software/taag/#p=display&f=Big&t=Miscellaneous
+%   __  __ _              _ _                                  
+%  |  \/  (_)            | | |                                 
+%  | \  / |_ ___  ___ ___| | | __ _ _ __   ___  ___  _   _ ___ 
+%  | |\/| | / __|/ __/ _ \ | |/ _` | '_ \ / _ \/ _ \| | | / __|
+%  | |  | | \__ \ (_|  __/ | | (_| | | | |  __/ (_) | |_| \__ \
+%  |_|  |_|_|___/\___\___|_|_|\__,_|_| |_|\___|\___/ \__,_|___/
+%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                                            
+                                                             
+
+
+
+
+% fcn_Path_debugPrintStringToNCharacters(input_sequence,N)
+% fcn_Path_debugPrintStringToNCharacters
+% Given a string and an integer N representing the number of characters to
+% keep or pad, creates a new string of exactly length N by cropping the
+% string or padding it (to the right) with spaces.
+%
+% NOTE: this function is being deprecated. See the GitHub library that
+% hosts debugging tools that includes a better version:
+% https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/wiki

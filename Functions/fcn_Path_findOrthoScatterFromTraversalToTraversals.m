@@ -108,9 +108,14 @@ function [closestXs, closestYs, closestDistances] = ...
 %      -- renamed function to clarify paths versus traversals
 %      2021_01_09:
 %      -- corrected terminology in comments
-%     2021_12_27:
-%     -- corrected dependencies in comments
-%     -- fixed name fcn_Path_findOrthogonalHitFromTraversalToTraversal
+%      2021_12_27:
+%      -- corrected dependencies in comments
+%      -- fixed name fcn_Path_findOrthogonalHitFromTraversalToTraversal
+%      2022_01_03
+%      -- found a bug in the constrainted search functionality,
+%      fcn_Path_findOrthogonalHitFromTraversalToTraversal, fixed it!
+%      -- in the case of single traversal queries, added printing of the
+%      distance to the hit
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -202,6 +207,10 @@ closestXs = zeros(Nstations,Ntraversals);
 closestYs = zeros(Nstations,Ntraversals);
 closestDistances = zeros(Nstations,Ntraversals);
 
+if flag_do_debug
+    % Plot the paths
+    fcn_Path_plotTraversalsXY(all_traversals,27272);
+end
 
 %% For each traversal, project from reference orthogonally
 % Search nearest points from reference path to each of the other
@@ -210,13 +219,23 @@ closestDistances = zeros(Nstations,Ntraversals);
 for ith_traversal = 1:Ntraversals
     nearby_traversal = all_traversals.traversal{ith_traversal};
     
-    [closest_path_points,closest_distances] = ...
-        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
-        reference_station_points,...
-        reference_traversal,...
-        nearby_traversal,...
-        flag_rounding_type,...
-        search_radius);
+    if flag_do_debug
+        [closest_path_points,closest_distances] = ...
+            fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
+            reference_station_points,...
+            reference_traversal,...
+            nearby_traversal,...
+            flag_rounding_type,...
+            search_radius,27272);
+    else
+        [closest_path_points,closest_distances] = ...
+            fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
+            reference_station_points,...
+            reference_traversal,...
+            nearby_traversal,...
+            flag_rounding_type,...
+            search_radius);
+    end
     
     % Save final results as closest points
     closestXs(:,ith_traversal) = closest_path_points(:,1);
@@ -251,8 +270,9 @@ if flag_do_plot
     % Plot the paths
     fcn_Path_plotTraversalsXY(all_traversals,fig_num);
         
-    % Setup to plot the station points (red) and sensor vectors (green
-    % arrows)
+    % Setup to plot the station points (green dots) and sensor vectors
+    % (green and cyan arrows)
+    
     % Find the unit normal vectors at each of the station points
     [unit_normal_vector_start, unit_normal_vector_end] = ...
         fcn_Path_findOrthogonalTraversalVectorsAtStations(...
@@ -263,26 +283,37 @@ if flag_do_plot
     postive_sensor_vector_end = unit_normal_vector_start + unit_vector_displacement*search_radius;
     negative_sensor_vector_end = unit_normal_vector_start - unit_vector_displacement*search_radius;
     
-    % Plot the sensor vector origin as red dots
-    plot(sensor_vector_start(:,1),sensor_vector_start(:,2),'r.','Markersize',35);
+    % Plot the sensor vector origin as green dots
+    plot(sensor_vector_start(:,1),sensor_vector_start(:,2),'g.','Markersize',35);
        
-    % Show the sensor vectors as green arrows
+    % Show the sensor vectors as green arrows (+) and cyan (-)
     positive_normal_vectors_at_stations = ...
         postive_sensor_vector_end - sensor_vector_start;
     negative_normal_vectors_at_stations = ...
         negative_sensor_vector_end - sensor_vector_start;
-
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
         positive_normal_vectors_at_stations(:,1),positive_normal_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
-        negative_normal_vectors_at_stations(:,1),negative_normal_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
+        negative_normal_vectors_at_stations(:,1),negative_normal_vectors_at_stations(:,2),0,'c','Linewidth',3);  % The 0 term is to prevent scaling
 
-    % Plot the hits
-    for i_point = 1:length(closestXs(:,1))
-        INTERNAL_plot_only_hits(closestXs(i_point,:),closestYs(i_point,:));
+    % Plot the hits as red circles
+    INTERNAL_plot_only_hits(closestXs,closestYs);
+        
+    % If there is only one query trajectory, print the distance
+    if length(all_traversals.traversal)==1
+        
+        % Add a legend - note that the line style, etc tries to be consistent
+        % with the legend in:
+        % fcn_Path_findOrthogonalHitFromTraversalToTraversal
+        legend('Central traversal','Path to check','Station query points','Sensor vectors (+)','Sensor vectors (-)','Hit locations');
+        
+        % Add text to indicate distance result
+        text_locations = sensor_vector_start + unit_vector_displacement.*closestDistances/2;
+        for ith_distance = 1:length(closestDistances)
+            text(text_locations(ith_distance,1),text_locations(ith_distance,2),sprintf('%.2f',closestDistances(ith_distance,1)),'Color',[1 0 0]);
+        end
     end
 
-    
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
@@ -291,14 +322,27 @@ end
 
 end % Ends the function
 
-function INTERNAL_plot_only_hits(xdata,ydata)
+function INTERNAL_plot_only_hits(all_xdata,all_ydata)
 
-% Find indices that are not NaN
-good_x_indices = find(~isnan(xdata));
-good_y_indices = find(~isnan(ydata));
-good_indices = intersect(good_x_indices,good_y_indices);
+xdata_to_keep = [];
+ydata_to_keep = [];
+for i_point = 1:length(all_xdata(:,1))
+    
+    % Grab the ith row of data for x and y, convert into columns
+    xdata = all_xdata(i_point,:)';
+    ydata = all_ydata(i_point,:)';
+    
+    % Find indices that are not NaN
+    good_x_indices = find(~isnan(xdata));
+    good_y_indices = find(~isnan(ydata));
+    good_indices = intersect(good_x_indices,good_y_indices);
+    
+    % Save values
+    xdata_to_keep = [xdata_to_keep; NaN; xdata(good_indices)]; %#ok<AGROW>
+    ydata_to_keep = [ydata_to_keep; NaN; ydata(good_indices)]; %#ok<AGROW>
+end
 
-
-plot(xdata(good_indices),ydata(good_indices),'bo-','Markersize',15,'Linewidth',3);
+% Put all the data into a plot
+plot(xdata_to_keep,ydata_to_keep,'ro-','Markersize',15,'Linewidth',3);
 
 end

@@ -55,7 +55,7 @@ function average_traversal = fcn_Path_findAverageTraversalViaClosestPoint(data, 
 %      
 %     See the scripts: 
 %     script_test_fcn_Path_findAverageTraversalViaClosestPoint
-%     script_test_fcn_Path_findAveragePath
+%     script_test_fcn_Path_findAverageTraversal
 %     for a full test suite.
 %
 % This function was written on 2020_11_13 by S. Brennan
@@ -68,6 +68,8 @@ function average_traversal = fcn_Path_findAverageTraversalViaClosestPoint(data, 
 %      -- changed name and output to reflect traversal, not path
 %      -- added figure number as optional input
 %      -- added input checking
+%     2022_01_03:
+%     -- corrected typos in comments
 
 % TO_DO:
 %      -- Make the reference_traversal an optional input (see the

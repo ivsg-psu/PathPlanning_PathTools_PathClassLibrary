@@ -7,8 +7,10 @@
 % Revision history
 %     2020_12_31
 %     -- first write of the code
-%     2020_01_09
+%     2021_01_09
 %     -- added more comments during clean-up
+%     2022_01_03
+%     -- added assertion tests
 
 close all;
 
@@ -27,6 +29,10 @@ central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
     stations,central_traversal,flag_rounding_type,fig_num); %#ok<*ASGLU>
 
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[ 1 0]));
+assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
+
 %% BASIC example 2 - angled line segment 
 stations = 1;
 central_path = [0 0; 2 2];
@@ -39,6 +45,10 @@ fig_num = 2;  % Define the figure
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
     stations,central_traversal,flag_rounding_type,fig_num);
+
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[0.7071    0.7071]));
+assert(isequal(round(unit_normal_vector_end,4),  [     0    1.4142]));
 
 %% BASIC example 3 - angled line segment adjacent to endpoint 
 stations = 2*2^0.5;
@@ -53,6 +63,10 @@ fig_num = 3;  % Define the figure
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
     stations,central_traversal,flag_rounding_type,fig_num);
 
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[     2     2]));
+assert(isequal(round(unit_normal_vector_end,4),  [1.2929    2.7071]));
+
 %% BASIC example 4 - angled line segment adjacent to startpoint
 stations = 0;
 central_path = [0 0; 2 2];
@@ -66,6 +80,9 @@ fig_num = 4;  % Define the figure
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
     stations,central_traversal,flag_rounding_type,fig_num);
 
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[      0    0]));
+assert(isequal(round(unit_normal_vector_end,4),  [-0.7071    0.7071]));
 
 %% AVERAGING examples
 
@@ -288,9 +305,9 @@ for i_Path = 1:length(paths)
     data.traversal{i_Path} = traversal;
 end
 
-% Call the plot command to show results in XY
-fig_num = 12;
-fcn_Path_plotTraversalsXY(data,fig_num);
+% % Call the plot command to show results in XY
+% fig_num = 12;
+% fcn_Path_plotTraversalsXY(data,fig_num);
 
 fig_num = 13;
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
