@@ -43,12 +43,15 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 %      -- wrote the code
 %      2022_01_07
 %      -- updated header to fix input definitions
+%      2022_08_20
+%      -- allow empty figure argument to avoid plotting
 
 % TODO:
 %   Remove the for loop after fcn_snapPointOntoNearestPath is vectorized
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_check_inputs = 1; % Flag to perform input checking
+flag_do_plots = 0; % Flag to perform plotting
 
 %% check input arguments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,14 +78,18 @@ if 1 == flag_check_inputs
 end
 
 % Does user want to show the plots?
-if 3 == nargin
-    fig_num = varargin{1};
-    figure(fig_num);
-    flag_do_debug = 1;
+if 3 == nargin   
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
     if flag_do_debug
         fig = figure;  %#ok<UNRCH>
         fig_num = fig.Number;
+        flag_do_plots = 1;
     end
 end
 
@@ -143,7 +150,7 @@ elevated_path = [path, closest_point_on_reference_path(:,3)];
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_debug
+if flag_do_plots
     figure(fig_num)
     grid on
     hold on

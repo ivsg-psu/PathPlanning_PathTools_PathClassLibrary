@@ -54,6 +54,8 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 %      fcn_Path_fillRandomTraversalsAboutTraversal as a template
 %      2022_01_03
 %      -- minor updates to comments
+%      2022_08_20
+%      -- allow empty figure argument to avoid plotting
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % % Flag to plot the final results
@@ -110,9 +112,12 @@ num_points = Nstations;
 
 % Does user want to show the plots?
 if 3 == nargin
-    fig_num = varargin{1};
-    figure(fig_num);
-    flag_do_plots = 1;
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
     if flag_do_debug
         fig = figure;

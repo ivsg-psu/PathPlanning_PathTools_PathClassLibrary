@@ -1,6 +1,11 @@
 % This is a demonstration script to show the primary functionality of the
 % path class library.
 
+% Revisions:
+% 2022_08_19 S. Brennan, sbrennan@psu.edu
+% -- added clearing variable data on an example, as it gave errors
+% -- fixed errors with the station-averaging example
+
 %% Set up workspace
 if ~exist('flag_paths_were_added_already','var')
     
@@ -120,6 +125,10 @@ ylabel('Y [m]');
 % Fill in some dummy data
 paths_array = fcn_Path_fillSamplePaths;
  
+clear data
+
+% Preallocate
+data.traversal{length(paths_array)} = [];
 
 % Convert paths into traversals
 for i_traveral = 1:length(paths_array)
