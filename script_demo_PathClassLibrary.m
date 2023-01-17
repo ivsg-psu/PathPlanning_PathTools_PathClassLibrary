@@ -997,7 +997,6 @@ paths_array = fcn_Path_fillSamplePaths;
 
 % Pick first path 1s reference_traversal structure
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
-all_traversals.traversal{1} = reference_traversal;
 
 
 % Test case 1: basic call for one trajectory
