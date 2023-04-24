@@ -80,6 +80,10 @@ function [closest_path_point,s_coordinate,...
 %     -- updated plotting to allow 3D
 %     2021_12_10
 %     -- updated header for clarity
+%     2023_04_24
+%     -- better comments
+%     -- fixed a bug where it was snapping to wrong locations for acute
+%     angles
 
 % TO-DO:
 % Allow multiple points, e.g.
@@ -157,89 +161,142 @@ traversal = fcn_Path_convertPathToTraversalStructure(path);
 path_station = traversal.Station;
 
 % Find distance from a point to every point on the path
-distances_point_to_path = sum((path - point).^2,2).^0.5; % Calculate distances
-[~,closest_path_point_index] = min(distances_point_to_path);  % Grab index of the closest point
+squared_distances_point_to_path = sum((path - point).^2,2); % Calculate distances
+[~,closest_path_point_index] = min(squared_distances_point_to_path);  % Grab index of the closest point
 
-% Be sure to check end cases as well
+% First check if we are in one of the end cases
 if 1 == closest_path_point_index || Npoints == closest_path_point_index
-    if 1 == closest_path_point_index
+    % If in here, closest point snapped to the start or end of the path.
+    % These are the end cases
+    if 1 == closest_path_point_index % At the start?
+        % TESTED
         first_path_point_index  = 1;
         second_path_point_index = 2;
-    else
+    else % At the end
+        % TESTED
         first_path_point_index  = Npoints-1;
         second_path_point_index = Npoints;
     end
     
-    % Do the dot products - define the vectors first
-    % See: https://mathinsight.org/dot_product for explanation
-    % Basically, we are seeing what amount the point_vector points in the
-    % direction of the path_vector
-    path_vector  = path(second_path_point_index,:)-path(first_path_point_index,:);
-    path_segment_length  = sum(path_vector.^2,2).^0.5;
-    point_vector = point-path(first_path_point_index,:);
-    projection_distance  = dot(path_vector,point_vector)/path_segment_length; % Do dot product
-    percent_along_length = projection_distance/path_segment_length;
-    
-    % Calculate the outputs
-    closest_path_point = path(first_path_point_index,:) + path_vector*percent_along_length;
-    s_coordinate       = path_station(first_path_point_index,1) + path_segment_length*percent_along_length;
+    % Calculate the outputs using vector measures on the segment
+    [closest_path_point,s_coordinate,percent_along_length] = fcn_INTERNAL_calculateVectorMeasures(point,path(second_path_point_index,:),path(first_path_point_index,:),path_station(first_path_point_index,1));
 else
-    % Do the dot products - define the vectors first
-    % See: https://mathinsight.org/dot_product for explanation
-    % Basically, we are seeing what amount the front_point_vector points in 
-    % the direction of the front_path_vector
-    front_path_vector  = path(closest_path_point_index+1,:)-path(closest_path_point_index,:);
-    front_path_segment_length  = sum(front_path_vector.^2,2).^0.5;
-    front_point_vector = point-path(closest_path_point_index,:);
-    front_projection_distance  = dot(front_path_vector,front_point_vector)/front_path_segment_length; % Do dot product
-    front_percent_along_length = front_projection_distance/front_path_segment_length;
+    % Calculate the outputs using vector measures on the front segment
+    [front_closest_path_point,front_s_coordinate,front_percent_along_length] = fcn_INTERNAL_calculateVectorMeasures(point,path(closest_path_point_index+1,:),path(closest_path_point_index,:),path_station(closest_path_point_index,1));
+
+    %     % Do the dot products - define the vectors first
+    %     % See: https://mathinsight.org/dot_product for explanation
+    %     % Basically, we are seeing what amount the front_point_vector points in
+    %     % the direction of the front_path_vector
+    %     front_path_vector  = path(closest_path_point_index+1,:)-path(closest_path_point_index,:);
+    %     front_path_segment_length  = sum(front_path_vector.^2,2).^0.5;
+    %     front_point_vector = point-path(closest_path_point_index,:);
+    %     front_projection_distance  = dot(front_path_vector,front_point_vector)/front_path_segment_length; % Do dot product
+    %     front_percent_along_length = front_projection_distance/front_path_segment_length;
     
-    % Do the dot products - define the vectors first
-    % See: https://mathinsight.org/dot_product for explanation
-    % Basically, we are seeing what amount the back_point_vector points in 
-    % the direction of the back_path_vector
-    back_path_vector  = path(closest_path_point_index,:)-path(closest_path_point_index-1,:);
-    back_path_segment_length  = sum(back_path_vector.^2,2).^0.5;
-    back_point_vector = point-path(closest_path_point_index-1,:);
-    back_projection_distance  = dot(back_path_vector,back_point_vector)/back_path_segment_length;    % Do dot product
-    back_percent_along_length = back_projection_distance/back_path_segment_length;
+
+    % Calculate the outputs using vector measures on the back segment   
+    [back_closest_path_point,back_s_coordinate,back_percent_along_length] = fcn_INTERNAL_calculateVectorMeasures(point,path(closest_path_point_index,:),path(closest_path_point_index-1,:),path_station(closest_path_point_index-1,1));
+
+    %     % Do the dot products - define the vectors first
+    %     % See: https://mathinsight.org/dot_product for explanation
+    %     % Basically, we are seeing what amount the back_point_vector points in
+    %     % the direction of the back_path_vector
+    %     back_path_vector  = path(closest_path_point_index,:)-path(closest_path_point_index-1,:);
+    %     back_path_segment_length  = sum(back_path_vector.^2,2).^0.5;
+    %     back_point_vector = point-path(closest_path_point_index-1,:);
+    %     back_projection_distance  = dot(back_path_vector,back_point_vector)/back_path_segment_length;    % Do dot product
+    %     back_percent_along_length = back_projection_distance/back_path_segment_length;
     
-    if 0 > back_percent_along_length % Point is located BEHIND the vector that is the rear-most vector
+    if 0 > back_percent_along_length 
+        % Point is located BEHIND the vector that is the rear-most vector -
+        % not possible, as this should only happen if snap point is start
+        % and that is caught in previous if statement
         error('ERROR: Point is lying BEHIND the BACK segment on path');
-    elseif 1 < back_percent_along_length  % Point is in front of vector that is the rear-most vector
-        if 1 < front_percent_along_length % Point is ahead of the vector that is in front
+    elseif 1 < back_percent_along_length  
+        % To enter here, point is after the end of the "back" vector's end
+        % point.
+        
+        if 1 < front_percent_along_length 
+            % Point is ahead of the vector that is in front - not possible
+            % as this can only happen if snap point is the last point on
+            % the path, and that is caught in previous if statement.
             error('ERROR: Point is lying AHEAD of the FRONT segment on path');
-        elseif 0 > front_percent_along_length  % point is BEFORE start of front and AHEAD start of back - this is normal
+        
+        elseif 0 > front_percent_along_length 
+            % TESTED
+            % point is BEFORE start of front and AFTER end of back 
+            % This is the special situation when points are before the
+            % "front" segment, e.g. the next path segment AND points are
+            % after the previous "back" path segment. In this special case,
+            % the distance calculation just uses the snap point.
+            
+            % Calculate the outputs
             first_path_point_index  = closest_path_point_index;
             second_path_point_index = closest_path_point_index;
-            percent_along_length    = 0;
-            
-            % Calculate the outputs
+            percent_along_length    = 0;            
             closest_path_point = path(closest_path_point_index,:);
             s_coordinate       = path_station(closest_path_point_index,1);
-        else  % Only way to enter here is if point is ahead of back, and ON the front vector
+            
+        else
+            % TESTED
+            % Only way to enter here is if point is after the back segement,
+            % and in the front vector area. This occurs when the point is
+            % on the front vectors "main" area. We just use the front
+            % segment result then.
+
+            % Calculate the outputs
             first_path_point_index  = closest_path_point_index;
             second_path_point_index = closest_path_point_index+1;
-            percent_along_length    = front_percent_along_length;
+            percent_along_length    = front_percent_along_length;            
+            closest_path_point = front_closest_path_point;
+            s_coordinate       = front_s_coordinate;
+        end
+    else
+        % Only way to enter here is if point is IN the back vector between
+        % 0 and 1. 
+        
+        if 0 > front_percent_along_length 
+            % TESTED
+            % Point is in back segment, and before front segment. Just use
+            % the back segment results.
             
             % Calculate the outputs
-            closest_path_point = path(first_path_point_index,:) + ...
-                front_path_vector*front_percent_along_length;
-            s_coordinate       = path_station(first_path_point_index,1) + ...
-                front_path_segment_length*front_percent_along_length;
-        end
-    else % Only way to enter here is if point is on the back vector
-        first_path_point_index  = closest_path_point_index-1;
-        second_path_point_index = closest_path_point_index;
-        percent_along_length    = back_percent_along_length;
+            first_path_point_index  = closest_path_point_index-1;
+            second_path_point_index = closest_path_point_index;
+            percent_along_length    = back_percent_along_length;            
+            closest_path_point = back_closest_path_point;
+            s_coordinate       = back_s_coordinate;
         
-        % Calculate the outputs
-        closest_path_point = path(first_path_point_index,:) + ...
-            back_path_vector*back_percent_along_length;
-        s_coordinate       = path_station(first_path_point_index,1) + ...
-            back_path_segment_length*back_percent_along_length;
-    end
-end
+        
+        else
+            % TESTED
+            % Only way to enter here is if point is in the back segement,
+            % and in front segment. This occurs when the point is
+            % on the both the back and front vectors "main" area. We just
+            % have to use the point that is closest to the test point.
+            distance_squared_front_to_point = sum((point-front_closest_path_point).^2,2);
+            distance_squared_back_to_point  = sum((point-back_closest_path_point).^2,2);
+            
+            % Calculate the outputs
+            if distance_squared_front_to_point<=distance_squared_back_to_point
+                % Front segment is closer
+                first_path_point_index  = closest_path_point_index;
+                second_path_point_index = closest_path_point_index+1;
+                percent_along_length    = front_percent_along_length;
+                closest_path_point = front_closest_path_point;
+                s_coordinate       = front_s_coordinate;
+            else
+                % Back segment is closer
+                first_path_point_index  = closest_path_point_index-1;
+                second_path_point_index = closest_path_point_index;
+                percent_along_length    = back_percent_along_length;
+                closest_path_point = back_closest_path_point;
+                s_coordinate       = back_s_coordinate;
+            end
+        end % Ends checks on front percent
+    end % Ends checks on back percent
+end % Ends check for if snap point is at ends
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -254,6 +311,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_debug
     figure(fig_num);
+    clf;
     hold on;
     grid on;
     
@@ -272,7 +330,7 @@ if flag_do_debug
         % Plot the closest path points;
         plot(...
             path(first_path_point_index:second_path_point_index,1),...
-            path(first_path_point_index:second_path_point_index,2),'r*');
+            path(first_path_point_index:second_path_point_index,2),'m*','MarkerSize',20);
         
         % % Label the points with distances?
         % for i_point = 1:length(path(:,1))
@@ -335,4 +393,34 @@ end % Ends the flag_do_debug if statement
 
 
 end % Ends the function
+
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+%% fcn_INTERNAL_calculateVectorMeasures    
+function     [closest_path_point,s_coordinate,percent_along_length] = fcn_INTERNAL_calculateVectorMeasures(point,segment_end_point,segment_start_point,segment_start_station)
+% Do the dot products - define the vectors first
+% See: https://mathinsight.org/dot_product for explanation Basically,
+% we are seeing what amount the point_vector points in the direction of
+% the path_vector
+path_vector  = segment_end_point - segment_start_point;
+path_segment_length  = sum(path_vector.^2,2).^0.5;
+point_vector = point-segment_start_point;
+projection_distance  = dot(path_vector,point_vector)/path_segment_length; % Do dot product
+percent_along_length = projection_distance/path_segment_length;
+
+% Calculate the outputs
+closest_path_point = segment_start_point + path_vector*percent_along_length;
+s_coordinate       = segment_start_station + path_segment_length*percent_along_length;
+end % Ends fcn_INTERNAL_calculateVectorMeasures
 

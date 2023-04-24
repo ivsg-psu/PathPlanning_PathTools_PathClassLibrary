@@ -66,8 +66,12 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 % Questions or comments? szm888@psu.edu 
 
 % Revision history:
-%     2020_01_29 - first write of the code
-%     2021_12_27 - improved the comments, fixed input argument comments
+% 2020_01_29 - first write of the code
+% 2021_12_27 - improved the comments, fixed input argument comments
+% 2023_04_24 - sbrennan@psu.edu
+% - converted code to a nested call to fcn_Path_snapPointOntoNearestPath
+% - fixed debug plotting to match fcn_Path_snapPointOntoNearestPath
+
 
 % TO-DO:
 % Allow multiple points, e.g.
@@ -135,98 +139,108 @@ end
 %  then choose the projected point as closest point from 1
 
 path = [traversal.X, traversal.Y];
-Npoints = length(path(:,1));
-path_station = traversal.Station;
+% Npoints = length(path(:,1));
+% path_station = traversal.Station;
 path_yaw = traversal.Yaw;
 
-% Find square of the distance from a point to every point on the path
-squared_distances_point_to_path = sum((path - point).^2,2); % Calculate square of distances
-[~,closest_path_point_index] = min(squared_distances_point_to_path);  % Grab index of the closest point
+[closest_path_point,s_coordinate,...
+    first_path_point_index,...
+    second_path_point_index,...
+    percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, path);
+path_point_yaw     = path_yaw(first_path_point_index);
 
-% Be sure to check end cases as well
-if 1 == closest_path_point_index || Npoints == closest_path_point_index
-    if 1 == closest_path_point_index
-        first_path_point_index  = 1;
-        second_path_point_index = 2;
-    else
-        first_path_point_index  = Npoints-1;
-        second_path_point_index = Npoints;
-    end
-    
-    % Do the dot products - define the vectors first
-    % See: https://mathinsight.org/dot_product for explanation
-    % Basically, we are seeing what amount the point_vector points in the
-    % direction of the path_vector
-    path_vector  = path(second_path_point_index,:)-path(first_path_point_index,:);
-    path_segment_length  = sum(path_vector.^2,2).^0.5;
-    point_vector = point-path(first_path_point_index,:);
-    projection_distance  = dot(path_vector,point_vector)/path_segment_length; % Do dot product
-    percent_along_length = projection_distance/path_segment_length;
-    
-    % Calculate the outputs
-    closest_path_point = path(first_path_point_index,:) + path_vector*percent_along_length;
-    s_coordinate       = path_station(first_path_point_index,1) + path_segment_length*percent_along_length;
-    path_point_yaw     = path_yaw(first_path_point_index);
-else
-    % Do the dot products - define the vectors first
-    % See: https://mathinsight.org/dot_product for explanation
-    % Basically, we are seeing what amount the front_point_vector points in 
-    % the direction of the front_path_vector
-    front_path_vector  = path(closest_path_point_index+1,:)-path(closest_path_point_index,:);
-    front_path_segment_length  = sum(front_path_vector.^2,2).^0.5;
-    front_point_vector = point-path(closest_path_point_index,:);
-    front_projection_distance  = dot(front_path_vector,front_point_vector)/front_path_segment_length; % Do dot product
-    front_percent_along_length = front_projection_distance/front_path_segment_length;
-    
-    % Do the dot products - define the vectors first
-    % See: https://mathinsight.org/dot_product for explanation
-    % Basically, we are seeing what amount the back_point_vector points in 
-    % the direction of the back_path_vector
-    back_path_vector  = path(closest_path_point_index,:)-path(closest_path_point_index-1,:);
-    back_path_segment_length  = sum(back_path_vector.^2,2).^0.5;
-    back_point_vector = point-path(closest_path_point_index-1,:);
-    back_projection_distance  = dot(back_path_vector,back_point_vector)/back_path_segment_length;    % Do dot product
-    back_percent_along_length = back_projection_distance/back_path_segment_length;
-    
-    if 0 > back_percent_along_length % Point is located BEHIND the vector that is the rear-most vector
-        error('ERROR: Point is lying BEHIND the BACK segment on path');
-    elseif 1 < back_percent_along_length  % Point is in front of vector that is the rear-most vector
-        if 1 < front_percent_along_length % Point is ahead of the vector that is in front
-            error('ERROR: Point is lying AHEAD of the FRONT segment on path');
-        elseif 0 > front_percent_along_length  % point is BEFORE start of front and AHEAD start of back - this is normal
-            first_path_point_index  = closest_path_point_index;
-            second_path_point_index = closest_path_point_index;
-            percent_along_length    = 0;
-            
-            % Calculate the outputs
-            closest_path_point = path(closest_path_point_index,:);
-            s_coordinate       = path_station(closest_path_point_index,1);
-            path_point_yaw     = path_yaw(first_path_point_index);
-        else  % Only way to enter here is if point is ahead of back, and ON the front vector
-            first_path_point_index  = closest_path_point_index;
-            second_path_point_index = closest_path_point_index+1;
-            percent_along_length    = front_percent_along_length;
-            
-            % Calculate the outputs
-            closest_path_point = path(first_path_point_index,:) + ...
-                front_path_vector*front_percent_along_length;
-            s_coordinate       = path_station(first_path_point_index,1) + ...
-                front_path_segment_length*front_percent_along_length;
-            path_point_yaw     = path_yaw(first_path_point_index);
-        end
-    else % Only way to enter here is if point is on the back vector
-        first_path_point_index  = closest_path_point_index-1;
-        second_path_point_index = closest_path_point_index;
-        percent_along_length    = back_percent_along_length;
-        
-        % Calculate the outputs
-        closest_path_point = path(first_path_point_index,:) + ...
-            back_path_vector*back_percent_along_length;
-        s_coordinate       = path_station(first_path_point_index,1) + ...
-            back_path_segment_length*back_percent_along_length;
-        path_point_yaw     = path_yaw(first_path_point_index);
-    end
-end
+% 
+% % Find square of the distance from a point to every point on the path
+% squared_distances_point_to_path = sum((path - point).^2,2); % Calculate square of distances
+% [~,closest_path_point_index] = min(squared_distances_point_to_path);  % Grab index of the closest point
+% 
+% % First check if we are in one of the end cases
+% if 1 == closest_path_point_index || Npoints == closest_path_point_index
+%     if 1 == closest_path_point_index
+%         first_path_point_index  = 1;
+%         second_path_point_index = 2;
+%     else
+%         first_path_point_index  = Npoints-1;
+%         second_path_point_index = Npoints;
+%     end
+%     
+%     % Do the dot products - define the vectors first
+%     % See: https://mathinsight.org/dot_product for explanation
+%     % Basically, we are seeing what amount the point_vector points in the
+%     % direction of the path_vector
+%     path_vector  = path(second_path_point_index,:)-path(first_path_point_index,:);
+%     path_segment_length  = sum(path_vector.^2,2).^0.5;
+%     point_vector = point-path(first_path_point_index,:);
+%     projection_distance  = dot(path_vector,point_vector)/path_segment_length; % Do dot product
+%     percent_along_length = projection_distance/path_segment_length;
+%     
+%     % Calculate the outputs
+%     closest_path_point = path(first_path_point_index,:) + path_vector*percent_along_length;
+%     s_coordinate       = path_station(first_path_point_index,1) + path_segment_length*percent_along_length;
+%     path_point_yaw     = path_yaw(first_path_point_index);
+% else
+%     % Do the dot products - define the vectors first
+%     % See: https://mathinsight.org/dot_product for explanation
+%     % Basically, we are seeing what amount the front_point_vector points in 
+%     % the direction of the front_path_vector
+%     front_path_vector  = path(closest_path_point_index+1,:)-path(closest_path_point_index,:);
+%     front_path_segment_length  = sum(front_path_vector.^2,2).^0.5;
+%     front_point_vector = point-path(closest_path_point_index,:);
+%     front_projection_distance  = dot(front_path_vector,front_point_vector)/front_path_segment_length; % Do dot product
+%     front_percent_along_length = front_projection_distance/front_path_segment_length;
+%     
+%     % Do the dot products - define the vectors first
+%     % See: https://mathinsight.org/dot_product for explanation
+%     % Basically, we are seeing what amount the back_point_vector points in 
+%     % the direction of the back_path_vector
+%     back_path_vector  = path(closest_path_point_index,:)-path(closest_path_point_index-1,:);
+%     back_path_segment_length  = sum(back_path_vector.^2,2).^0.5;
+%     back_point_vector = point-path(closest_path_point_index-1,:);
+%     back_projection_distance  = dot(back_path_vector,back_point_vector)/back_path_segment_length;    % Do dot product
+%     back_percent_along_length = back_projection_distance/back_path_segment_length;
+%     
+%     if 0 > back_percent_along_length % Point is located BEHIND the vector that is the rear-most vector
+%         error('ERROR: Point is lying BEHIND the BACK segment on path');
+%     elseif 1 < back_percent_along_length  % Point is in front of vector that is the rear-most vector
+%         if 1 < front_percent_along_length % Point is ahead of the vector that is in front
+%             error('ERROR: Point is lying AHEAD of the FRONT segment on path');
+%         elseif 0 > front_percent_along_length  % point is BEFORE start of front and AHEAD start of back - this is normal
+%             first_path_point_index  = closest_path_point_index;
+%             second_path_point_index = closest_path_point_index;
+%             percent_along_length    = 0;
+%             
+%             % Calculate the outputs
+%             closest_path_point = path(closest_path_point_index,:);
+%             s_coordinate       = path_station(closest_path_point_index,1);
+%             path_point_yaw     = path_yaw(first_path_point_index);
+%             
+%         else  % Only way to enter here is if point is ahead of back, and ON the front vector
+%             first_path_point_index  = closest_path_point_index;
+%             second_path_point_index = closest_path_point_index+1;
+%             percent_along_length    = front_percent_along_length;
+%             
+%             % Calculate the outputs
+%             closest_path_point = path(first_path_point_index,:) + ...
+%                 front_path_vector*front_percent_along_length;
+%             s_coordinate       = path_station(first_path_point_index,1) + ...
+%                 front_path_segment_length*front_percent_along_length;
+%             path_point_yaw     = path_yaw(first_path_point_index);
+%         end
+%     else % Only way to enter here is if point is on the back vector
+%         
+%         first_path_point_index  = closest_path_point_index-1;
+%         second_path_point_index = closest_path_point_index;
+%         percent_along_length    = back_percent_along_length;
+%         
+%         % Calculate the outputs
+%         closest_path_point = path(first_path_point_index,:) + ...
+%             back_path_vector*back_percent_along_length;
+%         s_coordinate       = path_station(first_path_point_index,1) + ...
+%             back_path_segment_length*back_percent_along_length;
+%         path_point_yaw     = path_yaw(first_path_point_index);
+%     end
+% end
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -263,11 +277,11 @@ if flag_do_debug
     %     text(path(i_point,2),path(i_point,3),sprintf('%.2f',distances_point_to_path(i_point)));
     % end
     
-    % Plot the closest point on path
-    plot(closest_path_point(:,1),closest_path_point(:,2),'go','Markersize',20);
-    quiver(closest_path_point(1), closest_path_point(2), ...
-           cos(path_point_yaw), sin(path_point_yaw), 0.3, 'g', 'Linewidth', 3);
-    text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
+    %     % Plot the closest point on path
+    %     plot(closest_path_point(:,1),closest_path_point(:,2),'go','Markersize',20);
+    %     quiver(closest_path_point(1), closest_path_point(2), ...
+    %            cos(path_point_yaw), sin(path_point_yaw), 0.3, 'g', 'Linewidth', 3);
+    %     text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
     
     % Connect closest point on path to query point
     plot(...

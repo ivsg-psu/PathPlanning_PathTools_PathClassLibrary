@@ -1,32 +1,23 @@
-<!--
-The following template is based on:
-Best-README-Template
-Search for this, and you will find!
->
+# PathPlanning_PathTools_PathClassLibrary
+
+This repo supports mathematical operations for paths and trajectories.
 <!-- PROJECT LOGO -->
-<br />
+<br>
 <p align="center">
-
-  <h2 align="center"> PathPlanning_PathTools_PathClassLibrary
+  <h2 align="center">
+    PathPlanning_PathTools_PathClassLibrary
   </h2>
-
-<img src=".\Images\RaceTrack.jpg" alt="main laps picture" width="960" height="540">
-
-  <p align="center">
-    This is the Path class library repo for MATLAB and listing of all functions within this class, whose purpose is to abstract very common "path" operations. What's a "path"? Why do we need them? How do we use them? Read more below for some exciting tools!
-    <br />
-    <a href="https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/tree/main/Documents">View Demo</a>
-    ·
-    <a href="https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/issues">Request Feature</a>
-  </p>
+  <pre align="center">
+        <img src=".\Images\TwoRoadsDivergeInForest_small.jpg" alt="main pathtools picture" width="960" height="540">
+        <!-- figcaption>Fig.1 - The typical progression of map generation.</figcaption -->
+        <font size="-2">Photo by <a href="https://unsplash.com/@madebyjens?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Jens Lelie</a> on <a href="https://unsplash.com/photos/u0vgcIOQG08?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+    </font>
+  </pre>
 </p>
 
-
+<p align="left">
+    This is the Path class library repo for MATLAB and listing of all functions within this class, whose purpose is to abstract very common "path" operations. What's a "path"? Why do we need them? How do we use them? Read more below for some exciting tools!
+</p>
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -45,39 +36,105 @@ Search for this, and you will find!
       </ul>
     </li>
     <li><a href="structure">Repo Structure</a>
-	    <ul>
-	    <li><a href="#directories">Top-Level Directories</li>
-	    <li><a href="#dependencies">Dependencies</li>
-	    <li><a href="#functions">Functions</li>
-	    </ul>
+     <ul>
+        <li><a href="#directories">Top-Level Directories</li>
+        <li><a href="#dependencies">Dependencies</li>
+     </ul>
+    <li><a href="#functions">Functions</li>
+        <ul>
+        <li><a href="#motivation-and-definitions">Motivation and Definitions</li>
+          <ul>
+            <li><a href="#definition-of-station">Definition of station</li>
+            <li><a href="#definition-of-stations">Definition of stations</li>
+            <li><a href="#definition-of-path">Definition of path</li>
+            <li><a href="#definition-of-paths">Definition of paths</li>
+            <li><a href="#definition-of-traversal">Definition of traversal</li>
+            <li><a href="#definition-of-traversals">Definition of traversals</li>
+          </ul>
+        <li><a href="#basic-getting-started-functions">Basic Getting Started Functions</li>
+          <ul>
+            <li><a href="#fcn_path_checkinputstofunctions">fcn_Path_checkInputsToFunctions - a general-use input checking function (deprecated by the Debug library, so replaced soon).</li>
+            <li><a href="#fcn_path_fillsamplepaths">fcn_Path_fillSamplePaths - Fills test data and includes a click-to-draw.</li>
+            <li><a href="#fcn_path_calcdiffanglesbetweenpathsegments">fcn_Path_calcDiffAnglesBetweenPathSegments - Calculates the change in angles between path segments.</li>
+            <li><a href="#fcn_path_calcyawfrompathsegments">fcn_Path_calcYawFromPathSegments - Calculates yaw angle for each path segment.</li>
+            <li><a href="#fcn_path_convertpathtotraversalstructure">fcn_Path_convertPathToTraversalStructure - Converts paths into traversals.</li>
+            <li><a href="#fcn_path_plottraversalsxy">fcn_Path_plotTraversalsXY - Plots the XY value of the traversals.</li>
+            <li><a href="#fcn_path_plottraversalsyaw">fcn_Path_plotTraversalsYaw - Plots the yaw values of the traversals.</li>
+          </ul>
+        <li><a href="#basic-path-operations">Basic Path Operations</li>
+          <ul>
+            <li><a href="#fcn_path_findprojectionhitontopath">fcn_Path_findProjectionHitOntoPath - Finds intersection between a sensor and a path.</li>
+            <li><a href="#fcn_path_findintersectionsbetweentraversals">fcn_Path_findIntersectionsBetweenTraversals - Finds where two traversals intersect.</li>
+            <li><a href="#fcn_path_snappointontonearestpath">fcn_Path_snapPointOntoNearestPath - snaps a point onto the nearest path segment.</li>
+            <li><a href="#fcn_path_snappointontonearesttraversal">fcn_Path_snapPointOntoNearestTraversal - snaps point to nearest traversal.</li>
+          </ul>
+        <li><a href="#functions-that-trim-paths">Functions That Trim Paths</li>
+          <ul>
+            <li><a href="#fcn_path_findtraversalstationsegment">fcn_Path_findTraversalStationSegment - crops traversal by given station interval.</li>
+            <li><a href="#fcn_path_removepinchpointintraversal">fcn_Path_removePinchPointInTraversal - Eliminates self-crossings in traversals.</li>
+          </ul>
+        <li><a href="#functions-that-project-paths">Functions That Project Paths</li>
+          <ul>
+            <li><a href="#fcn_path_findorthogonaltraversalvectorsatstations">fcn_Path_findOrthogonalTraversalVectorsAtStations - calculates orthogonal vectors to a traersal at given stations.</li>
+            <li><a href="#fcn_path_findorthogonalhitfromtraversaltotraversal">fcn_Path_findOrthogonalHitFromTraversalToTraversal - finds which traversals are hit at ortho projections from one traversal to another.</li>
+            <li><a href="#fcn_path_findorthoscatterfromtraversaltotraversals">fcn_Path_findOrthoScatterFromTraversalToTraversals - finds closest points on many traversals to a given central traversal. </li>
+            <li><a href="#fcn_path_filloffsettraversalsabouttraversal">fcn_Path_fillOffsetTraversalsAboutTraversal - fills in an array of traversals about a reference traversal at user-defined offset distances.</li>
+            <li><a href="#fcn_path_converttraversalxytosy">fcn_Path_convertTraversalXYtoSy - calculates the SY (e.g ST or "station") coordinates for a given traversal, given a reference traversal and another query traversal.</li>
+            <li><a href="#fcn_path_fillrandomtraversalsabouttraversal">fcn_Path_fillRandomTraversalsAboutTraversal - generates random traversals about a given traversal.</li>
+          </ul>
+        <li><a href="#statistical-analysis-of-paths">Statistical Analysis of Paths</li>
+          <ul>
+            <li><a href="#fcn_path_plottraversalxywithupperlowerbands">fcn_Path_plotTraversalXYWithUpperLowerBands - plots a central traversal with a band around it defined by an upper and lower traversal. All traversals must have same length.</li>
+            <li><a href="#fcn_path_calcsingletraversalstandarddeviation">fcn_Path_calcSingleTraversalStandardDeviation - estimates the standard deviation in the offsets of a single traversal using variance in path angles and average path segment length.</li>
+            <li><a href="#fcn_path_plottraversalxywithvariancebands">fcn_Path_plotTraversalXYWithVarianceBands - plots a traversal with standard deviation boundaries around it.</li>
+          </ul>
+        <li><a href="#functions-that-project-paths">Path Averaging Methods</li>
+          <ul>
+            <li><a href="#fcn_path_findaveragetraversalviastationalignment">fcn_Path_findAverageTraversalViaStationAlignment - estimates an average traversal based on aligning traversals by station.</li>
+            <li><a href="#fcn_path_findaveragetraversalviaclosestpoint">fcn_Path_findAverageTraversalViaClosestPoint - estimates an average traversal based on closest point.</li>
+            <li><a href="#fcn_path_newtraversalbystationresampling">fcn_Path_newTraversalByStationResampling - redecimates a traversal at given station points.</li>
+            <li><a href="#fcn_path_findaveragetraversalviaorthoprojection">fcn_Path_findAverageTraversalViaOrthoProjection - estimates average traversal using orthogonal projection.</li>
+            <li><a href="#fcn_path_findtraversalwithmostdata">fcn_Path_findTraversalWithMostData - finds the traversal in a traversals array with the most data (most elements in X array).</li>
+            <li><a href="#fcn_path_cleanpathfromforwardbackwardjogs">fcn_Path_cleanPathFromForwardBackwardJogs - removes back/forth jogs from data.</li>
+            <li><a href="#fcn_path_findclosestpointstotraversal">fcn_Path_findClosestPointsToTraversal - finds closest points on a set of traversals to reference traversal.</li>
+          </ul>
+        <li><a href="#3d-and-elevated-paths">3D and Elevated Paths</li>
+          <ul>
+            <li><a href="#fcn_path_addelevationtopath">fcn_Path_addElevationToPath - fills in the elevation in a Path's XY data using a reference traversal and interpolation.</li>
+          </ul>
+        <li><a href="#miscellaneous-functions">Miscellaneous Functions</li>
+        <ul>
+        </ul>
+      </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-	    <ul>
-	    <li><a href="#examples">Examples</li>
-	    <li><a href="#definition-of-endpoints">Definition of Endpoints</li>
-	    </ul>
+     <ul>
+     <li><a href="#general-usage">General Usage</li>
+     <li><a href="#examples">Examples</li>
+     </ul>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
+***
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-<!--[![Product Name Screen Shot][product-screenshot]](https://example.com)-->
 
 This "path" class library is one of the first and most commonly used libraries developed within the Intelligent Vehicles and Systems Group, as it contains the set of functions for processing directionality operations related to the "paths" that vehicles follow. This includes calculating intersections, offsets, projections, etc. For example: do you want to know the closest point a vehicle travels to an point in space (e.g. path to point)? Use this library. Or: what is the nearest road centerline to the current vehicle location (e.g. point to path)? Use this library. Or, figure out when a vehicle collides with another vehicle (intersection)? Use this library! Or even, what is the average trajectory of many different vehicles going down the road? You guessed it - use this library.
 
 Most of the tools used herein are abstracted from video gaming algorithms, and thus are highly optimized for speed in an algorithm context, e.g. they are parallelizable, support vectorization of inputs, minimize internal looping, and are highly robust to user input errors and fault cases. Where possible, we try to use matrix forms. All codes are in MATLAB to support generalization into other languages (Python, C, C++, etc.) and some students have started this conversion as these codes are FAR faster. However, MATLAB still seems to be the best "scratchpad" to test algorithms against each other (with Python being great also) - and if an algorithm is poorly chosen, a fast programming language will rarely overcome this flaw.
 
 ### Before you start
-To learn more about "paths" before starting, please watch the excellent YouTube video, "The Continuity of Splines", by Freya Holmer (her videos are amazing, among the best out there). Her introduction to splines can be found at this link: https://www.youtube.com/watch?v=jvPPXbo87ds&ab_channel=FreyaHolm%C3%A9r. 
 
-Chapter 1 of her video introduces the blending "t" notation of interpolation (used throughout the functions in "Paths"), the "lerp" operation (e.g. linear interpolation), Bezier curve derivations as a function of lerp in quadratic and cubic forms via DeCasteljau's algorithm. It also introduces variants such as the Bernstein form using basis polynomials (which follows Pascal's triangle, see https://math.stackexchange.com/questions/447718/algorithm-for-bezier-curve-with-eleven-control-points) and is based on convex combinations. It also shows how to pre-calculate polynomial coefficients for Bezier curves, and the characteristic matrix form of the Bezier curve (which, by the way, is invertable!). It also introduces the problem of local versus global control of a path and why global control is problematic.
+To learn more about "paths" before starting, please watch the excellent YouTube video, "The Continuity of Splines", by Freya Holmer (her videos are amazing, among the best out there). Her introduction to splines can be found at this link: <https://www.youtube.com/watch?v=jvPPXbo87ds&ab_channel=FreyaHolm%C3%A9r>.
 
-Chapter 2 (at 10 minutes in) introduces Bezier splines, definition of u-values and curve indices, the relationships between parameter space, control points, splines, joins and knots, knot values and knot intervals. It also discussed broken tangents, aligned tangents, and mirrored tangents. 
+Chapter 1 of her video introduces the blending "t" notation of interpolation (used throughout the functions in "Paths"), the "lerp" operation (e.g. linear interpolation), Bezier curve derivations as a function of lerp in quadratic and cubic forms via DeCasteljau's algorithm. It also introduces variants such as the Bernstein form using basis polynomials (which follows Pascal's triangle, see <https://math.stackexchange.com/questions/447718/algorithm-for-bezier-curve-with-eleven-control-points>) and is based on convex combinations. It also shows how to pre-calculate polynomial coefficients for Bezier curves, and the characteristic matrix form of the Bezier curve (which, by the way, is invertable!). It also introduces the problem of local versus global control of a path and why global control is problematic.
+
+Chapter 2 (at 10 minutes in) introduces Bezier splines, definition of u-values and curve indices, the relationships between parameter space, control points, splines, joins and knots, knot values and knot intervals. It also discussed broken tangents, aligned tangents, and mirrored tangents.
 
 Chapter 3 introduces parametric continuity and measures of connectivity including C0 continuity, C1 continuity, etc. and how to obtain these via derivative functions (velocity, acceleration, jerk, snap, crackle, pop). It also shows how the addition of constraints drastically affects the sensitivity of a trajectory to perturbations.
 
@@ -88,45 +145,18 @@ $$ \kappa = \frac{
     P^{'}_x & P^{''}_x \\
     \\
     P^{'}_y & P^{''}_y \\
-    \end{vmatrix} 
+    \end{vmatrix}
     }{||P^{'}||^{3}} $$
 
-where $P^{'}_x$ is the velocity in x, etc. and the determinant is the 2D cross product (wedge product producing a bivector). Note: curvature is increadibly important in vehicle dynamics because it directly relates to steering angle! This chapter also introduces the idea of a curvature comb, e.g. the plot of the curvature normal to the curve itself. Note that all roads are G2 or higher continuous, e.g. all roads are class-A surfaces. Further, roads that are G3 continous will - for non-slip conditions of the tire-road boundary - have smooth steering inputs to stay on the road. Most modern roads are G2 or higher continuous. (Note: this makes a HARD problem of collecting road data, and fitting the G2 or G3 curves to the data!). It also introduces the regularity condition, which shows up in vehicle dynamics as well where the bicycle model representation of vehicle dynamics also requires regularity. 
+where $P^{'}_x$ is the velocity in x, etc. and the determinant is the 2D cross product (wedge product producing a bivector). Note: curvature is increadibly important in vehicle dynamics because it directly relates to steering angle! This chapter also introduces the idea of a curvature comb, e.g. the plot of the curvature normal to the curve itself. Note that all roads are G2 or higher continuous, e.g. all roads are class-A surfaces. Further, roads that are G3 continous will - for non-slip conditions of the tire-road boundary - have smooth steering inputs to stay on the road. Most modern roads are G2 or higher continuous. (Note: this makes a HARD problem of collecting road data, and fitting the G2 or G3 curves to the data!). It also introduces the regularity condition, which shows up in vehicle dynamics as well where the bicycle model representation of vehicle dynamics also requires regularity.
 
 Chapter 5 introduces the problem of splines as a boundary value problem, which is useful for calculating trajectories for vehicle behaviors. It also introduces the Hermite spline as the extension of Bezier spline. Most of the Path library deals with the Linear spline representation, which is also introduced in this chapter. We do not use cardinal splines but they do appear in racing lines. It also introduces the Catmull-Rom spline. It then derives the B-spline representation from constriants on the Catmull-Rom, and wraps up the video there.
 
-Most of the issues discussed in this video sneak into the code in this library (as well as MANY more). So 
+Most of the issues discussed in this video sneak into the code in this library (as well as MANY more).
 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-* Inputs: 
-    * either a "traversals" type, as explained in the Path library, or a path of XY points in N x 2 format
-    * the start, end, and optional excursions can be entered as either a line segment or a point and radius.  
-* Outputs
-    * Separate arrays of XY points, or of indices for the lap, with one array for each lap
-    * The function also can return the points that were not used for laps, e.g. the points before the first start and after the last end
+***
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -135,104 +165,1334 @@ To get a local copy up and running follow these simple steps.
 
 ### Installation
 
-1.  Make sure to run MATLAB 2020b or higher. Why? The "digitspattern" command used in the DebugTools was released late 2020 and this is used heavily in the Debug routines. If debugging is shut off, then earlier MATLAB versions will likely work.
+1. Make sure to run MATLAB 2020b or higher. Why? The "digitspattern" command used in the DebugTools utilities was released late 2020 and this is used heavily in the Debug routines. If debugging is shut off, then earlier MATLAB versions will likely work, and this has been tested back to 2018 releases.
 
 2. Clone the repo
-   ```sh
-   git clone https://github.com/ivsg-psu/FeatureExtraction_DataClean_BreakDataIntoLaps
-   ```
-3. Unzip the zip files (DebugTools and PathClassLibrary) into a Utilities folder (.\Utilities), in locations .\Utilities\DebugTools and .\Utilities\PathClassLibrary
-4. Confirm it works! Run script_demo_Laps from the root directory root location. If the code works, the script should run without errors. This script produces numerous example images such as those in this README file.
 
+   ```sh
+   git clone https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary
+   ```
+
+3. Run the main code in the root of the folder (script_demo_AlignCoordinates.m), this will download the required utilities for this code, unzip the zip files into a Utilities folder (.\Utilities), and update the MATLAB path to include the Utility locations. This install process will only occur the first time. Note: to force the install to occur again, delete the Utilities directory and clear all global variables in MATLAB (type: "clear global *").
+
+4. Confirm it works! Run script_demo_AlignCoordinates. If the code works, the script should run without errors. This script produces numerous example images such as those in this README file.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 
 <!-- STRUCTURE OF THE REPO -->
 ### Directories
+
 The following are the top level directories within the repository:
 <ul>
-	<li>/Documents folder: Descriptions of the functionality and usage of the various MATLAB functions and scripts in the repository.</li>
-	<li>/Functions folder: The majority of the code for the point and patch association functionalities are implemented in this directory. All functions as well as test scripts are provided.</li>
-	<li>/Utilities folder: Dependencies that are utilized but not implemented in this repository are placed in the Utilities directory. These can be single files but are most often folders containing other cloned repositories.</li>
+ <li>/Data folder: contains any example datasets used in the code (not applicable to this repo).</li>
+ <li>/Documents folder: contains reference documents used for the creation of the code.</li>
+ <li>/Functions folder: The majority of the codes are found within functions in this directory. All functions as well as test scripts are provided.</li>
+ <li>/Images folder: images used for this README.md file are found in this directory.</li>
+ <li>/Releases folder: contains current and historic releases of the code in zip file archives.</li>
+ <li>/Utilities folder: Dependencies that are utilized but not implemented in this repository are placed in the Utilities directory. These can be single files but are most often folders containing other cloned repositories.</li>
 </ul>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 
 ### Dependencies
 
-* [Errata_Tutorials_DebugTools](https://github.com/ivsg-psu/Errata_Tutorials_DebugTools) - The DebugTools repo is used for the initial automated folder setup, and for input checking and general debugging calls within subfunctions. The repo can be found at: https://github.com/ivsg-psu/Errata_Tutorials_DebugTools
+* [Errata_Tutorials_DebugTools](https://github.com/ivsg-psu/Errata_Tutorials_DebugTools) - The DebugTools repo is used for the initial automated folder setup, and for input checking and general debugging calls within subfunctions. The repo can be found at: <https://github.com/ivsg-psu/Errata_Tutorials_DebugTools>
 
-* [PathPlanning_PathTools_PathClassLibrary](https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary) - the PathClassLibrary contains tools used to find intersections of the data with particular line segments, which is used to find start/end/excursion locations in the functions. The repo can be found at: https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary
+The dependencies are automatically installed by running the root master script (see below).
 
-    Each should be installed in a folder called "Utilities" under the root folder, namely ./Utilities/DebugTools/ , ./Utilities/PathClassLibrary/ . If you wish to put these codes in different directories, the main call stack in script_demo_Laps can be easily modified with strings specifying the different location, but the user will have to make these edits directly. 
-    
-    For ease of getting started, the zip files of the directories used - without the .git repo information, to keep them small - are included in this repo.
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 
 <!-- FUNCTION DEFINITIONS -->
-### Functions
-**Basic Support Functions**
-<ul>
-	<li>
-    fcn_Laps_plotLapsXY.m : This function plots the laps. For example, the function was used to make the plot below of the last Sample laps.
-    <br>
-    <img src=".\Images\fcn_Laps_plotLapsXY.png" alt="fcn_Laps_plotLapsXY picture" width="400" height="300">
-    </li>
-	<li>
-    fcn_Laps_fillSampleLaps.m : This function allows users to create dummy data to test lap functions. The test laps are in general difficult situations, including scenarios where laps loop back onto themself and/or with separate looping structures. These challenges show that the library can work on varying and complicated data sets. NOTE: within this function, commented out typically, there is code to allow users to draw their own lap test cases.
-    <br>
-    <img src=".\Images\fcn_Laps_fillSampleLaps.png" alt="fcn_Laps_fillSampleLaps picture" width="400" height="300">
-    </li>
-    <li>
-    fcn_Laps_plotZoneDefinition.m : Plots any type of zone, allowing user-defined colors. For example, the figure below shows a radial zone for the start, and a line segment for the end. For the line segment, an arrow is given that indicates which direction the segment must be crossed in order for the condition to be counted. 
-    <br>
-    <img src=".\Images\fcn_Laps_plotZoneDefinition.png" alt="fcn_Laps_plotZoneDefinition picture" width="400" height="300">
-    </li>
-    <li>
-    fcn_Laps_plotPointZoneDefinition.m : Plots a point zone, allowing user-defined colors. This function is mostly used to support fcn_Laps_plotZoneDefinition.m 
-    </li>
-    <li>
-    fcn_Laps_plotSegmentZoneDefinition.m : Plots a segment zone, allowing user-defined colors. This function is mostly used to support fcn_Laps_plotZoneDefinition.m 
-    </li>
-    
-    
+## Functions
 
-</ul>
+### Motivation and Definitions
 
-**Core Functions**
-<ul>
-	<li>
-    fcn_Laps_breakDataIntoLaps.m : This is the core function for this repo that breaks data into laps. Note: the example shown below uses radial zone definitions, and the results illustrate how a lap, when it is within a start zone, starts at the FIRST point within a start zone. Similarly, each lap ends at the LAST point before exiting the end zone definition. The input data is a traversal type for this particular function.
-    <br>
-    <img src=".\Images\fcn_Laps_breakDataIntoLaps.png" alt="fcn_Laps_breakDataIntoLaps picture" width="400" height="300">
-    </li>	
-	<li>
-    fcn_Laps_checkZoneType.m : This function supports fcn_Laps_breakDataIntoLaps by checking if the zone definition inputs are either a point or line segment zone specification.
-    </li>
-	<li>
-    fcn_Laps_breakDataIntoLapIndices.m : This is a more advanced version of fcn_Laps_breakDataIntoLaps, where the outputs are the indices that apply to each lap. The input type is also easier to use, a "path" type which is just an array of [X Y]. The example here shows the use of a segment type zone for the start zone, a point-radius type zone for the end zone. The results of this function are the row indices of the data. The plot below illustrates that the function returns 3 laps in this example, and as well returns the pre-lap and post-lap data. One can observe that it is common that the prelap data for one lap (Lap 2) consists of the post-lap data for the prior lap (Lap 1). 
-    <br>
-    <img src=".\Images\fcn_Laps_breakDataIntoLapIndices.png" alt="fcn_Laps_breakDataIntoLapIndices picture" width="600" height="300">
-    </li>	
-	<li>
-    fcn_Laps_findSegmentZoneStartStop.m : A supporting function that finds the portions of a path that meet a segment zone criteria, returning the starting/ending indices for every crossing of a segment zone. The crossing must cross in the correct direction, and a segment is considered crossed if either the start or end of segment lie on the segment line. This is illustrated in the challenging example shown below, where the input path (thin blue) starts at the top, and then zig-zags repeatedly over a segment definition (green). For each time the blue line crosses the line segment, that portion of the path is saved as a separate possible crossing and thus, for this example, there are 5 possible crossings.
-    <br>
-    <img src=".\Images\fcn_Laps_findSegmentZoneStartStop.png" alt="fcn_Laps_findSegmentZoneStartStop picture" width="400" height="300">
-    </li>	
-	<li>
-    fcn_Laps_findPointZoneStartStopAndMinimum.m : A supporting function that finds the portions of a path that meet a point zone criteria, returning the starting/ending indices for every crossing of a point zone. Note that a minimum number of points must be within the zone for it to be considered activated, which is useful for real-world data (such as GPS recordings) where noise may randomly push one point of a path randomly into a zone, and then jump out. This number of points threshold can be user-defined. In the example below, the threshold is 4 points and one can see that, for a path that crosses over the zone three times, that two of the crossings are found to meet the 4-point criteria.
-    <br>
-    <img src=".\Images\fcn_Laps_findPointZoneStartStopAndMinimum.png" alt="fcn_Laps_findPointZoneStartStopAndMinimum picture" width="400" height="300">
-    </li>	
-</ul>
-Each of the functions has an associated test script, using the convention
+Many applications require a reference path, but particularly driving. For example, roads are a form of path. The task of driving is to stay on the road, which means that a vehicle's position relative to the path - the offset to the path, travel along the path, angle relative to path, etc. -  are all basically path calculations.
 
-```sh
-script_test_fcn_fcnname
+<pre align="center">
+  <img src=".\Images\RoadsAreAFormOfPath.png" alt="roads are a form of path picture" width="400" height="300">
+  <figcaption>Roads are a type of path.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Definitions of terms are important so that we do not get confused later. These key definitions are defined in the following sections.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### Definition of Station
+
+The station of a path is the location on that path as measured by the s-coordinate of that path. Physically, it represents the distance traveled along that path from the path's origin.
+
+For example, mile markers on a road are a station type of measurement; they do not represent distance to a specific point, but rather represent how far along a road someone has traveled relative to some start location and independent of the curvature of the road. In this case, the station is "39 miles". For our work, we nearly always measure station in meters.
+
+<pre align="center">
+  <img src=".\Images\DefinitionOfStation.jpg" alt="definition of station" width="400" height="300">
+  <figcaption>Mile markers are a type of station measurement.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The important aspect of the station is that it does NOT depend on Euclidian distance from a location. The station distance is distance ALONG a path, so if a path is curvy, then the station distance from a point can be very large even if the point is relatively close in straight-line distance.In fact, for curvy paths, the Euclidean distance may be rise, fall, and then rise again as vehicles drive "away" from a point!
+
+<pre align="center">
+  <img src=".\Images\DefinitionOfStation2_small.jpg" alt="definition of station" width="900" height="300">
+  <figcaption>Station coordinates are not Euclidian and so true distances from a point, for example the bottom left of the image above, may increase and then decrease and increase, even while station distance is steadily increasing.</figcaption>
+  <font size="-2">Photo by <a href="https://unsplash.com/de/@umityildirim?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Umit Yildirim</a> on <a href="https://unsplash.com/photos/mY8-8Fsn3qw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+  </font>
+</pre>
+
+There are several key issues when using station coordinates. The first is that, for real-world paths, the station length of a path will change depending on how finely decimated the path is. For very curvy paths, the station distance can tend toward infinity with finer and finer scales of measurement as some paths follow fractacl curves. This is called the "Coastline Paradox"; see, for example, <a href="https://www.youtube.com/watch?v=7dcDuVyzb8Y"> Measuring Coastline - Numberphile </a>. A solution to this is to seek Allan Variance minima in measurements of time or space, a process covered in other repos. The idea of a distance that is not quite distance but not quite area falls into the class of problems called "intermediate asymptotics", "self similarity", and "fractal dimension" and is a difficult challenge.
+
+<pre align="center">
+  <img src=".\Images\CoastlineParadox.png" alt="definition of the coastline paradox" width="600" height="800">
+  <figcaption>An illustration of the Coastline Paradox</figcaption>
+  <font size="-2">Photo from <a href="https://sketchplanations.com/the-coastline-paradox">Sketchplanations.com</a>
+  </font>
+</pre>
+
+A practical solution, and one used for most vehicle calculations, is to choose a decimation length that is fine enough that the measurements of station distance converge to the desired accuracy, for example 1 meter, 10 cm, or 1 cm depending on the required accuracy. An easy method to approximate the error of a path definition is to take the change in angle of a path segment to another, and multiply by the distance of the path segment. Over the whole path, this can be done as maximum angle times maximum length, or average angle times average length. The statistical function listed below does this calculation.
+
+Even with a well-defined reference path, the length of other paths along the reference path depends very strongly on how much weaving is occurring and where the other paths are relative to curves - this is why, for example, in track and field races, runners are not started at the same starting line if there are races that have curves. The same issue arises when vehicles are driving along a reference path. For example, in comparing similar paths plotted at same station points - in this case every 40 meters - each path's station may be very distant from its neighbors. The following MATLAB code illustrates this issue (Example 2 in the main script). Most of the challenges with vehicle guidance require paths, but unless a clear reference path is used, the station distance on one side of the road or even between adjacent lanes may be very different. This illustrates a need a COMMON station for the road or lane.
+
+```MATLAB
+%% Example 2: Show station discrepancies
+% Plot station markers
+ 
+fig_num = 2;
+ 
+figure(fig_num);
+clf;
+hold on;
+grid on;
+grid minor;
+ 
+Station_step = 40;
+ 
+fcn_Path_plotTraversalsXY(data,fig_num);
+xlabel('X [m]');
+ylabel('Y [m]');
+ 
+for i_traveral = 1:length(paths)
+    traversal_stations = data.traversal{i_traveral}.Station;
+    for i_station = Station_step:Station_step:traversal_stations(end)
+        index = find(traversal_stations >= i_station,1);
+        plot(data.traversal{i_traveral}.X(index),...
+            data.traversal{i_traveral}.Y(index),...
+            'k.','Markersize',15);
+        text(data.traversal{i_traveral}.X(index),...
+            data.traversal{i_traveral}.Y(index),...
+            sprintf('Station: %.2f',...
+            data.traversal{i_traveral}.Station(index)));
+    end
+end
+
 ```
-where fcnname is the function name as listed above.
 
-As well, each of the functions includes a well-documented header that explains inputs and outputs. These are supported by MATLAB's help style so that one can type:
+<pre align="center">
+  <img src=".\Images\SimilarPathsMayHaveDifferentStationCoordinates.jpg" alt="definition of the coastline paradox" width="800" height="600">
+  <figcaption>Similar paths can have different station coordinates</figcaption>
+  <font size="-2">Photo from <a href="https://sketchplanations.com/the-coastline-paradox">Sketchplanations.com</a>
+  </font>
+</pre>
 
-```sh
-help fcn_fcnname
+And swerving around a relative path can add significant length. The side-by-side swerving is why marathon runners ALWAYS end up running more than 26.2 miles (which often surprises and annoys first-time runners).
+
+<pre align="center">
+  <img src=".\Images\MarathonDistances.png" alt="marathon distances" width="400" height="600">
+  <figcaption>Marathon runners often run significantly further than a marathon distance due to side-side swerving.</figcaption>
+  <!--font size="-2">Photo from <a href="https://sketchplanations.com/the-coastline-paradox">Sketchplanations.com</a>
+  </font -->
+</pre>
+
+Another issue with station coordinates is that the distance from a point to a path may be undefined, have multiple definitions, and/or is dependent on the history of the trajectory up to the point. This is illustrated in the figure below where a simple path connects points A, B, and C. The distance of point 1 to this path is unclear, as its position is outside the orthogonal projection of segment AB or segment BC. A solution may be to use projections of both segments, as illustrated with green dotted lines, but this projection can yield poor results if the point is near one projection but very far from another - an issue that can be solved by taking the maximum of the two distances, minimum, average, or weighted average (this issue is discussed in the functions below). Similarly, if a point is within the intersection of the orthogonal doimains of two segments, as is point 2 in the figure. Again, it is unclear how far this point is away from the path - whether to use segment AB or BC to answer this question. Again, this can be solved by taking the maximum of the two distances, minimum, average, or weighted average.
+
+<pre align="center">
+  <img src=".\Images\StationCoordinatesAreNotUnique.png" alt="station coordinates are not unique" width="520" height="370">
+  <figcaption>Station Coordinates are not unique</figcaption>
+  <font size="-2">Diagram created in Powerpoint</a>
+  </font>
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### Definition of Stations
+
+In the codes that follow, there is often a need to distinguish between a single station and many stations. Therefore, in this library of codes, we treat station as a 1 x 1 scalar, and stations (plural) as a N x 1 vector. This way, if a function needs multiple stations, it can query the arguments for a vector 'stations' rather than a scalar 'station'.So a stations type variable consists of N `station' variables stacked together.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### Definition of Path
+
+In the codes that follow, a path is a set of [X Y] points as a N x 2 vector or array. These X Y rows denote the locations we are trying to follow which defines the path. For example:
+
+```Matlab
+    paths{1} = [
+        8.1797    8.6006
+        8.4101   15.8892
+        10.0230   25.5102
+        10.4839   39.7959];
 ```
-for any function to view function details.
+
+A path type must have at least 2 rows so that a single 'path segment' can be defined. One connection between vertices is called a 'path segment', and a path must have at least ONE segment.
+
+<pre align="center">
+  <img src=".\Images\DefinitionOfPathSegment.jpg" alt="path segment" width="900" height="300">
+  <figcaption>Definition of a path segment.</figcaption>
+  <!--font size="-2">Photo from <a href="https://sketchplanations.com/the-coastline-paradox">Sketchplanations.com</a>
+  </font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### Definition of Paths
+
+Some operations require at least 2 segments, and we refer to these variable types as 'paths'. The use of plural is to denote a type of variable that has multiple segments. An example operation that requires multiple segments is when we need to calculate the angles between segments.
+
+We rarely use multiple paths as we have another variable type, traversals, discussed next that more clearly contains paths and properties of paths that are often used.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### Definition of Traversal
+
+Sometimes we want more information about a path than just XY, so we define something called a 'traversal'. It includes subfields that are routinely used, particularly the Station and Yaw. The codes below convert from Path to Traversals often, so a function exists that will fill in a Traversal given a Path.
+
+```MATLAB
+function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
+% fcn_Path_convertPathToTraversalStructure
+% Takes a Path type and creates it to a traversal structure
+%
+% FORMAT: 
+%
+%       traversal = fcn_Path_convertPathToTraversalStructure(path,(fig_num))
+%
+% INPUTS:
+%
+%      path: an N x 2 vector of [X Y] positions, with N>=2
+%
+% OUTPUTS:
+%
+%      traversal: a sttructure containing the following fields
+%            - X: an N x 1 vector that is a duplicate of the input X
+%            - Y: an N x 1 vector that is a duplicate of the input Y
+%            - Z: an N x 1 vector that is a zero array the same length as
+%            the input X
+%            - Diff: a [N x 2] array that is the change in X and Y
+%            (front-padded with [0 0])
+%            - Station: the XY distance as an N x 1 vector, representing
+%            the distance traveled up to the current point (starting with 0
+%            at the first point)
+%            - Yaw: the calculated yaw angle (radians) of each path segment
+%            (note: there are N-1 segments if there are N points, thus
+%            there are N-1 Yaw points)
+%            (thus - it is front-padded with NaN)
+%
+%      (OPTIONAL INPUTS)
+%
+%      fig_num: a figure number to plot results.
+
+```
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### Definition of Traversals
+
+The last major type commonly used is 'traversals' which are collections of traversal variables within an array, e.g. many paths that are operated upon in code together. An example would be:
+
+```MATLAB
+Many_traversals.traversal{1} = some_traversal;
+Many_ traversals.traversal{2} = some_other_traversal;
+
+```
+
+So, the variable 'Many_ traversals' is a 'traversals' type and contains an array of different traversals together. This variable allows us to create functions that operate on many traversals at the same time (such as plotting, averaging, variance calculations, etc.)
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Basic Getting Started Functions
+
+#### fcn_Path_checkInputsToFunctions
+
+ The function fcn_Path_checkInputsToFunctions is a general-use function whose only purpose is to confirm that variables that are passed to it meet the requirements of each type. It is often called repeatedly at the top of other codes to check that the inputs are the correct type. As of Dec. 2021, this function was replaced by those in the "Debug" repository, which are more powerful and general. However, this conversion to the new function has not yet been completed.
+
+```MATLAB
+%% Show how input arguments are checked, fcn_Path_checkInputsToFunctions
+% TO-DO - in future versions, use debug tools as a utility and remove the checkinputs capability out of Path class
+path_test = [4 1; 2 1];
+fcn_Path_checkInputsToFunctions(path_test, 'path');
+
+```
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_fillSamplePaths
+
+The function fcn_Path_fillSamplePaths fills test data and includes a click-to-draw. The codes often require testing and creating paths, and this function is for dummy 'starter' paths to create sample test cases. It fills in (currently) three different paths in an array, which is easily converted into a 'traversals' type.
+
+Note: a click-to-draw functionality also exists by setting a flag within the function itself. This allows interactive creation of paths in this function! An example call:
+
+```MATLAB
+% Fill in some dummy data
+paths = fcn_Path_fillSamplePaths;
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_fillSamplePaths.jpg" alt="fcn_Path_fillSamplePaths picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillSamplePaths creates test data sets for exercising PathClass functions.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Why do we use this example shown above? It has some challenging features that often break codes:
+
+1. Each traversal has a VERY different number of points and station distances
+2. The traversals cross each other repeatedly
+3. They have different start/stop XY locations
+4. Each traversal loops back on itself, which breaks Euclidean distance-based queries
+
+Note that this code has, within it, the function, fcn_Path_fillPathViaUserInputs. This allows the user to click in a figure to define test paths. This is a function for the user to click on the figure to generate XY path. Points are collected and plotted until the user double clicks.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_fillPathViaUserInputs.jpg" alt="fcn_Path_fillPathViaUserInputs picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillPathViaUserInputs allows users to click into a figure to define test paths.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_calcDiffAnglesBetweenPathSegments
+
+The function fcn_Path_calcDiffAnglesBetweenPathSegments calculates the change in angles between path segments. Specifically, it alculates the change in angles between path segments. It uses dot products and cross products to find the relative change in a path's angle. This avoids the use of arctan which does not work when segments are pointing toward -180 degrees.
+
+```MATLAB
+% Pick first path as reference_traversal structure
+paths_array = fcn_Path_fillSamplePaths;
+paths_to_check = paths_array{1};
+fig_num = 11111; 
+diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,fig_num);
+
+```
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+fcn_Path_calcYawFromPathSegments - Calculates yaw angle for each path segment.
+
+#### fcn_Path_calcYawFromPathSegments
+
+The function fcn_Path_calcYawFromPathSegments calculates yaw angle for each path segment. It does this by summing yaw changes to find the yaw angle along a path. An example call:
+
+```MATLAB
+%% Show how to calculate the yaw angles along a path, fcn_Path_calcYawFromPathSegments
+ 
+% Basic call with one path
+fig_num = 22222;
+yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num); %#ok<*NASGU>
+
+```
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_convertPathToTraversalStructure
+
+The function fcn_Path_convertPathToTraversalStructure converts paths into traversals. The traversal structure type is created because the row length of each traversal is different, and so we cannot save corresponding groups of paths as arrays (not easily, at least). So, we use structure types to save traversals to allow different lengths. Specificall, a traversal is a cell array of structures. For example, to plot many paths against each other, many paths are converted into a traversals type:
+
+```MATLAB
+% script_test_fcn_Path_plotTraversalsXY.m
+% Tests fcn_Path_plotTraversalsXY
+close all
+clc
+ 
+ 
+% Fill in some dummy data
+paths = fcn_Path_fillSamplePaths;
+ 
+ 
+% Convert paths into traversals
+for i_traveral = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_traveral});
+    data.traversal{i_traveral} = traversal;
+end
+ 
+ 
+%% Call the plot command to show how it works. 
+figure(11);
+fcn_Path_plotTraversalsXY(data);
+
+```
+
+<pre align="center">
+  <img src=".\Images\convertPathToTraversalStructure.jpg" alt="convertPathToTraversalStructure picture" width="400" height="300">
+  <figcaption>The function convertPathToTraversalStructure creates a traversal structure type given a path input.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_plotTraversalsXY
+
+The function fcn_Path_plotTraversalsXY plots the XY value of a traversals type. An example usage of the function is shown in the function above.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_plotTraversalsYaw
+
+The function fcn_Path_plotTraversalsYaw plots the yaw values of the traversals, as we often want to plot the yaw within traversal arrays.
+
+```MATLAB
+% script_test_fcn_Path_plotTraversalsYaw.m
+% tests fcn_Path_plotTraversalsYaw
+ 
+clc
+close all
+ 
+% Fill in some dummy data
+paths = fcn_Path_fillSamplePaths;
+ 
+ 
+% Convert paths into traversals
+for i_traveral = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_traveral});
+    data.traversal{i_traveral} = traversal;
+end
+ 
+ 
+%% Call the plot command to show how it works. First, put it into our figure
+% to show that it will auto-label the axes and create a new figure (NOT
+% figure 11 here) to plot the data.
+figure(11);
+fcn_Path_plotTraversalsYaw(data);
+ 
+ 
+%% Next, specify the figure number to show that it will NOT auto-label the
+% axes if figure is already given and it puts the plots into this figure.
+fig_num = 12;
+fcn_Path_plotTraversalsYaw(data,fig_num);
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_plotTraversalsYaw.jpg" alt="fcn_Path_plotTraversalsYaw picture" width="400" height="300">
+  <figcaption>The function fcn_Path_plotTraversalsYaw plots the yaw angle of a traversals type.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Basic Path Operations
+
+#### fcn_Path_findProjectionHitOntoPath
+
+The function fcn_Path_findProjectionHitOntoPath finds the intersection between a sensor vector and a path. This is the most basic path operation in this library: finding the intersection of a path segment rooted at point p and extending to p+r, with a sensor (or path segment) rooted at q and extending to p+s. Diagramatically, it is shown as:
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_1.jpg" alt="intersection of 2 segments picture" width="200" height="200">
+  <figcaption>The function fcn_Path_findProjectionHitOntoPath conducts the most basic and important analysis in this library: finding the intersection of two segments with each other.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This function is quite flexible, and includes many optional inputs and useful outputs:
+
+```Matlab
+function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(path,sensor_vector_start,sensor_vector_end,varargin)   
+% fcn_Path_findProjectionHitOntoPath calculates hits between a sensor
+% projection and a path, returning the distance and location of the hit.
+%
+% FORMAT: 
+%
+%      [distance,location,path_segment] = ...
+%         fcn_Path_findProjectionHitOntoPath(path,...
+%         sensor_vector_start,sensor_vector_end,...
+%         (flag_search_type),(fig_num))  
+%
+% INPUTS:
+%
+%      path: an N x 2 vector containing the X,Y points of the path to be
+%      checked for intersections
+%
+%      sensor_vector_start: a 1 x 2 vector containing the X,Y points of the
+%      sensor's start location
+%
+%      sensor_vector_end: a 1 x 2 vector containing the X,Y points of the
+%      sensor's end location
+%
+%      (OPTIONAL INPUTS)
+%      flag_search_type: an integer specifying the type of search.
+%
+%            0: return distance and location of first intersection only if
+%            the given sensor_vector overlaps the path (this is the
+%            default)
+%
+%            1: return distane and location of first intersection if any
+%            projection of the sensor vector, in any direction, hits the
+%            path (in other words, if there is any intersection). Note that
+%            distance returned will be negative if the nearest intersection
+%            is in the opposite direction of the given sensor vector.
+%
+%            2: returns distances and locations as M x 1 and M x 2 vectors
+%            respectively, where the M rows represent ALL the detected
+%            intersections. In cases where the sensor vector completely
+%            overlaps a path segment, the start and end of overlap are
+%            given.
+%
+%      fig_num: a figure number to plot results. Turns debugging on.
+%
+% OUTPUTS:
+%
+%      distance: a 1 x 1 scalar representing the distance to the closest
+%      intersection of the sensor with the path
+%
+%      location: a 1 x 2 vector of the X,Y location of intersection point
+%
+%      path_segment: the segment number of the path that was hit (1 is the
+%      first segment, 2 is the second, etc)
+```
+
+Details on the derivation of this code can be found at: <a href="https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect">Stakoverflow: How do you detect where two line segments intersect?</a>. That discussion explains, in detail, many of the cases as well as provides the C-code implementation of line intersection checks in a manner that avoids division, and thus is very (very) fast. The details are important and so are repeated here.
+
+First, the 2-d cross product is needed. While MATLAB includes a cross function, it is built for 3D implementation and thus requires extra steps. It is faster to define our own function that generates the 2-dimensional vector cross product $v \times w$ to be $v_x\cdot w_y - v_y \cdot w_x$. Note that the function is vectorized assuming column vectors. Suppose the path segment runs from $p$ to $p + r$ and the sensor starts from $q$ and extends to $q +s$. Then any point on the first line is representable as $p+ t\cdot r$ (for a scalar parameter $t$) and any point on the second line as $q + u\cdot s$ (for a scalar parameter $u$).
+
+```Matlab
+%% Calculate cross products
+function result = crossProduct(v,w)
+result = v(:,1).*w(:,2)-v(:,2).*w(:,1);
+end
+```
+
+The solution method used is to consider fractions of the path and of the sensor vectors. Specifically, the two line segments can be represented as vectors, which intersect if we can find $t$ and $u$ such that:
+
+$p + t\cdot r = q + u\cdot s$
+
+Pictorally, this looks like:
+
+<pre align="center">
+  <img src=".\Images\TwoSegmentsIntersect.jpg" alt="intersection of 2 segments picture 2" width="200" height="200">
+  <figcaption>The intersection of 2 segments creates a vector equivalence at point of intersection</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+To solve, cross both sides with $s$, getting
+
+$\left( p + t\cdot r \right) \times s = \left( q + u\cdot s \right) \times s$
+
+And since  $s \times s = 0$ , this means:
+
+$t \cdot \left( r \times s \right) = \left( q  - p \right) \times s$
+
+And therefore, solving for $t$:
+
+$\Large t = \Large \frac{\left( q  - p \right) \times s}{r \times s}$
+
+We can solve for $u$ similarly:
+
+$\left( p + t\cdot r \right) \times r = \left( q + u\cdot s \right) \times r$
+
+And since  $r \times r = 0$ , this means:
+
+$u \cdot \left( s \times r \right) = \left( p  - q \right) \times r$
+
+And therefore, solving for $u$:
+
+$\Large u = \Large \frac{\left( p  - q \right) \times r}{s \times r}$
+
+Note that the calculation of u can reuse the $r \times s$ calculation from the $t$ equation, noting that $s \times r = - r \times s$. The result:
+
+$\Large u = \Large \frac{\left( q  - p \right) \times r}{r \times s}$
+
+There are several cases to consider, and following the notation on Stackoverflow:
+
+1. If $r \times s = 0$ and $(q - p) \times r = 0$, then the two lines are collinear (more on this case shortly).
+2. If $r \times s = 0$ and $(q - p) \times r \neq  0$, then the two lines are parallel and non-intersecting.
+3. If $r \times s \neq 0$ and $0 \leq t \leq 1$ and $0 \leq u \leq 1$, the two line segments meet at the point $p + t r = q + u s$.
+4. Otherwise, the two line segments are not parallel but do not intersect.
+
+As noted therein: this method is the 2-dimensional specialization of the 3D line intersection algorithm from the article "Intersection of two lines in three-space" by Ronald Goldman, published in Graphics Gems, page 304. In three dimensions, the usual case is that the lines are skew (neither parallel nor intersecting) in which case the method gives the points of closest approach of the two lines.
+
+Looking at the parallel case in more detail: $r \times s = 0$, we can check if they are colinear or disjoint. This is done by checking the amount of overlap. Specifically, we express the endpoints of the second segment ($q$ and $q +s$) in terms of the equation of the first line segment $(p + tr)$:
+
+$t_0 = (q -p) \cdot r / (r \cdot r)$
+
+$t_1 = (q + s - p) \cdot r / (r \cdot r) = t_0 + s\cdot r/ (r \cdot r)$
+
+If the interval between $t_0$ and $t_1$ intersects in the interval [0, 1], then the line segments are collinear and overlapping (Case 1); otherwise, they are collinear and disjoint (Case 2). Note, as mentioned in that article, that if $s$ and $r$ point in opposite directions, then $s \cdot r < 0$ and so the interval to be checked is $[t_1, t_0]$ rather than $[t_0, t_1]$.
+
+In programming the algorithm, one must be careful of intersections at the end-points of the path, as shown below.
+
+<pre align="center">
+  <img src=".\Images\IntersectionsAtEndOfSegments.jpg" alt="Intersections misisng End Of Segments" width="400" height="300">
+  <figcaption>Intersections at the end of segments can create conditions where no intersections are detected, if not handled carefully</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+If intersections occur at the end-points of a path segment, then results can be ambiguous because $t = 0$ or $t = 1$.  In these cases, can have weird situations if we omit this, e.g. the following:
+
+$((0 < t).*(1 > t).*(0<u).*(1>u))$
+
+The result of this condition is that NO intersection would be detected!
+
+If we correct the t-range to allow equality, then the intersection is found.
+
+$ ((0 \leq t).*(1 \geq t).*(0<u).*(1>u))$
+
+<pre align="center">
+  <img src=".\Images\IntersectionsAtEndOfSegmentsGood.jpg" alt="Intersections At End Of Segments" width="400" height="300">
+  <figcaption>Fixing the t range check fixes errors of intersections on the path.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+However, this form with the $u$ range not including 0 or 1 can miss paths that barely hit the sensor at start or end. For example:
+
+<pre align="center">
+  <img src=".\Images\IntersectionsMissingOriginOrEndpoints.jpg" alt="Intersections At End Of Segments" width="800" height="300">
+  <figcaption>Intersections at the end or start of the sensor can have no intersections detected, if not handled carefully</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This can be fixed by correcting the inequality:
+
+$ ((0 \leq t).*(1 \geq t).*(0 \leq u).*(1 \geq u))$
+
+<pre align="center">
+  <img src=".\Images\IntersectionsHittingOriginOrEndpoints.jpg" alt="Intersections At End Of Segments" width="800" height="300">
+  <figcaption>Intersections at the end or start of the sensor can have no intersections detected, if not handled carefully</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+With this correct formulation, we can present several simple examples (See: script_test_fcn_Path_findProjectionHitOntoPath.m):
+
+Example 1: A simple intersection
+
+```Matlab
+%% Simple test 1 - a simple intersection
+fprintf(1,'Simple intersection result: \n');
+path = [0 10; 10 10];
+sensor_vector = [2 1; 5 15];
+fig_debugging = 2343;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(path,sensor_vector,fig_debugging);
+print_results(distance,location);
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_Ex1.jpg" alt="Example 1: A simple intersection" width="400" height="300">
+  <figcaption>Example 1: A simple intersection</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Example 2: not intersecting
+
+```Matlab
+%% Simple test 2 - no intersections
+fprintf(1,'No intersection result: \n');
+path = [-4 10; 2 10];
+sensor_vector = [0 0; 5 12];
+fig_debugging = 2343;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(path,sensor_vector,fig_debugging);
+print_results(distance,location);
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_Ex2.jpg" alt="Example 2: no intersection" width="400" height="300">
+  <figcaption>Example 2: No intersection</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Example 3: multiple line segments, only the first detection is recorded
+
+```Matlab
+%% Simple test 3 - multiple intersections
+fprintf(1,'Multiple intersections result: \n');
+path = [0 10; 10 10; 0 6; 10 6; 0 2];
+sensor_vector = [0 0; 5 12];
+fig_debugging = 2343;
+[distance,location] = fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector,fig_debugging);
+print_results(distance,location);
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_Ex3.jpg" alt="Example 3: multiple line segments" width="400" height="300">
+  <figcaption>Example 3: Multiple line segments</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+In some applications, the length of the sensor vector is irrelevant. One simply wants to know any location, in any direction, where the first intersection would occur. The flag_search_type variable can be set to 1 (instead of 0, default) to specify that any intersection will work. Here is an example with a sensor vector of length 2. If an unlimited search is used (e.g. with a flag of 1), a hit is detected with either positive or negative distance.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_Ex4.jpg" alt="Example 4: the search type" width="800" height="500">
+  <figcaption>Changing the search type to 1 gives the first detections at any distance, positive or negative</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+In some applications, we want to know all the intersection points, not just the first one. If the search type is set to 2, then this can be found:
+
+```Matlab
+%% Advanced test 2 - multiple intersections
+fprintf(1,'Single intersections reporting only first result: \n');
+path = [0 10; 10 10; 0 6; 10 6; 0 2];
+sensor_vector_start = [0 0]; 
+sensor_vector_end   = [5 12];
+fig_debugging = 23487;
+flag_search_type = 0;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+ 
+fprintf(1,'Multiple intersections reporting all results: \n');
+path = [0 10; 10 10; 0 6; 10 6; 0 2];
+sensor_vector_start = [0 0]; 
+sensor_vector_end   = [5 12];
+fig_debugging = 23488;
+flag_search_type = 2;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+```
+
+Which generates the following console result:
+
+``` c
+Single intersections reporting only first result: 
+Distance   Location X   Location Y 
+2.600      1.000    2.400
+Multiple intersections reporting all results: 
+Distance   Location X   Location Y 
+10.833     4.167    10.000
+7.800      3.000    7.200
+6.500      2.500    6.000
+2.600      1.000    2.400
+```
+
+And the following figure
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_Ex5.jpg" alt="Example 5: the search type" width="800" height="500">
+  <figcaption>Changing the search type to 2 gives all detections at any distance, positive or negative</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The algorithm is quite robust even to complex overlapping conditions such as multiple completely overlapping segments mixed with partial intersections.
+
+```Matlab
+%% Advanced Multihit Overlapping  test 32 - super overlapping colinear 1 BACKWARDS
+fprintf(1,'Super overlapping colinear BACKWARDS result: \n');
+path = [0 10; 10 10; 12 8; 14 10; 15 10];  
+sensor_vector_end = [-3 10]; 
+sensor_vector_start   = [15 10];
+fig_debugging = 2343;
+flag_search_type = 2;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_more_results(distance,location,path_segments);
+```
+
+which produces the following console result:
+
+``` c
+GIVES:
+Super overlapping colinear BACKWARDS result: 
+Distance     Location X      Location Y      PathSegment 
+5.000        10.000              10.000          1
+5.000        10.000              10.000          2
+1.000        14.000              10.000          3
+0.000        15.000              10.000          4
+15.000       0.000               10.000          1
+1.000        14.000              10.000          4
+```
+
+And the following figure
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findProjectionHitOntoPath_Ex6.jpg" alt="Example 4: the search type" width="400" height="300">
+  <figcaption>The algorithm is quite robust to very difficult situations</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_findIntersectionsBetweenTraversals
+
+The function fcn_Path_findIntersectionsBetweenTraversals finds where two traversals intersect. It is a traversal-type implementation of the prior function: fcn_Path_findProjectionHitOntoPath.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findIntersectionsBetweenTraversals.jpg" alt="fcn_Path_findIntersectionsBetweenTraversals picture" width="800" height="300">
+  <figcaption>The function fcn_Path_findIntersectionsBetweenTraversals finds where two traversals intersect.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+See script_test_fcn_Path_findIntersectionsBetweenTraversals for this demo.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_snapPointOntoNearestPath
+
+The function fcn_Path_snapPointOntoNearestPath snaps a point onto the nearest path segment. This is one of the basic path operations. An illustration of the steps is shown below.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_snapPointOntoNearestPath_steps.jpg" alt="fcn_Path_snapPointOntoNearestPath picture" width="800" height="300">
+  <figcaption>The function fcn_Path_snapPointOntoNearestPath snaps a point onto the nearest path segment.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The behavior of the snap depends on regions, whether or not the query point lands in the segment before the closest snap point, or the segment after the closest snap point. The code is separated by each of these 4 regions.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_snapPointOntoNearestPath_regions.jpg" alt="fcn_Path_snapPointOntoNearestPath regions" width="400" height="500">
+  <figcaption>The function fcn_Path_snapPointOntoNearestPath snaps a point onto the nearest path segment.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The regions are defined to ensure continuity of distance calculations across the borders of regions. However, the interior of the region has a boundary where the solution must choose, and therefore jump, between either the "before" segment or "after" segment.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_snapPointOntoNearestPath_3D_distance.jpg" alt="fcn_Path_snapPointOntoNearestPath regions" width="400" height="300">
+  <figcaption>The snap boundaries are mathematically defined to avoid jump discontinuities in distance.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Additional examples follow. See script_test_fcn_Path_snapPointOntoNearestPath.m for a comprehensive test suite.
+
+Example 1: a typical query
+
+```Matlab
+%% BASIC example 1.2 - works
+point = [1.4 1.3]; % Define the query point
+pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
+fignum = 112; % Define the figure number
+
+% Snap the point onto the path
+[closest_path_point,s_coordinate,...
+    first_path_point_index,second_path_point_index,...
+    percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
+
+% Print results to the workspace
+fprintf(1,'Figure: %d\n',fignum);
+fprintf(1,'\t\t Closest point is: %.2f %.2f \n',...
+    closest_path_point(1,1),closest_path_point(1,2));
+fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
+    first_path_point_index,second_path_point_index);
+fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
+        s_coordinate);
+fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+```
+
+Produces the following results
+
+``` c
+Figure: 112
+   Closest point is: 1.14 0.78 
+   Matched to the path segment given by indices 3 and 4, 
+   S-coordinate is: 1.61, 
+   percent_along_length is: 0.40
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_snapPointOntoNearestPath_Ex1.jpg" alt="fcn_Path_snapPointOntoNearestPath picture" width="400" height="300">
+  <figcaption>The function fcn_Path_snapPointOntoNearestPath snaps a point onto the nearest path segment.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Example 2: a query outside both segments
+
+```Matlab
+%% BASIC example 1.4 - works, but shows that it is on neither segement
+point = [0.9 1.4]; 
+pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
+
+fignum = 114;
+
+% Snap the point onto the path
+[closest_path_point,s_coordinate,...
+    first_path_point_index,second_path_point_index,...
+    percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
+
+% Print results to the workspace
+fprintf(1,'Figure: %d\n',fignum);
+fprintf(1,'\t\t Closest point is: %.2f %.2f \n',...
+    closest_path_point(1,1),closest_path_point(1,2));
+fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
+    first_path_point_index,second_path_point_index);
+fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
+        s_coordinate);
+fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+```
+
+Produces the following results
+
+``` c
+Figure: 114
+   Closest point is: 0.90 0.90 
+   Matched to the path segment given by indices 3 and 3, 
+   S-coordinate is: 1.34, 
+   percent_along_length is: 0.00
+```
+
+And the following figure:
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_snapPointOntoNearestPath_Ex2.jpg" alt="fcn_Path_snapPointOntoNearestPath picture 2" width="400" height="300">
+  <figcaption>The function fcn_Path_snapPointOntoNearestPath will use the nearest point if it is outside the orthogonal projection of a line segment.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_snapPointOntoNearestTraversal
+
+The function fcn_Path_snapPointOntoNearestTraversal snaps point to nearest traversal. It is basically a function that calls fcn_Path_snapPointOntoNearestPath with traversal information converted to path format.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Functions that Trim Paths
+
+#### fcn_Path_findTraversalStationSegment
+
+The function fcn_Path_findTraversalStationSegment crops traversal by given station interval. It was written because, when snapping points onto paths or traversals, if we include too much of a path, particularly one turned back toward itself, we can get incorrect snap points.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalStationSegment_IncorrectSnapPoints.jpg" alt="fcn_Path_findTraversalStationSegment with IncorrectSnapPoints" width="400" height="250">
+  <figcaption>Fig.4 - The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+However, if we limit the traversal area being studied to only a region of interest, we may snap to the correct point.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalStationSegment_CorrectSnapPoints.jpg" alt="fcn_Path_findTraversalStationSegment with Correct Snap Points" width="400" height="250">
+  <figcaption>Fig.4 - The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The function fcn_Path_findTraversalStationSegment takes in the s-coordinates of the start and end area of interest, and returns the portion of the path that includes these station coordinates. As well, it can set a flag if the query coordinates are outside the path either on the start side or end side of the given traversal. Here's the setup code:
+
+```Matlab
+% script_test_fcn_Path_findTraversalStationSegment.m
+% This is a script to exercise the function: 
+% fcn_Path_findTraversalStationSegment.m
+% This function was written on 2020_11_16 by S. Brennan
+% Questions or comments? sbrennan@psu.edu 
+ 
+%      [traversal_trimmed,flag_outside_start, flag_outside_end] = ...
+%      fcn_Path_findTraversalStationSegment(...
+%      long_traversal, s_coord_start,s_coord_end, 
+%      (fig_num))
+ 
+% Revision history:
+%     2021_01_09
+%     -- updated name and types to take traversal inputs
+%     -- added input checking
+%     -- added flag_do_plots    
+ 
+close all;
+clear data;
+ 
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+ 
+% Convert paths to traversal structures
+for i_Path = 1:1  % length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(...
+        paths_array{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+ 
+% Plot the results?
+if 1==1
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(data,fig_num);
+ 
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(data,fig_num);
+end
+```
+
+And here's the function call:
+
+```Matlab
+%% BASIC example 1
+s_coord_start = 10;
+s_coord_end   = 100;
+fignum = 111;
+[traversal_segment1,flag_outside_start, flag_outside_end] = ...
+    fcn_Path_findTraversalStationSegment(...
+    traversal, s_coord_start,s_coord_end, fignum);
+fprintf(1,...
+    'Figure: %d, flag_outside_start is: %d, flag_outside_end is: %d \n',...
+    fignum, flag_outside_start,flag_outside_end);
+title('Normal query - Test case #1');
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalStationSegment_Ex1.jpg" alt="fcn_Path_findTraversalStationSegment Example 1" width="400" height="300">
+  <figcaption>The function fcn_Path_findTraversalStationSegment returns the portion of the path containing the given start and end station coordinates.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The function is robust to degenerate queries. If a degenerate query is given where there is only a single station, then it automatically finds the segment of the traversal portion containing that station.
+
+```Matlab
+%% BASIC example 4 - degenerate within
+s_coord_start = 70;
+s_coord_end   = 70;
+fignum = 444;
+[traversal_segment4,flag_outside_start, flag_outside_end] = ...
+    fcn_Path_findTraversalStationSegment(...
+    traversal, s_coord_start,s_coord_end, fignum);
+fprintf(1,...
+    'Figure: %d, flag_outside_start is: %d, flag_outside_end is: %d \n',...
+    fignum, flag_outside_start,flag_outside_end);
+title('Query with exact same point');
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalStationSegment_Ex4.jpg" alt="fcn_Path_findTraversalStationSegment Example 4" width="400" height="300">
+  <figcaption>If given a single station, the function fcn_Path_findTraversalStationSegment returns the path segment containing those station coordinates.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+And if the ENTIRE traversal is within the station limits, it simply returns the entire traversal back:
+
+```Matlab
+%% BASIC example 5 - entire traversal within
+s_coord_start = -5;
+s_coord_end   = 7000;
+fignum = 555;
+[traversal_segment5,flag_outside_start, flag_outside_end] = ...
+    fcn_Path_findTraversalStationSegment(...
+    traversal, s_coord_start,s_coord_end, fignum);
+fprintf(1,...
+    'Figure: %d, flag_outside_start is: %d, flag_outside_end is: %d \n',...
+    fignum, flag_outside_start,flag_outside_end);
+title('Query where entire traversal within start and end of s-limits');
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalStationSegment_Ex5.jpg" alt="fcn_Path_findTraversalStationSegment Example 5" width="400" height="300">
+  <figcaption>If given a station range beyond that of the entire traversal, then the entire traversal is returned.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+If the station end query is past the end of the traversal, but start is within, it returns only the cut-out portion:
+
+```Matlab
+%% BASIC example 6 - end of traversal out
+s_coord_start = 200;
+s_coord_end   = 7000;
+fignum = 666;
+[traversal_segment6,flag_outside_start, flag_outside_end] = ...
+    fcn_Path_findTraversalStationSegment(...
+    traversal, s_coord_start,s_coord_end, fignum);
+fprintf(1,...
+    'Figure: %d, flag_outside_start is: %d, flag_outside_end is: %d \n',...
+    fignum, flag_outside_start,flag_outside_end);
+title('Query where end point outside of s-limits of traversal');
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalStationSegment_Ex6.jpg" alt="fcn_Path_findTraversalStationSegment Example 6" width="400" height="300">
+  <figcaption>If the station end query is past the end of the traversal, but start is within, it returns only the cut-out portion:
+.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Similarly, if the station start query is before the start of the traversal, but end is within, it returns only the cut-out portion; this is not shown but is the 7th basic example in the test script. If both the start and end of query are BEFORE the start, then it returns only the first segment; this is the 9th basic example. And similarly, if both the start and end of query are AFTER the end, then it returns only the last segment; this is the 10th basic example. This function will still give the correct result even if the start and end points are out of order, but will generate a warning as it auto-corrects this issue.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_removePinchPointInTraversal
+
+The function fcn_Path_removePinchPointInTraversal eliminates self-crossings in traversals.  Pinch points are where a path crosses back onto itself, creating a loop. The path without a pinch point is the minimum traversal moving only along the original path traveling from start to end. This traversal will avoid any loop or self-crossing area. The resulting path is one without "pinch points".
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_removePinchPointInTraversal_illustration.jpg" alt="fcn_Path_removePinchPointInTraversal illustration" width="400" height="300">
+  <figcaption>The function fcn_Path_removePinchPointInTraversal eliminates self-crossings in traversals.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This function is particularly useful to correct offset paths, which twist back onto themselves when created by an offset projection process. This function is also very useful to clean up weird polytopes that are self-crossing when traversing around an edge.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_removePinchPointInTraversal_pathOffsetRepair.jpg" alt="fcn_Path_removePinchPointInTraversal illustration" width="800" height="300">
+  <figcaption>The function fcn_Path_removePinchPointInTraversal is particularly useful to correct offset paths, which twist back onto themselves .</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Functions That Project Paths
+
+#### fcn_Path_findOrthogonalTraversalVectorsAtStations
+
+The function fcn_Path_findOrthogonalTraversalVectorsAtStations calculates orthogonal vectors to a traersal at given stations. A common operation is to seek vectors that are ortho-normal to a path at given station points. This is used in calculating nearby paths, in projecting paths sideways, and similar operations. This function does this calculation of orthogonal vectors.
+
+```Matlab
+function [unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(station_queries,central_traversal, varargin)
+ 
+% fcn_Path_findOrthogonalTraversalVectorsAtStations
+% Given a central traversal and a set of stations along that traversal,
+% finds the unit normal vector on the central traveral at each station
+% point.
+% 
+% FORMAT: 
+%
+%      [unit_normal_vector_start, unit_normal_vector_end] = ...
+%        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+%        station_queries,central_traversal,...
+%        (flag_rounding_type),(fig_num));
+%
+% INPUTS:
+%
+%      station_queries: an N x 1 vector containing the station on the
+%      central traversal where the projections should take place
+%
+%      central_traversal: a traversal structure that specifies the path
+%      where projections to other paths are taking place.
+%
+%      (OPTIONAL INPUTS)
+%      flag_rounding_type: a flag to indicate which type of projection is
+%      used, especially when stations are located at the end-points of
+%      segments within the nearby_traversal. When stations are at the
+%      end-points of segments, the normal vector is undefined as it depends
+%      on whether to use the prior or subsequent segment, or some
+%      combination of these.
+%
+%      Note that the very first point always uses projections from the
+%      following segement, and the very last point always uses the prior.
+%      Otherwise, the flag determines behaviors for endpoints of internal
+%      segments. The options include:
+%
+%          flag_rounding_type = 1;  % This is the default, and indicates
+%          that the orthogonal projection of an endpoint is created by the
+%          PRIOR segment leading up to each station query point.
+% 
+%          flag_rounding_type = 2;  % This indicates that the orthogonal
+%          projection of an endpoint is created by the FOLLOWING segment
+%          after each station query point.
+% 
+%          flag_rounding_type = 3;  % This indicates that the orthogonal
+%          projection, ONLY if the station query falls at the joining point
+%          between two segments (e.g. is on the "joint"), then the
+%          projection is created by averaging the vector projections
+%          created from the PRIOR segment and FOLLOWING segment.
+% 
+%          flag_rounding_type = 4;  % This indicates that the orthogonal
+%          projections along segments should be calculated at the midpoints
+%          of each segment, and then for each station qeuary, the vector
+%          projections are interpolated from their prior and subsequent
+%          vectors.
+%
+%      fig_num: a figure number to plot results. Turns debugging on.
+%
+% OUTPUTS:
+%
+%      unit_normal_vector start: a Nx2 vector containing [X1 Y1]
+%      coordinates as columns, where the [X1 Y1] represents the location of
+%      the start point of the vector, on the path.
+%
+%      unit_normal_vector_end: a Nx2 vector containing the [X2 Y2] location
+%      of the end point of the unit vector. On both outputs, there are N
+%      rows, one row for each station.
+%
+% DEPENDENCIES:
+%
+%      fcn_Path_checkInputsToFunctions
+%
+% EXAMPLES:
+%      
+% See the script: script_test_fcn_Path_findOrthogonalTraversalVectorsAtStations
+% for a full test suite.
+%
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthogonalTraversalVectorsAtStations_illustration.jpg" alt="fcn_Path_findOrthogonalTraversalVectorsAtStations picture" width="400" height="300">
+  <figcaption>The function fcn_Path_findOrthogonalTraversalVectorsAtStations calculates orthogonal vectors to a traersal at given stations.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Here are some examples:
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthogonalTraversalVectorsAtStations_Ex1.jpg" alt="fcn_Path_findOrthogonalTraversalVectorsAtStations example 1" width="800" height="300">
+  <figcaption>Examples of the function fcn_Path_findOrthogonalTraversalVectorsAtStations.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_findOrthogonalHitFromTraversalToTraversal
+
+The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which traversals are hit at ortho projections from one traversal to another.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_findOrthogonalHitFromTraversalToTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which traversals are hit at ortho projections from one traversal to another..</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_findOrthoScatterFromTraversalToTraversals
+
+The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_findOrthoScatterFromTraversalToTraversals picture" width="400" height="300">
+  <figcaption>The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal. .</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_fillOffsetTraversalsAboutTraversal
+
+The function fcn_Path_fillOffsetTraversalsAboutTraversal fills in an array of traversals about a reference traversal at user-defined offset distances.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_fillOffsetTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>FThe function fcn_Path_fillOffsetTraversalsAboutTraversal fills in an array of traversals about a reference traversal at user-defined offset distances..</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_convertTraversalXYtoSy
+
+The function fcn_Path_convertTraversalXYtoSy calculates the SY (e.g ST or "station") coordinates for a given traversal, given a reference traversal and another query traversal.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_convertTraversalXYtoSy picture" width="400" height="300">
+  <figcaption>Fig.4 - The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_fillRandomTraversalsAboutTraversal
+
+The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+URHERE
+
+#### fcn_AlignCoords_fitRotationKabsch
+
+The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another using the Kabsch algorithm.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_AlignCoords_fitRotationKabsch picture" width="400" height="300">
+  <figcaption>Fig.4 - The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Core Functions
+
+#### fcn_AlignCoords_fit2DCoordinates
+
+The function fcn_AlignCoords_fit2DCoordinates performs regression fitting to find the transform that matches one 2D coordinate system to another. Uses the Kabsch and scaling algorithms.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fit2DCoordinates.png" alt="fcn_AlignCoords_fit2DCoordinates picture" width="400" height="300">
+  <figcaption>Fig.5 - The function fcn_AlignCoords_fit2DCoordinates performs regression fitting to find the transform that matches one 2D coordinate system to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_AlignCoords_fitAffineXform
+
+The function fcn_AlignCoords_fitAffineXform performs regression fitting to find the affine transform that matches one point set another. In general, it can have better accuracy in fitting than fitting 2D coordinates, but the resulting transform does not preserve rotation. Both algorithms give nearly identical performance.
+
+<pre align="center">
+  <img src=".\Images\fcn_AlignCoords_fitAffineXform.png" alt="fcn_AlignCoords_fitAffineXform picture" width="400" height="300">
+  <figcaption>Fig.6 - The function fcn_AlignCoords_fitAffineXform performs regression fitting to find the affine transform that matches one point set another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -240,87 +1500,75 @@ for any function to view function details.
 Additional screenshots, code examples and demos work well in this space. You may
 also link to more resources. -->
 
+### General Usage
+
+Each of the functions has an associated test script, using the convention
+
+```sh
+script_test_fcn_fcnname
+```
+
+where fcnname is the function name as listed above.
+
+As well, each of the functions includes a well-documented header that explains inputs and outputs. These are supported by MATLAB's help style so that one can type:
+
+```sh
+help fcn_fcnname
+```
+
+for any function to view function details.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
 ### Examples
 
 1. Run the main script to set up the workspace and demonstrate main outputs, including the figures included here:
 
    ```sh
-   script_demo_Laps
+   script_demo_AlignCoordinates
    ```
-    This exercises the main function of this code: fcn_Laps_breakDataIntoLaps
+
+    This exercises the main function of this code: fcn_AlignCoords_fit2DCoordinates
 
 2. After running the main script to define the included directories for utility functions, one can then navigate to the Functions directory and run any of the functions or scripts there as well. All functions for this library are found in the Functions sub-folder, and each has an associated test script. Run any of the various test scripts, such as:
 
    ```sh
-   script_test_fcn_Laps_breakDataIntoLapIndices
+   script_test_fcn_aligncoords_breakDataIntoLapIndices
    ```
-For more examples, please refer to the [Documentation](https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/tree/main/Documents)
 
-### Definition of Endpoints
-The codeset uses two types of zone definitions:
-1. A point location defined by the center and radius of the zone, and number of points that must be within this zone. An example of this would be "travel from home" or "to grandma's house". The point "zone" specification is given by an X,Y center location and a radius in the form of [X Y radius], as a 3x1 matrix. Whenever the path passes within the radius with a specified number of points within that radius, the minimum distance point then "triggers" the zone. 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
-    <img src=".\Images\point_zone_definition.png" alt="point_zone_definition picture" width="200" height="200">
-
-2. A line segment. An example is the start line or finish line of a race. A runner has not started or ended the race without crossing these lines. For line segment conditions, the inputs are condition formatted as: [X_start Y_start; X_end Y_end] wherein start denotes the starting coordinate of the line segment, end denotes the ending coordinate of the line segment. The direction of start/end lines of the segment are defined such that a correct crossing of the line is in the positive cross-product direction defined from the vector from start to end of the segment.
-
-    <img src=".\Images\linesegment_zone_definition.png" alt="linesegment_zone_definition picture" width="200" height="200">
-
-These two conditions can be mixed and matched, so that one could, for example, find every lap of data where someone went from a race start line (defined by a line segment) to a specific mountain peak defined by a point and radius.
-
-The two zone types above can be used to define three types of conditions:
-1. A start condition - where a lap starts. The lap does not end until and end condition is met.
-2. An end condition - where a lap ends. The lap cannot end until this condition is met.
-3. An excursion condition (optional) - a condition that must be met after the start point, and before the end point. The excursion condition must be met before the end point is counted. 
-
-Why is an excursion point needed? Consider an example: it is common for the start line of a marathon to be quite close to the start line, sometimes even just a few hundred feet after the start line. This setup is for the practical reason that runners do not want to make long walks to/from starting locations to finish location either before, and definitely not after, such a race. As a consequence, it is common that, immediately after the start of the race, a runner will cross the finish line before actually finishing the race. This happens in field data collection when one accidentally passes a start/end station, and then backs up the vehicle to reset. In using these data recordings, we would not want these small segment to count as a complete laps, for example the 100-ish meter distance to be counted as a marathon run. Rather, one would require that the recorded data enter some excursion zone far away from the starting line for such a "lap" to count. Thus, this laps code allows one to define an excursion point as a location far out into the course that one must "hit" before the finish line is counted as the actual "finish" of the lap.
-
-* For each lap when there are repeats, the resulting laps of data include the lead-in and fade-out data, namely the datapoint immediately before the start condition was met, and the datapoint after the end condition is met. THIS CREATES REPLICATE DATA. However, this allows better merging of data for repeated laps, for example averaging data exactly from start to finish, or to more exactly calculate velocities on entry and exit of a lap by using windowed averages or filters.
-
-* Points inside the lap can be set for the point-type zones. These occur as optional input arguments in fcn_Laps_findPointZoneStartStopAndMinimum and in the core definition of a point zone as the 2nd argument. For example, the following code:
-
-  ```Matlab
-  start_definition = [10 3 0 0]; % Radius 10, 3 points must pass near [0 0]
-  ```
-
-  requires 3 points to occur within the start zone area. 
-
+***
 
 <!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 
 ## Major release versions
+
 This code is still in development (alpha testing)
 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 
 <!-- CONTACT -->
 ## Contact
+
 Sean Brennan - sbrennan@psu.edu
 
-Project Link: [hhttps://github.com/ivsg-psu/FeatureExtraction_DataClean_BreakDataIntoLaps](https://github.com/ivsg-psu/FeatureExtraction_DataClean_BreakDataIntoLaps)
+Project Link: [https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary](https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary)
 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
+***
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
-[contributors-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
-[forks-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/network/members
-[stars-shield]: https://img.shields.io/github/stars/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
-[stars-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/stargazers
-[issues-shield]: https://img.shields.io/github/issues/ivsg-psu/reFeatureExtraction_Association_PointToPointAssociationpo.svg?style=for-the-badge
-[issues-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/issues
-[license-shield]: https://img.shields.io/github/license/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation.svg?style=for-the-badge
-[license-url]: https://github.com/ivsg-psu/FeatureExtraction_Association_PointToPointAssociation/blob/master/LICENSE.txt
-
-
-
-
-
-
-
-
