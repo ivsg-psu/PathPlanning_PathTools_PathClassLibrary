@@ -28,15 +28,17 @@ library_name{ith_library}    = 'DebugTools_v2023_04_22';
 library_folders{ith_library} = {'Functions','Data'};
 library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2023_04_22.zip';
 
+ith_library = ith_library+1;
+library_name{ith_library}    = 'GPSClass_v2023_04_21';
+library_folders{ith_library} = {''};
+library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_GPSRelatedCodes_GPSClass/archive/refs/tags/GPSClass_v2023_04_21.zip';
+
+
+
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'PathClass_v2023_02_01';
 % library_folders{ith_library} = {'Functions'};                                
 % library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/blob/main/Releases/PathClass_v2023_02_01.zip?raw=true';
-% 
-% ith_library = ith_library+1;
-% library_name{ith_library}    = 'GPSClass_v2023_04_21';
-% library_folders{ith_library} = {''};
-% library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_GPSRelatedCodes_GPSClass/archive/refs/tags/GPSClass_v2023_04_21.zip';
 % 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GetUserInputPath_v2023_02_01';
@@ -55,6 +57,7 @@ if 1==0
     % Clear out the variables
     clear global flag* FLAG*
     clear flag*
+    clear path
 
     % Clear out any path directories under Utilities
     path_dirs = regexp(path,'[;]','split');

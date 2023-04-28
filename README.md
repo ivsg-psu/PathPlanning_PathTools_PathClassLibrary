@@ -1362,7 +1362,7 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 
 <pre align="center">
   <img src=".\Images\fcn_Path_findOrthogonalTraversalVectorsAtStations_illustration.jpg" alt="fcn_Path_findOrthogonalTraversalVectorsAtStations picture" width="400" height="300">
-  <figcaption>The function fcn_Path_findOrthogonalTraversalVectorsAtStations calculates orthogonal vectors to a traersal at given stations.</figcaption>
+  <figcaption>The function fcn_Path_findOrthogonalTraversalVectorsAtStations calculates "normal"" vectors to a traversal at given stations.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
@@ -1374,17 +1374,58 @@ Here are some examples:
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
+Why is "normal" in quotes? Because the definition of normal is unclear! Particularly at an internal vertex, it can be very unclear what to use as a normal vector.
+
+Here are 4 options:
+
+1. use previous segment so projection vector to define orthogonality,
+2. use following segment,
+3. average both previous and following, using average only at vertex, and
+4. average both everywhere (which is smooth, but almost no vectors are actually orthogonal!)
+
+The code allows all four to be selected via a flag option, and the differences between each of these options is illustrated below:
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthogonalTraversalVectorsAtStations_Ex2.jpg" alt="fcn_Path_findOrthogonalTraversalVectorsAtStations example 1" width="900" height="200">
+  <figcaption>Examples of the function fcn_Path_findOrthogonalTraversalVectorsAtStations.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
 ***
 
 #### fcn_Path_findOrthogonalHitFromTraversalToTraversal
 
-The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which traversals are hit at ortho projections from one traversal to another.
+The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which traversals are hit at ortho projections from one traversal to another. Basically, it finds the points on traversals nearby a given traversal that are closest to given station points, assuming orthogonal projections or variants set by a flag consistent with the flag for fcn_Path_findOrthogonalTraversalVectorsAtStations. An illustration of this process is shown below; This is from the averaging example in the script: script_test_fcn_Path_findOrthogonalHitFromTraversalToTraversal.m
 
 <pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_findOrthogonalHitFromTraversalToTraversal picture" width="400" height="300">
-  <figcaption>The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which traversals are hit at ortho projections from one traversal to another..</figcaption>
+  <img src=".\Images\fcn_Path_findOrthogonalHitFromTraversalToTraversal_Ex1.jpg" alt="fcn_Path_findOrthogonalHitFromTraversalToTraversal Example 1 picture" width="900" height="200">
+  <figcaption>The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which traversals are hit at ortho projections from one traversal to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Note that the result will give a positive or negative distance value, depending if it is to the left (positive cross-product) or right (negative) direction relative to the traversal.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthogonalHitFromTraversalToTraversal_Ex2.jpg" alt="fcn_Path_findOrthogonalHitFromTraversalToTraversal Example 2 picture" width="800" height="300">
+  <figcaption>The function fcn_Path_findOrthogonalHitFromTraversalToTraversal can report both positive and negative intersection distances, with the sign determined by the cross-product convention.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+One can limit the search radius for intersections, in this case to 1.5 meters. Note that the results are different depending on the projection type.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthogonalHitFromTraversalToTraversal_Ex3.jpg" alt="fcn_Path_findOrthogonalHitFromTraversalToTraversal Example 3 picture" width="900" height="300">
+  <figcaption>The function fcn_Path_findOrthogonalHitFromTraversalToTraversal has a flag to limit the search distance away from the central traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The search direction can also be negative. Here are the results for a search radius of 1.5 meters, showing that negative results are captured.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthogonalHitFromTraversalToTraversal_Ex5.jpg" alt="fcn_Path_findOrthogonalHitFromTraversalToTraversal Example 4 picture" width="900" height="200">
+  <figcaption>The function fcn_Path_findOrthogonalHitFromTraversalToTraversal is particularly useful to find nearby traversal points.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
@@ -1394,11 +1435,27 @@ The function fcn_Path_findOrthogonalHitFromTraversalToTraversal finds which trav
 
 #### fcn_Path_findOrthoScatterFromTraversalToTraversals
 
-The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal.
+The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal. Like the prior function, it gives positive values for positive (in the cross-product) sensor directions, negative for negative sensing. 
 
 <pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_findOrthoScatterFromTraversalToTraversals picture" width="400" height="300">
-  <figcaption>The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal. .</figcaption>
+  <img src=".\Images\fcn_Path_findOrthoScatterFromTraversalToTraversals_Ex1.jpg" alt="fcn_Path_findOrthoScatterFromTraversalToTraversals picture" width="800" height="300">
+  <figcaption>The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This is useful for finding all the nearby traversal points, including defining a search distance that ignores nearby traversals
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthoScatterFromTraversalToTraversals_Ex2.jpg" alt="fcn_Path_findOrthoScatterFromTraversalToTraversals picture" width="400" height="300">
+  <figcaption>The function fcn_Path_findOrthoScatterFromTraversalToTraversals is useful to find common station points for repeated measurements along a reference traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+With dense projections, one can analyze the histogram of projection distances:
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findOrthoScatterFromTraversalToTraversals_Ex3.jpg" alt="fcn_Path_findOrthoScatterFromTraversalToTraversals picture" width="400" height="300">
+  <figcaption>Dense projections allow error analysis of paths along a traversal, to find systematic bias, skew, etc.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
