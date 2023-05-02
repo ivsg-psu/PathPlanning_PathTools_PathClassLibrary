@@ -87,10 +87,11 @@ assert(isequal(round(unit_normal_vector_end,4),  [-0.7071    0.7071]));
 %% AVERAGING examples
 
 % Set up data
-close all
+% close all
 central_path = [0 0; 1 1; 2 0];
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
-stations = [0; 1; 2^0.5-0.1; 2^0.5; 2^0.5+.1; 2; central_traversal.Station(end)];
+% stations = [0; 1; 2^0.5-0.1; 2^0.5; 2^0.5+.1; 2; central_traversal.Station(end)];
+stations = [linspace(0,central_traversal.Station(end),20)'; 2^0.5];
 
 % AVERAGING example 1 - default setting
 flag_rounding_type = 1;  % use orthogonal projection of prior segment
@@ -99,13 +100,19 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
 fig_num = 11;  % Define the figure
+figure(fig_num);
+clf;
 
+subplot(1,4,1);
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
     stations,central_traversal,flag_rounding_type,fig_num);
-title('Vertex projection via prior segment (default, flag=1)');
+title('Using prior segment (default, flag=1)');
+axis equal
+xlim([-1 3]);
+ylim([-1 3]);
 
 % AVERAGING example 2 - use following segment
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
@@ -113,14 +120,19 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use averagae projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 12;  % Define the figure
+%fig_num = 12;  % Define the figure
+subplot(1,4,2);
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
     stations,central_traversal,flag_rounding_type,fig_num);
-title('Vertex projection via following segment (flag=2)');
+title('Using following segment (flag=2)');
+axis equal
+xlim([-1 3]);
+ylim([-1 3]);
+legend off
 
 % AVERAGING example 3 - use average of both segments
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
@@ -128,13 +140,19 @@ title('Vertex projection via following segment (flag=2)');
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 13;  % Define the figure
+% fig_num = 13;  % Define the figure
+subplot(1,4,3);
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    stations,central_traversal,flag_rounding_type,fig_num);title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
+    stations,central_traversal,flag_rounding_type,fig_num);
+title('Averaging only at vertex (flag=3)');
+axis equal
+xlim([-1 3]);
+ylim([-1 3]);
+legend off
 
 % AVERAGING example 4 - use average always
 % flag_rounding_type = 1;  % use orthogonal projection of prior segment
@@ -142,20 +160,28 @@ fig_num = 13;  % Define the figure
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 14;  % Define the figure
+subplot(1,4,4);
+% fig_num = 14;  % Define the figure
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    stations,central_traversal,flag_rounding_type,fig_num);title('Vertex projection via averaging everywhere (flag=4)');
+    stations,central_traversal,flag_rounding_type,fig_num);
+title('Continous averaging (flag=4)');
+axis equal
+xlim([-1 3]);
+ylim([-1 3]);
+legend off;
+
+sgtitle('Comparison of projection types');
 
 
 
 %% NEGATIVE examples
 
 % Prep the example and workspace
-close all;
+% close all;
 central_path = [-2 1; 1 4; 3 2];
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 stations = [0; 1.5; 3; 3.5; 18^0.5-0.1; 18^0.5; 18^0.5+.1; 5; 5.5; 6.5; central_traversal.Station(end)];
@@ -222,7 +248,7 @@ title('Vertex projection via averaging everywhere (flag=4)');
 
 
 %% MULTICROSS examples
-close all;
+% close all;
 
 % Setup
 central_path = [-2 1; 1 4; 3 2; 5 2; 6 3; 7 2];
@@ -294,7 +320,7 @@ title('Multicross example using projection via averaging of prior and following 
 
 
 %% Real path examples
-close all;
+% close all;
 
 % Fill in some dummy data
 paths = fcn_Path_fillSamplePaths;

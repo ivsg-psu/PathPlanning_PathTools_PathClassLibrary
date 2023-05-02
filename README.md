@@ -1078,7 +1078,6 @@ And the following figure:
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
-
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
 ***
@@ -1435,7 +1434,7 @@ The search direction can also be negative. Here are the results for a search rad
 
 #### fcn_Path_findOrthoScatterFromTraversalToTraversals
 
-The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal. Like the prior function, it gives positive values for positive (in the cross-product) sensor directions, negative for negative sensing. 
+The function fcn_Path_findOrthoScatterFromTraversalToTraversals finds closest points on many traversals to a given central traversal. Like the prior function, it gives positive values for positive (in the cross-product) sensor directions, negative for negative sensing.
 
 <pre align="center">
   <img src=".\Images\fcn_Path_findOrthoScatterFromTraversalToTraversals_Ex1.jpg" alt="fcn_Path_findOrthoScatterFromTraversalToTraversals picture" width="800" height="300">

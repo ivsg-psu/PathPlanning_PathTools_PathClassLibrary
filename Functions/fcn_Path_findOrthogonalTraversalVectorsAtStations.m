@@ -86,6 +86,9 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %      -- renamed to transition from path to traversal notation 
 %      2021_12_27:
 %      -- corrected dependencies in comments
+%      2023_04_29:
+%      -- added capability for interpolated results at endpoints that are
+%      undefined, using imaginary inputs. See flag type 5.
 
 % TO DO:
 % Define search radius - need to let user define this as an input!
@@ -174,7 +177,7 @@ X_central       = central_traversal.X;
 Y_central       = central_traversal.Y;
 
 
-%% Find the station coordinates on the central trajectory 
+%% Find the XY of query station coordinates on the central trajectory 
 % Find the points on the central trajectory corresponding to the station
 % query. Format for interp1: Vq = interp1(X,V,Xq). The result are X and Y
 % locations that are ON the central path defined by X_central and
@@ -207,6 +210,15 @@ Y_central_at_stations = interp1(Station_central,Y_central,station_queries,'linea
 %      each segment, and the endpoints of segments are an average of the
 %      PRIOR and SUBSEQUENT midpoints. All projections are interpolated
 %      from their prior and subsequent vectors.
+%
+%      flag_rounding_type = 5;  % This indicates that the orthogonal
+%      projection, ONLY at an endpoint is created by using the angle
+%      between the prior and subsequent segments, with the fraction of the
+%      angle given by the imaginary portion of the station number. The
+%      imaginary portion should range from 0 to 1, indicating a percentage
+%      of the angle to use. Imagninary values less than 0 default to 0, and
+%      values greater then 1 default to 1.
+
 
 % Figure out the number of indices within the central path, and number them
 % from 1 to the length. Then find which indices would likely be closest to
@@ -240,7 +252,8 @@ if ~isempty(indices_on_endpoints)
             error('Unrecognized method in flag_rounding_type.');
     end
 end
-   
+
+% Special case for situation 4
 if flag_rounding_type == 4 % Always do averaging
     indices_start = Indices_Central_at_Query_Stations - 0.5;
     indices_end   = Indices_Central_at_Query_Stations + 0.5;
@@ -252,12 +265,14 @@ indices_end   = min(Indices_central(end),indices_end);
 
 
 %% Check specifically the start and end locations
+% Start location?
 start_query_index = find(station_queries==Station_central(1));
 if ~isempty(start_query_index)
     indices_start(start_query_index) = 1;
     indices_end(start_query_index) = 2;
 end
 
+% End location?
 end_query_index = find(station_queries==Station_central(end));
 if ~isempty(end_query_index)
     indices_start(end_query_index) = Indices_central(end) - 1;
@@ -285,6 +300,9 @@ normal_unit_vectors_at_stations = tangent_unit_vectors_at_stations*[0 1; -1 0];
 unit_normal_vector_start = [X_central_at_stations Y_central_at_stations]; 
 unit_normal_vector_end   = [X_central_at_stations Y_central_at_stations] + normal_unit_vectors_at_stations;
 
+%% Calculate angle
+% URHERE
+% diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin);
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

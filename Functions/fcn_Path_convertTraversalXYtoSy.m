@@ -11,6 +11,15 @@ function [closestXs, closestYs, closestDistances] = ...
 % traversal outward toward nearby traversals. The results are then
 % presented as an array of lateral offsets.
 %
+% The process to calculate the results is to project orthogonally from the
+% reference traversal outward, depending on the flag type, to find the
+% intersection from the reference traversal to other traversals. These
+% intersections are then used to calculate lateral offsets.
+%
+% NOTE: this is not a function to convert from XY to Station coordinates,
+% as it does not work for all possible XY positions. It will only work for
+% very specific orthogonal projections.
+%
 % NOTE: this is just a reformulation of the function:
 % fcn_Path_FindOrthogonalHitFromTraversalToTraversal
 % The main difference is the final plotting result, but otherwise it uses
@@ -109,6 +118,10 @@ function [closestXs, closestYs, closestDistances] = ...
 %      -- edited header to rename:
 %      fcn_Path_findOrthoScatterFromTraversalToTraversals to
 %      fcn_Path_FindOrthogonalHitFromTraversalToTraversal
+%      2023_04_30:
+%      -- improved plotting by showing XY and Sy side-by-side
+%      -- edited header to make it more clear that this is NOT XY to Sy
+%      converter to use.
 
 flag_do_debug = 0; % Flag to debug the results
 flag_do_plot = 0; % Flag to plot the results
@@ -238,16 +251,62 @@ if flag_do_plot
 
     figure(fig_num);
     clf;
+
+    subplot(1,2,1);
     hold on;
     grid on;
+
+    xlabel('X [m]');
+    ylabel('Y [m]');
+    axis equal;
+
+    % Plot the central traversal
+    plot(reference_traversal.X,reference_traversal.Y,'k.-','Linewidth',3,'Markersize',25);
+
+    % Plot the paths 
+    h_plots = fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+    colors = zeros(length(h_plots),3);
+    for ith_plot = 1:length(h_plots)
+        set(h_plots(ith_plot),'LineWidth',3)
+        colors(ith_plot,:) = get(h_plots(ith_plot),'Color');
+    end
+
+    % Plot the station points
+    % Find the unit normal vectors at each of the station points
+    [unit_normal_vector_start, unit_normal_vector_end] = ...
+        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+        reference_station_points,reference_traversal,flag_rounding_type);
+
+    plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'r.','Markersize',25);
+
+    % Show the unit vectors
+    normal_unit_vectors_at_stations = ...
+        unit_normal_vector_end - unit_normal_vector_start;
+    quiver(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),...
+        normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
     
+    % Plot the hit results
+    for ith_traversal = 1:length(closestXs(1,:))
+        plot(closestXs(:,ith_traversal),closestYs(:,ith_traversal),'o','Markersize',5,'Linewidth',3,'Color',colors(ith_traversal,:));
+        for ith_point = 1:length(closestXs(:,1))
+            text(closestXs(ith_point,ith_traversal),closestYs(ith_point,ith_traversal),sprintf('%.0d',ith_point),'FontSize',12,'VerticalAlignment','bottom','Color',colors(ith_traversal,:));
+        end
+    end
+
+
+    subplot(1,2,2);
+    hold on; grid on;
     xlabel('Station [m]');
     ylabel('y-offset [m]');
     % axis equal;
     
     % Plot the results
     for ith_traversal = 1:length(closestDistances(1,:))        
-        plot(reference_station_points, closestDistances(:, ith_traversal),'.-','Markersize',15,'Linewidth',3);
+        plot(reference_station_points, closestDistances(:, ith_traversal),'.-','Markersize',15,'Linewidth',3,'Color',colors(ith_traversal,:));
+        for ith_point = 1:length(closestDistances)
+            text(reference_station_points(ith_point,1),closestDistances(ith_point,ith_traversal),sprintf('%.0d',ith_point),...
+                'FontSize',12,'VerticalAlignment','bottom','Color',colors(ith_traversal,:));
+        end
     end
     
     % For debugging    

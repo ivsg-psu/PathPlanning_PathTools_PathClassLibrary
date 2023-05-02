@@ -52,7 +52,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_
 
 
 %% Clear paths and folders, if needed
-if 1==0
+if 1==1
 
     % Clear out the variables
     clear global flag* FLAG*
@@ -826,7 +826,7 @@ for i_Path = 1:length(paths_array)
 end
 
 % Plot the results? (Note: they are plotted below as well)
-if 1==1
+if 1==0
     %     fig_num = 12;
     %     fcn_Path_plotTraversalsYaw(all_traversals,fig_num);
     fig_num = 13;
@@ -836,7 +836,7 @@ end
 
 % Test case 1: basic call
 reference_traversal = all_traversals.traversal{2};
-reference_station_points = (0:10:reference_traversal.Station(end))';
+reference_station_points = (0:20:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 fig_num = 1;
@@ -845,7 +845,43 @@ fig_num = 1;
        fcn_Path_convertTraversalXYtoSy(...
        reference_station_points, reference_traversal, all_traversals,...
        flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
-   
+
+subplot(1,2,2); axis normal;
+
+%% Advanced testing example of fcn_Path_convertTraversalXYtoSy
+% Set up data
+% close all
+reference_path = [0 0; 1 1; 2 0];
+reference_traversal = fcn_Path_convertPathToTraversalStructure(reference_path);
+% stations = [0; 1; 2^0.5-0.1; 2^0.5; 2^0.5+.1; 2; central_traversal.Station(end)];
+reference_station_points_1st_half = linspace(0,sum(reference_path(2,:).^2,2).^0.5,11)'; 
+reference_station_points_2nd_half = linspace(sum(reference_path(2,:).^2,2).^0.5,reference_traversal.Station(end),10)';
+reference_station_points = [reference_station_points_1st_half(1:end-1,:);reference_station_points_2nd_half];
+
+clear data
+% Load a test path that is challenging for this reference path
+test_path = fcn_Path_fillSamplePaths(4);
+test_traversal.traversal{1} = fcn_Path_convertPathToTraversalStructure(test_path);
+
+flag_rounding_type = 3;
+search_radius = 40;
+fig_num = 33;
+
+[closestXs, closestYs, closestDistances] = ...
+    fcn_Path_convertTraversalXYtoSy(...
+    reference_station_points, reference_traversal, test_traversal,...
+    flag_rounding_type,search_radius,fig_num);
+
+% Repeat with different projection type
+flag_rounding_type = 4;
+search_radius = 40;
+fig_num = 44;
+
+[closestXs, closestYs, closestDistances] = ...
+    fcn_Path_convertTraversalXYtoSy(...
+    reference_station_points, reference_traversal, test_traversal,...
+    flag_rounding_type,search_radius,fig_num);
+
    
 %% Find random traversals (with varying smoothness) about traversal:
 % fcn_Path_fillRandomTraversalsAboutTraversal

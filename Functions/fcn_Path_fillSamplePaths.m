@@ -1,4 +1,4 @@
-function paths_array = fcn_Path_fillSamplePaths
+function paths_array = fcn_Path_fillSamplePaths(varargin)
 % fcn_Path_fillSamplePaths
 % Produces dummy sample paths. Note: can go into the function and change
 % flag to allow user-selected paths.
@@ -9,7 +9,9 @@ function paths_array = fcn_Path_fillSamplePaths
 %
 % INPUTS:
 %
-%      (none)
+%      (path_number) - an input asking for a specific path. If left empty,
+%      only paths 1 to 3 will be filled. The paths beyond this are for
+%      very specific debugging operations.
 %
 % OUTPUTS:
 %
@@ -61,10 +63,14 @@ end
 
 if flag_check_inputs == 1
     % Are there the right number of inputs?
-    if  nargin > 0
-        error('Incorrect number of input arguments')
-    end
+    narginchk(0,1);
     
+end
+
+if nargin == 0
+    path_to_grab = 0;
+else
+    path_to_grab = varargin{1};
 end
 
 %% Solve for the circle
@@ -368,6 +374,85 @@ else
         7.9493   86.4431
         6.5668   88.4840
         5.8756   89.6501];
+end
+
+if path_to_grab==0
+    return
+end
+
+if path_to_grab<=3
+    paths_array = paths_array{path_to_grab};
+    return
+end
+
+%% Build or load Path 4
+% This path is useful for testing snap functions
+
+if path_to_grab==4
+    if 1==flag_grab_user_inputs
+        % Grab other points manually to create a test path
+        figure(1);
+
+        % Show prior results
+        clf; hold on;
+        grid on;
+        axis equal;
+        reference_path = [0 0; 1 1; 2 0];
+        plot(reference_path(:,1),reference_path(:,2),'-');
+        text(reference_path(1,1),reference_path(1,2),'Start');
+        axis([-1 3 -1 3]);
+
+
+        % Get a set of sampling points
+        [X4,Y4] = ginput;
+        plot(X4,Y4)
+    else
+        paths_array = [
+            -0.1595   -0.6381
+            -0.1751   -0.4669
+            -0.1984   -0.3502
+            -0.1984   -0.2568
+            -0.1751   -0.0778
+            -0.1751    0.1012
+            -0.1518    0.2490
+            -0.0272    0.4202
+            0.0584    0.5370
+            0.1829    0.6070
+            0.2607    0.7315
+            0.2685    0.7938
+            0.2840    0.9183
+            0.3074    0.9961
+            0.3385    1.1128
+            0.4397    1.1673
+            0.5564    1.2218
+            0.6498    1.2218
+            0.8132    1.2218
+            0.8755    1.1595
+            0.9611    1.1751
+            0.9922    1.2218
+            1.0467    1.3074
+            1.1323    1.4475
+            1.2724    1.5331
+            1.4125    1.5331
+            1.4747    1.4163
+            1.5058    1.2918
+            1.5136    1.1751
+            1.5136    1.0506
+            1.6381    0.8794
+            1.7860    0.8093
+            1.9339    0.7393
+            2.0895    0.7004
+            2.1362    0.6148
+            2.1751    0.5058
+            2.2296    0.3502
+            2.2996    0.1945
+            2.2763    0.0856
+            2.2062   -0.0234
+            2.1362   -0.1479
+            2.0895   -0.3035
+            2.0584   -0.4592
+            2.0350   -0.5681];
+    end
 end
 
 

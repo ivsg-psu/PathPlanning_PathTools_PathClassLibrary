@@ -29,4 +29,21 @@ end
 fig_num = 12;
 fcn_Path_plotTraversalsXY(data,fig_num);
 
+%% Test specific paths
+fig_num = 22;
 
+clear data
+single_path = fcn_Path_fillSamplePaths(2);
+traversal = fcn_Path_convertPathToTraversalStructure(single_path);
+data.traversal{1} = traversal;
+fcn_Path_plotTraversalsXY(data,fig_num);
+
+%% Test specific paths
+% This is a test path for testing the conversions from XY to Sy
+fig_num = 33;
+
+clear data
+single_path = fcn_Path_fillSamplePaths(4);
+traversal = fcn_Path_convertPathToTraversalStructure(single_path);
+data.traversal{1} = traversal;
+fcn_Path_plotTraversalsXY(data,fig_num);
