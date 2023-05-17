@@ -2092,53 +2092,6 @@ elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fign
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
 ***
-URHERE
-
-#### fcn_AlignCoords_fitRotationKabsch
-
-The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another using the Kabsch algorithm.
-
-<pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_AlignCoords_fitRotationKabsch picture" width="400" height="300">
-  <figcaption>Fig.4 - The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another.</figcaption>
-  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
-</pre>
-
-<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
-
-
-
-***
-
-### Core Functions
-
-#### fcn_AlignCoords_fit2DCoordinates
-
-The function fcn_AlignCoords_fit2DCoordinates performs regression fitting to find the transform that matches one 2D coordinate system to another. Uses the Kabsch and scaling algorithms.
-
-<pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fit2DCoordinates.png" alt="fcn_AlignCoords_fit2DCoordinates picture" width="400" height="300">
-  <figcaption>Fig.5 - The function fcn_AlignCoords_fit2DCoordinates performs regression fitting to find the transform that matches one 2D coordinate system to another.</figcaption>
-  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
-</pre>
-
-<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
-
-***
-
-#### fcn_AlignCoords_fitAffineXform
-
-The function fcn_AlignCoords_fitAffineXform performs regression fitting to find the affine transform that matches one point set another. In general, it can have better accuracy in fitting than fitting 2D coordinates, but the resulting transform does not preserve rotation. Both algorithms give nearly identical performance.
-
-<pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitAffineXform.png" alt="fcn_AlignCoords_fitAffineXform picture" width="400" height="300">
-  <figcaption>Fig.6 - The function fcn_AlignCoords_fitAffineXform performs regression fitting to find the affine transform that matches one point set another.</figcaption>
-  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
-</pre>
-
-<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
-
-***
 
 <!-- USAGE EXAMPLES -->
 ## Usage
