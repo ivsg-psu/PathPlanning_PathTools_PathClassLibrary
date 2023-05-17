@@ -88,7 +88,7 @@ This repo supports mathematical operations for paths and trajectories.
             <li><a href="#fcn_path_calcsingletraversalstandarddeviation">fcn_Path_calcSingleTraversalStandardDeviation - estimates the standard deviation in the offsets of a single traversal using variance in path angles and average path segment length.</li>
             <li><a href="#fcn_path_plottraversalxywithvariancebands">fcn_Path_plotTraversalXYWithVarianceBands - plots a traversal with standard deviation boundaries around it.</li>
           </ul>
-        <li><a href="#functions-that-project-paths">Path Averaging Methods</li>
+        <li><a href="#path-averaging-methods">Path Averaging Methods</li>
           <ul>
             <li><a href="#fcn_path_findaveragetraversalviastationalignment">fcn_Path_findAverageTraversalViaStationAlignment - estimates an average traversal based on aligning traversals by station.</li>
             <li><a href="#fcn_path_findaveragetraversalviaclosestpoint">fcn_Path_findAverageTraversalViaClosestPoint - estimates an average traversal based on closest point.</li>
@@ -1467,8 +1467,16 @@ With dense projections, one can analyze the histogram of projection distances:
 The function fcn_Path_fillOffsetTraversalsAboutTraversal fills in an array of traversals about a reference traversal at user-defined offset distances.
 
 <pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_fillOffsetTraversalsAboutTraversal picture" width="400" height="300">
-  <figcaption>FThe function fcn_Path_fillOffsetTraversalsAboutTraversal fills in an array of traversals about a reference traversal at user-defined offset distances..</figcaption>
+  <img src=".\Images\fcn_Path_fillOffsetTraversalsAboutTraversal_Ex1.jpg" alt="fcn_Path_fillOffsetTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillOffsetTraversalsAboutTraversal fills in an array of traversals about a reference traversal at user-defined offset distances..</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This is particularly useful for finding the intersection points of road boundaries
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_fillOffsetTraversalsAboutTraversal_Ex2.jpg" alt="fcn_Path_fillOffsetTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>This is particularly useful for finding the intersection points of road boundaries.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
@@ -1481,8 +1489,14 @@ The function fcn_Path_fillOffsetTraversalsAboutTraversal fills in an array of tr
 The function fcn_Path_convertTraversalXYtoSy calculates the SY (e.g ST or "station") coordinates for a given traversal, given a reference traversal and another query traversal.
 
 <pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_convertTraversalXYtoSy picture" width="400" height="300">
-  <figcaption>Fig.4 - The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to find the best-fit rotation and translation that matches one set of points to another.</figcaption>
+  <img src=".\Images\fcn_Path_convertTraversalXYtoSy_Ex1.png" alt="fcn_Path_convertTraversalXYtoSy picture" width="400" height="300">
+  <figcaption>The function fcn_Path_convertTraversalXYtoSy calculates the SY (e.g ST or "station") coordinates for a given traversal, given a reference traversal and another query traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+The results can be very sensitive to station decimation, so this is a user-defined variable.
+<pre align="center">
+  <img src=".\Images\fcn_Path_convertTraversalXYtoSy_Ex2.png" alt="fcn_Path_convertTraversalXYtoSy picture" width="400" height="300">
+  <figcaption>The results can be very sensitive to station decimation, so this is a user-defined variable.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
@@ -1495,7 +1509,467 @@ The function fcn_Path_convertTraversalXYtoSy calculates the SY (e.g ST or "stati
 The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.
 
 <pre align="center">
-  <img src=".\Images\fcn_AlignCoords_fitRotationKabsch.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <img src=".\Images\fcn_Path_fillRandomTraversalsAboutTraversal_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+One can choose different smoothness factors or the number of trajectories produced.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_fillRandomTraversalsAboutTraversal_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Choosing different smoothness factors or the number of trajectories produced.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+One can change the standard deviations
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_fillRandomTraversalsAboutTraversal_Ex3.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Changing the standard deviations.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+One can also change the number of points to use to generate each random traversal
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_fillRandomTraversalsAboutTraversal_Ex4.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Changing the number of points to use to generate each random traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Statistical Analysis of Paths
+
+Basic path statistics operations include
+
+Plotting a bound around a traversal
+Calculating the default variance of a traversal
+Plotting variance bands about a traversal
+
+These basic functions are described below.
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_plotTraversalXYWithUpperLowerBands
+
+In the statistics functions, one often needs to plot bounds around a central traversal. This is done within the function fcn_Path_plotTraversalXYWithUpperLowerBands
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_plotTraversalXYWithUpperLowerBands.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Tthe function fcn_Path_plotTraversalXYWithUpperLowerBands plot bounds around a central traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_calcSingleTraversalStandardDeviation
+
+The variance of a single traversal is a measure of how much it bends at each segment, as a distance offset. 
+
+This is useful to estimate the error in decimation of a path, as this variance becomes smaller with finer decimations.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_calcSingleTraversalStandardDeviation.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>This is useful to estimate the error in decimation of a path, as this variance becomes smaller with finer decimations.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_plotTraversalXYWithVarianceBands
+
+The orthogonal projections can also be used to plot the standard deviation about a traversal
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_plotTraversalXYWithVarianceBands_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The orthogonal projections can also be used to plot the standard deviation about a traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Note that this function, fcn_Path_plotPathXYWithVarianceBands inherets the band color from plotting, so that multiple traversals can be put on the same figure.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_plotTraversalXYWithVarianceBands_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>This function, fcn_Path_plotPathXYWithVarianceBands inherets the band color from plotting, so that multiple traversals can be put on the same figure.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Path Averaging Methods
+
+Basic path averaging operations include
+
+Averaging paths based on station
+Averaging paths based on proximity
+Averaging paths based on orthogonal projection
+Find the traversal with the most data
+
+These basic functions are described below.
+
+One of the more useful ways to create permanent paths is to average ones followed earlier. These naturally occurring paths are called “desire lines”.
+
+<pre align="center">
+  <img src=".\Images\path_averaging_methods_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Path Averaging Methods</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The averaging process seems obvious, but it depends on metrics of distance
+
+There are many!
+
+1. Averaging points with the same station for different paths
+2. Averaging the closest points from other paths to given points
+3. Averaging points found by orthogonal projection from a path
+
+Each of the averaging methods depends on how to define closeness of path points to each other
+
+<pre align="center">
+  <img src=".\Images\path_averaging_methods_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>TEach of the averaging methods depends on how to define closeness of path points to each other</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This discrepancy in station distances is why lanes on track and field have staggered starts. The inside line would be shorter than the outside lane if everyone started at the same line.
+
+<pre align="center">
+  <img src=".\Images\path_averaging_methods_Ex3.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The inside line would be shorter than the outside lane if everyone started at the same line.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Measuring nearness of a point to a path: three methods
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_findAverageTraversalViaStationAlignment
+
+The “same station” method is just to average paths by station. This is done easily by just interpolation of all paths to same stations, then averaging.
+
+It fails, however, when paths have different path lengths. As well, it tends to average points further and further apart from each other when moving along the path. 
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaStationAlignment_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The “same station” method is just to average paths by station. This is done easily by just interpolation of all paths to same stations, then averaging.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The “closest point” method finds the closest point on a nearby path to the central path. It then finds the associated line segment on the nearby path, and then projects FROM the line segment back to the central path.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaStationAlignment_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>TThe “closest point” method finds the closest point on a nearby path to the central path. It then finds the associated line segment on the nearby path, and then projects FROM the line segment back to the central path.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### fcn_Path_findAverageTraversalViaClosestPoint
+
+The function, fcn_Path_findAverageTraversalViaClosestPoint implements closest-point averaging
+
+The problem with closest point averaging is that the directions of the contributions can be unclear, e.g. the nearby path may be ahead or behind the station points on the central path.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function, fcn_Path_findAverageTraversalViaClosestPoint implements closest-point averaging.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Generating average trajectories by averaging orthogonal projections
+
+Orthogonal projection takes a “central” trajectory, and then projects orthogonally from that trajectory at given stations to find where it hits nearby trajectories.
+
+```MATLAB
+%% BASIC example 1 - parallel lines, query is in middle area
+stations = 1; % Define the station
+ 
+% Create a dummy central path and convert it to a traversal
+central_path = [0 0; 2 0];  
+central_traversal = fcn_Path_convertXYtoTraversalStructure(central_path(:,1),central_path(:,2));
+ 
+% Define a "nearby" path and convert it to a traversal
+nearby_path = [0 4; 2 4];
+nearby_traversal =  fcn_Path_convertXYtoTraversalStructure(nearby_path(:,1),nearby_path(:,2));
+ 
+% Calculate the closest point and distance on the nearby path
+[closest_path_point,distances] = ...
+    fcn_Path_FindOrthogonalHitFromPathToPath(stations,central_traversal,nearby_traversal);
+ 
+print_results(stations,closest_path_point,distances);
+ 
+```
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>TOrthogonal projection takes a “central” trajectory, and then projects orthogonally from that trajectory at given stations to find where it hits nearby trajectories.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The approach gives the intersection point for arbitrary segments nearby the central trajectory
+
+```MATLAB
+%% BASIC example 2 - angled line segment adjacent to endpoint query
+stations = 1;
+central_path = [0 0; 2 0];
+central_traversal = fcn_Path_convertXYtoTraversalStructure(central_path(:,1),central_path(:,2));
+ 
+nearby_path = [0 4; 2 7];
+nearby_traversal =  fcn_Path_convertXYtoTraversalStructure(nearby_path(:,1),nearby_path(:,2));
+ 
+[closest_path_point,distances] = ...
+    fcn_Path_FindOrthogonalHitFromPathToPath(stations,central_traversal,nearby_traversal);
+ 
+print_results(stations,closest_path_point,distances);
+
+```
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex3.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The approach gives the intersection point for arbitrary segments nearby the central trajectory.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+We define a “miss” to even include “grazing” from one trajectory to another
+
+```MATLAB
+%% BASIC example 3 - angled line segment adjacent to endpoint query but near-miss
+stations = 10;
+central_path = [0 0; 10 0];
+central_traversal = ...
+    fcn_Path_convertXYtoTraversalStructure(central_path(:,1),central_path(:,2));
+nearby_path = [0 4; 10 7];
+nearby_traversal = ...
+    fcn_Path_convertXYtoTraversalStructure(nearby_path(:,1),nearby_path(:,2));
+ 
+[closest_path_point,distances] = ...
+    fcn_Path_FindOrthogonalHitFromPathToPath(stations,central_traversal,nearby_traversal);
+```
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex4.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Define a “miss” to even include “grazing” from one trajectory to another</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+A challenge with query stations is that the orthogonal projection is unclear. At the start and end, we use the segment ahead and behind these points.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex5.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>A challenge with query stations is that the orthogonal projection is unclear. At the start and end, we use the segment ahead and behind these points.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+As noted before in the orthogonal projection, the normal vectors are unclear at vertex points, and the path intersections can change depending on which type of averaging is used.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex6.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>As noted before in the orthogonal projection, the normal vectors are unclear at vertex points, and the path intersections can change depending on which type of averaging is used.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+The same challenge arises for queries to the involuted area
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex7.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The same challenge arises for queries to the involuted area</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+One result of this process is that some areas of a nearby path may receive very poor sampling. Generally, portions of nearby paths that are parallel are sampled well, but perpendicular segments are not sampled at all.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex8.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>Generally, portions of nearby paths that are parallel are sampled well, but perpendicular segments are not sampled at all.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+For orthogonal projection, the option of averaging at the vertex appears to give the best results (e.g. flags 3 and 4 in orthogonal projections)
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex9.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>For orthogonal projection, the option of averaging at the vertex appears to give the best results (e.g. flags 3 and 4 in orthogonal projections).</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Of the three methods, the orthogonal one is most robust and clear. It is demonstrated next.
+
+Using cross-cutting for path averaging
+
+The particular advantage of the orthogonal projection is that every query “cuts” adjacent paths as one would expect. 
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex10.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The particular advantage of the orthogonal projection is that every query “cuts” adjacent paths as one would expect.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_newTraversalByStationResampling
+
+The function, fcn_Path_newTraversalByStationResampling implements a station resampling process
+
+```MATLAB
+%% Finding the traversal with the most data, fcn_Path_findTraversalWithMostData
+% finds the traversal index with the most amount of data (determined as the
+% most elements in the X array)
+ 
+% Fill in some dummy data
+paths_array = fcn_Path_fillSamplePaths;
+ 
+% Convert paths into traversals
+for i_traveral = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_traveral});
+    data.traversal{i_traveral} = traversal;
+end
+ 
+index_of_longest = fcn_Path_findTraversalWithMostData(data);
+fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n',...
+    length(data.traversal),...
+    index_of_longest,...
+    length(data.traversal{index_of_longest}.X));
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_newTraversalByStationResampling.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+*** 
+
+#### fcn_Path_findAverageTraversalViaOrthoProjection
+
+The function, fcn_Path_findOrthoScatterFromTraversalToTraversals implements this cutting process at given stations
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This allows one to average adjacent paths along each cut to produce an average path. 
+
+This is implemented in fcn_Path_findAverageTraversalViaOrthoProjection.m
+
+The process of averaging has to avoid averaging paths that are nearby but not adjacent in the s-coordinate. Otherwise, the average may bias toward the alternate paths and may even “wander” at the intersections.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+To force a query to include only a short part of a path, one can use: fcn_Path_findPathSXYSegment.m as mentioned earlier.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex3.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+A comparison of the averaging methods shown here reveals that orthogonal projection cross-sections appear to work the best
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex4.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Note that the orthogonal averaging function has the additional outputs of distance and XY hit points of the nearby paths, which allow statistics, detailed point analysis, and advanced plotting.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex5.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+When doing the average, the starting traversal for the average is important as this “seeds” the search. The user can specify this reference_traversal as an input. If nothing is specified, the longest input traversal is used.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex6.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Because orthogonal averaging uses iterations, the function allows the user to specify the number of iterations to try (default is 40, which is usually too much)
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex7.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+By turning on the debug flag within the function, one can see the iteration results (shown here for N=40)
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex8.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Finally, the averaging process allows weighted smoothing to be used between iterations. A higher weight (from 0 to 1) means less of the new value is used. This prevents numerical oscillation (default is 0.8)
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findAverageTraversalViaOrthoProjection_Ex9.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+*** 
+
+#### fcn_Path_findTraversalWithMostData
+
+The function, fcn_Path_findTraversalWithMostData finds the traversal with the most data (e.g. most elements within an array)
+
+This functionality is used to define the “default” reference traversal when doing orthogonal projection averaging.`
+
+```MATLAB
+%% Finding the traversal with the most data, fcn_Path_findTraversalWithMostData
+% finds the traversal index with the most amount of data (determined as the
+% most elements in the X array)
+ 
+% Fill in some dummy data
+paths_array = fcn_Path_fillSamplePaths;
+ 
+% Convert paths into traversals
+for i_traveral = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_traveral});
+    data.traversal{i_traveral} = traversal;
+end
+ 
+index_of_longest = fcn_Path_findTraversalWithMostData(data);
+fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n',...
+    length(data.traversal),...
+    index_of_longest,...
+    length(data.traversal{index_of_longest}.X));
+
+```
+<pre align="center">
+  <img src=".\Images\fcn_Path_findTraversalWithMostData.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
   <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
@@ -1504,6 +1978,120 @@ The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traver
 
 ***
 
+#### fcn_Path_cleanPathFromForwardBackwardJogs
+
+The function, fcn_Path_cleanPathFromForwardBackwardJogs removes forward/backward oscillations caused by averaging data spatially
+
+The main approach therein is to examine the change in relative yaw angle between segments, removing those that are too large.
+
+```MATLAB
+%% Example 1: Basic call 
+
+fig_num = 1;
+path_with_jogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.7; 3.5 3.6; 5 5];
+clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
+(path_with_jogs,fig_num);
+ 
+plot(path_with_jogs(:,1), path_with_jogs(:,2),'.-','Linewidth',2,'Markersize',25);  
+plot(clean_path(:,1), clean_path(:,2),'.-','Linewidth',2,'Markersize',25);
+title('Original path with jogs and cleaned path')
+xlabel('X [m]')
+ylabel('Y [m]')
+
+```
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_cleanPathFromForwardBackwardJogs.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_findClosestPointsToTraversal
+
+The function, fcn_Path_findClosestPointsToTraversal implements the method described in the following slides to find the closest points on a traversal to a traversal
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findClosestPointsToTraversal_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+This method has the advantage of generating expected results even when the queries “graze” nearby paths
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findClosestPointsToTraversal_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+But this method gives unexpected results when the segment’s closest location is not actually on the segment.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findClosestPointsToTraversal_Ex3.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+Generally, the “closest point” method gives expected results when applied to adjacent paths
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findClosestPointsToTraversal_Ex4.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### 3D and Elevated Paths
+
+What is an elevated path?
+
+An elevated path is a set of [X Y Z] points as a N x 3 vector or array. These X Y Z rows denote the locations we are trying to follow, in 3D, which defines the elevated path. For example:
+
+```MATLAB
+    paths{1} = [
+        8.1797    8.6006  0.1
+        8.4101   15.8892  0.2
+        10.0230   25.5102  -0.1
+        10.4839   39.7959  0.3];
+```
+
+An elevated path type must have at least 2 rows so that at least one “path segment” can be defined.
+
+
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_addElevationToPath
+
+fcn_Path_addElevationToPath adds elevation to a "path" by finding two nearest neighbors in an "elevated path" and interpolating their elevations
+
+```MATLAB
+%% BASIC example 1.3 - works
+point = [0.5 0.2; 1.4 1.3]; % Define the query point as an XY
+reference_elevated_path = [0 0 0.1; 0.25 0.2 0.2; 0.9 0.9 0.3; 1.1 1.1 0.4; 2.3 2.7 0.5]; % Define an XYZ path
+fignum = 113; % Define the figure number
+ 
+% Snap the point onto the path
+elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fignum);
+```
+<pre align="center">
+  <img src=".\Images\fcn_Path_addElevationToPath.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
 URHERE
 
 #### fcn_AlignCoords_fitRotationKabsch
@@ -1517,6 +2105,8 @@ The function fcn_AlignCoords_fitRotationKabsch performs regression fitting to fi
 </pre>
 
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+
 
 ***
 
