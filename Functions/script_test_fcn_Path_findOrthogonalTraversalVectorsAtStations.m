@@ -18,9 +18,10 @@ close all;
 stations = 1; % Define the station
 flag_rounding_type = 1; % Define the rounding type
 fig_num = 1;  % Define the figure
+figure(fig_num); clf;
 
 % Create a dummy central path and convert it to a traversal
-central_path = [0 0; 2 0];  
+central_path = [0 0; 4 0];  
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 
 % Calculate the unit normal vectors at given stations and put results into
@@ -33,12 +34,34 @@ central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 assert(isequal(round(unit_normal_vector_start,4),[ 1 0]));
 assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
 
-%% BASIC example 2 - angled line segment 
-stations = 1;
-central_path = [0 0; 2 2];
+%% BASIC example 1 - simple horizontal line with flag type 4
+stations = linspace(0,4,10)'; % Define the stations
+flag_rounding_type = 4; % Define the rounding type
+fig_num = 11;  % Define the figure
+figure(fig_num); clf;
+
+% Create a dummy central path and convert it to a traversal
+central_path = [0 0; 4 0];  
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 
-fig_num = 2;  % Define the figure
+% Calculate the unit normal vectors at given stations and put results into
+% the figure.
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+    stations,central_traversal,flag_rounding_type,fig_num); %#ok<*ASGLU>
+
+% Make sure function worked
+% assert(isequal(round(unit_normal_vector_start,4),[ 1 0]));
+% assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
+
+%% BASIC example 2 - angled line segment - flag 1
+stations = 2;
+flag_rounding_type = 1; % Define the rounding type
+central_path = [0 0; 2 0; 2 -2];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+fig_num = 21;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -47,15 +70,74 @@ fig_num = 2;  % Define the figure
     stations,central_traversal,flag_rounding_type,fig_num);
 
 % Make sure function worked
-assert(isequal(round(unit_normal_vector_start,4),[0.7071    0.7071]));
-assert(isequal(round(unit_normal_vector_end,4),  [     0    1.4142]));
+assert(isequal(round(unit_normal_vector_start,4),[2 0]));
+assert(isequal(round(unit_normal_vector_end,4),[ 2 1]));
+
+%% BASIC example 2 - angled line segment - flag 2
+stations = 2;
+flag_rounding_type = 2; % Define the rounding type
+central_path = [0 0; 2 0; 2 -2];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+fig_num = 22;  % Define the figure
+figure(fig_num); clf;
+
+% Calculate the unit normal vectors at given stations and put results into
+% the figure.
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+    stations,central_traversal,flag_rounding_type,fig_num);
+
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[2 0]));
+assert(isequal(round(unit_normal_vector_end,4),[ 3 0]));
+
+%% BASIC example 2 - angled line segment - flag 3
+stations = 2;
+flag_rounding_type = 3; % Define the rounding type
+central_path = [0 0; 2 0; 2 -2];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+fig_num = 23;  % Define the figure
+
+% Calculate the unit normal vectors at given stations and put results into
+% the figure.
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+    stations,central_traversal,flag_rounding_type,fig_num);
+
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[2 0]));
+assert(isequal(round(unit_normal_vector_end,4),[2.7071 .7071]));
+
+%% BASIC example 2 - angled line segment - flag 4
+stations = 2;
+flag_rounding_type = 4; % Define the rounding type
+central_path = [0 0; 2 0; 2 -2];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+fig_num = 24;  % Define the figure
+figure(fig_num); clf;
+
+% Calculate the unit normal vectors at given stations and put results into
+% the figure.
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+    stations,central_traversal,flag_rounding_type,fig_num);
+
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[2 0]));
+assert(isequal(round(unit_normal_vector_end,4),[2.7071 .7071]));
+
 
 %% BASIC example 3 - angled line segment adjacent to endpoint 
 stations = 2*2^0.5;
+flag_rounding_type = 1; % Define the rounding type
 central_path = [0 0; 2 2];
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 
 fig_num = 3;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -69,10 +151,12 @@ assert(isequal(round(unit_normal_vector_end,4),  [1.2929    2.7071]));
 
 %% BASIC example 4 - angled line segment adjacent to startpoint
 stations = 0;
+flag_rounding_type = 1; % Define the rounding type
 central_path = [0 0; 2 2];
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
 
 fig_num = 4;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -99,7 +183,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 11;  % Define the figure
+fig_num = 1111;  % Define the figure
 figure(fig_num);
 clf;
 
@@ -192,7 +276,8 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 21;  % Define the figure
+fig_num = 221;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -207,7 +292,8 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 22;  % Define the figure
+fig_num = 222;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -222,7 +308,8 @@ title('Vertex projection via following segment (flag=2)');
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 23;  % Define the figure
+fig_num = 223;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -237,7 +324,8 @@ title('Vertex projection via averaging prior and following segment at vertex (fl
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-fig_num = 24;  % Define the figure
+fig_num = 224;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -264,6 +352,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
 fig_num = 31;  % Define the figure
+figure(fig_num); clf;
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
@@ -332,10 +421,12 @@ for i_Path = 1:length(paths)
 end
 
 % % Call the plot command to show results in XY
-% fig_num = 12;
+% fig_num = 112;
 % fcn_Path_plotTraversalsXY(data,fig_num);
 
-fig_num = 13;
+fig_num = 113;
+figure(fig_num); clf;
+
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 
 central_traversal = data.traversal{1};

@@ -241,7 +241,7 @@ if 1 == closest_path_point_index || Npoints == closest_path_point_index
         first_path_point_index  = 1;
         second_path_point_index = 2;
     else % At the end
-        % TESTED
+        % TESTED2
         first_path_point_index  = Npoints-1;
         second_path_point_index = Npoints;
     end
@@ -272,7 +272,7 @@ else % Step 2b:
             error('ERROR: Point is lying AHEAD of the FRONT segment on path');
         
         elseif 0 > front_percent_along_length 
-            % TESTED
+            % TESTED2
             % point is BEFORE start of front and also AFTER end of back 
             % This is the special situation when points are before the
             % "front" segment, e.g. the next path segment AND points are
@@ -434,6 +434,14 @@ if flag_do_debug
             path(first_path_point_index:second_path_point_index,1),...
             path(first_path_point_index:second_path_point_index,2),'m.','MarkerSize',20);
         
+        % Plot the reference vector
+        quiver(path(closest_path_point_index,1),path(closest_path_point_index,2),...
+            unit_orthogonal_projection_vector(1,1),unit_orthogonal_projection_vector(1,2),...
+            0,'Color',[0.5 0.5 0.5]);
+        midpoint = (path(closest_path_point_index,:) + path(closest_path_point_index,:)+unit_orthogonal_projection_vector)/2;
+        text(midpoint(1,1),midpoint(1,2),'Reference vector','LineWidth',2,'VerticalAlignment','bottom');
+
+
         % Label the points with distances
         midpoint = (closest_path_point + point)/2;
         if distance_imaginary==0
@@ -441,7 +449,7 @@ if flag_do_debug
         else
             distance_string = sprintf('distance = %.2f + %.2f i',distance_real,distance_imaginary);
         end
-        text(midpoint(1,1),midpoint(1,2),distance_string);
+        text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');
         
         % Plot the closest point on path
         plot(closest_path_point(:,1),closest_path_point(:,2),'g.','Markersize',20);

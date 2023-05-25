@@ -176,6 +176,64 @@ Station_central = central_traversal.Station;
 X_central       = central_traversal.X;
 Y_central       = central_traversal.Y;
 
+%% Find the midpoint tangent vectors for all segments in the central path 
+% These are used to calculate the midpoint vectors at each segment
+% Find changes in X and Y for each segment
+delta_X_midpoints = diff(X_central);
+delta_Y_midpoints = diff(Y_central);
+
+% Convert these into vector form
+tangent_vectors_at_midpoints = [delta_X_midpoints delta_Y_midpoints];  
+magnitudes = sum(tangent_vectors_at_midpoints.^2,2).^0.5;
+tangent_unit_vectors_at_midpoints = tangent_vectors_at_midpoints./magnitudes;
+normal_unit_vectors_at_midpoints= tangent_unit_vectors_at_midpoints*[0 1; -1 0];
+
+%% Find the joint tangent vectors for all joints in the central path 
+% The joint projection vector for each joint will depend on the input
+% options. For options where the orthogonal projection only uses the prior
+% or subsequent values, we can use the previously calculated vectors. For
+% options where averaging is occuring, we use averages of vectors.
+% 
+% Note that the start and end points are considered "joints" also, so if
+% there are N segments, then there are N+1 joints.
+% 
+% Here's the rounding options:
+%      flag_rounding_type = 1;  % This is the default, and indicates that
+%      the orthogonal projection at a joint is created by the PRIOR
+%      segment.
+%
+%      flag_rounding_type = 2;  % This indicates that the orthogonal
+%      projection at a joint is created by the FOLLOWING segment.
+%
+%      flag_rounding_type = 3;  % This indicates that the orthogonal
+%      projection, ONLY at a joint, is created by averaging both the
+%      PRIOR segment and FOLLOWING segment.
+%
+%      flag_rounding_type = 4;  % This indicates that the orthogonal
+%      projections at the joint is created by averaging. Additionally,
+%      along the entire segment, vectors should be calculated by
+%      interpolating between the midpoint and the joint vectors.
+
+switch flag_rounding_type
+    case 1  % Default - use orthogonal projection via prior segment
+        joint_vectors = [normal_unit_vectors_at_midpoints(1,:); normal_unit_vectors_at_midpoints];
+    case 2  % Use orthogonal projection of subsequent segment
+        joint_vectors = [normal_unit_vectors_at_midpoints; normal_unit_vectors_at_midpoints(end,:)];
+    case 3  % Average the two segments but only at the endpoints
+        average_vectors = (normal_unit_vectors_at_midpoints(1:end-1,:)+normal_unit_vectors_at_midpoints(2:end,:))/2;
+        magnitudes = sum(average_vectors.^2,2).^0.5;
+        unit_average_vectors = average_vectors./magnitudes;
+        joint_vectors = [normal_unit_vectors_at_midpoints(1,:); unit_average_vectors; normal_unit_vectors_at_midpoints(end,:)];
+    case 4 % Average the two segments along all points
+        average_vectors = (normal_unit_vectors_at_midpoints(1:end-1,:)+normal_unit_vectors_at_midpoints(2:end,:))/2;
+        magnitudes = sum(average_vectors.^2,2).^0.5;
+        unit_average_vectors = average_vectors./magnitudes;
+        joint_vectors = [normal_unit_vectors_at_midpoints(1,:); unit_average_vectors; normal_unit_vectors_at_midpoints(end,:)];
+    otherwise
+        error('Unrecognized method in flag_rounding_type.');
+end
+
+
 
 %% Find the XY of query station coordinates on the central trajectory 
 % Find the points on the central trajectory corresponding to the station
@@ -185,39 +243,7 @@ Y_central       = central_traversal.Y;
 X_central_at_stations = interp1(Station_central,X_central,station_queries,'linear');
 Y_central_at_stations = interp1(Station_central,Y_central,station_queries,'linear');
 
-%% Find the projection vector at the station coordinates
-% Now need to create the projection vector for each station. This will
-% depend on the input options. For options where the orthogonal projection
-% only uses the prior or subsequent values, we can use the original
-% Station_center indices. For options where averaging is occuring, we use
-% intermediate vectors. To do this, we change the definition of
-% Station_central if needed.
-% 
-% Here's the rounding options:
-%      flag_rounding_type = 1;  % This is the default, and indicates that
-%      the orthogonal projection of an endpoint is created by the PRIOR
-%      segment.
-%
-%      flag_rounding_type = 2;  % This indicates that the orthogonal
-%      projection of an endpoint is created by the FOLLOWING segment.
-%
-%      flag_rounding_type = 3;  % This indicates that the orthogonal
-%      projection, ONLY at an endpoint is created by averaging both the
-%      PRIOR segment and FOLLOWING segment.
-%
-%      flag_rounding_type = 4;  % This indicates that the orthogonal
-%      projections along segments should be calculated at the midpoints of
-%      each segment, and the endpoints of segments are an average of the
-%      PRIOR and SUBSEQUENT midpoints. All projections are interpolated
-%      from their prior and subsequent vectors.
-%
-%      flag_rounding_type = 5;  % This indicates that the orthogonal
-%      projection, ONLY at an endpoint is created by using the angle
-%      between the prior and subsequent segments, with the fraction of the
-%      angle given by the imaginary portion of the station number. The
-%      imaginary portion should range from 0 to 1, indicating a percentage
-%      of the angle to use. Imagninary values less than 0 default to 0, and
-%      values greater then 1 default to 1.
+%% Find the projection vector at these station coordinates
 
 
 % Figure out the number of indices within the central path, and number them
@@ -229,80 +255,97 @@ Indices_central = (1:length(Station_central))';
 % Format for interp1: Vq = interp1(X,V,Xq)
 Indices_Central_at_Query_Stations = interp1(Station_central, Indices_central,station_queries);
 
-% Find the indices of start and end of the vectors
+
+%% Find the indices of start and end of the vectors
 indices_start = floor(Indices_Central_at_Query_Stations);
 indices_end   = ceil(Indices_Central_at_Query_Stations);
 
-% If the start and end indices match, then the station coordinate is on top
-% of an endpoint of a segment. In these cases, it can be unclear which
-% projection vector to use, and this depends on the rounding type.
-indices_on_endpoints = find(indices_start==indices_end);
-if ~isempty(indices_on_endpoints)    
-    switch flag_rounding_type
-        case 1  % Default - use orthogonal projection via prior segment
-            indices_start(indices_on_endpoints) = indices_end(indices_on_endpoints) - 1;
-        case 2  % Use orthogonal projection of subsequent segment
-            indices_end(indices_on_endpoints) = indices_start(indices_on_endpoints) + 1;
-        case 3  % Average the two segments but only at the endpoints
-            indices_end(indices_on_endpoints) = indices_start(indices_on_endpoints) + 0.5;
-            indices_start(indices_on_endpoints) = indices_end(indices_on_endpoints) - 1;
-        case 4
-            % Do nothing - this is a special case which is filled in below
-        otherwise
-            error('Unrecognized method in flag_rounding_type.');
-    end
-end
 
-% Special case for situation 4
-if flag_rounding_type == 4 % Always do averaging
-    indices_start = Indices_Central_at_Query_Stations - 0.5;
-    indices_end   = Indices_Central_at_Query_Stations + 0.5;
-end
-
-%% Make sure all the indices are within acceptable range
+% Make sure all the indices are within acceptable range
 indices_start = max(1,indices_start);
 indices_end   = min(Indices_central(end),indices_end);
 
+%% Initialize normal vectors
+normal_unit_vectors_at_stations = nan(length(station_queries), 2); 
+
 
 %% Check specifically the start and end locations
-% Start location?
+% Are any queries EXACTLY at the start location?
 start_query_index = find(station_queries==Station_central(1));
 if ~isempty(start_query_index)
-    indices_start(start_query_index) = 1;
-    indices_end(start_query_index) = 2;
+    normal_unit_vectors_at_stations(start_query_index,:) = normal_unit_vectors_at_midpoints(1,:);
 end
 
-% End location?
+% Are any queries EXACTLY at the end location?
 end_query_index = find(station_queries==Station_central(end));
 if ~isempty(end_query_index)
-    indices_start(end_query_index) = Indices_central(end) - 1;
-    indices_end(end_query_index) = Indices_central(end);
+    normal_unit_vectors_at_stations(end_query_index,:) = normal_unit_vectors_at_midpoints(end,:);
 end
 
 
-%% Create the vectors in the direction of the central trajectory 
-% at the station points
-X_central_indices_start = interp1(Indices_central, X_central,indices_start,'linear');
-Y_central_indices_start = interp1(Indices_central, Y_central,indices_start,'linear');
-X_central_indices_end   = interp1(Indices_central, X_central,indices_end,  'linear');
-Y_central_indices_end   = interp1(Indices_central, Y_central,indices_end,  'linear');
+%% Check for queries on joints
+% If the start and end indices match, then the station coordinate is on top
+% of a "joint" of two segment. In these cases, it can be unclear which
+% projection vector to use, and this depends on the rounding type.
+% NOTE: must add 1 to the indicies as the first joint is the start point,
+% and not an actual joint
 
+indices_on_joints = find(indices_start==indices_end);
+if ~isempty(indices_on_joints)    
+    normal_unit_vectors_at_stations(indices_on_joints,:) = joint_vectors(indices_start(indices_on_joints),:);
+end
 
-%% Convert the tangent vectors to normal unit vectors
-delta_X_central_at_stations = X_central_indices_end - X_central_indices_start;
-delta_Y_central_at_stations = Y_central_indices_end - Y_central_indices_start;
-tangent_vectors_at_stations = [delta_X_central_at_stations delta_Y_central_at_stations];  
-magnitudes = sum(tangent_vectors_at_stations.^2,2).^0.5;
-tangent_unit_vectors_at_stations = tangent_vectors_at_stations./magnitudes;
-normal_unit_vectors_at_stations = tangent_unit_vectors_at_stations*[0 1; -1 0];
+%% Fill any that were not one of the above cases
+indicies_not_on_joints = isnan(normal_unit_vectors_at_stations(:,1));
+normal_unit_vectors_at_stations(indicies_not_on_joints,:) = normal_unit_vectors_at_midpoints(indices_start(indicies_not_on_joints),:);
+
+%% Check for special case for flag type of 4
+if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
+    remainder = Indices_Central_at_Query_Stations - floor(Indices_Central_at_Query_Stations);
+
+    % For this special situation, the joint vectors at the ends need to be
+    % modified
+    joint_vectors(1,:) = -1*normal_unit_vectors_at_midpoints(1,:)*[0 -1; 1 0];
+    joint_vectors(end,:) =  normal_unit_vectors_at_midpoints(end,:)*[0 -1; 1 0];
+
+   
+    % Are any at the very end? If so, the floor operation gives the wrong
+    % answers.
+    segment_numbers = floor(Indices_Central_at_Query_Stations);
+    if any(segment_numbers==Indices_central(end))
+        indices_at_ends = segment_numbers==Indices_central(end);
+        remainder(indices_at_ends) = 1;
+        segment_numbers(indices_at_ends) = Indices_central(end-1);
+    end
+
+    % Fraction is 0 if at start of segment, if rounding down, 
+    % and 1 if at midpoint
+    round_down_indices = find(remainder<=0.5);    
+    if ~isempty(round_down_indices)
+        fraction_to_midpoint = 2*remainder(round_down_indices);
+        normal_unit_vectors_at_stations(round_down_indices,:)   = ...
+            (fraction_to_midpoint).*normal_unit_vectors_at_midpoints(segment_numbers(round_down_indices),:) ...
+            + (1 - fraction_to_midpoint).*joint_vectors(segment_numbers(round_down_indices),:);
+        mags = sum(normal_unit_vectors_at_stations(round_down_indices,:).^2,2).^0.5;
+        normal_unit_vectors_at_stations(round_down_indices,:) = normal_unit_vectors_at_stations(round_down_indices,:)./mags;
+    end
+
+    % Fraction is 0 if at end of segment, if rounding up, 
+    % and 1 if at midpoint
+    round_up_indicies = find(remainder>0.5);
+    if ~isempty(round_up_indicies)
+        fraction_to_midpoint = 2*(1-remainder(round_up_indicies));
+        normal_unit_vectors_at_stations(round_up_indicies,:)   = ...
+            (fraction_to_midpoint).*normal_unit_vectors_at_midpoints(segment_numbers(round_up_indicies),:) ...
+            + (1-fraction_to_midpoint).*joint_vectors(segment_numbers(round_up_indicies)+1,:);
+        mags = sum(normal_unit_vectors_at_stations(round_up_indicies,:).^2,2).^0.5;
+        normal_unit_vectors_at_stations(round_up_indicies,:) = normal_unit_vectors_at_stations(round_up_indicies,:)./mags;
+    end
+end
 
 %% Create unit vectors
 unit_normal_vector_start = [X_central_at_stations Y_central_at_stations]; 
 unit_normal_vector_end   = [X_central_at_stations Y_central_at_stations] + normal_unit_vectors_at_stations;
-
-%% Calculate angle
-% URHERE
-% diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin);
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -323,18 +366,29 @@ if flag_do_plots
     % Plot the central traversal
     plot(central_traversal.X,central_traversal.Y,'k','Linewidth',3);      
     
-    % Make the axis normal shaped
-    axis equal;
-    
-    % Plot the station points
+    % Make the axis normally shaped
+    axis equal;   
+
+    % Plot the query station points
     plot(X_central_at_stations,Y_central_at_stations,'r.','Markersize',30);
-            
-    % Show the unit vectors
-    quiver(X_central_at_stations,Y_central_at_stations,normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'g','Linewidth',3);
+
+    % Show the unit vectors at the stations
+    quiver(X_central_at_stations,Y_central_at_stations,normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'r','Linewidth',2);
 
     % Add a legend
-    legend('Central traversal','Station query points','Unit vectors');  
-    
+    legend('Central traversal','Station query points','Unit vectors','Location','southwest');
+
+    if 1==0
+        % Plot the modpoint tangent and normal vectors
+        midpoints = [(X_central(1:end-1,1)+X_central(2:end,1))/2, (Y_central(1:end-1,1)+Y_central(2:end,1))/2 ];
+        plot(midpoints(:,1),midpoints(:,2),'b.','MarkerSize',20);
+        quiver(midpoints(:,1),midpoints(:,2),tangent_unit_vectors_at_midpoints(:,1),tangent_unit_vectors_at_midpoints(:,2),0,'b','Linewidth',3);
+        quiver(midpoints(:,1),midpoints(:,2),normal_unit_vectors_at_midpoints(:,1),normal_unit_vectors_at_midpoints(:,2),0,'b','Linewidth',3);
+
+        % Plot the joint tangent vectors
+        plot(X_central(:,1),Y_central(:,1),'k.','MarkerSize',20);
+        quiver(X_central(:,1),Y_central(:,1),joint_vectors(:,1),joint_vectors(:,2),0,'g','Linewidth',3);
+    end
 end % Ends the flag_do_plots if statement
 
 if flag_do_debug

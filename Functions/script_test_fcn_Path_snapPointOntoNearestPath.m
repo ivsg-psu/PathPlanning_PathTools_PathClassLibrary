@@ -106,6 +106,85 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 xlim([-1 3])
 
 %% BASIC example 1.01
+% Tests the flag_snap_type = 1 case
+points = [0.5 1.5; 1 1.5; 1.5 1.5; 2 1.5; 2.5 2; 2.5 1.5; 2.5 1; 2.5 0.5; 2.5 0; 2.5 -0.5; 2 -0.5; 1.5 -0.5; 1.5 0; 1.5 0.5; 1 0.5; 0.5 0.5; 0.5 1];
+pathXY = [1 1; 2 1; 2 0]; % Define an XY path
+flag_snap_type = 1;
+
+
+for ith_point = 1:length(points(:,1))
+    point = points(ith_point,:);
+    fignum = 11100+ith_point;
+    [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+        fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+    axis([-1 4 -1 3]);
+    fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+        fignum, closest_path_point(1,1),closest_path_point(1,2),...
+        first_path_point_index,second_path_point_index, ...
+        s_coordinate, percent_along_length);
+end
+
+%% BASIC example 1.02
+% Tests the flag_snap_type = 2 case
+points = [0.5 1.5; 1 1.5; 1.5 1.5; 2 1.5; 2.5 2; 2.5 1.5; 2.5 1; 2.5 0.5; 2.5 0; 2.5 -0.5; 2 -0.5; 1.5 -0.5; 1.5 0; 1.5 0.5; 1 0.5; 0.5 0.5; 0.5 1];
+pathXY = [1 1; 2 1; 2 0]; % Define an XY path
+flag_snap_type = 2;
+
+
+for ith_point = 1:length(points(:,1))
+    point = points(ith_point,:);
+    fignum = 11100+ith_point;
+    [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+        fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+    axis([-1 4 -1 3]);
+    fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+        fignum, closest_path_point(1,1),closest_path_point(1,2),...
+        first_path_point_index,second_path_point_index, ...
+        s_coordinate, percent_along_length);
+end
+
+
+%% BASIC example 1.03
+% Tests the flag_snap_type = 3 case
+points = [0.5 1.5; 1 1.5; 1.5 1.5; 2 1.5; 2.5 2; 2.5 1.5; 2.5 1; 2.5 0.5; 2.5 0; 2.5 -0.5; 2 -0.5; 1.5 -0.5; 1.5 0; 1.5 0.5; 1 0.5; 0.5 0.5; 0.5 1];
+pathXY = [1 1; 2 1; 2 0]; % Define an XY path
+flag_snap_type = 3;
+
+
+for ith_point = 1:length(points(:,1))
+    point = points(ith_point,:);
+    fignum = 11100+ith_point;
+    [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+        fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+    axis([-1 4 -1 3]);
+    fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+        fignum, closest_path_point(1,1),closest_path_point(1,2),...
+        first_path_point_index,second_path_point_index, ...
+        s_coordinate, percent_along_length);
+end
+
+
+%% BASIC example 1.04
+% Tests the flag_snap_type = 4 case
+points = [0.5 1.5; 1 1.5; 1.5 1.5; 2 1.5; 2.5 2; 2.5 1.5; 2.5 1; 2.5 0.5; 2.5 0; 2.5 -0.5; 2 -0.5; 1.5 -0.5; 1.5 0; 1.5 0.5; 1 0.5; 0.5 0.5; 0.5 1];
+pathXY = [1 1; 2 1; 2 0]; % Define an XY path
+flag_snap_type = 4;
+
+
+for ith_point = 1:length(points(:,1))
+    point = points(ith_point,:);
+    fignum = 11100+ith_point;
+    [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+        fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+    axis([-1 4 -1 3]);
+    fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+        fignum, closest_path_point(1,1),closest_path_point(1,2),...
+        first_path_point_index,second_path_point_index, ...
+        s_coordinate, percent_along_length);
+end
+
+
+%% BASIC example 1.01
 % Tests the before start case
 point = [0.4 0.2];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
