@@ -20,9 +20,25 @@
 %     2021_03_21
 %     -- modified to allow 3D snapping
 %     -- changed input checks to include 3D paths
+%     2023_06_03
+%     -- modified to allow vectorized snapping
 
 
 close all;
+
+%% Basic Example
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+%   ____            _        ______                           _      
+%  |  _ \          (_)      |  ____|                         | |     
+%  | |_) | __ _ ___ _  ___  | |__  __  ____ _ _ __ ___  _ __ | | ___ 
+%  |  _ < / _` / __| |/ __| |  __| \ \/ / _` | '_ ` _ \| '_ \| |/ _ \
+%  | |_) | (_| \__ \ | (__  | |____ >  < (_| | | | | | | |_) | |  __/
+%  |____/ \__,_|___/_|\___| |______/_/\_\__,_|_| |_| |_| .__/|_|\___|
+%                                                      | |           
+%                                                      |_|          
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Basic%20Example
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 %% BASIC example 1
 % A simple line segment, a simple query, positive distance
@@ -69,7 +85,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 point = [-0.5 -0.2];
 pathXY = [0 0; 1 0];
 
-fignum = 333;
+fignum = 444;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -79,10 +95,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 5
 % A simple line segment, a post-end query, positive distance
-point = [1.5 0.2];
-pathXY = [0 0; 1 0];
+point = [1 2];
+pathXY = [0 0; 1 1];
 
-fignum = 333;
+
+fignum = 555;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -92,11 +109,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 xlim([-1 3])
 
 %% BASIC example 6
-% A simple line segment, a pre-start query, negative distance
-point = [1.5 -0.2];
-pathXY = [0 0; 1 0];
+% A simple line segment, a post-end query, positive distance
+point = [2 1];
+pathXY = [0 0; 1 1];
 
-fignum = 333;
+fignum = 666;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -104,6 +121,21 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     first_path_point_index,second_path_point_index, ...
     s_coordinate, percent_along_length);
 xlim([-1 3])
+
+
+%% Flag Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+%   ______ _               _______        _       
+%  |  ____| |             |__   __|      | |      
+%  | |__  | | __ _  __ _     | | ___  ___| |_ ___ 
+%  |  __| | |/ _` |/ _` |    | |/ _ \/ __| __/ __|
+%  | |    | | (_| | (_| |    | |  __/\__ \ |_\__ \
+%  |_|    |_|\__,_|\__, |    |_|\___||___/\__|___/
+%                   __/ |                         
+%                  |___/                          
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Flag%20Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 %% BASIC example 1.01
 % Tests the flag_snap_type = 1 case
@@ -123,6 +155,10 @@ for ith_point = 1:length(points(:,1))
         first_path_point_index,second_path_point_index, ...
         s_coordinate, percent_along_length);
 end
+
+% Now, call all the points at once to show the function is vectorized
+fig_num = 111111;
+fcn_Path_snapPointOntoNearestPath(points, pathXY,flag_snap_type,fignum);
 
 %% BASIC example 1.02
 % Tests the flag_snap_type = 2 case
