@@ -1,4 +1,4 @@
-function [closest_path_point,...
+function [closest_path_points,...
     s_coordinate,...
     first_path_point_index,...
     second_path_point_index,...
@@ -12,7 +12,7 @@ function [closest_path_point,...
 %
 % The solution method is as follows:
 %  1. Find the closest point on the path to the query point
-%  2. Find path points behind and ahead of the closest point from step 1
+%  2. Find vectors behind and ahead of the closest point from step 1
 %   -> Check for end cases. For start/end, use the adjacent points.
 %  3. Find percentage of travel on both the segments using dot products
 %  4. Find projected point on the segment that has percentage of travel
@@ -26,7 +26,7 @@ function [closest_path_point,...
 % 
 % FORMAT: 
 %
-%    [closest_path_point,...
+%    [closest_path_points,...
 %     s_coordinate,...
 %     first_path_point_index,...
 %     second_path_point_index,...
@@ -132,7 +132,7 @@ function [closest_path_point,...
 %     -- added real and imaginary distance outputs
 %     2023_05_02
 %     -- added flag options for snap options
-%     2023_06_01 to 2023_06_02 by sbrennan@psu.edu
+%     2023_06_01 to 2023_06_05 by sbrennan@psu.edu
 %     -- vectorized code
 
 
@@ -151,8 +151,6 @@ flag_check_inputs = 1; % Flag to perform input checking
 %              |_| 
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Are the input vectors the right shape?
-Npoints = length(path(:,1));
 
 if flag_check_inputs == 1
     % Are there the right number of inputs?
@@ -227,87 +225,82 @@ end
 %  then choose the projected point as closest point from step 1
 
 
-traversal = fcn_Path_convertPathToTraversalStructure(path);
-path_station = traversal.Station;
+path_segment_lengths = diff(path,1,1);
+path_segment_lengths = [0*path_segment_lengths(1,:); path_segment_lengths];
+path_stations = cumsum(sqrt(sum(path_segment_lengths.^2,2)));
 
 % Step 1: find distance from a point to every point on the path
 closest_path_point_indicies = fcn_Path_findNearestPathPoints(points, path);
 
-% Step 2. Find vectors behind and ahead of the closest point from step 1
+% Step 2. Find vectors behind and ahead of each of the index points in the
+% path. Note: for the first and last point, the vectors are repeated. Thus,
+% if there are N path points, there are N+2 vectors.
+path_vectors  = path(2:end,:) - path(1:end-1,:);
+unit_tangential_vectors = (path_vectors./path_stations(2:end-1));
+% unit_tangential_vectors(end,:) = unit_tangential_vectors(end-1,:);
+unit_tangential_vectors = [unit_tangential_vectors(1,:); unit_tangential_vectors];
+
+unit_orthogonal_vectors = unit_tangential_vectors*[0 1; -1 0]; % Rotate by 90 degrees
+% padded_path_points = [path(1,:); path; path(end,:)];
+
+Npath = length(path(:,1));
+back_indices = closest_path_point_indicies-1;
+front_indices = closest_path_point_indicies;
+
+%     2a. Check for end cases. For start/end, use the adjacent vectors.
+back_indices(closest_path_point_indicies==1) = 1;
+front_indices(closest_path_point_indicies==1) = 2;
+back_indices(closest_path_point_indicies==Npath) = Npath-1;
+front_indices(closest_path_point_indicies==Npath) = Npath;
+
+
+% Find the measurements to the back segment
+back_start_to_query_vectors = points-path(back_indices,:);
+back_projection_distances  = dot(unit_tangential_vectors(back_indices,:),back_start_to_query_vectors); % Do dot product
+back_percent_along_lengths = back_projection_distances./path_segment_lengths(back_indices);
+back_closest_path_points = path(back_indices,:) + path_vectors(back_indices,:).*back_percent_along_lengths;
+back_s_coordinates       = path_segment_lengths(back_indices) + path_segment_lengths(back_indices).*back_percent_along_lengths;
+
+
+% Find the measurements to the front segment
+front_start_to_query_vectors = points-path(front_indices,:);
+front_projection_distances  = dot(unit_tangential_vectors(front_indices,:),front_start_to_query_vectors); % Do dot product
+front_percent_along_lengths = front_projection_distances./path_segment_lengths(front_indices);
+front_closest_path_points = path(front_indices,:) + path_vectors(front_indices,:).*front_percent_along_lengths;
+front_s_coordinates       = path_segment_lengths(front_indices) + path_segment_lengths(front_indices).*front_percent_along_lengths;
+
+% Check for error cases that should never happen
+indicies_to_check = find(back_percent_along_length<0, 1); 
+if ~isempty(indicies_to_check)
+        % Point is located BEHIND the vector that is the rear-most vector -
+        % not possible, as this should only happen if snap point is start
+        % and that is caught in previous if statement
+        error('ERROR: Point is lying BEHIND the BACK segment on path');
+end
+indicies_to_check = find(front_percent_along_length>1, 1); 
+if ~isempty(indicies_to_check)
+        % Point is located BEHIND the vector that is the rear-most vector -
+        % not possible, as this should only happen if snap point is start
+        % and that is caught in previous if statement
+         error('ERROR: Point is lying AHEAD of the FRONT segment on path');
+end
+
 URHERE
 
-% Initialize all the outputs
-closest_path_point = path(closest_path_point_indicies);
-s_coordinate = zeros(length(points(:,1)),1);
-first_path_point_index = closest_path_point_indicies;
-second_path_point_index = closest_path_point_indicies+1;
-percent_along_length = zeros(length(points(:,1)),1);
-distance_real = zeros(length(points(:,1)),1);
-distance_imaginary = zeros(length(points(:,1)),1);
-
-URHERE
-% Calculate the outputs using vector measures on the front segment
-[front_closest_path_point,front_s_coordinate,front_percent_along_length,front_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(points,path(closest_path_point_indicies+1,:),path(closest_path_point_indicies,:),path_station(closest_path_point_indicies,1));
-
-% Calculate the outputs using vector measures on the back segment
-[back_closest_path_point,back_s_coordinate,back_percent_along_length,back_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(points,path(closest_path_point_indicies,:),path(closest_path_point_indicies-1,:),path_station(closest_path_point_indicies-1,1));
+indicies_to_check = find(front_percent_along_length>1, 1); 
+if ~isempty(indicies_to_check)
+        % Point is located BEHIND the vector that is the rear-most vector -
+        % not possible, as this should only happen if snap point is start
+        % and that is caught in previous if statement
+         error('ERROR: Point is lying AHEAD of the FRONT segment on path');
+end
 
 
-% % Step 2a: check if any of the closest points are at the end
-% end_of_path_indicies = closest_path_point_indicies==Npoints;
-% first_path_point_index(end_of_path_indicies)=Npoints-1;
-% second_path_point_index(end_of_path_indicies)=Npoints;
-% [closest_path_point(end_of_path_indicies),...
-%     s_coordinate(end_of_path_indicies),...
-%     percent_along_length(end_of_path_indicies),...
-%     unit_orthogonal_projection_vector(end_of_path_indicies)] = ...
-%     fcn_INTERNAL_calculateVectorMeasures(...
-%     points(end_of_path_indicies),...
-%     path(second_path_point_index(end_of_path_indicies),:),...
-%     path(first_path_point_index(end_of_path_indicies),:),...
-%     path_station(first_path_point_index((end_of_path_indicies),1));
 
-
-% 
-% % Step 2a: check if any of the closest points are at the end
-% if 1 == closest_path_point_indicies || Npoints == closest_path_point_indicies
-%     % If in here, closest point snapped to the start or end of the path.
-%     % These are the end cases
-%     if 1 == closest_path_point_indicies % At the start?
-%         % TESTED2
-%         first_path_point_index  = 1;
-%         second_path_point_index = 2;
-%     else % At the end
-%         % TESTED2
-%         first_path_point_index  = Npoints-1;
-%         second_path_point_index = Npoints;
-%     end
-%     
-%     % Calculate the outputs using vector measures on the segment
-%     [closest_path_point,s_coordinate,percent_along_length,unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(points,path(second_path_point_index,:),path(first_path_point_index,:),path_station(first_path_point_index,1));
-% 
-% else % Step 2b:
-%     % Calculate the outputs using vector measures on the front segment
-%     [front_closest_path_point,front_s_coordinate,front_percent_along_length,front_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(points,path(closest_path_point_indicies+1,:),path(closest_path_point_indicies,:),path_station(closest_path_point_indicies,1));  
-% 
-%     % Calculate the outputs using vector measures on the back segment   
-%     [back_closest_path_point,back_s_coordinate,back_percent_along_length,back_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(points,path(closest_path_point_indicies,:),path(closest_path_point_indicies-1,:),path_station(closest_path_point_indicies-1,1));
-%     
-%     if 0 > back_percent_along_length 
-%         % Point is located BEHIND the vector that is the rear-most vector -
-%         % not possible, as this should only happen if snap point is start
-%         % and that is caught in previous if statement
-%         error('ERROR: Point is lying BEHIND the BACK segment on path');
 %     elseif 1 < back_percent_along_length  
 %         % To enter here, point is after the end of the "back" vector's end
 %         % point.
-%         
-%         if 1 < front_percent_along_length 
-%             % Point is ahead of the vector that is in front - not possible
-%             % as this can only happen if snap point is the last point on
-%             % the path, and that is caught in previous if statement.
-%             error('ERROR: Point is lying AHEAD of the FRONT segment on path');
-%         
+%
 %         elseif 0 > front_percent_along_length 
 %             % TESTED2
 %             % point is BEFORE start of front and also AFTER end of back 
@@ -480,7 +473,7 @@ if flag_do_debug
 
 
         % Label the points with distances
-        midpoint = (closest_path_point + points)/2;
+        midpoint = (closest_path_points + points)/2;
         if distance_imaginary==0
             distance_string = sprintf('distance = %.2f',distance_real);
         else
@@ -489,14 +482,14 @@ if flag_do_debug
         text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');
         
         % Plot the closest point on path
-        plot(closest_path_point(:,1),closest_path_point(:,2),'g.','Markersize',20);
-        text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
+        plot(closest_path_points(:,1),closest_path_points(:,2),'g.','Markersize',20);
+        text(closest_path_points(:,1),closest_path_points(:,2),'Snap Point on Path');
         
         
         % Connect closest point on path to query point
         plot(...
-            [points(:,1) closest_path_point(:,1)],...
-            [points(:,2) closest_path_point(:,2)],'g-','Linewidth',2);
+            [points(:,1) closest_path_points(:,1)],...
+            [points(:,2) closest_path_points(:,2)],'g-','Linewidth',2);
         
     elseif length(path(1,:))==3
         
@@ -519,22 +512,22 @@ if flag_do_debug
         
         % Plot the closest point on path
         plot3(...
-            closest_path_point(:,1),...
-            closest_path_point(:,2),...
-            closest_path_point(:,3),...
+            closest_path_points(:,1),...
+            closest_path_points(:,2),...
+            closest_path_points(:,3),...
             'go','Markersize',20);
         text(...
-            closest_path_point(:,1),...
-            closest_path_point(:,2),...
-            closest_path_point(:,3),...
+            closest_path_points(:,1),...
+            closest_path_points(:,2),...
+            closest_path_points(:,3),...
             'Snap Point on Path');
         
         
         % Connect closest point on path to query point
         plot3(...
-            [points(:,1) closest_path_point(:,1)],...
-            [points(:,2) closest_path_point(:,2)],...
-            [points(:,3) closest_path_point(:,3)],...
+            [points(:,1) closest_path_points(:,1)],...
+            [points(:,2) closest_path_points(:,2)],...
+            [points(:,3) closest_path_points(:,3)],...
             'g-','Linewidth',2);
         
 
