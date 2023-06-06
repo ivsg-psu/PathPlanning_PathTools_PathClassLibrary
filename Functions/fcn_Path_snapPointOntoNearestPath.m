@@ -1,5 +1,5 @@
 function [closest_path_points,...
-    s_coordinate,...
+    s_coordinates,...
     first_path_point_index,...
     second_path_point_index,...
     percent_along_length,...
@@ -285,14 +285,61 @@ if ~isempty(indicies_to_check)
          error('ERROR: Point is lying AHEAD of the FRONT segment on path');
 end
 
-URHERE
 
-indicies_to_check = find(front_percent_along_length>1, 1); 
+indicies_to_check = (back_percent_along_lengths>1).*(front_percent_along_lengths<0); 
 if ~isempty(indicies_to_check)
-        % Point is located BEHIND the vector that is the rear-most vector -
-        % not possible, as this should only happen if snap point is start
-        % and that is caught in previous if statement
-         error('ERROR: Point is lying AHEAD of the FRONT segment on path');
+    % TESTED2
+    % point is BEFORE start of front yet also AFTER end of back!
+    % This is the special situation when points are before the
+    % "front" segment, e.g. the next path segment AND points are
+    % after the previous "back" path segment. In this special case,
+    % the distance calculation just uses the snap point.
+    
+    % Calculate the outputs
+    first_path_point_index  = closest_path_point_indicies;
+    second_path_point_index = closest_path_point_indicies;
+    percent_along_length    = 0;
+    closest_path_points     = path(closest_path_point_indicies,:);
+    s_coordinates           = path_station(closest_path_point_indicies,1);
+    
+    % The conversion into imaginary distance depends on the snap
+    % type
+    %          flag_rounding_type = 1;  % This is the default, and indicates
+    %          that the orthogonal projection of an endpoint is created by the
+    %          PRIOR segment leading up to each station query point.
+    %
+    %          flag_rounding_type = 2;  % This indicates that the orthogonal
+    %          projection of an endpoint is created by the FOLLOWING segment
+    %          after each station query point.
+    %
+    %          flag_rounding_type = 3;  % This indicates that the orthogonal
+    %          projection, ONLY if the station query falls at the joining point
+    %          between two segments (e.g. is on the "joint"), then the
+    %          projection is created by averaging the vector projections
+    %          created from the PRIOR segment and FOLLOWING segment.
+    %
+    %          flag_rounding_type = 4;  % This indicates that the orthogonal
+    %          projections along segments should be calculated at the midpoints
+    %          of each segment, and then for each station qeuary, the vector
+    %          projections are interpolated from their prior and subsequent
+    %          vectors.
+    %
+    switch flag_rounding_type
+        case 1 % Use the rear vector
+            unit_orthogonal_projection_vector = back_unit_orthogonal_projection_vector;
+        case 2 % Use the front vector
+            unit_orthogonal_projection_vector = front_unit_orthogonal_projection_vector;
+        case 3 % Use the average of the front and rear vectors
+            mixed_vector = back_unit_orthogonal_projection_vector+front_unit_orthogonal_projection_vector;
+            magnitude_mixed_vector = sum(mixed_vector.^2,2).^0.5;
+            unit_mixed_vector = mixed_vector/magnitude_mixed_vector;
+            unit_orthogonal_projection_vector = unit_mixed_vector;
+        case 4
+            % This is a very special case, handled separately
+            error('Not coded yet!');
+        otherwise
+            error('Unknown flag_rounding_type');
+    end
 end
 
 

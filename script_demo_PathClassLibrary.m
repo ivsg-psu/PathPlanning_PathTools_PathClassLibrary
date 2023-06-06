@@ -8,6 +8,8 @@
 % 2023_04_22 S. Brennan, sbrennan@psu.edu
 % -- updated loading conditions
 % -- improved comments and README.MD
+% 2023_06_05 S. Brennan, sbrennan@psu.edu
+% -- cleaned up the workspace codes to use functions, work on MacOS
 
 %% Prep the workspace
 close all
@@ -52,36 +54,15 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_
 
 
 %% Clear paths and folders, if needed
-if 1==0
+if 1==1
 
-    % Clear out the variables
-    clear global flag* FLAG*
-    clear flag*
-    clear path
-
-    % Clear out any path directories under Utilities
-    path_dirs = regexp(path,'[;]','split');
-    utilities_dir = fullfile(pwd,filesep,'Utilities');
-    for ith_dir = 1:length(path_dirs)
-        utility_flag = strfind(path_dirs{ith_dir},utilities_dir);
-        if ~isempty(utility_flag)
-            rmpath(path_dirs{ith_dir});
-        end
-    end
-
-    % Delete the Utilities folder, to be extra clean!
-    if  exist(utilities_dir,'dir')
-        [status,message,message_ID] = rmdir(utilities_dir,'s');
-        if 0==status
-            error('Unable remove directory: %s \nReason message: %s \nand message_ID: %s\n',utilities_dir, message,message_ID);
-        end
-    end
+   fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
 end
 
 %% Do we need to set up the work space?
 if ~exist('flag_PathClass_Folders_Initialized','var')
-    this_project_folders = {'Functions'}; % {'Functions','Data'};
+    this_project_folders = {'Functions','Data'};
     fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders);  
     flag_PathClass_Folders_Initialized = 1;
 end
@@ -1403,6 +1384,33 @@ elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fign
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
+%% function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
+function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
+% Clear out the variables
+clear global flag* FLAG*
+clear flag*
+clear path
+
+% Clear out any path directories under Utilities
+path_dirs = regexp(path,'[;]','split');
+utilities_dir = fullfile(pwd,filesep,'Utilities');
+for ith_dir = 1:length(path_dirs)
+    utility_flag = strfind(path_dirs{ith_dir},utilities_dir);
+    if ~isempty(utility_flag)
+        rmpath(path_dirs{ith_dir});
+    end
+end
+
+% Delete the Utilities folder, to be extra clean!
+if  exist(utilities_dir,'dir')
+    [status,message,message_ID] = rmdir(utilities_dir,'s');
+    if 0==status
+        error('Unable remove directory: %s \nReason message: %s \nand message_ID: %s\n',utilities_dir, message,message_ID);
+    end
+end
+
+end % Ends fcn_INTERNAL_clearUtilitiesFromPathAndFolders
+
 %% fcn_INTERNAL_initializeUtilities
 function  fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders)
 % Reset all flags for installs to empty
@@ -1681,7 +1689,7 @@ if ~exist(flag_varname,'var') || isempty(eval(flag_varname))
                 if directory_contents(ith_entry).isdir
                     flag_is_nested_install = 1;
                     install_directory_from = fullfile(directory_contents(ith_entry).folder,directory_contents(ith_entry).name);
-                    install_files_from = fullfile(directory_contents(ith_entry).folder,directory_contents(ith_entry).name,'*.*');
+                    install_files_from = fullfile(directory_contents(ith_entry).folder,directory_contents(ith_entry).name,'*'); % BUG FIX - For Macs, must be *, not *.*
                     install_location_to = fullfile(directory_contents(ith_entry).folder);
                 end
             end
@@ -1776,6 +1784,7 @@ if ~exist(flag_varname,'var') || isempty(eval(flag_varname))
 
     eval(sprintf('%s = 1;',flag_varname));
 end
+
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
