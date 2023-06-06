@@ -42,8 +42,8 @@ close all;
 
 %% BASIC example 1
 % A simple line segment, a simple query, positive distance
-point = [0.5 0.2];
-pathXY = [0 0; 1 0];
+point = [0.2 0.2];
+pathXY = [0 0; 2 0; 3 3];
 flag_snap_type = 1;
 
 fignum = 111;
@@ -57,7 +57,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 2
 % A simple line segment, a simple query, negative distance
 point = [0.5 -0.2];
-pathXY = [0 0; 1 0];
+pathXY = [0 0; 2 0; 3 3];
 
 fignum = 222;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...

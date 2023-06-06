@@ -224,24 +224,40 @@ end
 %  5. If percentage of travel is not between 0 and 1 for both the segments,
 %  then choose the projected point as closest point from step 1
 
+% Find the differences, then square X, Y, (Z) terms, and take square root
+% to find lengths
+path_segment_lengths = sum(diff(path,1,1).^2,2).^0.5;
+% Add them up to generate stations
+path_stations = cumsum(path_segment_lengths);
+% Make sure last point has a "length"
+path_segment_lengths = [path_segment_lengths; path_segment_lengths(end,:)];
 
-path_segment_lengths = diff(path,1,1);
-path_segment_lengths = [0*path_segment_lengths(1,:); path_segment_lengths];
-path_stations = cumsum(sqrt(sum(path_segment_lengths.^2,2)));
 
 % Step 1: find distance from a point to every point on the path
 closest_path_point_indicies = fcn_Path_findNearestPathPoints(points, path);
 
 % Step 2. Find vectors behind and ahead of each of the index points in the
-% path. Note: for the first and last point, the vectors are repeated. Thus,
-% if there are N path points, there are N+2 vectors.
-path_vectors  = path(2:end,:) - path(1:end-1,:);
-unit_tangential_vectors = (path_vectors./path_stations(2:end-1));
-% unit_tangential_vectors(end,:) = unit_tangential_vectors(end-1,:);
-unit_tangential_vectors = [unit_tangential_vectors(1,:); unit_tangential_vectors];
+% path. Notes on this: Each point has associated with it two vectors:
+% ahead, and behind The ahead vector for a point is defined by the line
+% segment of the point, and the point after it. The behind vector for a
+% point is defined by the line segment of the prior point leading up to the
+% point. For the first, the behind vector is not defined and so is just a
+% repeat of the "behind" point of the 2nd point For the last point, the
+% ahead vector is not defined, and so is just a repeat of the ahead point
+% of the second-to-last point. Nearly all the vectors overlap, so we only
+% calculate them once from the path. The first path vector is from points 1
+% to 2, the second is points 2 to 3, etc. Tangential vectors are vectors
+% along the directions of the segments Orthogonal vectors are ones that are
+% 90 degrees, in positive cross-product direction, from the tangent
+% vectors.
+%
+% The normal and tangential unit vectors are used to perform dot products
+% to determine distances along a segment, or orthogonal to the segment.
 
+path_vectors  = path(2:end,:) - path(1:end-1,:);
+unit_tangential_vectors = (path_vectors./path_stations(2:end));
+unit_tangential_vectors = [unit_tangential_vectors(1,:); unit_tangential_vectors];
 unit_orthogonal_vectors = unit_tangential_vectors*[0 1; -1 0]; % Rotate by 90 degrees
-% padded_path_points = [path(1,:); path; path(end,:)];
 
 Npath = length(path(:,1));
 back_indices = closest_path_point_indicies-1;
@@ -253,10 +269,15 @@ front_indices(closest_path_point_indicies==1) = 2;
 back_indices(closest_path_point_indicies==Npath) = Npath-1;
 front_indices(closest_path_point_indicies==Npath) = Npath;
 
+% Fill in the back and front orthogonal vectors
+back_unit_tangential_vectors  = unit_tangential_vectors(back_indices,:);
+front_unit_tangential_vectors = unit_tangential_vectors(front_indices,:);
+back_unit_orthogonal_vector   = unit_orthogonal_vectors(back_indices,:);
+front_unit_orthogonal_vector  = unit_orthogonal_vectors(front_indices,:);
 
 % Find the measurements to the back segment
 back_start_to_query_vectors = points-path(back_indices,:);
-back_projection_distances  = dot(unit_tangential_vectors(back_indices,:),back_start_to_query_vectors); % Do dot product
+back_projection_distances  = dot(back_unit_tangential_vectors,back_start_to_query_vectors); % Do dot product
 back_percent_along_lengths = back_projection_distances./path_segment_lengths(back_indices);
 back_closest_path_points = path(back_indices,:) + path_vectors(back_indices,:).*back_percent_along_lengths;
 back_s_coordinates       = path_segment_lengths(back_indices) + path_segment_lengths(back_indices).*back_percent_along_lengths;
@@ -264,20 +285,20 @@ back_s_coordinates       = path_segment_lengths(back_indices) + path_segment_len
 
 % Find the measurements to the front segment
 front_start_to_query_vectors = points-path(front_indices,:);
-front_projection_distances  = dot(unit_tangential_vectors(front_indices,:),front_start_to_query_vectors); % Do dot product
+front_projection_distances  = dot(front_unit_tangential_vectors,front_start_to_query_vectors); % Do dot product
 front_percent_along_lengths = front_projection_distances./path_segment_lengths(front_indices);
 front_closest_path_points = path(front_indices,:) + path_vectors(front_indices,:).*front_percent_along_lengths;
 front_s_coordinates       = path_segment_lengths(front_indices) + path_segment_lengths(front_indices).*front_percent_along_lengths;
 
 % Check for error cases that should never happen
-indicies_to_check = find(back_percent_along_length<0, 1); 
+indicies_to_check = find(back_percent_along_lengths<0, 1); 
 if ~isempty(indicies_to_check)
         % Point is located BEHIND the vector that is the rear-most vector -
         % not possible, as this should only happen if snap point is start
         % and that is caught in previous if statement
         error('ERROR: Point is lying BEHIND the BACK segment on path');
 end
-indicies_to_check = find(front_percent_along_length>1, 1); 
+indicies_to_check = find(front_percent_along_lengths>1, 1); 
 if ~isempty(indicies_to_check)
         % Point is located BEHIND the vector that is the rear-most vector -
         % not possible, as this should only happen if snap point is start
@@ -285,22 +306,30 @@ if ~isempty(indicies_to_check)
          error('ERROR: Point is lying AHEAD of the FRONT segment on path');
 end
 
+% Fill in output defaults
+first_path_point_index  = closest_path_point_indicies;
+second_path_point_index = closest_path_point_indicies;
+percent_along_length = 0*closest_path_point_indicies;
+closest_path_points = path(closest_path_point_indicies);
+s_coordinates = 0*closest_path_point_indicies;
 
-indicies_to_check = (back_percent_along_lengths>1).*(front_percent_along_lengths<0); 
+indicies_to_check = find((back_percent_along_lengths>1).*(front_percent_along_lengths<0)); 
 if ~isempty(indicies_to_check)
-    % TESTED2
+
     % point is BEFORE start of front yet also AFTER end of back!
     % This is the special situation when points are before the
     % "front" segment, e.g. the next path segment AND points are
     % after the previous "back" path segment. In this special case,
-    % the distance calculation just uses the snap point.
+    % the distance calculation just uses the snap point, and both the first
+    % and second indicies are set to the same values. Because the point is
+    % not actually on either segment, the percent along length is zero.
     
     % Calculate the outputs
-    first_path_point_index  = closest_path_point_indicies;
-    second_path_point_index = closest_path_point_indicies;
-    percent_along_length    = 0;
-    closest_path_points     = path(closest_path_point_indicies,:);
-    s_coordinates           = path_station(closest_path_point_indicies,1);
+    first_path_point_index(indicies_to_check)  = closest_path_point_indicies(indicies_to_check);
+    second_path_point_index(indicies_to_check) = closest_path_point_indicies(indicies_to_check);
+    percent_along_length(indicies_to_check)    = 0;
+    closest_path_points(indicies_to_check,:)   = path(closest_path_point_indicies((indicies_to_check),:));
+    s_coordinates(indicies_to_check)           = path_stations(closest_path_point_indicies(indicies_to_check),1);
     
     % The conversion into imaginary distance depends on the snap
     % type
@@ -326,14 +355,14 @@ if ~isempty(indicies_to_check)
     %
     switch flag_rounding_type
         case 1 % Use the rear vector
-            unit_orthogonal_projection_vector = back_unit_orthogonal_projection_vector;
+            unit_orthogonal_projection_vector(indicies_to_check,:) = back_unit_orthogonal_vector(indicies_to_check,:);
         case 2 % Use the front vector
-            unit_orthogonal_projection_vector = front_unit_orthogonal_projection_vector;
+            unit_orthogonal_projection_vector(indicies_to_check,:) = front_unit_orthogonal_vector(indicies_to_check,:);
         case 3 % Use the average of the front and rear vectors
-            mixed_vector = back_unit_orthogonal_projection_vector+front_unit_orthogonal_projection_vector;
+            mixed_vector = back_unit_orthogonal_vector(indicies_to_check,:)+front_unit_orthogonal_vector(indicies_to_check,:);
             magnitude_mixed_vector = sum(mixed_vector.^2,2).^0.5;
             unit_mixed_vector = mixed_vector/magnitude_mixed_vector;
-            unit_orthogonal_projection_vector = unit_mixed_vector;
+            unit_orthogonal_projection_vector(indicies_to_check,:) = unit_mixed_vector;
         case 4
             % This is a very special case, handled separately
             error('Not coded yet!');
@@ -343,6 +372,82 @@ if ~isempty(indicies_to_check)
 end
 
 
+indicies_to_check = (back_percent_along_lengths>1).*(front_percent_along_lengths>=0); 
+if ~isempty(indicies_to_check)
+    % Only way to enter here is if point is after the back segement,
+    % and exclusively in the front vector area. This occurs when the point
+    % is on the front vectors "main" area. We just use the front segment
+    % result then.
+
+    % Calculate the outputs
+    first_path_point_index(indicies_to_check,:)   = closest_path_point_indicies(indicies_to_check,:) ;
+    second_path_point_index(indicies_to_check,:)  = closest_path_point_indicies(indicies_to_check,:) +1;
+    percent_along_length(indicies_to_check,:)     = front_percent_along_lengths(indicies_to_check,:) ;
+    closest_path_points(indicies_to_check,:)      = front_closest_path_points(indicies_to_check,:) ;
+    s_coordinates(indicies_to_check,:)            = front_s_coordinates(indicies_to_check,:) ;
+    unit_orthogonal_projection_vector(indicies_to_check,:)  = front_unit_orthogonal_vector(indicies_to_check,:) ;
+end
+
+
+
+indicies_to_check = (back_percent_along_lengths<=1).*(front_percent_along_lengths<0); 
+if ~isempty(indicies_to_check)
+    % Point is in back segment, and before front segment. Just use
+    % the back segment results.
+
+    % Calculate the outputs
+    first_path_point_index(indicies_to_check,:)  = closest_path_point_indicies(indicies_to_check,:)-1;
+    second_path_point_index(indicies_to_check,:) = closest_path_point_indicies(indicies_to_check,:);
+    percent_along_length(indicies_to_check,:)    = back_percent_along_lengths(indicies_to_check,:);
+    closest_path_points(indicies_to_check,:)     = back_closest_path_points(indicies_to_check,:);
+    s_coordinates(indicies_to_check,:)           = back_s_coordinates(indicies_to_check,:);
+    unit_orthogonal_projection_vector(indicies_to_check,:) = back_unit_orthogonal_vector(indicies_to_check,:);
+end
+
+
+indicies_to_check = (back_percent_along_lengths<=1).*(front_percent_along_lengths>=0); 
+if ~isempty(indicies_to_check)
+    % Only way to enter here is if point is in the back segement,
+    % and in front segment. This occurs when the point is
+    % on the both the back and front vectors "main" area. We just
+    % have to use the point that is closest to the test point.
+    distance_squared_front_to_point = sum((points-front_closest_path_points).^2,2);
+    distance_squared_back_to_point  = sum((points-back_closest_path_points).^2,2);
+
+    % Calculate the outputs
+    front_closer_indicies = indicies_to_check.*(distance_squared_front_to_point<=distance_squared_back_to_point);
+    rear_closer_indicies  = indicies_to_check.*(distance_squared_front_to_point>distance_squared_back_to_point);
+
+    % Front segment is closer
+    if ~isempty(front_closer_indicies)
+        first_path_point_index(front_closer_indicies,:)  = closest_path_point_indicies(front_closer_indicies,:) ;
+        second_path_point_index(front_closer_indicies,:) = closest_path_point_indicies(front_closer_indicies,:) +1;
+        percent_along_length(front_closer_indicies,:)    = front_percent_along_lengths(front_closer_indicies,:) ;
+        closest_path_points(front_closer_indicies,:)     = front_closest_path_points(front_closer_indicies,:) ;
+        s_coordinates(front_closer_indicies,:)           = front_s_coordinates(front_closer_indicies,:) ;
+        unit_orthogonal_projection_vector(front_closer_indicies,:)  = front_unit_orthogonal_vector(front_closer_indicies,:) ;
+    end
+
+    % Back segment is closer
+    if ~isempty(rear_closer_indicies)
+        first_path_point_index(rear_closer_indicies,:)   = closest_path_point_indicies(rear_closer_indicies,:) -1;
+        second_path_point_index(rear_closer_indicies,:)  = closest_path_point_indicies(rear_closer_indicies,:) ;
+        percent_along_length(rear_closer_indicies,:)     = back_percent_along_lengths(rear_closer_indicies,:) ;
+        closest_path_points(rear_closer_indicies,:)      = back_closest_path_points(rear_closer_indicies,:) ;
+        s_coordinates(rear_closer_indicies,:)            = back_s_coordinates(rear_closer_indicies,:) ;
+        unit_orthogonal_projection_vector(rear_closer_indicies,:)  = back_unit_orthogonal_vector(rear_closer_indicies,:);
+    end
+end
+
+% Calculate real and imaginary portions
+reference_points = closest_path_points;
+
+off_segment_indicies = (percent_along_length<=0) || (percent_along_length>=1);
+if ~isempty(off_segment_indicies)
+    reference_points(off_segment_indicies,:) = path(closest_path_point_indicies(off_segment_indicies,1),:);
+end
+[distance_real, distance_imaginary] = ...
+        fcn_INTERNAL_convertOffsetCoordinateToImaginaryNumber(unit_orthogonal_projection_vector,reference_points, points);
 
 %     elseif 1 < back_percent_along_length  
 %         % To enter here, point is after the end of the "back" vector's end
