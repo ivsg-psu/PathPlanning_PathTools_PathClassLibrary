@@ -228,7 +228,7 @@ end
 % to find lengths
 path_segment_lengths = sum(diff(path,1,1).^2,2).^0.5;
 % Add them up to generate stations
-path_stations = cumsum(path_segment_lengths);
+path_stations = [0; cumsum(path_segment_lengths)];
 % Make sure last point has a "length"
 path_segment_lengths = [path_segment_lengths; path_segment_lengths(end,:)];
 
@@ -255,8 +255,8 @@ closest_path_point_indicies = fcn_Path_findNearestPathPoints(points, path);
 % to determine distances along a segment, or orthogonal to the segment.
 
 path_vectors  = path(2:end,:) - path(1:end-1,:);
-unit_tangential_vectors = (path_vectors./path_stations(2:end));
-unit_tangential_vectors = [unit_tangential_vectors(1,:); unit_tangential_vectors];
+unit_tangential_vectors = (path_vectors./path_segment_lengths(1:end-1));
+unit_tangential_vectors = [unit_tangential_vectors; unit_tangential_vectors(end,:)];
 unit_orthogonal_vectors = unit_tangential_vectors*[0 1; -1 0]; % Rotate by 90 degrees
 
 Npath = length(path(:,1));
@@ -280,7 +280,7 @@ back_start_to_query_vectors = points-path(back_indices,:);
 back_projection_distances  = dot(back_unit_tangential_vectors,back_start_to_query_vectors); % Do dot product
 back_percent_along_lengths = back_projection_distances./path_segment_lengths(back_indices);
 back_closest_path_points = path(back_indices,:) + path_vectors(back_indices,:).*back_percent_along_lengths;
-back_s_coordinates       = path_segment_lengths(back_indices) + path_segment_lengths(back_indices).*back_percent_along_lengths;
+back_s_coordinates       = path_stations(back_indices) + path_segment_lengths(back_indices).*back_percent_along_lengths;
 
 
 % Find the measurements to the front segment
@@ -288,7 +288,7 @@ front_start_to_query_vectors = points-path(front_indices,:);
 front_projection_distances  = dot(front_unit_tangential_vectors,front_start_to_query_vectors); % Do dot product
 front_percent_along_lengths = front_projection_distances./path_segment_lengths(front_indices);
 front_closest_path_points = path(front_indices,:) + path_vectors(front_indices,:).*front_percent_along_lengths;
-front_s_coordinates       = path_segment_lengths(front_indices) + path_segment_lengths(front_indices).*front_percent_along_lengths;
+front_s_coordinates       = path_stations(front_indices) + path_segment_lengths(front_indices).*front_percent_along_lengths;
 
 % Check for error cases that should never happen
 indicies_to_check = find(back_percent_along_lengths<0, 1); 
@@ -310,7 +310,7 @@ end
 first_path_point_index  = closest_path_point_indicies;
 second_path_point_index = closest_path_point_indicies;
 percent_along_length = 0*closest_path_point_indicies;
-closest_path_points = path(closest_path_point_indicies);
+closest_path_points = path(closest_path_point_indicies,:);
 s_coordinates = 0*closest_path_point_indicies;
 
 indicies_to_check = find((back_percent_along_lengths>1).*(front_percent_along_lengths<0)); 
@@ -372,7 +372,7 @@ if ~isempty(indicies_to_check)
 end
 
 
-indicies_to_check = (back_percent_along_lengths>1).*(front_percent_along_lengths>=0); 
+indicies_to_check = find((back_percent_along_lengths>1).*(front_percent_along_lengths>=0)); 
 if ~isempty(indicies_to_check)
     % Only way to enter here is if point is after the back segement,
     % and exclusively in the front vector area. This occurs when the point
@@ -390,7 +390,7 @@ end
 
 
 
-indicies_to_check = (back_percent_along_lengths<=1).*(front_percent_along_lengths<0); 
+indicies_to_check = find((back_percent_along_lengths<=1).*(front_percent_along_lengths<0)); 
 if ~isempty(indicies_to_check)
     % Point is in back segment, and before front segment. Just use
     % the back segment results.
@@ -405,7 +405,7 @@ if ~isempty(indicies_to_check)
 end
 
 
-indicies_to_check = (back_percent_along_lengths<=1).*(front_percent_along_lengths>=0); 
+indicies_to_check = find((back_percent_along_lengths<=1).*(front_percent_along_lengths>=0)); 
 if ~isempty(indicies_to_check)
     % Only way to enter here is if point is in the back segement,
     % and in front segment. This occurs when the point is
@@ -415,8 +415,8 @@ if ~isempty(indicies_to_check)
     distance_squared_back_to_point  = sum((points-back_closest_path_points).^2,2);
 
     % Calculate the outputs
-    front_closer_indicies = indicies_to_check.*(distance_squared_front_to_point<=distance_squared_back_to_point);
-    rear_closer_indicies  = indicies_to_check.*(distance_squared_front_to_point>distance_squared_back_to_point);
+    front_closer_indicies = indicies_to_check(distance_squared_front_to_point<=distance_squared_back_to_point);
+    rear_closer_indicies  = indicies_to_check(distance_squared_front_to_point>distance_squared_back_to_point);
 
     % Front segment is closer
     if ~isempty(front_closer_indicies)
@@ -442,7 +442,7 @@ end
 % Calculate real and imaginary portions
 reference_points = closest_path_points;
 
-off_segment_indicies = (percent_along_length<=0) || (percent_along_length>=1);
+off_segment_indicies = find((percent_along_length<=0) || (percent_along_length>=1));
 if ~isempty(off_segment_indicies)
     reference_points(off_segment_indicies,:) = path(closest_path_point_indicies(off_segment_indicies,1),:);
 end
@@ -607,41 +607,41 @@ if flag_do_debug
         
         axis equal;
         
-        % Plot the query point
-        plot(points(:,1),points(:,2),'k.');
-        text(points(:,1),points(:,2),'Query point');
+        % Plot the query points
+        plot(points(:,1),points(:,2),'k.','MarkerSize',20);
         
-        % Plot the closest path points;
-        plot(...
-            path(first_path_point_index:second_path_point_index,1),...
-            path(first_path_point_index:second_path_point_index,2),'m.','MarkerSize',20);
+        %         % Plot the closest path points;
+        %         plot(...
+        %             path(first_path_point_index:second_path_point_index,1),...
+        %             path(first_path_point_index:second_path_point_index,2),'m.','MarkerSize',20);
         
         % Plot the reference vector
-        quiver(path(closest_path_point_indicies,1),path(closest_path_point_indicies,2),...
-            unit_orthogonal_projection_vector(1,1),unit_orthogonal_projection_vector(1,2),...
-            0,'Color',[0.5 0.5 0.5]);
-        midpoint = (path(closest_path_point_indicies,:) + path(closest_path_point_indicies,:)+unit_orthogonal_projection_vector)/2;
-        text(midpoint(1,1),midpoint(1,2),'Reference vector','LineWidth',2,'VerticalAlignment','bottom');
-
-
-        % Label the points with distances
-        midpoint = (closest_path_points + points)/2;
-        if distance_imaginary==0
-            distance_string = sprintf('distance = %.2f',distance_real);
-        else
-            distance_string = sprintf('distance = %.2f + %.2f i',distance_real,distance_imaginary);
+        for ith_point = 1:length(points(:,1))
+            quiver(path(closest_path_point_indicies(ith_point),1),path(closest_path_point_indicies(ith_point),2),...
+                unit_orthogonal_projection_vector(ith_point,1),unit_orthogonal_projection_vector(ith_point,2),...
+                0,'Color',[0.5 0.5 0.5]);
+            % midpoint = (path(closest_path_point_indicies(ith_point),:) + path(closest_path_point_indicies(ith_point),:)+unit_orthogonal_projection_vector(ith_point,:))/2;
+            %text(midpoint(1,1),midpoint(1,2),'Reference vector','LineWidth',2,'VerticalAlignment','bottom');
+            
+            % Label the points with distances
+            midpoint = (closest_path_points(ith_point,:) + points(ith_point,:))/2;
+            if distance_imaginary==0
+                distance_string = sprintf('distance = %.2f',distance_real(ith_point));
+            else
+                distance_string = sprintf('distance = %.2f + %.2f i',distance_real(ith_point),distance_imaginary(ith_point));
+            end
+            text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');
+            
+            % Plot the closest point on path
+            plot(closest_path_points(ith_point,1),closest_path_points(ith_point,2),'g.','Markersize',20);
+            text(closest_path_points(ith_point,1),closest_path_points(ith_point,2),'Snap Point on Path');
+            
+            
+            % Connect closest point on path to query point
+            plot(...
+                [points(ith_point,1) closest_path_points(ith_point,1)],...
+                [points(ith_point,2) closest_path_points(ith_point,2)],'g-','Linewidth',2);
         end
-        text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');
-        
-        % Plot the closest point on path
-        plot(closest_path_points(:,1),closest_path_points(:,2),'g.','Markersize',20);
-        text(closest_path_points(:,1),closest_path_points(:,2),'Snap Point on Path');
-        
-        
-        % Connect closest point on path to query point
-        plot(...
-            [points(:,1) closest_path_points(:,1)],...
-            [points(:,2) closest_path_points(:,2)],'g-','Linewidth',2);
         
     elseif length(path(1,:))==3
         
