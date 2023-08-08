@@ -22,6 +22,8 @@
 %     -- changed input checks to include 3D paths
 %     2023_06_03
 %     -- modified to allow vectorized snapping
+%     2023_08_08
+%     -- bug fixes for points before start or after end
 
 
 close all;
