@@ -43,23 +43,76 @@ close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 %% BASIC example 1
-% A simple line segment, a simple query, positive distance
+% A simple line segment, a simple query, positive distance in both front
+% and rear segments
 point = [0.5 2];
-pathXY = [0 0; 2 0; 4 2];
+pathXY = [0 0;3 0; 5 2; 8 2];
 flag_snap_type = 1;
 
 fignum = 111;
-[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
-fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
-    s_coordinate, percent_along_length);
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
+%% BASIC example 1.1
+% A simple line segment, a simple query, negative distance in both front
+% and rear segments
+point = [5 0.5];
+pathXY = [0 0;3 0; 5 2; 8 2];
+
+flag_snap_type = 1;
+
+fignum = 111;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
+%% BASIC example 1.2
+% A simple line segment, a simple query, negative distance in both front
+% and rear segments
+point = [4 1];
+pathXY = [0 0;3 0; 5 2; 8 2];
+
+flag_snap_type = 1;
+
+fignum = 111;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
 
 %% BASIC example 2
-% A simple line segment, a simple query, negative distance
+% A simple line segment, a simple query, negative distance purely in rear
+% segment
 point = [0.5 -1];
-pathXY = [0 0; 2 0; 4 2];
+pathXY = [0 0;3 0; 5 2; 8 2];
 
 fignum = 222;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -72,7 +125,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 3
 % A simple line segment, a pre-start query, positive distance
 point = [-0.5 1];
-pathXY = [0 0; 2 0; 4 2];
+pathXY = [0 0;3 0; 5 2; 8 2];
 
 fignum = 333;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -85,7 +138,8 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 4
 % A simple line segment, a pre-start query, negative distance
 point = [-0.5 -0.2];
-pathXY = [0 0; 1 0];
+pathXY = [0 0;3 0; 5 2; 8 2];
+
 
 fignum = 444;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -98,7 +152,8 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 5
 % A simple line segment, a post-end query, positive distance
 point = [1 2];
-pathXY = [0 0; 1 1];
+pathXY = [0 0;3 0; 5 2; 8 2];
+
 
 
 fignum = 555;
@@ -113,7 +168,8 @@ xlim([-1 3])
 %% BASIC example 6
 % A simple line segment, a post-end query, positive distance
 point = [2 1];
-pathXY = [0 0; 1 1];
+pathXY = [0 0;3 0; 5 2; 8 2];
+
 
 fignum = 666;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...

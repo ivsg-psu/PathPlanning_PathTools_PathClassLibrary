@@ -87,7 +87,11 @@ function [closest_path_points,...
 %      Z] location of the nearest point on the path
 %
 %      s_coordinate: a scalar (Mx1) representing the s-coordinate distance
-%      along the path
+%      along the path. Negative values indicate distances "before" the path
+%      starts, measured from the projection of the first path segment.
+%      Similarly, values larger than the total path length represent
+%      distances "after" the path ends, measured from the projection of the
+%      last path segment.
 %
 %      first_path_point_index: a scalar (Mx1) representing the index of the
 %      starting "row" of the path where the closest point landed.
@@ -96,7 +100,9 @@ function [closest_path_points,...
 %      ending "row" of the path where the closest point landed.
 %
 %      percent_along_length: a scalar (Mx1) of the percent along the
-%      segment of the path where the closest point landed.
+%      segment of the path where the closest point landed. Values less than
+%      zero represent locations before a path starts, and values above 1
+%      represent locations after the path ends.
 %
 % EXAMPLES:
 %      
@@ -139,9 +145,11 @@ function [closest_path_points,...
 %     2023_08_08 by sbrennan@psu.edu
 %     -- cleaned up end case of vector cacluations, bug fix
 %     -- cleaned up plotting flags
+%     -- improved the comments
 
 
 flag_do_debug = 1; % Flag to plot the results for debugging
+flag_do_plots = 0;
 flag_check_inputs = 1; % Flag to perform input checking
 
 %% check input arguments
@@ -184,15 +192,13 @@ end
 if 4 == nargin
     temp = varargin{end};
     if ~isempty(temp)
-        fig_num=temp;
-        figure(fig_num);
-        flag_do_debug = 1;
+        fig_num = temp;
+        flag_do_plots = 1;
     end
 end
 
 if flag_do_debug
-    fig = figure; 
-    fig_debug = fig.Number;
+    fig_debug = 888;
 end
 
 
@@ -219,6 +225,10 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% How many points are on the path? How many points are we testing?
+Npath = length(path(:,1));
+Npoints = length(points(:,1));
+
 % The solution method is as follows:
 %  1. Find the closest point on the path to the query point
 %  2. Find vectors behind and ahead of the closest point from step 1
@@ -239,65 +249,8 @@ path_stations = [0; cumsum(path_segment_lengths)];
 path_segment_lengths = [path_segment_lengths; path_segment_lengths(end,:)];
 
 
-% Step 1: find distance from a point to every point on the path
+%% Step 1: find distance from a point to every point on the path
 closest_path_point_indicies = fcn_Path_findNearestPathPoints(points, path);
-
-% Step 2. Find vectors behind and ahead of each of the index points in the
-% path. Notes on this: Each point has associated with it two vectors:
-% ahead, and behind The ahead vector for a point is defined by the line
-% segment of the point, and the point after it. The behind vector for a
-% point is defined by the line segment of the prior point leading up to the
-% point. For the first, the behind vector is not defined and so is just a
-% repeat of the "behind" point of the 2nd point For the last point, the
-% ahead vector is not defined, and so is just a repeat of the ahead point
-% of the second-to-last point. Nearly all the vectors overlap, so we only
-% calculate them once from the path. The first path vector is from points 1
-% to 2, the second is points 2 to 3, etc. Tangential vectors are vectors
-% along the directions of the segments Orthogonal vectors are ones that are
-% 90 degrees, in positive cross-product direction, from the tangent
-% vectors.
-%
-% The normal and tangential unit vectors are used to perform dot products
-% to determine distances along a segment, or orthogonal to the segment.
-path_vectors  = path(2:end,:) - path(1:end-1,:);
-
-% Fill in the path vector at the very end
-path_vectors(end+1,:)  = path_vectors(end,:);
-
-unit_tangential_vectors = path_vectors./path_segment_lengths;
-unit_orthogonal_vectors = unit_tangential_vectors*[0 1; -1 0]; % Rotate by 90 degrees
-
-Npath = length(path(:,1));
-back_indices = closest_path_point_indicies-1;
-front_indices = closest_path_point_indicies;
-
-%     2a. Check for end cases. For start/end, use the adjacent vectors.
-back_indices(closest_path_point_indicies==1) = 1;
-front_indices(closest_path_point_indicies==1) = 2;
-back_indices(closest_path_point_indicies==Npath) = Npath-1;
-front_indices(closest_path_point_indicies==Npath) = Npath;
-
-% Fill in the back and front orthogonal vectors
-back_unit_tangential_vectors  = unit_tangential_vectors(back_indices,:);
-front_unit_tangential_vectors = unit_tangential_vectors(front_indices,:);
-back_unit_orthogonal_vector   = unit_orthogonal_vectors(back_indices,:);
-front_unit_orthogonal_vector  = unit_orthogonal_vectors(front_indices,:);
-
-% Find the measurements to the back segment
-back_start_to_query_vectors = points-path(back_indices,:);
-back_projection_distances  = dot(back_unit_tangential_vectors,back_start_to_query_vectors); % Do dot product
-back_percent_along_lengths = back_projection_distances./path_segment_lengths(back_indices);
-back_closest_path_points = path(back_indices,:) + path_vectors(back_indices,:).*back_percent_along_lengths;
-back_s_coordinates       = path_stations(back_indices) + path_segment_lengths(back_indices).*back_percent_along_lengths;
-
-
-% Find the measurements to the front segment
-front_start_to_query_vectors = points-path(front_indices,:);
-front_projection_distances  = dot(front_unit_tangential_vectors,front_start_to_query_vectors); % Do dot product
-front_percent_along_lengths = front_projection_distances./path_segment_lengths(front_indices);
-front_closest_path_points = path(front_indices,:) + path_vectors(front_indices,:).*front_percent_along_lengths;
-front_s_coordinates       = path_stations(front_indices) + path_segment_lengths(front_indices).*front_percent_along_lengths;
-
 
 % Plot everything up to now?
 if flag_do_debug
@@ -305,20 +258,130 @@ if flag_do_debug
     clf;
     hold on;
     grid on;
+    axis equal
 
     % Plot the path
     plot(path(:,1),path(:,2),'k.-','LineWidth',3,'MarkerSize',10);
 
     % Plot the test points
-    plot(points(:,1),points(:,2),'g.','LineWidth',3,'MarkerSize',10);
+    plot(points(:,1),points(:,2),'g.','LineWidth',3,'MarkerSize',20);
     
     temp = axis;
     axis_range_x = temp(2)-temp(1);
     axis_range_y = temp(4)-temp(3);
-    axis([temp(1)-0.1*axis_range_x, temp(2)+0.1*axis_range_x,  temp(3)-0.1*axis_range_y, temp(4)+0.1*axis_range_y]);
-    
+    percent_larger = 0.3
+    axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
+
+    % Plot the closest points
+     plot(...
+         [path(closest_path_point_indicies,1)],...
+         [path(closest_path_point_indicies,2)],...
+         'go','MarkerSize',20);
+    for ith_point = 1:Npoints
+        plot(...
+            [path(closest_path_point_indicies(ith_point),1) points(ith_point,1)],...
+            [path(closest_path_point_indicies(ith_point),2) points(ith_point,2)],...
+            'g--');
+    end
 end
 
+%% Step 2.
+% Find vectors behind and ahead of each of the index points in the
+% path. Notes on this: Each point has associated with it two vectors:
+% ahead, and behind The ahead vector for a point is defined by the line
+% segment of the point, and the point after it. The behind vector for a
+% point is defined by the line segment of the prior point leading up to the
+% point. For the first, the behind vector is not defined and so is just a
+% repeat of the "ahead" vector. For the last point, the
+% ahead vector is not defined, and so is just a repeat of the "behind"
+% vector. Nearly all the vectors overlap, so we only calculate them once
+% from the path. The first path vector is from points 1 to 2, the second is
+% points 2 to 3, etc. Tangential vectors are vectors along the directions
+% of the segments Orthogonal vectors are ones that are 90 degrees, in
+% positive cross-product direction, from the tangent vectors.
+%
+% These normal and tangential unit vectors are used to perform dot products
+% to determine distances along a segment, or orthogonal to the segment.
+path_vectors  = path(2:end,:) - path(1:end-1,:);
+
+% Fill in the path vector at the very end as a repeat of the previous one
+path_vectors(end+1,:)  = path_vectors(end,:);
+
+% Calculate the unit vectors
+unit_tangential_vectors = path_vectors./path_segment_lengths;
+unit_orthogonal_vectors = unit_tangential_vectors*[0 1; -1 0]; % Rotate by 90 degrees
+
+
+
+% Fill in arrays for the back and front. For example, the "back" tangent
+% vector for point 3 will be the unit vector connecting 2 to 3, e.g. the
+% 2nd unit vector. Similary, the "front" tangent vector at point 3 will be
+% the vector connecting 3 to 4, or the 3rd unit vector.
+back_indices = (0:Npath-1)';
+front_indices = (1:Npath)';
+back_indices(1) = 1;
+
+% Fill in the back and front orthogonal vectors
+behind_unit_tangential_vectors = unit_tangential_vectors(back_indices,:);
+ahead_unit_tangential_vectors  = unit_tangential_vectors(front_indices,:);
+
+back_unit_orthogonal_vector   = unit_orthogonal_vectors(back_indices,:);
+front_unit_orthogonal_vector  = unit_orthogonal_vectors(front_indices,:);
+
+% Show the vectors?
+if flag_do_debug
+
+    figure(fig_debug)
+    
+    % Plot the vectors for ahead and behind
+    for ith_point = 1:Npath
+        quiver(...
+            path(ith_point,1)-behind_unit_tangential_vectors(ith_point,1),...
+            path(ith_point,2)-behind_unit_tangential_vectors(ith_point,2),...
+            behind_unit_tangential_vectors(ith_point,1),...
+            behind_unit_tangential_vectors(ith_point,2),...
+            'off','filled',...
+            'r','LineWidth',3);
+        quiver(...
+            path(ith_point,1),...
+            path(ith_point,2),...
+            ahead_unit_tangential_vectors(ith_point,1),...
+            ahead_unit_tangential_vectors(ith_point,2),...
+            'off','filled',...
+            'g','LineWidth',3);
+    end
+    plot(path(:,1),path(:,2),'k.','MarkerSize',20);
+end
+
+%% STEP 3. Find percentage of travel on both the segments using dot products
+
+
+% Find the measurements to the back segment
+back_start_to_query_vectors = points-path(back_indices,:);
+back_projection_distances  = dot(behind_unit_tangential_vectors,back_start_to_query_vectors); % Do dot product
+back_percent_along_lengths = back_projection_distances./path_segment_lengths(back_indices);
+back_closest_path_points = path(back_indices,:) + path_vectors(back_indices,:).*back_percent_along_lengths;
+back_s_coordinates       = path_stations(back_indices) + path_segment_lengths(back_indices).*back_percent_along_lengths;
+
+% Find the measurements to the front segment
+front_start_to_query_vectors = points-path(front_indices,:);
+front_projection_distances  = dot(ahead_unit_tangential_vectors,front_start_to_query_vectors); % Do dot product
+front_percent_along_lengths = front_projection_distances./path_segment_lengths(front_indices);
+front_closest_path_points = path(front_indices,:) + path_vectors(front_indices,:).*front_percent_along_lengths;
+front_s_coordinates       = path_stations(front_indices) + path_segment_lengths(front_indices).*front_percent_along_lengths;
+
+
+
+
+%%  STEPS 4 and 5:
+%  4. Find projected point on the segment that has percentage of travel
+%  between 0 and 1
+%  5. If percentage of travel is not between 0 and 1 for both the segments,
+%  then choose the snap point as closest point, e.g. the result from step.
+%  For this special case, if the point is not clearly orthogonal to the
+%  path (which can happen at endpoints for flag types other than 4), it
+%  calculates the imaginary portion which is the orthogonal distance to the
+%  point as measured from the unit orthogonal projection from the path.
 
 % Fill in output defaults
 first_path_point_index  = closest_path_point_indicies;
@@ -327,18 +390,23 @@ percent_along_length = 0*closest_path_point_indicies;
 closest_path_points = path(closest_path_point_indicies,:);
 s_coordinates = 0*closest_path_point_indicies;
 
-% Check for error cases that should never happen
+%% Check for the case of points before the start
 indicies_to_check = find(back_percent_along_lengths<0, 1);
 if ~isempty(indicies_to_check)
-    % Point is located BEHIND the vector that is the rear-most vector -
-    % This typically happens for points before the start point.
+    % Point must be located BEHIND the vector that is the rear-most vector -
+    % This typically happens for points before the start point. 
+
+    % Check that the nearest point is indeed the first point
+    if ~all(closest_path_point_indicies(indicies_to_check)==1)
+        error('Negative percent distances detected when closest point NOT first point. This needs to be debugged!');
+    end
 
     % Calculate the outputs
-    first_path_point_index(indicies_to_check)  = closest_path_point_indicies(indicies_to_check);
-    second_path_point_index(indicies_to_check) = closest_path_point_indicies(indicies_to_check);
+    first_path_point_index(indicies_to_check)  = 1; % closest_path_point_indicies(indicies_to_check);
+    second_path_point_index(indicies_to_check) = 2; % closest_path_point_indicies(indicies_to_check);
     percent_along_length(indicies_to_check)    = back_percent_along_lengths(indicies_to_check);
-    closest_path_points(indicies_to_check,:)   = path(closest_path_point_indicies((indicies_to_check),:));
-    s_coordinates(indicies_to_check)           = back_projection_distances(indicies_to_check).*percent_along_length(indicies_to_check);
+    closest_path_points(indicies_to_check,:)   = path(1,:);
+    s_coordinates(indicies_to_check)           = back_projection_distances(1).*percent_along_length(indicies_to_check);
 
     % The conversion into imaginary distance depends on the snap
     % type
@@ -377,17 +445,66 @@ if ~isempty(indicies_to_check)
     end
 end
 
-
+%% Check for points past the end
 indicies_to_check = find(front_percent_along_lengths>1, 1); 
 if ~isempty(indicies_to_check)
-    % URHERE
-        % Point is located BEHIND the vector that is the rear-most vector -
-        % not possible, as this should only happen if snap point is start
-        % and that is caught in previous if statement
-         error('ERROR: Point is lying AHEAD of the FRONT segment on path');
+    % Point must be located AHEAD the vector that is the front-most vector -
+    % This typically happens for points after the end point. 
+
+    % Check that the nearest point is indeed the end point
+    if ~all(closest_path_point_indicies(indicies_to_check)==Npath)
+        error('Greater than 100 percent distances detected when closest point NOT end point. This needs to be debugged!');
+    end
+
+    % Calculate the outputs
+    first_path_point_index(indicies_to_check)  = Npath-1; % closest_path_point_indicies(indicies_to_check);
+    second_path_point_index(indicies_to_check) = Npath; % closest_path_point_indicies(indicies_to_check);
+    percent_along_length(indicies_to_check)    = front_percent_along_lengths(indicies_to_check);
+    closest_path_points(indicies_to_check,:)   = path(Npath,:);
+    s_coordinates(indicies_to_check)           = front_projection_distances(end).*percent_along_length(indicies_to_check);
+
+    % The conversion into imaginary distance depends on the snap
+    % type
+    %          flag_rounding_type = 1;  % This is the default, and indicates
+    %          that the orthogonal projection of an endpoint is created by the
+    %          PRIOR segment leading up to each station query point.
+    %
+    %          flag_rounding_type = 2;  % This indicates that the orthogonal
+    %          projection of an endpoint is created by the FOLLOWING segment
+    %          after each station query point.
+    %
+    %          flag_rounding_type = 3;  % This indicates that the orthogonal
+    %          projection, ONLY if the station query falls at the joining point
+    %          between two segments (e.g. is on the "joint"), then the
+    %          projection is created by averaging the vector projections
+    %          created from the PRIOR segment and FOLLOWING segment.
+    %
+    %          flag_rounding_type = 4;  % This indicates that the orthogonal
+    %          projections along segments should be calculated at the midpoints
+    %          of each segment, and then for each station qeuary, the vector
+    %          projections are interpolated from their prior and subsequent
+    %          vectors.
+    %
+    switch flag_rounding_type
+        case 1 % Use the rear vector
+            unit_orthogonal_projection_vector(indicies_to_check,:) = back_unit_orthogonal_vector(indicies_to_check,:);
+        case 2 % Use the front vector (WHICH IN THIS CASE IS BACK)
+            unit_orthogonal_projection_vector(indicies_to_check,:) = back_unit_orthogonal_vector(indicies_to_check,:);
+        case 3 % Use the average of the front and rear vectors
+            unit_orthogonal_projection_vector(indicies_to_check,:) = back_unit_orthogonal_vector(indicies_to_check,:);
+        case 4
+            % This is a very special case, handled separately
+            error('Not coded yet!');
+        otherwise
+            error('Unknown flag_rounding_type');
+    end
 end
 
-
+%% Check the case that the point is between back and front segments 
+% e.g. back percentage along length is positive, but before the front
+% percentage is negative. This only happens when the point is on the
+% outside angle of an joint between segments, where the segments are
+% bending away from the point.
 indicies_to_check = find((back_percent_along_lengths>1).*(front_percent_along_lengths<0)); 
 if ~isempty(indicies_to_check)
 
@@ -446,7 +563,9 @@ if ~isempty(indicies_to_check)
     end
 end
 
-
+%% Check the case that the point is within the "front" segment, 
+% e.g. back percentage along length is positive, and front percentage is
+% positive.
 indicies_to_check = find((back_percent_along_lengths>1).*(front_percent_along_lengths>=0)); 
 if ~isempty(indicies_to_check)
     % Only way to enter here is if point is after the back segement,
@@ -464,24 +583,30 @@ if ~isempty(indicies_to_check)
 end
 
 
-
-indicies_to_check = find((back_percent_along_lengths<=1).*(front_percent_along_lengths<0)); 
+%% Check the case that the point is purely within the "back" segment, 
+% e.g. back percentage along length is positive, and front percentage is
+% negative.
+indicies_to_check = find((back_percent_along_lengths>=0).*(back_percent_along_lengths<=1).*(front_percent_along_lengths<0)); 
 if ~isempty(indicies_to_check)
     % Point is in back segment, and before front segment. Just use
     % the back segment results.
 
     % Calculate the outputs
-    first_path_point_index(indicies_to_check,:)  = closest_path_point_indicies(indicies_to_check,:)-1;
-    second_path_point_index(indicies_to_check,:) = closest_path_point_indicies(indicies_to_check,:);
+    first_path_point_index(indicies_to_check,:)  = closest_path_point_indicies(indicies_to_check,:);
+    second_path_point_index(indicies_to_check,:) = closest_path_point_indicies(indicies_to_check,:)+1;
     percent_along_length(indicies_to_check,:)    = back_percent_along_lengths(indicies_to_check,:);
     closest_path_points(indicies_to_check,:)     = back_closest_path_points(indicies_to_check,:);
     s_coordinates(indicies_to_check,:)           = back_s_coordinates(indicies_to_check,:);
     unit_orthogonal_projection_vector(indicies_to_check,:) = back_unit_orthogonal_vector(indicies_to_check,:);
 end
 
-
-indicies_to_check = find((back_percent_along_lengths<=1).*(front_percent_along_lengths>=0)); 
+%% Check the case that the point is within the "back" and "front" segments
+% e.g. back percentage along length is positive, and also within the front
+% segment, e.g. the front percentage is positive. This occurs when points
+% are within the interior bend of two segments joining at an angle.
+indicies_to_check = find((back_percent_along_lengths>=0).*(back_percent_along_lengths<=1).*(front_percent_along_lengths>=0)); 
 if ~isempty(indicies_to_check)
+    % TESTED:
     % Only way to enter here is if point is in the back segement,
     % and in front segment. This occurs when the point is
     % on the both the back and front vectors "main" area. We just
@@ -495,8 +620,8 @@ if ~isempty(indicies_to_check)
 
     % Front segment is closer
     if ~isempty(front_closer_indicies)
-        first_path_point_index(front_closer_indicies,:)  = closest_path_point_indicies(front_closer_indicies,:) ;
-        second_path_point_index(front_closer_indicies,:) = closest_path_point_indicies(front_closer_indicies,:) +1;
+        first_path_point_index(front_closer_indicies,:)  = closest_path_point_indicies(front_closer_indicies,:);
+        second_path_point_index(front_closer_indicies,:) = closest_path_point_indicies(front_closer_indicies,:) + 1;
         percent_along_length(front_closer_indicies,:)    = front_percent_along_lengths(front_closer_indicies,:) ;
         closest_path_points(front_closer_indicies,:)     = front_closest_path_points(front_closer_indicies,:) ;
         s_coordinates(front_closer_indicies,:)           = front_s_coordinates(front_closer_indicies,:) ;
@@ -505,8 +630,8 @@ if ~isempty(indicies_to_check)
 
     % Back segment is closer
     if ~isempty(rear_closer_indicies)
-        first_path_point_index(rear_closer_indicies,:)   = closest_path_point_indicies(rear_closer_indicies,:) -1;
-        second_path_point_index(rear_closer_indicies,:)  = closest_path_point_indicies(rear_closer_indicies,:) ;
+        first_path_point_index(rear_closer_indicies,:)   = closest_path_point_indicies(rear_closer_indicies,:) - 1;
+        second_path_point_index(rear_closer_indicies,:)  = closest_path_point_indicies(rear_closer_indicies,:);
         percent_along_length(rear_closer_indicies,:)     = back_percent_along_lengths(rear_closer_indicies,:) ;
         closest_path_points(rear_closer_indicies,:)      = back_closest_path_points(rear_closer_indicies,:) ;
         s_coordinates(rear_closer_indicies,:)            = back_s_coordinates(rear_closer_indicies,:) ;
@@ -537,7 +662,7 @@ end
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_debug
+if flag_do_plots
     figure(fig_num);
     clf;
     hold on;
@@ -548,11 +673,15 @@ if flag_do_debug
         % Plot the path
         plot(path(:,1),path(:,2),'r-','Linewidth',5);
         plot(path(:,1),path(:,2),'r.','Markersize',20);
+        for ith_point = 1:length(path(:,1))
+            text(path(ith_point,1),path(ith_point,2),sprintf('%.0d',ith_point),'Color',[1 0 0],'FontSize',12,'VerticalAlignment','bottom');
+        end
         
         axis equal;
         
         % Plot the query points
         plot(points(:,1),points(:,2),'k.','MarkerSize',20);
+
         
         %         % Plot the closest path points;
         %         plot(...
@@ -570,9 +699,9 @@ if flag_do_debug
             % Label the points with distances
             midpoint = (closest_path_points(ith_point,:) + points(ith_point,:))/2;
             if distance_imaginary==0
-                distance_string = sprintf('distance = %.2f',distance_real(ith_point));
+                distance_string = sprintf('Between points %.0d %.0d, distance = %.2f',first_path_point_index, second_path_point_index, distance_real(ith_point));
             else
-                distance_string = sprintf('distance = %.2f + %.2f i',distance_real(ith_point),distance_imaginary(ith_point));
+                distance_string = sprintf('Between points %.0d %.0d, distance = %.2f + %.2f i',first_path_point_index, second_path_point_index, distance_real(ith_point),distance_imaginary(ith_point));
             end
             text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');
             
