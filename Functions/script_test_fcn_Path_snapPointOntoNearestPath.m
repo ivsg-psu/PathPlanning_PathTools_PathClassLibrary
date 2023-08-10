@@ -42,10 +42,72 @@ close all;
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Basic%20Example
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
+
+%% BASIC example 0
+% A simple line segment, a simple query, zero distance in rear segments
+point = [0.5 0.5];
+pathXY = [0 0;2 2];
+flag_snap_type = 1;
+
+fignum = 111;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
+%% BASIC example 0.1
+% A simple line segment, a simple query, zero distance in rear segments,
+% negative percent length
+point = [-0.5 -0.5];
+pathXY = [0 0;2 2];
+flag_snap_type = 1;
+
+fignum = 111;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
+%% BASIC example 0.2
+% A simple line segment, a simple query, zero distance in rear segments,
+% positive percent length over 100%
+point = [3 3];
+pathXY = [0 0;2 2];
+flag_snap_type = 1;
+
+fignum = 111;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
 %% BASIC example 1
-% A simple line segment, a simple query, positive distance in both front
-% and rear segments
-point = [0.5 2];
+% A simple line segment, a simple query, positive distance in rear segments
+point = [0.5 1.5];
 pathXY = [0 0;3 0; 5 2; 8 2];
 flag_snap_type = 1;
 
@@ -66,7 +128,7 @@ fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
 %% BASIC example 1.1
 % A simple line segment, a simple query, negative distance in both front
 % and rear segments
-point = [5 0.5];
+point = [4.5 1];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
 flag_snap_type = 1;
@@ -88,7 +150,29 @@ fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
 %% BASIC example 1.2
 % A simple line segment, a simple query, negative distance in both front
 % and rear segments
-point = [4 1];
+point = [5.4 1.5];
+pathXY = [0 0;3 0; 5 2; 8 2];
+
+flag_snap_type = 1;
+
+fignum = 111;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
+    '\t\t Matched to the path segment given by indices %d and %d, \n' ...
+    '\t\t S-coordinate is: %.2f, \n' ...
+    '\t\t percent_along_length is: %.2f\n' ...
+    '\t\t real distance is: %.2f\n, ' ...
+    '\t\t imag distance is %.2f\n, '],...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length,...
+    distance_real,distance_imaginary);
+
+%% BASIC example 1.3
+% A simple line segment, a simple query, postive distance in both front
+% and rear segments
+point = [2 3];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
 flag_snap_type = 1;
@@ -151,10 +235,8 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 5
 % A simple line segment, a post-end query, positive distance
-point = [1 2];
+point = [9 3];
 pathXY = [0 0;3 0; 5 2; 8 2];
-
-
 
 fignum = 555;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -163,11 +245,10 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
     s_coordinate, percent_along_length);
-xlim([-1 3])
 
 %% BASIC example 6
 % A simple line segment, a post-end query, positive distance
-point = [2 1];
+point = [9 1];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
 
@@ -178,7 +259,6 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     fignum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
     s_coordinate, percent_along_length);
-xlim([-1 3])
 
 
 %% Flag Tests
@@ -194,6 +274,29 @@ xlim([-1 3])
 %                  |___/                          
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Flag%20Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+%% BASIC example 1.001
+% Tests the flag_snap_type cases with an outside corner point
+points = [2.5 1.3];
+pathXY = [1 1; 2 1; 2 0]; % Define an XY path
+flags_snap_type = [1; 2; 3];
+
+
+for ith_flag = 1:length(flags_snap_type(:,1))
+    flag_snap_type = flags_snap_type(ith_flag,:);
+    fignum = 111100+ith_flag;
+    figure(fignum); clf;
+
+    [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+        fcn_Path_snapPointOntoNearestPath(points, pathXY,flag_snap_type,fignum);
+    title(sprintf('Flag type: %.0d',flag_snap_type));
+
+    axis([-1 4 -1 3]);
+    fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+        fignum, closest_path_point(1,1),closest_path_point(1,2),...
+        first_path_point_index,second_path_point_index, ...
+        s_coordinate, percent_along_length);
+end
+
 
 %% BASIC example 1.01
 % Tests the flag_snap_type = 1 case
@@ -204,7 +307,8 @@ flag_snap_type = 1;
 
 for ith_point = 1:length(points(:,1))
     point = points(ith_point,:);
-    fignum = 11100+ith_point;
+    fignum = 11101;
+    figure(fignum); clf;
     [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
         fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
     axis([-1 4 -1 3]);
@@ -227,7 +331,7 @@ flag_snap_type = 2;
 
 for ith_point = 1:length(points(:,1))
     point = points(ith_point,:);
-    fignum = 11100+ith_point;
+    fignum = 11102;
     [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
         fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
     axis([-1 4 -1 3]);
@@ -247,7 +351,7 @@ flag_snap_type = 3;
 
 for ith_point = 1:length(points(:,1))
     point = points(ith_point,:);
-    fignum = 11100+ith_point;
+    fignum = 11103;
     [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
         fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
     axis([-1 4 -1 3]);
@@ -258,32 +362,33 @@ for ith_point = 1:length(points(:,1))
 end
 
 
-%% BASIC example 1.04
-% Tests the flag_snap_type = 4 case
-points = [0.5 1.5; 1 1.5; 1.5 1.5; 2 1.5; 2.5 2; 2.5 1.5; 2.5 1; 2.5 0.5; 2.5 0; 2.5 -0.5; 2 -0.5; 1.5 -0.5; 1.5 0; 1.5 0.5; 1 0.5; 0.5 0.5; 0.5 1];
-pathXY = [1 1; 2 1; 2 0]; % Define an XY path
-flag_snap_type = 4;
-
-
-for ith_point = 1:length(points(:,1))
-    point = points(ith_point,:);
-    fignum = 11100+ith_point;
-    [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
-        fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
-    axis([-1 4 -1 3]);
-    fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
-        fignum, closest_path_point(1,1),closest_path_point(1,2),...
-        first_path_point_index,second_path_point_index, ...
-        s_coordinate, percent_along_length);
-end
+% %% BASIC example 1.04
+% % Tests the flag_snap_type = 4 case
+% points = [0.5 1.5; 1 1.5; 1.5 1.5; 2 1.5; 2.5 2; 2.5 1.5; 2.5 1; 2.5 0.5; 2.5 0; 2.5 -0.5; 2 -0.5; 1.5 -0.5; 1.5 0; 1.5 0.5; 1 0.5; 0.5 0.5; 0.5 1];
+% pathXY = [1 1; 2 1; 2 0]; % Define an XY path
+% flag_snap_type = 4;
+% 
+% 
+% for ith_point = 1:length(points(:,1))
+%     point = points(ith_point,:);
+%     fignum = 11104;
+%     [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+%         fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+%     axis([-1 4 -1 3]);
+%     fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+%         fignum, closest_path_point(1,1),closest_path_point(1,2),...
+%         first_path_point_index,second_path_point_index, ...
+%         s_coordinate, percent_along_length);
+% end
 
 
 %% BASIC example 1.01
 % Tests the before start case
+flag_snap_type = 1;
 point = [0.4 0.2];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11101;
+fignum = 111001;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -293,10 +398,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 1.02
 % Tests the after end case
+flag_snap_type = 1;
 point = [1.1 0.4];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11102;
+fignum = 111002;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -307,10 +413,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 1.03
 % Tests the after back and before front case
+flag_snap_type = 1;
 point = [0.9 1];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11103;
+fignum = 111003;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -321,10 +428,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 1.04
 % Tests the after back and in front case
+flag_snap_type = 1;
 point = [1.2 0.9];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11104;
+fignum = 111004;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -334,10 +442,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 1.05
 % Tests the in back and before front case
+flag_snap_type = 1;
 point = [0.6 0.9];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11105;
+fignum = 111005;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -348,10 +457,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 1.06
 % Tests the in back and in front case, where back wins
+flag_snap_type = 1;
 point = [0.8 0.7];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11106;
+fignum = 111006;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -362,10 +472,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 %% BASIC example 1.07
 % Tests the in back and in front case, where front wins
+flag_snap_type = 1;
 point = [0.9 0.7];
 pathXY = [0.5 0.2; 0.9 0.9; 1 0.4]; % Define an XY path
 
-fignum = 11106;
+fignum = 111007;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -384,10 +495,11 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 
 
 %% BASIC example 1.01
+flag_snap_type = 1;
 point = [0.5 0.5];
 pathXY = [0.5 0.2; 0.9 0.9; 1.5 0.6]; % Define an XY path
 
-fignum = 11101;
+fignum = 111;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -396,6 +508,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     s_coordinate, percent_along_length);
 
 %% BASIC example 1.2 - works
+flag_snap_type = 1;
 point = [1.4 1.3]; % Define the query point
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
 fignum = 112; % Define the figure number
@@ -417,6 +530,7 @@ fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
 %% BASIC example 1.21 - works
+flag_snap_type = 1;
 point = [0.5 0.75]; % Define the query point
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
 fignum = 112; % Define the figure number
@@ -439,6 +553,7 @@ fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
 
 %% BASIC example 1.3 - works
+flag_snap_type = 1;
 point = [1.5 1];
 % pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
@@ -463,6 +578,7 @@ fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
 
 %% BASIC example 1.4 - works, but shows that it is on neither segement
+flag_snap_type = 1;
 point = [0.9 1.4]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
 
@@ -485,6 +601,7 @@ fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
 %% BASIC example 1.5 - works, but is on BOTH segments
+flag_snap_type = 1;
 point = [1 0.5]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
 
@@ -507,10 +624,11 @@ fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
 %% BASIC example 1.5 - works, but is on BOTH segments
+flag_snap_type = 1;
 point = [1 0.5]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
 
-fignum = 115;
+fignum = 1152;
 
 % Snap the point onto the path
 [closest_path_point,s_coordinate,...
@@ -529,8 +647,10 @@ fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
 %% BASIC example 1.6 - all points
+flag_snap_type = 1;
 %pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
 pathXY = [0.5 0.2; 0.9 0.9; 1.5 0.6]; % Define an XY path
+% pathXY = [0 0; 1 1]; 
 
 
 x_range = linspace(-4,4,100);
