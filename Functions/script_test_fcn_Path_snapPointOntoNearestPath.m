@@ -252,7 +252,7 @@ point = [9 1];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
 
-fignum = 666;
+fignum = 6661;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
@@ -260,6 +260,49 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     first_path_point_index,second_path_point_index, ...
     s_coordinate, percent_along_length);
 
+
+
+%% BASIC example 7.1
+% A right angle, at midpoint in angle
+point = [1 1];
+pathXY = [1 0;0 0; 0 1];
+
+
+fignum = 7771;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length);
+
+%% BASIC example 7.2
+% A right angle, at midpoint in angle
+point = [0.5 0.5];
+pathXY = [1 0;0 0; 0 1];
+
+
+fignum = 7771;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length);
+
+%% BASIC example 7.2
+% A right angle, at nudge from midpoint in angle
+point = [0.40 0.5];
+pathXY = [1 0;0 0; 0 1];
+
+
+fignum = 7772;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length);
 
 %% Flag Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

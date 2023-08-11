@@ -1129,22 +1129,22 @@ if 1==0
     fcn_Path_plotTraversalsXY(data,fig_num);
 end
 
-%% Averaging by station, fcn_Path_findAverageTraversalViaStationAlignment
-% fcn_Path_findAverageTraversalViaStationAlignment
-% finds the average traversal of several traversals by averaging the
-% lateral offsets at the same stations.
-
-[aligned_Data_ByStation,mean_Data] = ...
-    fcn_Path_findAverageTraversalViaStationAlignment(data);
-
-% Plot the final XY result of mean station
-path_points_fig = 11111;
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
-title('Original paths and final average path via station averaging')
-xlabel('X [m]')
-ylabel('Y [m]')
+% %% Averaging by station, fcn_Path_findAverageTraversalViaStationAlignment
+% % fcn_Path_findAverageTraversalViaStationAlignment
+% % finds the average traversal of several traversals by averaging the
+% % lateral offsets at the same stations.
+% 
+% [aligned_Data_ByStation,mean_Data] = ...
+%     fcn_Path_findAverageTraversalViaStationAlignment(data);
+% 
+% % Plot the final XY result of mean station
+% path_points_fig = 11111;
+% fcn_Path_plotTraversalsXY(data,path_points_fig);
+% hold on
+% plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
+% title('Original paths and final average path via station averaging')
+% xlabel('X [m]')
+% ylabel('Y [m]')
 
 
 %% Averaging by closest point, fcn_Path_findAverageTraversalViaClosestPoint
@@ -1198,7 +1198,7 @@ path_points_fig = 123;
 figure(path_points_fig);
 clf;
 hold on
-plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
+% plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
 plot(path_average_final2.X,path_average_final2.Y,'Linewidth',4);
 plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
 fcn_Path_plotTraversalsXY(data,path_points_fig);

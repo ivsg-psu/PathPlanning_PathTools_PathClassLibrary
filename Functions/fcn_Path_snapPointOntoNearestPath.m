@@ -228,6 +228,9 @@ end
 % How many points are on the path? How many points are we testing?
 Npath = length(path(:,1));
 Npoints = length(points(:,1));
+flag_3D = 0;
+point_dimension = length(points(1,:));
+
 
 % The solution method is as follows:
 %  1. Find the closest point on the path to the query point
@@ -310,7 +313,12 @@ path_vectors(end+1,:)  = path_vectors(end,:);
 
 % Calculate the unit vectors
 unit_tangential_vectors = path_vectors./path_segment_lengths;
-unit_orthogonal_vectors = unit_tangential_vectors*[0 1; -1 0]; % Rotate by 90 degrees
+if point_dimension == 3
+    rotation_matrix = [0 1 0; -1 0 0; 0 0 1];
+else
+    rotation_matrix = [0 1; -1 0];
+end
+unit_orthogonal_vectors = unit_tangential_vectors*rotation_matrix; % Rotate by 90 degrees
 
 
 
@@ -442,7 +450,7 @@ end
 closest_path_vertex_points = path(closest_path_point_indicies,:);
 closest_s_coordinates = path_stations(closest_path_point_indicies);
 s_coordinate_perturbations = nan*closest_s_coordinates;
-unit_orthogonal_projection_vectors = nan(length(closest_s_coordinates),2);
+unit_orthogonal_projection_vectors = nan(length(closest_s_coordinates),point_dimension);
 
 % Keep flags to check whether we need to calculate an imaginary component
 flags_calculate_imaginary = nan(length(closest_s_coordinates),1);
@@ -450,6 +458,7 @@ flags_calculate_imaginary = nan(length(closest_s_coordinates),1);
 %% 4a. If one is positive, use that segment to calculate values
 query_point_indicies_to_check = find((query_point_back_tangential_distances>=0).*(query_point_front_tangential_distances<0)); 
 if ~isempty(query_point_indicies_to_check)
+    % This is the case where the point is squarely in the back section
     % TESTED
     % Point must be located BEHIND the closest point 
     s_coordinate_perturbations(query_point_indicies_to_check) = -query_point_back_tangential_distances(query_point_indicies_to_check);
@@ -459,6 +468,7 @@ end
 
 query_point_indicies_to_check = find((query_point_back_tangential_distances<=0).*(query_point_front_tangential_distances>=0)); 
 if ~isempty(query_point_indicies_to_check)
+    % This is the case where the point is squarely in the front section
 
     % TESTED
     % Point must be located AHEAD of the closest point 
@@ -470,15 +480,18 @@ end
 %%  4b. If both are positive, use the one that has the smallest orthogonal distance,
 query_point_indicies_to_check = find((query_point_back_tangential_distances>=0).*(query_point_front_tangential_distances>=0)); 
 if ~isempty(query_point_indicies_to_check)
+    % This is the case where the point is in the inside of a bend between front and back
 
     % TESTED
     % Is point closer to rear, orthogonally?
-    back_is_closer = query_point_indicies_to_check(query_point_back_orthogonal_distances(query_point_indicies_to_check)<query_point_front_orthogonal_distances(query_point_indicies_to_check));
+    abs_back_distances = abs(query_point_back_orthogonal_distances(query_point_indicies_to_check));
+    abs_front_distances = abs(query_point_front_orthogonal_distances(query_point_indicies_to_check));
+    back_is_closer = query_point_indicies_to_check(abs_back_distances<abs_front_distances);
     s_coordinate_perturbations(back_is_closer) =  -query_point_back_tangential_distances(back_is_closer);
     unit_orthogonal_projection_vectors(back_is_closer,:) = behind_unit_orthogonal_vectors(closest_path_point_indicies(back_is_closer),:);
 
     % Is point closer to front, orthogonally?
-    front_is_closer = query_point_indicies_to_check(query_point_back_orthogonal_distances(query_point_indicies_to_check)>=query_point_front_orthogonal_distances(query_point_indicies_to_check));
+    front_is_closer = query_point_indicies_to_check(abs_back_distances>=abs_front_distances);
     s_coordinate_perturbations(front_is_closer) =  query_point_front_tangential_distances(front_is_closer);
     unit_orthogonal_projection_vectors(front_is_closer,:) = ahead_unit_orthogonal_vectors(closest_path_point_indicies(front_is_closer),:);
 
@@ -488,6 +501,7 @@ end
 %%  4c. If neither are positive, use the flag type to disambiguate
 query_point_indicies_to_check = find((query_point_back_tangential_distances<0).*(query_point_front_tangential_distances<0)); 
 if ~isempty(query_point_indicies_to_check)
+    % This is the case where the point is in the outside of a bend between front and back
 
     % The conversion into imaginary distance depends on the snap
     % type
@@ -589,7 +603,7 @@ distances_imaginary = distances_imaginary.*(1.00*flags_calculate_imaginary);
 
 % Calculate closest_path_points
 closest_path_points = path(first_path_point_indicies,:) + ...
-                percent_along_length*(path(second_path_point_indicies,:)-path(first_path_point_indicies,:));
+                percent_along_length.*(path(second_path_point_indicies,:)-path(first_path_point_indicies,:));
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -643,19 +657,17 @@ if flag_do_plots
             %text(midpoint(1,1),midpoint(1,2),'Reference vector','LineWidth',2,'VerticalAlignment','bottom');
             
             % Label the points with distances
-            midpoint = (closest_path_vertex_points(ith_point,:) + points(ith_point,:))/2;
+            midpoint = (closest_path_points(ith_point,:) + points(ith_point,:))/2;
 
             if distances_imaginary(ith_point)==0
-                distance_string = sprintf('Between points %.0d %.0d, distance = %.2f',first_path_point_indicies(ith_point), second_path_point_indicies(ith_point), distances_real(ith_point));
+                distance_string = sprintf('Between points %.0d %.0d,\n distance = %.2f,\n %% on path = %.2f',...
+                    first_path_point_indicies(ith_point), second_path_point_indicies(ith_point), distances_real(ith_point), percent_along_length(ith_point));
             else
-                distance_string = sprintf('Between points %.0d %.0d, distance = %.2f + %.2f i',first_path_point_indicies(ith_point), second_path_point_indicies(ith_point), distances_real(ith_point),distances_imaginary(ith_point));
+                distance_string = sprintf('Between points %.0d %.0d,\n distance = %.2f + %.2f i,\n %% on path = %.2f',...
+                    first_path_point_indicies(ith_point), second_path_point_indicies(ith_point), distances_real(ith_point),distances_imaginary(ith_point),percent_along_length(ith_point));
             end
 
-            text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');
-            
-            % Plot the closest point on path
-            plot(closest_path_vertex_points(ith_point,1),closest_path_vertex_points(ith_point,2),'g.','Markersize',20);
-            text(closest_path_vertex_points(ith_point,1),closest_path_vertex_points(ith_point,2),'Snap Point on Path');
+            text(midpoint(1,1),midpoint(1,2),distance_string,'VerticalAlignment','top');            
 
 
             % Connect closest point on path to query point
@@ -665,6 +677,9 @@ if flag_do_plots
                 [points(ith_point,1) closest_point(1,1)],...
                 [points(ith_point,2) closest_point(1,2)],'g-','Linewidth',2);
 
+            % Plot the closest point on path
+            plot(closest_point(1,1),closest_point(1,2),'g.','Markersize',20);
+            text(closest_point(1,1),closest_point(1,2),'Snap Point on Path');
         end
 
         % Make axis slightly larger
@@ -714,6 +729,7 @@ if flag_do_plots
             [points(:,3) closest_path_vertex_points(:,3)],...
             'g-','Linewidth',2);
         
+        view(3);
 
     end
 end % Ends the flag_do_debug if statement
@@ -786,7 +802,14 @@ function     [real_distance, imag_distance] = ...
 % converstions from path offsets in XY to Sy representations, and vice
 % versa.
 
-unit_projection_vector_of_imag_axis = unit_projection_vector_of_real_axis*[0 1; -1 0]; % Rotate by 90 degrees
+point_dimension = length(unit_projection_vector_of_real_axis(1,:));
+if point_dimension == 3
+    rotation_matrix = [0 1 0; -1 0 0; 0 0 1];
+else
+    rotation_matrix = [0 1; -1 0];
+end
+
+unit_projection_vector_of_imag_axis = unit_projection_vector_of_real_axis*rotation_matrix; % Rotate by 90 degrees
 
 start_to_point_vector = point_to_convert-origin_point;
 real_distance  = sum(unit_projection_vector_of_real_axis.*start_to_point_vector,2); % Do dot product
