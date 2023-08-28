@@ -31,17 +31,12 @@ library_folders{ith_library} = {'Functions','Data'};
 library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2023_04_22.zip';
 
 ith_library = ith_library+1;
-library_name{ith_library}    = 'GPSClass_v2023_04_21';
-library_folders{ith_library} = {''};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_GPSRelatedCodes_GPSClass/archive/refs/tags/GPSClass_v2023_04_21.zip';
+library_name{ith_library}    = 'GPSClass_v2023_06_29';
+library_folders{ith_library} = {'Functions'};
+library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_GPSRelatedCodes_GPSClass/archive/refs/tags/GPSClass_v2023_06_29.zip';
 
 
-
-% ith_library = ith_library+1;
-% library_name{ith_library}    = 'PathClass_v2023_02_01';
-% library_folders{ith_library} = {'Functions'};                                
-% library_url{ith_library}     = 'https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary/blob/main/Releases/PathClass_v2023_02_01.zip?raw=true';
-% 
+ 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GetUserInputPath_v2023_02_01';
 % library_folders{ith_library} = {''};
@@ -1343,6 +1338,35 @@ fignum = 113; % Define the figure number
 
 % Snap the point onto the path
 elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fignum);
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% See http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=XYZ%20%20to%20STH%20%0Aand%20%0ASTH%20%20to%20XYZ%20%20%20%20%0AConversions%0A
+%  __   ____     ________   _           _____ _______ _    _     
+%  \ \ / /\ \   / /___  /  | |         / ____|__   __| |  | |    
+%   \ V /  \ \_/ /   / /   | |_ ___   | (___    | |  | |__| |    
+%    > <    \   /   / /    | __/ _ \   \___ \   | |  |  __  |    
+%   / . \    | |   / /__   | || (_) |  ____) |  | |  | |  | |    
+%  /_/ \_\   |_|  /_____|   \__\___/  |_____/   |_|  |_|  |_|    
+%                  | |                                           
+%    __ _ _ __   __| |                                           
+%   / _` | '_ \ / _` |                                           
+%  | (_| | | | | (_| |                                           
+%   \__,_|_| |_|\__,_|                                           
+%    _____ _______ _    _    _         __   ____     ________    
+%   / ____|__   __| |  | |  | |        \ \ / /\ \   / /___  /    
+%  | (___    | |  | |__| |  | |_ ___    \ V /  \ \_/ /   / /     
+%   \___ \   | |  |  __  |  | __/ _ \    > <    \   /   / /      
+%   ____) |  | |  | |  | |  | || (_) |  / . \    | |   / /__     
+%  |_____/   |_|  |_|  |_|   \__\___/  /_/ \_\   |_|  /_____|    
+%   / ____|                            (_)                       
+%  | |     ___  _ ____   _____ _ __ ___ _  ___  _ __  ___        
+%  | |    / _ \| '_ \ \ / / _ \ '__/ __| |/ _ \| '_ \/ __|       
+%  | |___| (_) | | | \ V /  __/ |  \__ \ | (_) | | | \__ \       
+%   \_____\___/|_| |_|\_/ \___|_|  |___/_|\___/|_| |_|___/       
+%                                                                
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                                               
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

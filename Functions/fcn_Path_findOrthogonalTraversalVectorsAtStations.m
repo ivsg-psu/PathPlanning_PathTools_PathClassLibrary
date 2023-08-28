@@ -79,16 +79,21 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 % Questions or comments? sbrennan@psu.edu 
 
 % Revision history:
-%      2020_12_31:
-%      -- first write of the code via modification from 
-%      fcn_Path_FindOrthogonalHitFromPathToPath
-%      2021_01_07
-%      -- renamed to transition from path to traversal notation 
-%      2021_12_27:
-%      -- corrected dependencies in comments
-%      2023_04_29:
-%      -- added capability for interpolated results at endpoints that are
-%      undefined, using imaginary inputs. See flag type 5.
+%  2020_12_31:
+%  -- first write of the code via modification from 
+%  fcn_Path_FindOrthogonalHitFromPathToPath
+%  2021_01_07
+%  -- renamed to transition from path to traversal notation 
+%  2021_12_27:
+%  -- corrected dependencies in comments
+%  2023_04_29:
+%  -- added capability for interpolated results at endpoints that are
+%  undefined, using imaginary inputs. See flag type 5.
+%  2023_08_27:
+%  -- fixed bug when many points are filled with the first or last
+%  vector, when previous version of code could only handle one point
+%  -- Cleaned up input checking a bit, allowing empty inputs and using
+%  narginchk
 
 % TO DO:
 % Define search radius - need to let user define this as an input!
@@ -119,9 +124,7 @@ end
 
 if flag_check_inputs == 1
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 4
-        error('Incorrect number of input arguments')
-    end
+    narginchk(2,4);
     
     % Check the station_queries input
     fcn_Path_checkInputsToFunctions(station_queries, 'station');
@@ -139,26 +142,27 @@ if flag_check_inputs == 1
     
 end
 
-
-flag_rounding_type = 1; % Set default value
-
-
-% Does the user want to give a different rounding type?
+% Does user want to specify the rounding type?
+flag_rounding_type = 1;
 if 3 <= nargin
-    flag_rounding_type = varargin{1};
+    temp = varargin{1};
+    if ~isempty(temp)
+        flag_rounding_type=temp;
+    end
 end
 
 % Does user want to show the plots?
 if 4 == nargin
-    fig_num = varargin{2};
-    figure(fig_num);
-    flag_do_plots = 1;
-else
-    if flag_do_debug
+    temp = varargin{end};
+    if ~isempty(temp)
+        fig_num = temp;
         flag_do_plots = 1;
-        fig = figure; 
-        fig_num = fig.Number;
     end
+end
+
+
+if flag_do_debug
+    fig_debug = 818181; %#ok<*UNRCH> 
 end
 
 %% Start of main code
@@ -176,63 +180,12 @@ Station_central = central_traversal.Station;
 X_central       = central_traversal.X;
 Y_central       = central_traversal.Y;
 
-%% Find the midpoint tangent vectors for all segments in the central path 
-% These are used to calculate the midpoint vectors at each segment
-% Find changes in X and Y for each segment
-delta_X_midpoints = diff(X_central);
-delta_Y_midpoints = diff(Y_central);
 
-% Convert these into vector form
-tangent_vectors_at_midpoints = [delta_X_midpoints delta_Y_midpoints];  
-magnitudes = sum(tangent_vectors_at_midpoints.^2,2).^0.5;
-tangent_unit_vectors_at_midpoints = tangent_vectors_at_midpoints./magnitudes;
-normal_unit_vectors_at_midpoints= tangent_unit_vectors_at_midpoints*[0 1; -1 0];
-
-%% Find the joint tangent vectors for all joints in the central path 
-% The joint projection vector for each joint will depend on the input
-% options. For options where the orthogonal projection only uses the prior
-% or subsequent values, we can use the previously calculated vectors. For
-% options where averaging is occuring, we use averages of vectors.
-% 
-% Note that the start and end points are considered "joints" also, so if
-% there are N segments, then there are N+1 joints.
-% 
-% Here's the rounding options:
-%      flag_rounding_type = 1;  % This is the default, and indicates that
-%      the orthogonal projection at a joint is created by the PRIOR
-%      segment.
-%
-%      flag_rounding_type = 2;  % This indicates that the orthogonal
-%      projection at a joint is created by the FOLLOWING segment.
-%
-%      flag_rounding_type = 3;  % This indicates that the orthogonal
-%      projection, ONLY at a joint, is created by averaging both the
-%      PRIOR segment and FOLLOWING segment.
-%
-%      flag_rounding_type = 4;  % This indicates that the orthogonal
-%      projections at the joint is created by averaging. Additionally,
-%      along the entire segment, vectors should be calculated by
-%      interpolating between the midpoint and the joint vectors.
-
-switch flag_rounding_type
-    case 1  % Default - use orthogonal projection via prior segment
-        joint_vectors = [normal_unit_vectors_at_midpoints(1,:); normal_unit_vectors_at_midpoints];
-    case 2  % Use orthogonal projection of subsequent segment
-        joint_vectors = [normal_unit_vectors_at_midpoints; normal_unit_vectors_at_midpoints(end,:)];
-    case 3  % Average the two segments but only at the endpoints
-        average_vectors = (normal_unit_vectors_at_midpoints(1:end-1,:)+normal_unit_vectors_at_midpoints(2:end,:))/2;
-        magnitudes = sum(average_vectors.^2,2).^0.5;
-        unit_average_vectors = average_vectors./magnitudes;
-        joint_vectors = [normal_unit_vectors_at_midpoints(1,:); unit_average_vectors; normal_unit_vectors_at_midpoints(end,:)];
-    case 4 % Average the two segments along all points
-        average_vectors = (normal_unit_vectors_at_midpoints(1:end-1,:)+normal_unit_vectors_at_midpoints(2:end,:))/2;
-        magnitudes = sum(average_vectors.^2,2).^0.5;
-        unit_average_vectors = average_vectors./magnitudes;
-        joint_vectors = [normal_unit_vectors_at_midpoints(1,:); unit_average_vectors; normal_unit_vectors_at_midpoints(end,:)];
-    otherwise
-        error('Unrecognized method in flag_rounding_type.');
-end
-
+%% Find the midpoint and joint tangent vectors for all segments 
+% Call the function fcn_Path_findPathOrthogonalVectors
+[normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
+    fcn_Path_findPathOrthogonalVectors([X_central Y_central],flag_rounding_type);
+tangent_unit_vectors_at_midpoints = normal_unit_vectors_at_midpoints*[0 -1; 1 0];
 
 
 %% Find the XY of query station coordinates on the central trajectory 
@@ -240,6 +193,7 @@ end
 % query. Format for interp1: Vq = interp1(X,V,Xq). The result are X and Y
 % locations that are ON the central path defined by X_central and
 % Y_central, yet at the station distances given by the query.
+
 X_central_at_stations = interp1(Station_central,X_central,station_queries,'linear');
 Y_central_at_stations = interp1(Station_central,Y_central,station_queries,'linear');
 
@@ -273,13 +227,13 @@ normal_unit_vectors_at_stations = nan(length(station_queries), 2);
 % Are any queries EXACTLY at the start location?
 start_query_index = find(station_queries==Station_central(1));
 if ~isempty(start_query_index)
-    normal_unit_vectors_at_stations(start_query_index,:) = normal_unit_vectors_at_midpoints(1,:);
+    normal_unit_vectors_at_stations(start_query_index,:) = ones(length(start_query_index),1)*normal_unit_vectors_at_midpoints(1,:);
 end
 
 % Are any queries EXACTLY at the end location?
 end_query_index = find(station_queries==Station_central(end));
 if ~isempty(end_query_index)
-    normal_unit_vectors_at_stations(end_query_index,:) = normal_unit_vectors_at_midpoints(end,:);
+    normal_unit_vectors_at_stations(end_query_index,:) = ones(length(end_query_index),1)*normal_unit_vectors_at_midpoints(end,:);
 end
 
 
@@ -292,7 +246,7 @@ end
 
 indices_on_joints = find(indices_start==indices_end);
 if ~isempty(indices_on_joints)    
-    normal_unit_vectors_at_stations(indices_on_joints,:) = joint_vectors(indices_start(indices_on_joints),:);
+    normal_unit_vectors_at_stations(indices_on_joints,:) = normal_unit_vectors_at_joints(indices_start(indices_on_joints),:);
 end
 
 %% Fill any that were not one of the above cases
@@ -305,8 +259,8 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
 
     % For this special situation, the joint vectors at the ends need to be
     % modified
-    joint_vectors(1,:) = -1*normal_unit_vectors_at_midpoints(1,:)*[0 -1; 1 0];
-    joint_vectors(end,:) =  normal_unit_vectors_at_midpoints(end,:)*[0 -1; 1 0];
+    normal_unit_vectors_at_joints(1,:) = -1*normal_unit_vectors_at_midpoints(1,:)*[0 -1; 1 0];
+    normal_unit_vectors_at_joints(end,:) =  normal_unit_vectors_at_midpoints(end,:)*[0 -1; 1 0];
 
    
     % Are any at the very end? If so, the floor operation gives the wrong
@@ -325,7 +279,7 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
         fraction_to_midpoint = 2*remainder(round_down_indices);
         normal_unit_vectors_at_stations(round_down_indices,:)   = ...
             (fraction_to_midpoint).*normal_unit_vectors_at_midpoints(segment_numbers(round_down_indices),:) ...
-            + (1 - fraction_to_midpoint).*joint_vectors(segment_numbers(round_down_indices),:);
+            + (1 - fraction_to_midpoint).*normal_unit_vectors_at_joints(segment_numbers(round_down_indices),:);
         mags = sum(normal_unit_vectors_at_stations(round_down_indices,:).^2,2).^0.5;
         normal_unit_vectors_at_stations(round_down_indices,:) = normal_unit_vectors_at_stations(round_down_indices,:)./mags;
     end
@@ -337,7 +291,7 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
         fraction_to_midpoint = 2*(1-remainder(round_up_indicies));
         normal_unit_vectors_at_stations(round_up_indicies,:)   = ...
             (fraction_to_midpoint).*normal_unit_vectors_at_midpoints(segment_numbers(round_up_indicies),:) ...
-            + (1-fraction_to_midpoint).*joint_vectors(segment_numbers(round_up_indicies)+1,:);
+            + (1-fraction_to_midpoint).*normal_unit_vectors_at_joints(segment_numbers(round_up_indicies)+1,:);
         mags = sum(normal_unit_vectors_at_stations(round_up_indicies,:).^2,2).^0.5;
         normal_unit_vectors_at_stations(round_up_indicies,:) = normal_unit_vectors_at_stations(round_up_indicies,:)./mags;
     end
@@ -387,7 +341,7 @@ if flag_do_plots
 
         % Plot the joint tangent vectors
         plot(X_central(:,1),Y_central(:,1),'k.','MarkerSize',20);
-        quiver(X_central(:,1),Y_central(:,1),joint_vectors(:,1),joint_vectors(:,2),0,'g','Linewidth',3);
+        quiver(X_central(:,1),Y_central(:,1),normal_unit_vectors_at_joints(:,1),normal_unit_vectors_at_joints(:,2),0,'g','Linewidth',3);
     end
 end % Ends the flag_do_plots if statement
 

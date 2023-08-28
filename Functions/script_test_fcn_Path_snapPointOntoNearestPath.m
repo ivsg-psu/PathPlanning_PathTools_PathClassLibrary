@@ -52,6 +52,26 @@ flag_snap_type = 1;
 fignum = 111;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
     fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+
+
+% Make sure function worked
+true_closest_path_point = [0.5 0.5];
+true_s_coordinate = 0.5*(2^0.5);
+true_first_path_point_index = 1;
+true_second_path_point_index = 2;
+true_percent_along_length = 0.25;
+true_distance_real = 0;
+true_distance_imaginary = 0;
+
+assert(isequal(round(closest_path_point,4),round(true_closest_path_point,4)));
+assert(isequal(round(s_coordinate,4),round(true_s_coordinate,4)));
+assert(isequal(round(first_path_point_index,4),round(true_first_path_point_index,4)));
+assert(isequal(round(second_path_point_index,4),round(true_second_path_point_index,4)));
+assert(isequal(round(percent_along_length,4),round(true_percent_along_length,4)));
+assert(isequal(round(distance_real,4),round(true_distance_real,4)));
+assert(isequal(round(distance_imaginary,4),round(true_distance_imaginary,4)));
+
+
 fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
     '\t\t Matched to the path segment given by indices %d and %d, \n' ...
     '\t\t S-coordinate is: %.2f, \n' ...
@@ -291,6 +311,20 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
     s_coordinate, percent_along_length);
 
 %% BASIC example 7.2
+% A right angle, at nudge from midpoint in angle
+point = [0.40 0.5];
+pathXY = [1 0;0 0; 0 1];
+
+
+fignum = 7772;
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
+    fignum, closest_path_point(1,1),closest_path_point(1,2),...
+    first_path_point_index,second_path_point_index, ...
+    s_coordinate, percent_along_length);
+
+%% BASIC example 7.3
 % A right angle, at nudge from midpoint in angle
 point = [0.40 0.5];
 pathXY = [1 0;0 0; 0 1];
@@ -688,6 +722,20 @@ fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
 fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
         s_coordinate);
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+
+%% BROKEN - not working on 2023-08-27
+
+flag_snap_type = 1;
+point = [2 0]; 
+pathXY = [-1 0; 1 0; 1 -1];
+
+fignum = 999;
+
+% Snap the point onto the path
+[closest_path_point,s_coordinate,...
+    first_path_point_index,second_path_point_index,...
+    percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 
 %% BASIC example 1.6 - all points
 flag_snap_type = 1;
