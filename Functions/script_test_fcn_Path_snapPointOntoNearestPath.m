@@ -83,6 +83,92 @@ fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
     s_coordinate, percent_along_length,...
     distance_real,distance_imaginary);
 
+
+
+
+
+%% HARD one - was not working on 2023-08-27, now fixed
+
+flag_snap_type = 1;
+point = [2 0]; 
+pathXY = [-1 0; 1 0; 1 -1];
+
+fignum = 999;
+
+% Snap the point onto the path
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+
+
+% Make sure function worked
+true_closest_path_point = [1 0];
+true_s_coordinate = 2;
+true_first_path_point_index = 2;
+true_second_path_point_index = 2;
+true_percent_along_length = 0;
+true_distance_real = 0;
+true_distance_imaginary = -1;
+
+assert(isequal(round(closest_path_point,4),round(true_closest_path_point,4)));
+assert(isequal(round(s_coordinate,4),round(true_s_coordinate,4)));
+assert(isequal(round(first_path_point_index,4),round(true_first_path_point_index,4)));
+assert(isequal(round(second_path_point_index,4),round(true_second_path_point_index,4)));
+assert(isequal(round(percent_along_length,4),round(true_percent_along_length,4)));
+assert(isequal(round(distance_real,4),round(true_distance_real,4)));
+assert(isequal(round(distance_imaginary,4),round(true_distance_imaginary,4)));
+
+% Print results to the workspace
+fprintf(1,'Figure: %d\n',fignum);
+fprintf(1,'\t\t Closest point is: %.2f %.2f \n',...
+    closest_path_point(1,1),closest_path_point(1,2));
+fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
+    first_path_point_index,second_path_point_index);
+fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
+        s_coordinate);
+fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+
+
+
+%% HARD one - was not working on 2023-08-27, now fixed
+
+flag_snap_type = 2;
+point = [1 1]; 
+pathXY = [-1 0; 1 0; 1 -1];
+
+fignum = 9898;
+
+% Snap the point onto the path
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+
+
+% Make sure function worked
+true_closest_path_point = [1 0];
+true_s_coordinate = 2;
+true_first_path_point_index = 2;
+true_second_path_point_index = 2;
+true_percent_along_length = 0;
+true_distance_real = 0;
+true_distance_imaginary = 1;
+
+assert(isequal(round(closest_path_point,4),round(true_closest_path_point,4)));
+assert(isequal(round(s_coordinate,4),round(true_s_coordinate,4)));
+assert(isequal(round(first_path_point_index,4),round(true_first_path_point_index,4)));
+assert(isequal(round(second_path_point_index,4),round(true_second_path_point_index,4)));
+assert(isequal(round(percent_along_length,4),round(true_percent_along_length,4)));
+assert(isequal(round(distance_real,4),round(true_distance_real,4)));
+assert(isequal(round(distance_imaginary,4),round(true_distance_imaginary,4)));
+
+% Print results to the workspace
+fprintf(1,'Figure: %d\n',fignum);
+fprintf(1,'\t\t Closest point is: %.2f %.2f \n',...
+    closest_path_point(1,1),closest_path_point(1,2));
+fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
+    first_path_point_index,second_path_point_index);
+fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
+        s_coordinate);
+fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+
 %% BASIC example 0.1
 % A simple line segment, a simple query, zero distance in rear segments,
 % negative percent length
@@ -723,19 +809,7 @@ fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
         s_coordinate);
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
 
-%% BROKEN - not working on 2023-08-27
 
-flag_snap_type = 1;
-point = [2 0]; 
-pathXY = [-1 0; 1 0; 1 -1];
-
-fignum = 999;
-
-% Snap the point onto the path
-[closest_path_point,s_coordinate,...
-    first_path_point_index,second_path_point_index,...
-    percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
 
 %% BASIC example 1.6 - all points
 flag_snap_type = 1;

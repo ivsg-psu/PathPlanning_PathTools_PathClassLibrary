@@ -112,23 +112,69 @@ XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 
-%% BASIC example 5 - many points
+%% BASIC example 101 - many points, flag of 1
 
 % A 90-degree line segment with multiple surrounding queries
 XY_points = [-2 1; -1 1; 0 1; 1 1; 2 1; 2 0; 2 -1; 2 -2; 1 -2; 0 -2; 0 -1; -1 -1; -2 -1; -2 0];
-XY_points = XY_points(6,:);
+%XY_points = XY_points(6,:);
 referencePath = [-1 0; 1 0; 1 -1];
 flag_snap_type = 1;
 
-fig_num = 555;
+fig_num = 101;
 St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
 assert(length(St_points(:,1))==length(XY_points(:,1)));
 
 
 % Now, convert them back
-fig_num = 666;
+fig_num = 1011;
 XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,fig_num);
-figure(555);
+figure(101);
 plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
 
 assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
+
+%% BASIC example 102 - many points, flag of 2
+
+% A 90-degree line segment with multiple surrounding queries
+XY_points = [-2 1; -1 1; 0 1; 1 1; 2 1; 2 0; 2 -1; 2 -2; 1 -2; 0 -2; 0 -1; -1 -1; -2 -1; -2 0];
+%XY_points = XY_points(6,:);
+referencePath = [-1 0; 1 0; 1 -1];
+flag_snap_type = 2;
+
+fig_num = 102;
+St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
+assert(length(St_points(:,1))==length(XY_points(:,1)));
+
+
+% Now, convert them back
+fig_num = 1022;
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,fig_num);
+figure(102);
+plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
+
+assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
+
+
+
+%% BASIC example 103 - many points, flag of 3
+
+% A 90-degree line segment with multiple surrounding queries
+XY_points = [-2 1; -1 1; 0 1; 1 1; 2 1; 2 0; 2 -1; 2 -2; 1 -2; 0 -2; 0 -1; -1 -1; -2 -1; -2 0];
+%XY_points = XY_points(6,:);
+referencePath = [-1 0; 1 0; 1 -1];
+flag_snap_type = 3;
+
+fig_num = 103;
+St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
+assert(length(St_points(:,1))==length(XY_points(:,1)));
+
+
+% Now, convert them back
+fig_num = 1033;
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,fig_num);
+figure(103);
+plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
+
+assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
+
+
