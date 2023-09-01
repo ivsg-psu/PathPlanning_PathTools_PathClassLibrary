@@ -18,7 +18,7 @@ function [closest_path_points,closest_distances] = ...
 %
 % FORMAT:
 %
-%      [closest_path_point,s_coordinate] = ...
+%      [closest_path_points,s_coordinate] = ...
 %        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
 %        query_stations,central_traversal,nearby_traversal,...
 %        (flag_rounding_type),(search_radius),(fig_num));
@@ -69,10 +69,12 @@ function [closest_path_points,closest_distances] = ...
 %
 % OUTPUTS:
 %
-%      closest_path_point: a 1x2 vector containing the [X Y] location of
-%      the nearest point on the path
-%      s_coordinate: a scalar (1x1) representing the s-coordinate distance
-%      along the path
+%      closest_path_points: a vector of coordinates (N x 2) containing the
+%      [X Y] locations of the nearest points on the target trajectory with
+%      projections from the central trajectory.
+%
+%      closest_distances: a vector of scalars (Nx1) representing the
+%      distances from the central trajectory to the target trajectory
 %
 % DEPENDENCIES:
 %

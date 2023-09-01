@@ -323,6 +323,8 @@ if flag_do_plots
     % Make the axis normally shaped
     axis equal;   
 
+    
+
     % Plot the query station points
     plot(X_central_at_stations,Y_central_at_stations,'r.','Markersize',30);
 
@@ -350,4 +352,16 @@ if flag_do_debug
 end
 
 end % Ends the function
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
