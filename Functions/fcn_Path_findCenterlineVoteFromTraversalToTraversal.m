@@ -1,0 +1,249 @@
+function [centerline_points_projected,unit_vectors_orthogonal] = ...
+    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
+    from_traversal,to_traversal,varargin)
+
+%% fcn_Path_findCenterlineVoteFromTraversalToTraversal
+% Given a "from" traversal and a "to" traversal, the method is to
+% orthogonally project from the "from" traversal to find the distance to
+% the "to" traversal at each station in the "from" traversal. For
+% situations where the projection does not hit anything, the nearest
+% neighbor is used that has a hit. The projection distances are then
+% divided in half to find the apparent centerline measured via the "from"
+% traersal. As well, the orthogonal unit vectors for each projection are
+% returned. The function allows the user to specify the flag_rounding_type
+% and search_radius.
+% 
+% FORMAT: 
+%
+%    [centerline_points_projected,unit_vectors_orthogonal] = ...
+%     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
+%     from_traversal,to_traversal,(flag_rounding_type),(search_radius),(fig_num))
+%
+% INPUTS:
+%
+%      from_traversal: a traversal type wherein the projections are
+%      calculated "from".
+%
+%      from_traversal: a traversal type wherein the projections are
+%      calculated "to", to determine the distances "from".
+%
+%      (OPTIONAL INPUTS)
+%      flag_rounding_type: a flag to indicate which type of projection is
+%      used, especially when stations are located at the end-points of
+%      segments within the nearby_traversal. When stations are at the
+%      end-points of segments, the normal vector is undefined as it depends
+%      on whether to use the prior or subsequent segment, or some
+%      combination of these.
+%
+%      Note that the very first point always uses projections from the
+%      following segement, and the very last point always uses the prior.
+%      Otherwise, the flag determines behaviors for endpoints of internal
+%      segments. The options include:
+%
+%          flag_rounding_type = 1;  % This is the default, and indicates
+%          that the orthogonal projection of an endpoint is created by the
+%          PRIOR segment leading up to each station query point.
+% 
+%          flag_rounding_type = 2;  % This indicates that the orthogonal
+%          projection of an endpoint is created by the FOLLOWING segment
+%          after each station query point.
+% 
+%          flag_rounding_type = 3;  % This indicates that the orthogonal
+%          projection, ONLY if the station query falls at the joining point
+%          between two segments (e.g. is on the "joint"), then the
+%          projection is created by averaging the vector projections
+%          created from the PRIOR segment and FOLLOWING segment.
+% 
+%          flag_rounding_type = 4;  % This indicates that the orthogonal
+%          projections along segments should be calculated at the midpoints
+%          of each segment, and then for each station qeuary, the vector
+%          projections are interpolated from their prior and subsequent
+%          vectors. For the endpoints - the start and end - the vectors are
+%          aligned with the endpoints in the negative and positive
+%          directions, respectively.
+%
+%      search_radius: the distance to project "from" to search for
+%      intersections with the "to" traversal (default is 10 meters).
+%
+%      fig_num: figure number where results are plotted
+%
+% OUTPUTS:
+%
+%      St_points: a Mx2 or Mx3 vector containing the [S t] or [S t h]
+%      coordinates corresponding to each [ X Y (Z)] input point.
+%
+% EXAMPLES:
+%      
+% See the script: script_test_fcn_Path_findCenterlineVoteFromTraversalToTraversal
+% for a full test suite.
+%
+% DEPENDENCIES:
+%
+%     fcn_Path_checkInputsToFunctions
+%     fcn_Path_findOrthogonalHitFromTraversalToTraversal
+%     fcn_Path_findOrthogonalTraversalVectorsAtStations
+%
+% This function was written on 2023_09_04 by S. Brennan
+% Questions or comments? sbrennan@psu.edu 
+
+% Revision history:
+% 2023_09_04 by S. Brennan
+% -- first write of the code
+
+flag_do_debug = 0; % Flag to plot the results for debugging
+flag_do_plots = 0;
+flag_check_inputs = 1; % Flag to perform input checking
+
+%% check input arguments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _       
+%  |_   _|                 | |      
+%    | |  _ __  _ __  _   _| |_ ___ 
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |                  
+%              |_| 
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if flag_check_inputs == 1
+    % Are there the right number of inputs?
+    narginchk(2,5);
+    
+end
+
+
+% Does user want to specify the rounding type?
+flag_rounding_type = 1; % Default
+if 3 <= nargin
+    temp = varargin{1};
+    if ~isempty(temp)
+        flag_rounding_type=temp;
+    end
+end
+
+% Does user want to specify the search_radius?
+search_radius = 10; % Default
+if 4 <= nargin
+    temp = varargin{2};
+    if ~isempty(temp)
+        search_radius=temp;
+    end
+end
+
+% Does user want to show the plots?
+if 5 == nargin
+    temp = varargin{end};
+    if ~isempty(temp)
+        fig_num = temp;
+        flag_do_plots = 1;
+    end
+end
+
+if flag_do_debug
+    fig_debug = 888; %#ok<*UNRCH> 
+end
+
+
+%% Find the closest point
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   __  __       _       
+%  |  \/  |     (_)      
+%  | \  / | __ _ _ _ __  
+%  | |\/| |/ _` | | '_ \ 
+%  | |  | | (_| | | | | |
+%  |_|  |_|\__,_|_|_| |_|
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Calculate the closest point and distances from right side to left
+% FORMAT:
+%
+%      [closest_path_points,s_coordinate] = ...
+%        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
+%        query_stations,central_traversal,nearby_traversal,...
+%        (flag_rounding_type),(search_radius),(fig_num));
+
+[~,distances_between] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
+    from_traversal.Station,...
+    from_traversal,to_traversal,...
+    flag_rounding_type,search_radius);
+
+full_distances_between = fillmissing(distances_between, 'nearest');
+
+% Find the centerline points:
+% FORMAT: 
+%
+%      [unit_normal_vector_start, unit_normal_vector_end] = ...
+%        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+%        station_queries,central_traversal,...
+%        (flag_rounding_type),(fig_num));
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+       fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+       from_traversal.Station,...
+       from_traversal,...
+       flag_rounding_type);
+unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
+
+centerline_points_projected = [from_traversal.X from_traversal.Y]  + (unit_vectors/2).*full_distances_between;
+unit_vectors_orthogonal = unit_vectors*[0 -1; 1 0];
+
+
+%% Plot the results (for debugging)?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____       _                 
+%  |  __ \     | |                
+%  | |  | | ___| |__  _   _  __ _ 
+%  | |  | |/ _ \ '_ \| | | |/ _` |
+%  | |__| |  __/ |_) | |_| | (_| |
+%  |_____/ \___|_.__/ \__,_|\__, |
+%                            __/ |
+%                           |___/ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if flag_do_plots
+    figure(fig_num);
+    clf;
+    hold on;
+    grid on;
+    axis equal;
+    
+    % Plot the input traversals
+    plot(from_traversal.X,from_traversal.Y,'k.-','Linewidth',3,'MarkerSize',20);      
+    plot(to_traversal.X,to_traversal.Y,'k.-','Linewidth',3,'MarkerSize',20);      
+
+    % Plot the centerline_points_right_to_left and centerline_points_left_to_right
+    plot(centerline_points_projected(:,1), centerline_points_projected(:,2), '.-','Linewidth',3,'MarkerSize',20,'Color',[1 0 0]*0.7);         
+
+    % Show the unit vectors at the stations
+    quiver(centerline_points_projected(:,1),centerline_points_projected(:,2),...
+        unit_vectors_orthogonal(:,1),...
+        unit_vectors_orthogonal(:,2),...
+        0,'Color',[1 0 1],'Linewidth',2);
+
+    % Make axis slightly larger
+    temp = axis;
+    axis_range_x = temp(2)-temp(1);
+    axis_range_y = temp(4)-temp(3);
+    percent_larger = 0.3;
+    axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
+
+end % Ends the flag_do_debug if statement
+
+
+
+end % Ends the function
+
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§

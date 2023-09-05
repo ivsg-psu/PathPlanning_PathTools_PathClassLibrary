@@ -1308,6 +1308,21 @@ title('Original path with jogs and cleaned path')
 xlabel('X [m]')
 ylabel('Y [m]')
 
+%% Demonstration of fcn_Path_findCenterlineVoteFromTraversalToTraversal
+% This function finds the center projected from one traversal toward
+% another
+from_path = [0 0; 1 1; 2 1; 3 4];
+to_path   = from_path + ones(length(from_path(:,1)),1)*[0 1];
+from_traversal =  fcn_Path_convertPathToTraversalStructure(from_path);
+to_traversal =  fcn_Path_convertPathToTraversalStructure(to_path);
+flag_rounding_type = 1;
+search_radius = 10;
+fig_num = fig_num+1;
+
+[centerline_points_projected,unit_vectors_orthogonal] = ...
+    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
+    from_traversal,to_traversal,(flag_rounding_type),(search_radius),(fig_num));
+
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

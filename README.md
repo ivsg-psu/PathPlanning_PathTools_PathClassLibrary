@@ -92,11 +92,12 @@ This repo supports mathematical operations for paths and trajectories.
           <ul>
             <li><a href="#fcn_path_findaveragetraversalviastationalignment">fcn_Path_findAverageTraversalViaStationAlignment - estimates an average traversal based on aligning traversals by station.</li>
             <li><a href="#fcn_path_findaveragetraversalviaclosestpoint">fcn_Path_findAverageTraversalViaClosestPoint - estimates an average traversal based on closest point.</li>
-            <li><a href="#fcn_path_newtraversalbystationresampling">fcn_Path_newTraversalByStationResampling - redecimates a traversal at given station points.</li>
             <li><a href="#fcn_path_findaveragetraversalviaorthoprojection">fcn_Path_findAverageTraversalViaOrthoProjection - estimates average traversal using orthogonal projection.</li>
-            <li><a href="#fcn_path_findtraversalwithmostdata">fcn_Path_findTraversalWithMostData - finds the traversal in a traversals array with the most data (most elements in X array).</li>
-            <li><a href="#fcn_path_cleanpathfromforwardbackwardjogs">fcn_Path_cleanPathFromForwardBackwardJogs - removes back/forth jogs from data.</li>
             <li><a href="#fcn_path_findclosestpointstotraversal">fcn_Path_findClosestPointsToTraversal - finds closest points on a set of traversals to reference traversal.</li>
+            <li><a href="#fcn_path_findtraversalwithmostdata">fcn_Path_findTraversalWithMostData - finds the traversal in a traversals array with the most data (most elements in X array).</li>
+            <li><a href="#fcn_path_newtraversalbystationresampling">fcn_Path_newTraversalByStationResampling - redecimates a traversal at given station points.</li>
+            <li><a href="#fcn_path_cleanpathfromforwardbackwardjogs">fcn_Path_cleanPathFromForwardBackwardJogs - removes back/forth jogs from data.</li>
+            <li><a href="#fcn_path_findcenterlinevotefromtraversaltotraversal">fcn_Path_findCenterlineVoteFromTraversalToTraversal - finds the center projected from one traversal toward another.</li>
           </ul>
         <li><a href="#3d-and-elevated-paths">3D and Elevated Paths</li>
           <ul>
@@ -2045,6 +2046,16 @@ Generally, the “closest point” method gives expected results when applied to
 </pre>
 
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+#### fcn_Path_findCenterlineVoteFromTraversalToTraversal
+
+The function, fcn_Path_findCenterlineVoteFromTraversalToTraversal , finds the center projected from one traversal toward another. Given a "from" traversal and a "to" traversal, the method is to orthogonally project from the "from" traversal to find the distance to the "to" traversal at each station in the "from" traversal. For situations where the projection does not hit anything, the nearest neighbor is used that has a hit. The projection distances are then divided in half to find the apparent centerline measured via the "from" traversal. As well, the orthogonal unit vectors for each projection are returned. The function allows the user to specify the flag_rounding_type and search_radius.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findCenterlineVoteFromTraversalToTraversal.png" alt="fcn_Path_findCenterlineVoteFromTraversalToTraversal picture" width="400" height="300">
+  <figcaption>The function fcn_Path_findCenterlineVoteFromTraversalToTraversal finds the apparent centerline as measured from one traversal to another.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
 
 ***
 
