@@ -178,3 +178,32 @@ plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
 assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
 
 
+%% Illustrative example of fcn_Path_convertSt2XY
+St_points = [2 -1; 3 0; 3.5 0.4; 4 0; 4.5 -0.5; 5 -0.4];
+referencePath = [-3 -3; -1 -0.5; 0.5 0; 3 3];
+flag_snap_type = 1;
+
+St_points_ref   = fcn_Path_convertXY2St(referencePath,referencePath, flag_snap_type);
+XY_points_from_St = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type);
+
+
+fig_num = 999;
+figure(fig_num);
+clf;
+
+subplot(1,2,1);
+hold on;
+grid on;
+axis equal;
+
+plot(St_points(:,1),St_points(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(St_points_ref(:,1),St_points_ref(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('St coordinates');
+
+subplot(1,2,2);
+hold on;
+grid on;
+axis equal;
+plot(XY_points_from_St(:,1),XY_points_from_St(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(referencePath(:,1),referencePath(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('XY coordinates');

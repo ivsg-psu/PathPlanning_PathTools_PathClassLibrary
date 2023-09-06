@@ -10,6 +10,9 @@
 % -- improved comments and README.MD
 % 2023_06_05 S. Brennan, sbrennan@psu.edu
 % -- cleaned up the workspace codes to use functions, work on MacOS
+% 2023_08_25 to 2-23_09_06 by S. Brennan
+% -- added examples of XY to St conversions, and vice versa
+% -- added tools to calculate the centerline of paths
 
 %% Prep the workspace
 close all
@@ -49,7 +52,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_
 
 
 %% Clear paths and folders, if needed
-if 1==1
+if 1==0
 
    fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
@@ -1324,6 +1327,26 @@ fig_num = fig_num+1;
     from_traversal,to_traversal,(flag_rounding_type),(search_radius),(fig_num));
 
 
+%% Demonstration of fcn_Path_findCenterPathBetweenTwoPaths
+% This function finds the center projected from one traversal toward
+% another
+first_path = [0 0; 1 1; 2 1; 3 2];
+second_path   = [0.5 1.5; 1.5 2.1; 4 6];
+
+flag_rounding_type = 1;
+search_radius = 10;
+fig_num = fig_num+1;
+
+figure(fig_num);
+clf;
+hold on;
+grid on;
+axis equal;
+
+center_path = ...
+    fcn_Path_findCenterPathBetweenTwoPaths(...
+    first_path,second_path,(flag_rounding_type),(search_radius),(fig_num));
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % See http://patorjk.com/software/taag/#p=display&f=Big&t=Elevated%20Paths
@@ -1382,7 +1405,66 @@ elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fign
 %                                                                
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                                                
+%% fcn_Path_convertXY2St
+XY_points = [-2 -1; -1 0; -0.5 0.4; 0 0; 0.5 -0.5; 1 -0.4];
+referencePath = [-3 -3; -1 -0.5; 0.5 0; 3 3];
+flag_snap_type = 3;
 
+St_points_XY = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type);
+St_points_ref = fcn_Path_convertXY2St(referencePath,referencePath, flag_snap_type);
+
+
+fig_num = 999;
+figure(fig_num);
+clf;
+
+subplot(1,2,1);
+hold on;
+grid on;
+axis equal;
+
+plot(XY_points(:,1),XY_points(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(referencePath(:,1),referencePath(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('XY coordinates');
+
+subplot(1,2,2);
+hold on;
+grid on;
+axis equal;
+plot(St_points_XY(:,1),St_points_XY(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(St_points_ref(:,1),St_points_ref(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('St coordinates');
+
+
+%% fcn_Path_convertSt2XY
+St_points = [2 -1; 3 0; 3.5 0.4; 4 0; 4.5 -0.5; 5 -0.4];
+referencePath = [-3 -3; -1 -0.5; 0.5 0; 3 3];
+flag_snap_type = 1;
+
+St_points_ref   = fcn_Path_convertXY2St(referencePath,referencePath, flag_snap_type);
+XY_points_from_St = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type);
+
+
+fig_num = 999;
+figure(fig_num);
+clf;
+
+subplot(1,2,1);
+hold on;
+grid on;
+axis equal;
+
+plot(St_points(:,1),St_points(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(St_points_ref(:,1),St_points_ref(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('St coordinates');
+
+subplot(1,2,2);
+hold on;
+grid on;
+axis equal;
+plot(XY_points_from_St(:,1),XY_points_from_St(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(referencePath(:,1),referencePath(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('XY coordinates');
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % See http://patorjk.com/software/taag/#p=display&f=Big&t=Miscellaneous

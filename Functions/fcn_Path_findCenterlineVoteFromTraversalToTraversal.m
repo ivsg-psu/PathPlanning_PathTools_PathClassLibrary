@@ -24,7 +24,7 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %      from_traversal: a traversal type wherein the projections are
 %      calculated "from".
 %
-%      from_traversal: a traversal type wherein the projections are
+%      to_traversal: a traversal type wherein the projections are
 %      calculated "to", to determine the distances "from".
 %
 %      (OPTIONAL INPUTS)
@@ -69,8 +69,13 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %
 % OUTPUTS:
 %
-%      St_points: a Mx2 or Mx3 vector containing the [S t] or [S t h]
-%      coordinates corresponding to each [ X Y (Z)] input point.
+%      centerline_points_projected: a Mx2 or Mx3 vector containing the [X
+%      Y (Z)] locations of the projected centerline, one for each station
+%      point in the "from" traversal.
+%
+%      unit_vectors_orthogonal: vectors at each centerline point that are
+%      unit vectors orthogonal to the projection used in the "from"
+%      traversal. 
 %
 % EXAMPLES:
 %      
@@ -89,6 +94,9 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 % Revision history:
 % 2023_09_04 by S. Brennan
 % -- first write of the code
+% 2023_09_06 by S. Brennan
+% -- minor typo fix and better comments, including corrections in the
+% header
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_do_plots = 0;

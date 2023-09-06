@@ -98,13 +98,16 @@ This repo supports mathematical operations for paths and trajectories.
             <li><a href="#fcn_path_newtraversalbystationresampling">fcn_Path_newTraversalByStationResampling - redecimates a traversal at given station points.</li>
             <li><a href="#fcn_path_cleanpathfromforwardbackwardjogs">fcn_Path_cleanPathFromForwardBackwardJogs - removes back/forth jogs from data.</li>
             <li><a href="#fcn_path_findcenterlinevotefromtraversaltotraversal">fcn_Path_findCenterlineVoteFromTraversalToTraversal - finds the center projected from one traversal toward another.</li>
+            <li><a href="#fcn_path_findcenterpathbetweentwopaths">fcn_Path_findCenterPathBetweenTwoPaths - Given two paths, finds the path that is geometrically inbetween both.</li>
           </ul>
         <li><a href="#3d-and-elevated-paths">3D and Elevated Paths</li>
           <ul>
             <li><a href="#fcn_path_addelevationtopath">fcn_Path_addElevationToPath - fills in the elevation in a Path's XY data using a reference traversal and interpolation.</li>
           </ul>
-        <li><a href="#miscellaneous-functions">Miscellaneous Functions</li>
+        <li><a href="#coordinate-conversions-for-paths">Coordinate Conversions for Paths</li>
         <ul>
+            <li><a href="#fcn_path_convertxy2st">fcn_Path_convertXY2St - converts a path in XY coordinates measured relative to a reference path into Station-transverse (St) coordinates.</li>
+            <li><a href="#fcn_path_convertst2xy">fcn_Path_convertSt2XY - converts a path in St coordinates measured relative to a reference path into Cartesian XY coordinates.</li>
         </ul>
       </ul>
     </li>
@@ -1573,7 +1576,7 @@ In the statistics functions, one often needs to plot bounds around a central tra
 
 #### fcn_Path_calcSingleTraversalStandardDeviation
 
-The variance of a single traversal is a measure of how much it bends at each segment, as a distance offset. 
+The variance of a single traversal is a measure of how much it bends at each segment, as a distance offset.
 
 This is useful to estimate the error in decimation of a path, as this variance becomes smaller with finer decimations.
 
@@ -1662,7 +1665,7 @@ Measuring nearness of a point to a path: three methods
 
 The “same station” method is just to average paths by station. This is done easily by just interpolation of all paths to same stations, then averaging.
 
-It fails, however, when paths have different path lengths. As well, it tends to average points further and further apart from each other when moving along the path. 
+It fails, however, when paths have different path lengths. As well, it tends to average points further and further apart from each other when moving along the path.
 
 <pre align="center">
   <img src=".\Images\fcn_Path_findAverageTraversalViaStationAlignment_Ex1.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
@@ -1717,6 +1720,7 @@ nearby_traversal =  fcn_Path_convertXYtoTraversalStructure(nearby_path(:,1),near
 print_results(stations,closest_path_point,distances);
  
 ```
+
 <pre align="center">
   <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex2.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
   <figcaption>TOrthogonal projection takes a “central” trajectory, and then projects orthogonally from that trajectory at given stations to find where it hits nearby trajectories.</figcaption>
@@ -1740,6 +1744,7 @@ nearby_traversal =  fcn_Path_convertXYtoTraversalStructure(nearby_path(:,1),near
 print_results(stations,closest_path_point,distances);
 
 ```
+
 <pre align="center">
   <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex3.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
   <figcaption>The approach gives the intersection point for arbitrary segments nearby the central trajectory.</figcaption>
@@ -1761,6 +1766,7 @@ nearby_traversal = ...
 [closest_path_point,distances] = ...
     fcn_Path_FindOrthogonalHitFromPathToPath(stations,central_traversal,nearby_traversal);
 ```
+
 <pre align="center">
   <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex4.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
   <figcaption>Define a “miss” to even include “grazing” from one trajectory to another</figcaption>
@@ -1811,7 +1817,7 @@ Of the three methods, the orthogonal one is most robust and clear. It is demonst
 
 Using cross-cutting for path averaging
 
-The particular advantage of the orthogonal projection is that every query “cuts” adjacent paths as one would expect. 
+The particular advantage of the orthogonal projection is that every query “cuts” adjacent paths as one would expect.
 
 <pre align="center">
   <img src=".\Images\fcn_Path_findAverageTraversalViaClosestPoint_Ex10.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
@@ -1855,10 +1861,9 @@ fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
-
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
-*** 
+***
 
 #### fcn_Path_findAverageTraversalViaOrthoProjection
 
@@ -1870,7 +1875,7 @@ The function, fcn_Path_findOrthoScatterFromTraversalToTraversals implements this
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
-This allows one to average adjacent paths along each cut to produce an average path. 
+This allows one to average adjacent paths along each cut to produce an average path.
 
 This is implemented in fcn_Path_findAverageTraversalViaOrthoProjection.m
 
@@ -1940,7 +1945,7 @@ Finally, the averaging process allows weighted smoothing to be used between iter
 
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
-*** 
+***
 
 #### fcn_Path_findTraversalWithMostData
 
@@ -1969,6 +1974,7 @@ fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n
     length(data.traversal{index_of_longest}.X));
 
 ```
+
 <pre align="center">
   <img src=".\Images\fcn_Path_findTraversalWithMostData.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
   <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
@@ -2057,6 +2063,22 @@ The function, fcn_Path_findCenterlineVoteFromTraversalToTraversal , finds the ce
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+#### fcn_Path_findCenterPathBetweenTwoPaths
+
+The function, fcn_Path_findCenterlineVoteFromTraversalToTraversal , if given two paths, finds the path that is geometrically inbetween both.
+
+The method is to orthogonally project from the first_path to find the distance to the second_path at each station in the first_path. For situations where the projection does not hit anything, the nearest neighbor is used that has a hit. The projection distances are then divided in half to find the apparent centerline measured via the first_path. The process is then repeated, projecting from the second_path to the first_path, again finding the centerline measured from the second_path. For each centerline point, the orthogonal vector is kept for that centerline point. The resulting points are then sorted using the points and the orthogonal vectors, taking the first point as the start point in either the first_path or second_path that has no point behind it as measured via a dot-product with the centerline vector. Every point thereafter is sorted by the projections to create a composite centerline.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_findCenterPathBetweenTwoPaths.png" alt="fcn_Path_findCenterPathBetweenTwoPaths picture" width="400" height="300">
+  <figcaption>The function fcn_Path_findCenterPathBetweenTwoPaths finds center path between two paths.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
 ***
 
 ### 3D and Elevated Paths
@@ -2075,8 +2097,6 @@ An elevated path is a set of [X Y Z] points as a N x 3 vector or array. These X 
 
 An elevated path type must have at least 2 rows so that at least one “path segment” can be defined.
 
-
-
 <a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
 ***
@@ -2093,10 +2113,46 @@ fignum = 113; % Define the figure number
  
 % Snap the point onto the path
 elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fignum);
+
 ```
+
 <pre align="center">
   <img src=".\Images\fcn_Path_addElevationToPath.png" alt="fcn_Path_fillRandomTraversalsAboutTraversal picture" width="400" height="300">
   <figcaption>The function fcn_Path_fillRandomTraversalsAboutTraversal generates random traversals about a given traversal.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+### Coordinate Conversions for Paths
+
+It is common that one needs to convert from one coordinate representation such as East-North-Up (ENU) which is a Cartesian frame, into path-relative coordinate systems such as Station-transverse-height (Sth) which are non-Cartesian. Several functions exist that can perform these conversions.
+
+***
+
+#### fcn_Path_convertXY2St
+
+Given a referencePath (N x 2) and a set of XY_points (N x 2), the function fcn_Path_convertXY2St returns the Station-transverse coordinates that represent the XY points. Note: this function is essentially a streamlined version of fcn_Path_snapPointOntoNearestPath. For points snapped at verticies, the results may be a complex number where the real portion of the number is the distance along the flag_rounding_type projection vector, and the imaginary portion is the complex portion. The angle of the point relative to the vertex can be found using the complex vector angle.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_convertXY2St.png" alt="fcn_Path_convertXY2St picture" width="400" height="300">
+  <figcaption>The function fcn_Path_convertXY2St converts a path in XY coordinates (blue), measured relative to a reference path (red) into Station-transverse (St) coordinates.</figcaption>
+  <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
+</pre>
+
+<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
+
+***
+
+#### fcn_Path_convertSt2XY
+
+Given a referencePath (N x 2) and a set of XY_points (N x 2), returns the XY coordinates that represent the St points.
+
+<pre align="center">
+  <img src=".\Images\fcn_Path_convertSt2XY.png" alt="fcn_Path_convertSt2XY picture" width="400" height="300">
+  <figcaption>The function fcn_Path_convertSt2XY converts a path in St coordinates (blue), measured relative to a reference path (red) into Cartesian XY coordinates.</figcaption>
   <!--font size="-2">Photo by <a href="https://unsplash.com/ko/@samuelchenard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Samuel Chenard</a> on <a href="https://unsplash.com/photos/Bdc8uzY9EPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></font -->
 </pre>
 
@@ -2172,7 +2228,7 @@ This code is still in development (alpha testing)
 <!-- CONTACT -->
 ## Contact
 
-Sean Brennan - sbrennan@psu.edu
+Sean Brennan - <sbrennan@psu.edu>
 
 Project Link: [https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary](https://github.com/ivsg-psu/PathPlanning_PathTools_PathClassLibrary)
 

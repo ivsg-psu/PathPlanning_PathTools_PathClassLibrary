@@ -112,3 +112,41 @@ St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_nu
 expected_solution = [2 2^0.5];
 assert(abs(sum((St_points - expected_solution).^2,2))<1E-10);
 
+%% Illustrative example of fcn_Path_convertXY2St
+XY_points = [-2 -1; -1 0; -0.5 0.4; 0 0; 0.5 -0.5; 1 -0.4];
+referencePath = [-3 -3; -1 -0.5; 0.5 0; 3 3];
+flag_snap_type = 3;
+
+St_points_XY = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type);
+St_points_ref = fcn_Path_convertXY2St(referencePath,referencePath, flag_snap_type);
+
+
+fig_num = 999;
+figure(fig_num);
+clf;
+
+subplot(1,2,1);
+hold on;
+grid on;
+axis equal;
+
+plot(XY_points(:,1),XY_points(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(referencePath(:,1),referencePath(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('XY coordinates');
+
+subplot(1,2,2);
+hold on;
+grid on;
+axis equal;
+plot(St_points_XY(:,1),St_points_XY(:,2),'b.-','LineWidth',3,'MarkerSize',20)
+plot(St_points_ref(:,1),St_points_ref(:,2),'r.-','LineWidth',3,'MarkerSize',20)
+title('St coordinates');
+
+
+
+
+
+
+
+
+
