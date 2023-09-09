@@ -151,6 +151,11 @@ end
 
 if flag_do_debug
     fig_debug = 888; %#ok<*UNRCH> 
+    figure(fig_debug)
+    clf;
+    hold on;
+    grid on;
+
 end
 
 
@@ -165,7 +170,18 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Convert the paths into traversal types
+%% Check alignment of input paths
+successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(first_path);
+if any(successive_dot_products<0)
+    warning('Misaligned vectors found in first_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
+end
+successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(second_path);
+if any(successive_dot_products<0)
+    warning('Misaligned vectors found in second_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
+end
+
+
+%% Convert the paths into traversal types
 first_traversal   = fcn_Path_convertPathToTraversalStructure(first_path);
 second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path);
 
@@ -173,12 +189,12 @@ second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path);
 [centerline_points_first_to_second,centerline_points_first_to_second_unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     first_traversal,second_traversal,...
-    (flag_rounding_type),(search_radius));
+    (flag_rounding_type),(search_radius),23);
 
 [centerline_points_second_to_first,centerline_points_second_to_first_unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     second_traversal,first_traversal,...
-    (flag_rounding_type),(search_radius));
+    (flag_rounding_type),(search_radius),24);
 
 
 
@@ -192,25 +208,38 @@ N_firstPath = length(first_path(:,1));
 N_secondPath  = length(second_path(:,1));
 N_centerPath = N_firstPath+N_secondPath;
 
+if N_firstPath<2
+    error('first_path must have at least 2 points.')
+end
+
+if N_secondPath<2
+    error('first_path must have at least 2 points.')
+end
+
+
 % Initialize all the points that need to be sorted
-all_points = [centerline_points_first_to_second(:,1:2); centerline_points_second_to_first(:,1:2)];
-all_unit_vectors = [centerline_points_first_to_second_unit_vectors_orthogonal; centerline_points_second_to_first_unit_vectors_orthogonal];
-all_points_remaining = ones(1,N_centerPath);
+firstPath_points_remaining  = ones(1,N_firstPath);
+secondPath_points_remaining = ones(1,N_centerPath);
+firstPath_nextPointIndex = 1;
+secondPath_nextPointIndex = 1;
+
 
 % Tag the first point as "not remaining"
 if first_path_starts
-    first_index = 1;
+    firstPath_points_remaining(1) = 0;
+    firstPath_nextPointIndex = 2;
+    next_point = centerline_points_first_to_second(1,:);
+    next_orthoginal_vector = centerline_points_first_to_second_unit_vectors_orthogonal(1,:);
 else
-    first_index = N_firstPath+1;
+    secondPath_points_remaining(1) = 0;
+    secondPath_nextPointIndex = 2;
+    next_point = centerline_points_second_to_first(1,:);
+    next_orthoginal_vector = centerline_points_second_to_first_unit_vectors_orthogonal(1,:);
 end
 
+
+
 %% Sort all the centerline points to create a center path
-
-% Initialize the first point
-next_point = all_points(first_index,:);
-next_orthoginal_vector = all_unit_vectors(first_index,:);
-all_points_remaining(first_index) = 0;
-
 
 % Initialize the center path
 center_path = nan(N_centerPath,2);
@@ -218,11 +247,28 @@ current_point_count = 1;
 center_path(current_point_count,:) = next_point;
 previous_distance = inf;
 
-% Loop through the points
-while any(all_points_remaining==1)
-    % Set the points to search
-    points_to_search = all_points;
-    points_to_search(all_points_remaining==0,1) = nan; % Make one value equal to NaN, which makes the calculations result in Nan that follow
+% Initialize the points to search
+next_firstPathPoint  = centerline_points_first_to_second(firstPath_nextPointIndex,:);
+next_secondPathPoint = centerline_points_second_to_first(secondPath_nextPointIndex,:);
+points_to_search = [next_firstPathPoint; next_secondPathPoint];
+
+% Loop through the points until none are left
+while any(~isnan(points_to_search))
+    
+    % Plot the situation, for debugging?
+    if flag_do_debug      
+        figure(fig_debug);
+
+        plot(first_path(:,1),first_path(:,2),'.-','Color',[1 1 1]*0.2,'Markersize',30);
+        plot(second_path(:,1),second_path(:,2),'.-','Color',[1 1 1]*0.2,'Markersize',30);
+        
+
+        plot(centerline_points_first_to_second(:,1),centerline_points_first_to_second(:,2),'.-','Color',[0.5 0.5 0.5],'Markersize',30);
+        plot(centerline_points_second_to_first(:,1),centerline_points_second_to_first(:,2),'.-','Color',[0.5 0.5 0.5],'Markersize',30);
+        plot(points_to_search(:,1),points_to_search(:,2),'.','Color',[1 0 0],'Markersize',30);
+        plot(next_point(:,1),next_point(:,2),'.','Color',[0 1 0],'Markersize',40);
+        quiver(next_point(:,1),next_point(:,2),next_orthoginal_vector(1,1),next_orthoginal_vector(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 1 0],'MaxHeadSize',4)
+    end
 
     % Create a vector from current point to all remaining points
     vectors_to_search_points =  points_to_search - next_point;
@@ -232,40 +278,84 @@ while any(all_points_remaining==1)
 
     % Check that we don't have any negatives (this is an error)
     if any(dot_products<-1*previous_distance)
-        error('A dot product was found further negative than the previous distance - this should never happen!');
+       error('A dot product was found further negative than the previous distance - this should never happen!');
     end
 
     % Find the smallest distance, and keep the index for that point
     [~,closest_index] = min(dot_products);
-
-    % Save the result
-    all_points_remaining(closest_index) = 0;
-    next_point = all_points(closest_index,:);
-    current_point_count = current_point_count+1;
-    center_path(current_point_count,:) = next_point;
-    next_orthoginal_vector = all_unit_vectors(closest_index,:);
     previous_distance = dot_products(closest_index);
 
-    % For debugging:
-    % fprintf(1,'Closest index: %.0d at distance of %f\n',closest_index,previous_distance);
+    % Which path was closest?
+    if 1==closest_index
+        firstPath_points_remaining(firstPath_nextPointIndex) = 0;
+        next_point = centerline_points_first_to_second(firstPath_nextPointIndex,:);
+        next_orthoginal_vector = centerline_points_first_to_second_unit_vectors_orthogonal(firstPath_nextPointIndex,:);
+
+        firstPath_nextPointIndex = firstPath_nextPointIndex+1;
+        if firstPath_nextPointIndex>N_firstPath
+            firstPath_nextPointIndex = [];
+        end
+
+
+    elseif 2 == closest_index
+
+        secondPath_points_remaining(secondPath_nextPointIndex) = 0;
+        next_point = centerline_points_second_to_first(secondPath_nextPointIndex,:);
+        next_orthoginal_vector = centerline_points_second_to_first_unit_vectors_orthogonal(secondPath_nextPointIndex,:);
+
+        secondPath_nextPointIndex = secondPath_nextPointIndex+1;
+        if secondPath_nextPointIndex>N_secondPath
+            secondPath_nextPointIndex = [];
+        end
+        
+
+    else
+        error('strange situation encountered - should not happen!');
+    end
+
+    % Plot the situation, for debugging?
+    if flag_do_debug
+        plot(next_point(:,1),next_point(:,2),'o','Color',[0 0 1],'Markersize',30);
+    end
+
+    % Save the result
+    current_point_count = current_point_count+1;
+    center_path(current_point_count,:) = next_point;
+
+    % What is the next point to search in each of the centerline paths?
+    if ~isempty(firstPath_nextPointIndex)
+        next_firstPathPoint  = centerline_points_first_to_second(firstPath_nextPointIndex,:);
+    else
+        next_firstPathPoint = nan(1,2);
+    end
+
+    if ~isempty(secondPath_nextPointIndex)
+        next_secondPathPoint = centerline_points_second_to_first(secondPath_nextPointIndex,:);
+    else
+        next_secondPathPoint = nan(1,2);
+    end
+
+    % Set the points to search as the next ones on the list 
+    points_to_search = [next_firstPathPoint; next_secondPathPoint];
 end
 
 % Finally, check direcitonality - are all the vectors aligned with each
 % other?
-centerline_final_vectors = center_path(2:end,:)-center_path(1:end-1,:);
-mag_centerline_final_vectors = sum(centerline_final_vectors.^2,2).^0.5;
-unit_centerline_final_vectors = centerline_final_vectors./mag_centerline_final_vectors;
+if flag_do_debug
+    successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(center_path);
+    if any(successive_dot_products<0)
+        indicies = find(successive_dot_products<0);
+        plot(center_path(:,1),center_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
+        plot(center_path(indicies,1),center_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
 
-successive_dot_products = sum((unit_centerline_final_vectors(1:end-1,:).*unit_centerline_final_vectors(2:end,:)),2);
-if any(successive_dot_products<0)
-    error('Misaligned vectors found - this indicates an error');
-else
+        disp([center_path, [0; 0; successive_dot_products]]);
+        warning('Misaligned vectors found - this may indicate a strange result usually caused by 2 centerline points very close to each other.');
+    end
     angles = acos(successive_dot_products)*180/pi;
     fprintf('Mean misalignment in angle is: %.3f degrees.\n',mean(angles));
     fprintf('Standard deviation in misalignment in angle is: %.3f degrees.\n',std(angles));
     fprintf('Max misalignment angle is: %.3f degrees.\n',max(angles));
 end
-
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -320,3 +410,12 @@ end % Ends the function
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+%% fcn_INTERNAL_calculateSuccessiveDotProducts
+function successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(center_path)
+    centerline_final_vectors = center_path(2:end,:)-center_path(1:end-1,:);
+    mag_centerline_final_vectors = sum(centerline_final_vectors.^2,2).^0.5;
+    unit_centerline_final_vectors = centerline_final_vectors./mag_centerline_final_vectors;
+
+    successive_dot_products = sum((unit_centerline_final_vectors(1:end-1,:).*unit_centerline_final_vectors(2:end,:)),2);
+end % ends fcn_INTERNAL_calculateSuccessiveDotProducts

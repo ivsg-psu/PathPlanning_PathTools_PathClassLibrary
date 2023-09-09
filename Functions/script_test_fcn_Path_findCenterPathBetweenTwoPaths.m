@@ -46,6 +46,7 @@ axis equal;
 center_path = ...
     fcn_Path_findCenterPathBetweenTwoPaths(...
     first_path,second_path,(flag_rounding_type),(search_radius),(fig_num));
+assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path(:,1))));
 
 %% Demonstration of fcn_Path_findCenterPathBetweenTwoPaths
 % This function finds the center projected from one traversal toward
@@ -66,7 +67,7 @@ axis equal;
 center_path = ...
     fcn_Path_findCenterPathBetweenTwoPaths(...
     first_path,second_path,(flag_rounding_type),(search_radius),(fig_num));
-
+assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path(:,1))));
 
 %% Demonstration of effect of flag_rounding_type
 % This function finds the center projected from one traversal toward
@@ -93,8 +94,9 @@ for flag_rounding_type = 1:3
     title(sprintf('flag_rounding_type: %.0d',flag_rounding_type),'Interpreter','none');
 end
 sgtitle('Effect of flag_rounding_type','Interpreter','none');
+assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path(:,1))));
 
-%% Call the center calculation function
+%% Call the center calculation function with a real-world path
 first_path = paths{1};
 second_path = paths{2};
 
@@ -112,4 +114,4 @@ axis equal;
 center_path = ...
     fcn_Path_findCenterPathBetweenTwoPaths(...
     first_path,second_path,(flag_rounding_type),(search_radius),(fig_num));
-
+assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path(:,1))));
