@@ -97,6 +97,10 @@ function center_path = ...
 % Revision history:
 % 2023_09_04 by S. Brennan
 % -- first write of the code
+% 2023_09_10 by S. Brennan
+% -- rewrote to allow for projections that miss each other, for example
+% cases where a short segment is adjacent to a long segment. uses ST2XY
+% and XY2ST methods.
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_do_plots = 0;
@@ -173,32 +177,36 @@ end
 %% Check alignment of input paths
 successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(first_path);
 if any(successive_dot_products<0)
-    fig_debug = 888; %#ok<*UNRCH> 
-    figure(fig_debug)
-    clf;
-    hold on;
-    grid on;
+    if flag_do_debug
+        figure(fig_debug);
+        clf;
+        hold on;
+        grid on;
 
-    indicies = find(successive_dot_products<0);
-    plot(first_path(:,1),first_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
-    plot(first_path(indicies,1),first_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
+        indicies = find(successive_dot_products<0);
+        plot(first_path(:,1),first_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
+        plot(first_path(indicies,1),first_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
 
-    disp([first_path, [0; 0; successive_dot_products]]);
+        disp([first_path, [0; 0; successive_dot_products]]);
+    end
     warning('Misaligned vectors found in first_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
 end
+
 successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(second_path);
 if any(successive_dot_products<0)
-    fig_debug = 888; %#ok<*UNRCH>
-    figure(fig_debug)
-    clf;
-    hold on;
-    grid on;
+    if flag_do_debug
+        figure(fig_debug);
 
-    indicies = find(successive_dot_products<0);
-    plot(second_path(:,1),second_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
-    plot(second_path(indicies,1),second_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
+        clf;
+        hold on;
+        grid on;
 
-    disp([first_path, [0; 0; successive_dot_products]]);
+        indicies = find(successive_dot_products<0);
+        plot(second_path(:,1),second_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
+        plot(second_path(indicies,1),second_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
+
+        disp([first_path, [0; 0; successive_dot_products]]);
+    end
     warning('Misaligned vectors found in second_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
 end
 
@@ -218,7 +226,62 @@ second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path);
     second_traversal,first_traversal,...
     (flag_rounding_type),(search_radius));
 
+%% Check for non-intersecting situations
+if all(isnan(centerline_points_first_to_second),'all') && all(isnan(centerline_points_second_to_first),'all')
+    if flag_do_debug
+        figure(fig_debug);
 
+        plot(first_path(:,1),first_path(:,2),'.-','Color',[1 0.5 0.5],'Markersize',30);
+        plot(second_path(:,1),second_path(:,2),'.-','Color',[0.5 0.5 1],'Markersize',30);
+
+        [~,centerline_unit_vectors_orthogonal] = ...
+            fcn_INTERNAL_fillCenterlinePointsAndVectorFromPath(first_path);
+        quiver(first_path(:,1),first_path(:,2),centerline_unit_vectors_orthogonal(:,1),centerline_unit_vectors_orthogonal(:,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[1 0 0],'MaxHeadSize',4)
+
+        [~,centerline_unit_vectors_orthogonal] = ...
+            fcn_INTERNAL_fillCenterlinePointsAndVectorFromPath(second_path);
+        quiver(second_path(:,1),second_path(:,2),centerline_unit_vectors_orthogonal(:,1),centerline_unit_vectors_orthogonal(:,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 0 1],'MaxHeadSize',4)
+
+    end
+    error('The paths are not aligned with each other - cannot find a center for paths that are not co-aligned at any locations.')
+end
+
+if any(isnan(centerline_points_first_to_second),'all') || any(isnan(centerline_points_second_to_first),'all')
+    % There are missing interesections from either one to each other. To
+    % solve this, we use XY to ST conversion, and then keep the ST
+    % coordinates, converting them back into XY
+
+    % Find ST coordinates from 1 to 2
+    St_points_from1_to2 = fcn_Path_convertXY2St(first_path,second_path, flag_rounding_type);
+    reference_stations_from1_to2 = fcn_Path_convertXY2St(first_path,first_path, flag_rounding_type);
+    St_points_halfway_from1_to2 = [reference_stations_from1_to2(:,1) St_points_from1_to2(:,2)/2];
+    XY_points_halfway_from1_to2 = fcn_Path_convertSt2XY(first_path,St_points_halfway_from1_to2, flag_rounding_type);
+
+    % Find ST coordinates from 2 to 1
+    St_points_from2_to1 = fcn_Path_convertXY2St(second_path, first_path, flag_rounding_type);
+    reference_stations_from2_to1 = fcn_Path_convertXY2St(second_path,second_path, flag_rounding_type);
+    St_points_halfway_from2_to1 = [reference_stations_from2_to1(:,1) St_points_from2_to1(:,2)/2];
+    XY_points_halfway_from2_to1 = fcn_Path_convertSt2XY(second_path,St_points_halfway_from2_to1, flag_rounding_type);
+
+    % Plot the situation, for debugging?
+    if flag_do_debug
+        figure(fig_debug);
+
+        plot(first_path(:,1),first_path(:,2),'.-','Color',[1 0.5 0.5],'Markersize',30);
+        plot(second_path(:,1),second_path(:,2),'.-','Color',[0.5 0.5 1],'Markersize',30);
+        plot(XY_points_halfway_from1_to2(:,1),XY_points_halfway_from1_to2(:,2),'.-','Color',[1 0 0],'Markersize',30);
+        plot(XY_points_halfway_from2_to1(:,1),XY_points_halfway_from2_to1(:,2),'.-','Color',[0 0 1],'Markersize',30);
+
+    end
+
+    % Transfer results to centerline points
+    [centerline_points_first_to_second,centerline_points_first_to_second_unit_vectors_orthogonal] =...
+        fcn_INTERNAL_fillCenterlinePointsAndVectorFromPath(XY_points_halfway_from1_to2);
+
+    [centerline_points_second_to_first,centerline_points_second_to_first_unit_vectors_orthogonal] = ...
+        fcn_INTERNAL_fillCenterlinePointsAndVectorFromPath(XY_points_halfway_from2_to1);
+
+end
 
 %% Find which point is "first" in the sorting order
 startfirst_to_startsecond_vector = second_path(1,1:2) - first_path(1,1:2);
@@ -274,6 +337,11 @@ next_firstPathPoint  = centerline_points_first_to_second(firstPath_nextPointInde
 next_secondPathPoint = centerline_points_second_to_first(secondPath_nextPointIndex,:);
 points_to_search = [next_firstPathPoint; next_secondPathPoint];
 
+% Check if next_point is empty
+if isempty(next_point)
+    disp('stop here');
+end
+
 % Loop through the points until none are left
 while any(~isnan(points_to_search))
     
@@ -300,7 +368,8 @@ while any(~isnan(points_to_search))
 
     % Check that we don't have any negatives (this is an error)
     if any(dot_products<-1*previous_distance)
-        warning('A dot product was found in the negative direction of the projection of previous centerline points - this indicates a situation wherein path-to-path vectors are severely misaligned. Errors may occur in the calculation of a centerline path.');
+       % error('A dot product was found further negative than the previous distance - this should never happen!');
+       disp('Weird output here');
     end
 
     % Find the smallest distance, and keep the index for that point
@@ -332,12 +401,18 @@ while any(~isnan(points_to_search))
         
 
     else
-        error('A point was found that is not expected in the list of search points - this should not happen!');
+        error('strange situation encountered where neither path 1 nor path 2 is closest - should not happen!');
     end
+    
 
     % Plot the situation, for debugging?
     if flag_do_debug
         plot(next_point(:,1),next_point(:,2),'o','Color',[0 0 1],'Markersize',30);
+    end
+
+    % Check if next_point is empty
+    if isempty(next_point)
+        disp('stop here');
     end
 
     % Save the result
@@ -441,3 +516,18 @@ function successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(c
 
     successive_dot_products = sum((unit_centerline_final_vectors(1:end-1,:).*unit_centerline_final_vectors(2:end,:)),2);
 end % ends fcn_INTERNAL_calculateSuccessiveDotProducts
+
+
+%% fcn_INTERNAL_fillCenterlinePointsAndVectorFromPath
+function [centerline_points,centerline_unit_vectors_orthogonal] = ...
+    fcn_INTERNAL_fillCenterlinePointsAndVectorFromPath(path_points)
+% Fill in the output points
+centerline_points = path_points;
+
+% Calculate centerline vectors
+vectors_centerline = diff(path_points);
+% Fill in the last vector with the prior segment's vector
+vectors_centerline = [vectors_centerline;vectors_centerline(end,:)];
+magnitude_vectors_centerline = sum(vectors_centerline.^2,2).^0.5;
+centerline_unit_vectors_orthogonal = vectors_centerline./magnitude_vectors_centerline;
+end
