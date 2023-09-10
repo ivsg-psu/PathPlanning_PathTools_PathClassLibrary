@@ -173,10 +173,32 @@ end
 %% Check alignment of input paths
 successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(first_path);
 if any(successive_dot_products<0)
+    fig_debug = 888; %#ok<*UNRCH> 
+    figure(fig_debug)
+    clf;
+    hold on;
+    grid on;
+
+    indicies = find(successive_dot_products<0);
+    plot(first_path(:,1),first_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
+    plot(first_path(indicies,1),first_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
+
+    disp([first_path, [0; 0; successive_dot_products]]);
     warning('Misaligned vectors found in first_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
 end
 successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(second_path);
 if any(successive_dot_products<0)
+    fig_debug = 888; %#ok<*UNRCH>
+    figure(fig_debug)
+    clf;
+    hold on;
+    grid on;
+
+    indicies = find(successive_dot_products<0);
+    plot(second_path(:,1),second_path(:,2),'.-','Color',[0.5 1 0.5],'Markersize',30);
+    plot(second_path(indicies,1),second_path(indicies,2),'o','Color',[1 0 0],'Markersize',30);
+
+    disp([first_path, [0; 0; successive_dot_products]]);
     warning('Misaligned vectors found in second_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
 end
 
@@ -278,7 +300,7 @@ while any(~isnan(points_to_search))
 
     % Check that we don't have any negatives (this is an error)
     if any(dot_products<-1*previous_distance)
-       error('A dot product was found further negative than the previous distance - this should never happen!');
+        warning('A dot product was found in the negative direction of the projection of previous centerline points - this indicates a situation wherein path-to-path vectors are severely misaligned. Errors may occur in the calculation of a centerline path.');
     end
 
     % Find the smallest distance, and keep the index for that point
@@ -310,7 +332,7 @@ while any(~isnan(points_to_search))
         
 
     else
-        error('strange situation encountered - should not happen!');
+        error('A point was found that is not expected in the list of search points - this should not happen!');
     end
 
     % Plot the situation, for debugging?
