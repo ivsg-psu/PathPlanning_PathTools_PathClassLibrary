@@ -1,9 +1,11 @@
-function center_path = ...
+function [center_path, first_path_resampled, second_path_resampled] = ...
     fcn_Path_findCenterPathBetweenTwoPaths(...
     first_path,second_path,varargin)
 
 %% fcn_Path_findCenterPathBetweenTwoPaths
 % Given two paths, finds the path that is geometrically inbetween both.
+% Will also return the centerline projection back onto the first and second
+% paths, as resampled versions of both.
 % 
 % The method is to orthogonally project from the first_path to find
 % the distance to the second_path at each station in the
@@ -19,10 +21,15 @@ function center_path = ...
 % the first_path or second_path that has no point behind it as
 % measured via a dot-product with the centerline vector. Every point
 % thereafter is sorted by the projections to create a composite centerline.
+% In most cases, the composite centerline will have M + N points where M is
+% the number of points in the first path, and N is the number of points in
+% the second path. However, in cases where both paths give exactly the same
+% centerline votes, the repeated votes are eliminated when calculating the
+% resampled projections back onto the first and second paths.
 %
 % FORMAT: 
 %
-%    center_path = ...
+%    [center_path, first_path_resampled, second_path_resampled] = ...
 %     fcn_Path_findCenterPathBetweenTwoPaths(...
 %     first_path,second_path,(flag_rounding_type),(search_radius),(fig_num))
 %
@@ -78,7 +85,16 @@ function center_path = ...
 %
 %      center_path: a Mx2 or Mx3 vector containing the [X Y (Z)] points
 %      that bisect the two traversals.
+% 
+%      first_path_resampled: a Mx2 or Mx3 vector containing the [X Y (Z)]
+%      points of the first path that correspond to the same stations as the
+%      center_path
 %
+%      second_path_resampled: a Mx2 or Mx3 vector containing the [X Y (Z)]
+%      points of the second path that correspond to the same stations as
+%      the center_path
+%
+
 % EXAMPLES:
 %      
 % See the script: script_test_fcn_Path_findCenterPathBetweenTwoPaths
@@ -216,15 +232,16 @@ first_traversal   = fcn_Path_convertPathToTraversalStructure(first_path);
 second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path);
 
 %% Obtain the projections from the traversals toward each other
+flag_project_full_distance = 0;
 [centerline_points_first_to_second,centerline_points_first_to_second_unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     first_traversal,second_traversal,...
-    (flag_rounding_type),(search_radius));
+    (flag_rounding_type),(search_radius),(flag_project_full_distance));
 
 [centerline_points_second_to_first,centerline_points_second_to_first_unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     second_traversal,first_traversal,...
-    (flag_rounding_type),(search_radius));
+    (flag_rounding_type),(search_radius),(flag_project_full_distance));
 
 %% Check for non-intersecting situations
 if all(isnan(centerline_points_first_to_second),'all') && all(isnan(centerline_points_second_to_first),'all')
@@ -436,8 +453,8 @@ while any(~isnan(points_to_search))
     points_to_search = [next_firstPathPoint; next_secondPathPoint];
 end
 
-% Finally, check direcitonality - are all the vectors aligned with each
-% other?
+%% Finally, check direcitonality
+% - are all the vectors aligned with each other?
 if flag_do_debug
     successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(center_path);
     if any(successive_dot_products<0)
@@ -454,6 +471,50 @@ if flag_do_debug
     fprintf('Max misalignment angle is: %.3f degrees.\n',max(angles));
 end
 
+%% Obtain the projections from the central traversal back toward 1st and 2nd traversals
+center_path_no_repeats = unique(center_path,'rows','stable');
+center_traversal_no_repeats   = fcn_Path_convertPathToTraversalStructure(center_path_no_repeats);
+flag_project_full_distance = 1;
+[first_path_resampled,~] = ...
+    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
+    center_traversal_no_repeats,first_traversal,...
+    (flag_rounding_type),(search_radius),(flag_project_full_distance));
+[second_path_resampled,~] = ...
+    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
+    center_traversal_no_repeats,second_traversal,...
+    (flag_rounding_type),(search_radius),(flag_project_full_distance));
+
+
+if any(isnan(first_path_resampled),'all') && any(isnan(second_path_resampled),'all')
+    error('No projections found from centerline back onto either path that created the centerline.');
+end
+
+if any(isnan(first_path_resampled),'all')
+    % There are missing interesections from centerline onto path. To
+    % solve this, we use XY to ST conversion, and then keep the ST
+    % coordinates, converting them back into XY
+
+    % Find vectors from first path to centerline
+    vectors_path2_to_centerline = center_path_no_repeats - second_path_resampled;
+    
+    % Multiply this by 2 to get the second resampled path
+    first_path_resampled = second_path_resampled + 2*vectors_path2_to_centerline;
+end
+
+
+if any(isnan(second_path_resampled),'all')
+    % There are missing interesections from centerline onto path. To
+    % solve this, we use XY to ST conversion, and then keep the ST
+    % coordinates, converting them back into XY
+
+    % Find vectors from first path to centerline
+    vectors_path1_to_centerline = center_path_no_repeats - first_path_resampled;
+    
+    % Multiply this by 2 to get the second resampled path
+    second_path_resampled = first_path_resampled + 2*vectors_path1_to_centerline;
+end
+
+
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _                 
@@ -469,10 +530,10 @@ if flag_do_plots
     figure(fig_num);
     
     % Plot the input traversals
-    plot(first_path(:,1),first_path(:,2),'k.-','Linewidth',3,'MarkerSize',20);      
-    plot(second_path(:,1),second_path(:,2),'k.-','Linewidth',3,'MarkerSize',20);      
+    plot(first_path(:,1),first_path(:,2),'r.-','Linewidth',3,'MarkerSize',30);      
+    plot(second_path(:,1),second_path(:,2),'b.-','Linewidth',3,'MarkerSize',30);      
 
-    % Plot the results
+    % Plot the center_path results
     plot_color = [0 1 0];
     line_width = 3;
 
@@ -480,6 +541,12 @@ if flag_do_plots
     plot(center_path(:,1),center_path(:,2), '-','Color',plot_color,'Linewidth',line_width,'Markersize',sizeOfMarkers);
     plot(center_path(:,1),center_path(:,2), '.','Color',plot_color,'Linewidth',line_width,'Markersize',round(sizeOfMarkers*2));
     plot(center_path(:,1),center_path(:,2), '.','Color',[0 0 0],'Linewidth',line_width,'Markersize',round(sizeOfMarkers*0.5));
+
+    % Plot the resampled results
+    plot_color = [0 1 0];
+    line_width = 1;
+    plot(first_path_resampled(:,1),first_path_resampled(:,2), '.-','Color',plot_color,'Linewidth',line_width,'Markersize',sizeOfMarkers);
+    plot(second_path_resampled(:,1),second_path_resampled(:,2), '.-','Color',plot_color,'Linewidth',line_width,'Markersize',sizeOfMarkers);
 
 
     % Make axis slightly larger

@@ -24,10 +24,10 @@ if 1==0
 end
 
 %% Initialize the figure numbers
-fig_num = 1000;
+core_fig_num = 1000;
 
 
-%% Demonstration of fcn_Path_findCenterPathBetweenTwoPaths
+%% Basic demo 1 - Demonstration of fcn_Path_findCenterPathBetweenTwoPaths
 % This function finds the center projected from one traversal toward
 % another
 first_path = [0 0; 1 1; 2 1; 3 2];
@@ -35,7 +35,7 @@ second_path   = [0.5 1.5; 1.5 2.1; 4 6];
 
 flag_rounding_type = 1;
 search_radius = 10;
-fig_num = fig_num+1;
+fig_num = core_fig_num+1;
 
 figure(fig_num);
 clf;
@@ -56,7 +56,7 @@ second_path   = first_path + ones(length(first_path(:,1)),1)*[0 1];
 
 flag_rounding_type = 1;
 search_radius = 10;
-fig_num = fig_num+1;
+fig_num = core_fig_num+2;
 
 figure(fig_num);
 clf;
@@ -75,7 +75,7 @@ assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path
 first_path = [0 0; 1 1; 2 1; 3 2];
 second_path   = [0.5 1.5; 1.5 2.1; 4 6];
 
-fig_num = fig_num+1;
+fig_num = core_fig_num+3;
 search_radius = 10;
 
 
@@ -101,7 +101,7 @@ assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path
 first_path = [0 0; 10 0];
 second_path   = [1 1; 9 1];
 
-fig_num = fig_num+1;
+fig_num = core_fig_num+4;
 search_radius = 10;
 
 
@@ -121,7 +121,7 @@ assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path
 second_path = [0 0; 10 0];
 first_path   = [1 1; 9 1];
 
-fig_num = fig_num+1;
+fig_num = core_fig_num+5;
 search_radius = 10;
 
 
@@ -140,7 +140,7 @@ assert(length(center_path(:,1)) == (length(first_path(:,1)) + length(second_path
 first_path = [-5 0; 0 0; 10 0; 30 0];
 second_path   = [-5 5; 1 5; 11 11; 30 11];
 
-fig_num = fig_num+1;
+fig_num = core_fig_num+6;
 search_radius = 20;
 
 
@@ -160,7 +160,7 @@ second_path = paths{2};
 
 flag_rounding_type = 1;
 search_radius = 10;
-fig_num = fig_num+1;
+fig_num = core_fig_num+7;
 
 
 figure(fig_num);
@@ -183,7 +183,7 @@ if 1==0
     first_path = [0 0; 10 0];
     second_path   = [-1 0; -10 10];
 
-    fig_num = fig_num+1;
+    fig_num = core_fig_num+8;
     search_radius = 10;
 
 

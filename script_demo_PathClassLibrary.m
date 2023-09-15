@@ -1320,11 +1320,12 @@ from_traversal =  fcn_Path_convertPathToTraversalStructure(from_path);
 to_traversal =  fcn_Path_convertPathToTraversalStructure(to_path);
 flag_rounding_type = 1;
 search_radius = 10;
+flag_project_full_distance = 0; % Set to 1 to do a full distance projection, not halfway
 fig_num = fig_num+1;
 
 [centerline_points_projected,unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-    from_traversal,to_traversal,(flag_rounding_type),(search_radius),(fig_num));
+    from_traversal,to_traversal,(flag_rounding_type),(search_radius),(flag_project_full_distance), (fig_num));
 
 
 %% Demonstration of fcn_Path_findCenterPathBetweenTwoPaths

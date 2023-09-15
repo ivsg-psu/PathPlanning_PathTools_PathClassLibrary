@@ -64,6 +64,19 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %
 %      search_radius: the distance to project "from" to search for
 %      intersections with the "to" traversal (default is 10 meters).
+% 
+%      flag_project_full_distance: this is a flag to determine whether the
+%      projection is to the halfway distance between 1 and 2. For the
+%      following values:
+%
+%          flag_project_full_distance = 0 (default): In this case, the returned path
+%          is the halfway distance from 1 to 2, resulting in
+%          the function returning the centerline between 1 and 2 as
+%          measured from path 1.
+%
+%          flag_project_full_distance = 1: In this case, the returned path
+%          is the full distance between 1 and 2, resulting in the function
+%          returning the projection of path 1 onto 2.
 %
 %      fig_num: figure number where results are plotted
 %
@@ -97,6 +110,8 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 % 2023_09_06 by S. Brennan
 % -- minor typo fix and better comments, including corrections in the
 % header
+% 2023_09_15 by S. Brennan
+% -- added flag_project_full_distance to allow full distance projections
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_do_plots = 0;
@@ -117,7 +132,7 @@ flag_check_inputs = 1; % Flag to perform input checking
 
 if flag_check_inputs == 1
     % Are there the right number of inputs?
-    narginchk(2,5);
+    narginchk(2,6);
     
 end
 
@@ -140,8 +155,17 @@ if 4 <= nargin
     end
 end
 
+% Does user want to specify flag_project_full_distance?
+flag_project_full_distance = 0; % Default
+if 5 <= nargin
+    temp = varargin{3};
+    if ~isempty(temp)
+        flag_project_full_distance=temp;
+    end
+end
+
 % Does user want to show the plots?
-if 5 == nargin
+if 6 == nargin
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
@@ -195,7 +219,12 @@ full_distances_between = fillmissing(distances_between, 'nearest');
        flag_rounding_type);
 unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
 
-centerline_points_projected = [from_traversal.X from_traversal.Y]  + (unit_vectors/2).*full_distances_between;
+if 0==flag_project_full_distance
+    centerline_points_projected = [from_traversal.X from_traversal.Y]  + (unit_vectors/2).*full_distances_between;
+else
+    centerline_points_projected = [from_traversal.X from_traversal.Y]  + (unit_vectors).*full_distances_between;
+end
+
 unit_vectors_orthogonal = unit_vectors*[0 -1; 1 0];
 
 
@@ -218,8 +247,8 @@ if flag_do_plots
     axis equal;
     
     % Plot the input traversals
-    plot(from_traversal.X,from_traversal.Y,'k.-','Linewidth',3,'MarkerSize',20);      
-    plot(to_traversal.X,to_traversal.Y,'k.-','Linewidth',3,'MarkerSize',20);      
+    plot(from_traversal.X,from_traversal.Y,'.-', 'Color',[0 1 0],'Linewidth',5,'MarkerSize',20);      
+    plot(to_traversal.X,to_traversal.Y,'.-', 'Color',[0 0 1],'Linewidth',5,'MarkerSize',20);      
 
     % Plot the centerline_points_right_to_left and centerline_points_left_to_right
     plot(centerline_points_projected(:,1), centerline_points_projected(:,2), '.-','Linewidth',3,'MarkerSize',20,'Color',[1 0 0]*0.7);         
@@ -230,6 +259,8 @@ if flag_do_plots
         unit_vectors_orthogonal(:,2),...
         0,'Color',[1 0 1],'Linewidth',2);
 
+    legend('From path', 'To path','Calculated result','Unit vectors of calculated result');
+    
     % Make axis slightly larger
     temp = axis;
     axis_range_x = temp(2)-temp(1);
