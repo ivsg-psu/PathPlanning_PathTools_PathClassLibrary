@@ -472,7 +472,7 @@ if flag_do_debug
 end
 
 %% Obtain the projections from the central traversal back toward 1st and 2nd traversals
-center_path_no_repeats = unique(center_path,'rows','stable');
+center_path_no_repeats =  unique(round(center_path,8),'rows','stable');
 center_traversal_no_repeats   = fcn_Path_convertPathToTraversalStructure(center_path_no_repeats);
 flag_project_full_distance = 1;
 [first_path_resampled,~] = ...

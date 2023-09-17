@@ -29,6 +29,7 @@ if 1==0
 end
 
 %% Test case 1: basic call for one trajectory
+% NOTE: the function itself does not plot since not given a figure number
 offsets = 2; 
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets);
 
@@ -38,32 +39,36 @@ plot(offset_traversals.traversal{1}.X,offset_traversals.traversal{1}.Y,'r.-','Li
 %% Test case 2: basic call for one trajectory - specify figure
 fig_num = 2;
 offsets = 2; 
-offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num); %#ok<*NASGU>
+flag_rounding_type = [];
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type, fig_num); %#ok<*NASGU>
 
 %% Test case 3: basic call for two trajectories 
 fig_num = 3;
 offsets = [2; -2]; 
-offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+flag_rounding_type = [];
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,  flag_rounding_type, fig_num);
 
 %% Test case 4: show how "pinching" can happen
 fig_num = 4;
+flag_rounding_type = [];
 % Grab the "curve" of the path
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
 offsets = (-10:1:10)'; 
-offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type,  fig_num);
 axis equal;
 
 %% Test case 5: Show how offsets can link lane markers
 fig_num = 5;
+flag_rounding_type = [];
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(30:end,:));
 path2 = [30 10; 25 44];
 second_traversal = fcn_Path_convertPathToTraversalStructure(path2);
 
-offsets = [2]; 
-offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+offsets = 2; 
+offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type,  fig_num);
 
 offsets = [2; -2]; 
-offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(second_traversal, offsets,fig_num);
+offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(second_traversal, offsets, flag_rounding_type,  fig_num);
 
 % Find intersections
 [right_intersection_points,...
@@ -84,6 +89,29 @@ plot(left_intersection_points(:,1),left_intersection_points(:,2),'bo','Markersiz
 title('Illustration of how to use offsets to link lane edge designations');
 
 
+%% Demonstration of effect of flag_rounding_type
+fig_num = 6;
+
+angles = (-45:45)'*pi/180;
+path = 20*[cos(angles) sin(angles)];
+
+reference_traversal = fcn_Path_convertPathToTraversalStructure(path);
+
+offsets = [2; -2]; 
+
+figure(fig_num);
+clf;
+
+
+for flag_rounding_type = 1:4
+    subplot(2,2,flag_rounding_type);
+    hold on;
+    grid on;
+    axis equal;
+    offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type,  fig_num);
+    title(sprintf('flag_rounding_type: %.0d',flag_rounding_type),'Interpreter','none');
+end
+sgtitle('Effect of flag_rounding_type','Interpreter','none');
 
 
 

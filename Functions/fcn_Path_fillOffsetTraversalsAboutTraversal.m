@@ -9,6 +9,7 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 %      fcn_Path_fillOffsetTraversalsAboutTraversal(...
 %            reference_traversal,...
 %            offsets,...
+%            (flag_rounding_type),
 %            (fig_num));
 %
 % INPUTS:
@@ -23,6 +24,11 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 %      offset would be above it, negative would be below.
 %
 %      (OPTIONAL INPUTS)
+% 
+%      flag_rounding_type: determines type of projection, and is passed
+%      into fcn_Path_findOrthogonalTraversalVectorsAtStations. See that
+%      function for more explanation. Default (empty) is used unless
+%      changed via this input.
 %
 %      fig_num: a figure number to plot results.
 %
@@ -49,13 +55,16 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2021_01_24
-%      -- first write of the code, using
-%      fcn_Path_fillRandomTraversalsAboutTraversal as a template
-%      2022_01_03
-%      -- minor updates to comments
-%      2022_08_20
-%      -- allow empty figure argument to avoid plotting
+% 2021_01_24
+% -- first write of the code, using
+% fcn_Path_fillRandomTraversalsAboutTraversal as a template
+% 2022_01_03
+% -- minor updates to comments
+% 2022_08_20
+% -- allow empty figure argument to avoid plotting
+% 2023_09_17 by S. Brennan
+% -- added flag_rounding_type to inputs
+% -- fixed some comments
 
 flag_do_debug = 0; % Flag to show the results for debugging
 flag_do_plots = 0; % % Flag to plot the final results
@@ -84,9 +93,7 @@ end
 % Check inputs?
 if flag_check_inputs
     % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
-        error('Incorrect number of input arguments')
-    end
+    narginchk(2,4)
         
     % Check the reference_traversal input
     fcn_Path_checkInputsToFunctions(reference_traversal, 'traversal');
@@ -108,14 +115,22 @@ num_trajectories = length(offsets(:,1));
 % the default number of points to use
 num_points = Nstations;
 
+% Does user want to specify flag_rounding_type?
+flag_rounding_type = []; % Default is to not do any plotting
+if 3 <= nargin
+    temp = varargin{1};
+    if ~isempty(temp)
+        flag_rounding_type = temp;
+    end
+end
+
 %% Check for variable argument inputs (varargin)
 
 % Does user want to show the plots?
-if 3 == nargin
+if 4 == nargin
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        figure(fig_num);
         flag_do_plots = 1;
     end
 else
@@ -152,8 +167,6 @@ reference_station_points = Station_reference*ones(1,num_trajectories);
 offsets_from_reference = ones(num_points,1)*offsets';
 
 %% Find projection from reference orthogonally
-% Set the projection type (see help in function below for details)
-flag_rounding_type = 4; % This averages the projection vectors along segments
 
 % Find the unit normal vectors at each of the station points
 [unit_normal_vector_start, unit_normal_vector_end] = ...

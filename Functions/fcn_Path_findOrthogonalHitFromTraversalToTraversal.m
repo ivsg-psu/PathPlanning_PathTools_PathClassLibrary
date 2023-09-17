@@ -155,6 +155,7 @@ if flag_check_inputs == 1
     
     % Check the central_traversal input
     fcn_Path_checkInputsToFunctions(central_traversal, 'traversal');
+
     
     % Check the nearby_traversal input
     fcn_Path_checkInputsToFunctions(nearby_traversal, 'traversal');
