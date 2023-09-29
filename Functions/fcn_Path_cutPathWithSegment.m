@@ -108,8 +108,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set the search type
-flag_search_type = 0; % 0 searches for exact crossing
+% flag_search_type = 0; % 0 searches for exact crossing
 % flag_search_type = 1; % 1 searches for any crossing, in any direction
+flag_search_type = 2; % 2 searches for all crossings
+
 
 % Initialize the outputs
 cut_path_before = [];
@@ -117,20 +119,31 @@ cut_path_after  = [];
 
 
 % Look for a crossing of the pathToCut with the cutting_segment
-[distance,location_of_crossing] = ...
+[distances,locations_of_crossing] = ...
     fcn_Path_findProjectionHitOntoPath(pathToCut,...
     cutting_segment(1,1:2),cutting_segment(2,1:2),...
     (flag_search_type));
 
-if isnan(distance) || distance<0 
+if all(isnan(distances)) || all(distances<0)
     % Return empty values - do nothing
 
 else
-    [~,s_coordinate_of_cut] = ...
-        fcn_Path_snapPointToPathViaVectors(location_of_crossing, pathToCut);
+    % For all the points that were hit, find the one with lowest
+    % s-coordinate
+    s_coordinate_of_cut = inf;
+    correct_crossing = 0;
+    for ith_crossing = 1:length(locations_of_crossing(:,1))
+        location_of_crossing = locations_of_crossing(ith_crossing,:);
+        [~,s_coordinate_of_crossing] = ...
+            fcn_Path_snapPointToPathViaVectors(location_of_crossing, pathToCut);
+        if s_coordinate_of_crossing <= s_coordinate_of_cut
+            s_coordinate_of_cut = s_coordinate_of_crossing;
+            correct_crossing = ith_crossing;
+        end
+    end
 
+    % Prep path for cutting
     traversalToCut = fcn_Path_convertPathToTraversalStructure(pathToCut);
-
     trimmed_after_indicies  = traversalToCut.Station >=s_coordinate_of_cut;
     trimmed_before_indicies = traversalToCut.Station <=s_coordinate_of_cut;
     
@@ -155,11 +168,11 @@ else
 
             % Vq = interp1(X,V,Xq)
             height_at_cut = interp1(stations,heights,s_coordinate_of_cut);
-            location_of_crossing(1,3) = height_at_cut;
+            locations_of_crossing(1,3) = height_at_cut;
 
         end
-        cut_path_after  = [location_of_crossing; cut_path_after];
-        cut_path_before = [cut_path_before; location_of_crossing];
+        cut_path_after  = [locations_of_crossing(correct_crossing,:); cut_path_after];
+        cut_path_before = [cut_path_before; locations_of_crossing(correct_crossing,:)];
     end
 end
 
@@ -193,13 +206,13 @@ if flag_do_plots
     % Plot the cutting_segment
     n_plots = n_plots+1;
     legend_strings{n_plots} = 'cutting_segment';
-    plot(cutting_segment(:,1),cutting_segment(:,2),'b.-','Linewidth',5,'MarkerSize',20);
+    plot(cutting_segment(:,1),cutting_segment(:,2),'b.-','Linewidth',6,'MarkerSize',20);
 
     % Plot the cut_path_before
     if ~isempty(cut_path_before)
         n_plots = n_plots+1;
         legend_strings{n_plots} = 'cut_path_before';
-        plot(cut_path_before(:,1),cut_path_before(:,2),'r-','Linewidth',2,'MarkerSize',20);
+        plot(cut_path_before(:,1),cut_path_before(:,2),'r-','Linewidth',4,'MarkerSize',20);
     end
 
     % Plot the cut_path_after
