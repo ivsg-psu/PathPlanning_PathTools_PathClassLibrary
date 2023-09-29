@@ -52,7 +52,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_
 
 
 %% Clear paths and folders, if needed
-if 1==0
+if 1==1
 
    fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
@@ -358,7 +358,7 @@ traversal_2 = fcn_Path_convertPathToTraversalStructure(traversal_2_path);
     fig_num);
 
 
-%% Show how to snap a point onto a path, fcn_Path_snapPointOntoNearestPath
+%% Show how to snap a point onto a path, fcn_Path_snapPointToPathViaVectors
 % This can be tricky when the point is not on a perpendicular projection of
 % any path segment. Examples are given in the documentation PPT.
 
@@ -371,7 +371,7 @@ fignum = 112; % Define the figure number
 [closest_path_point,s_coordinate,...
     first_path_point_index,second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,fignum);
+    fcn_Path_snapPointToPathViaVectors(point, pathXY,fignum);
  
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',fignum);
@@ -493,7 +493,8 @@ end
 % Grab the "curve" of the path
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
 offsets = (0:1:10)'; 
-offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+flag_rounding_type = 1;
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,flag_rounding_type, fig_num);
 
 % Fill in an array of "fixed" traversals
 clear fixed_traversals
@@ -1376,7 +1377,7 @@ reference_elevated_path = [0 0 0.1; 0.25 0.2 0.2; 0.9 0.9 0.3; 1.1 1.1 0.4; 2.3 
 fignum = 113; % Define the figure number
 
 % Snap the point onto the path
-elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fignum);
+% elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, fignum);
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

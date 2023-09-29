@@ -42,7 +42,7 @@ function [closestXs,closestYs,closestZs,closestYaws] = ...
 % DEPENDENCIES:
 %
 %      fcn_Path_checkInputsToFunctions
-%      fcn_Path_snapPointOntoNearestPath
+%      fcn_Path_snapPointToPathViaVectors
 %
 % EXAMPLES:
 %
@@ -212,7 +212,7 @@ for index_reference_path = 1:length(reference_traversal.X) % loop through all th
         path = [X_tra, Y_tra];
                 
         [closest_path_point,~,first_path_point_index,second_path_point_index,percent_along_length]...
-            = fcn_Path_snapPointOntoNearestPath([X_ref,Y_ref], path);
+            = fcn_Path_snapPointToPathViaVectors([X_ref,Y_ref], path);
         
         closestXs(index_reference_path,i_traversal) = closest_path_point(1);
         closestYs(index_reference_path,i_traversal) = closest_path_point(2);

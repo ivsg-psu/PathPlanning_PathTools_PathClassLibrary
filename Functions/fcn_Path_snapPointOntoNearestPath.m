@@ -226,6 +226,8 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+warning('This function is being deprecated and will be removed in future releases. Use fcn_Path_snapPointToPathViaVectors instead.');
+
 % How many points are on the path? How many points are we testing?
 Npath = length(path(:,1));
 Npoints = length(points(:,1));

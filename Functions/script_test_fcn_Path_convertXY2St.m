@@ -66,8 +66,20 @@ flag_snap_type = 1;
 
 fig_num = 444;
 St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
-expected_solution = [-1 -1+1i];
+expected_solution = [-1 -1+i];
 assert(abs(sum((St_points - expected_solution).^2,2))<1E-10);
+
+%% BASIC example 4.1
+% A simple line egment, a complex number in front segments
+XY_points = [2 1];
+referencePath = [-1 0; 1 0];
+flag_snap_type = 1;
+
+fig_num = 4441;
+St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
+expected_solution = [3 1-i];
+assert(abs(sum((St_points - expected_solution).^2,2))<1E-10);
+
 
 %% BASIC example 5 - many points
 % A 90-degree line segment with multiple surrounding queries

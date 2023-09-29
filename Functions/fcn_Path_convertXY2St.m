@@ -3,7 +3,7 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 % Given a referencePath (N x 2) and a set of XY_points (N x 2), returns the
 % Station-transverse coordinates that represent the XY points. Note: this
 % function is essentially a streamlined version of
-% fcn_Path_snapPointOntoNearestPath. For points snapped at verticies, the
+% fcn_Path_snapPointToPathViaVectors. For points snapped at verticies, the
 % results may be a complex number where the real portion of the number is
 % the distance along the flag_rounding_type projection vector, and the
 % imaginary portion is the complex portion. The angle of the point relative
@@ -72,7 +72,7 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 %
 % DEPENDENCIES:
 %
-%     fcn_Path_snapPointOntoNearestPath
+%     fcn_Path_snapPointToPathViaVectors
 %     fcn_Path_checkInputsToFunctions
 %     fcn_Path_convertPathToTraversalStructure
 %
@@ -156,7 +156,7 @@ end
     percent_along_length,...
     distances_real,...
     distances_imaginary] = ...
-    fcn_Path_snapPointOntoNearestPath(XY_points, referencePath, flag_rounding_type);
+    fcn_Path_snapPointToPathViaVectors(XY_points, referencePath, flag_rounding_type);
 
 closest_point_on_path = referencePath(first_path_point_indicies,:) + percent_along_length.*(referencePath(second_path_point_indicies,:) - referencePath(first_path_point_indicies,:));
 St_points = [s_coordinates distances_real+distances_imaginary*1i];

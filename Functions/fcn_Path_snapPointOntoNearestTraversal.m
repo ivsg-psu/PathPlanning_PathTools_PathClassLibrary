@@ -71,7 +71,9 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 % 2023_04_24 - sbrennan@psu.edu
 % - converted code to a nested call to fcn_Path_snapPointOntoNearestPath
 % - fixed debug plotting to match fcn_Path_snapPointOntoNearestPath
-
+% 2023_09_29 - sbrennan@psu.edu
+% - updated code to use fcn_Path_snapPointToPathViaVectors
+% - fixed bug where it can call a yaw value larger than the array
 
 % TO-DO:
 % Allow multiple points, e.g.
@@ -147,8 +149,9 @@ path_yaw = traversal.Yaw;
     first_path_point_index,...
     second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, path);
-path_point_yaw     = path_yaw(first_path_point_index);
+    fcn_Path_snapPointToPathViaVectors(point, path);
+
+path_point_yaw     = path_yaw(min(first_path_point_index,length(path_yaw)));
 
 % 
 % % Find square of the distance from a point to every point on the path

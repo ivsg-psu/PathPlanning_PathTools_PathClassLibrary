@@ -3,27 +3,29 @@
 % This function was written on 2020_10_10 by S. Brennan, sbrennan@psu.edu
 
 % Revision history:
-%     2020_10_10 
-%     -- first write of the code
-%     2020_11_10 
-%     -- changed function names in prep for DataClean class
-%     2020_12_03 
-%     -- updated some of the plotting/debug details to improve
-%     2020_11_12 
-%     -- modified to prep for Path class
-%     2021_01_08 
-%     -- cleaned up comments
-%     -- added argument checking
-%     -- cleaned up notation to show path vs pathSXY
-%     2021_01_09
-%     -- completely converted code to path form, not pathSXY
-%     2021_03_21
-%     -- modified to allow 3D snapping
-%     -- changed input checks to include 3D paths
-%     2023_06_03
-%     -- modified to allow vectorized snapping
-%     2023_08_08
-%     -- bug fixes for points before start or after end
+% 2020_10_10 
+% -- first write of the code
+% 2020_11_10 
+% -- changed function names in prep for DataClean class
+% 2020_12_03 
+% -- updated some of the plotting/debug details to improve
+% 2020_11_12 
+% -- modified to prep for Path class
+% 2021_01_08 
+% -- cleaned up comments
+% -- added argument checking
+% -- cleaned up notation to show path vs pathSXY
+% 2021_01_09
+% -- completely converted code to path form, not pathSXY
+% 2021_03_21
+% -- modified to allow 3D snapping
+% -- changed input checks to include 3D paths
+% 2023_06_03
+% -- modified to allow vectorized snapping
+% 2023_08_08
+% -- bug fixes for points before start or after end
+% 2023_09_28 - S. Brennan
+% -- documented bug via test case wherein closest path not correctly found
 
 
 close all;
@@ -168,6 +170,51 @@ fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
 fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
         s_coordinate);
 fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+
+%% Known fail case - requires different function approach
+% There is a point ON the path, and yet it is snapping to a different
+% portion of the path. This is because the snap function FIRST finds the
+% closest vertx point on the path to the query point, and if this closet
+% point is on a path segment nearby but NOT the closest, the closest path
+% will not be checked.
+flag_snap_type = 1;
+point = [1 1]; 
+pathXY = [-5 1; 5 1; 5 0; 2 0; 2 2];
+
+fignum = 12345;
+
+% Snap the point onto the path
+[closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length,distance_real,distance_imaginary] = ...
+    fcn_Path_snapPointOntoNearestPath(point, pathXY,flag_snap_type,fignum);
+
+% 
+% % Make sure function worked
+% true_closest_path_point = [1 0];
+% true_s_coordinate = 2;
+% true_first_path_point_index = 2;
+% true_second_path_point_index = 2;
+% true_percent_along_length = 0;
+% true_distance_real = 0;
+% true_distance_imaginary = 1;
+% 
+% assert(isequal(round(closest_path_point,4),round(true_closest_path_point,4)));
+% assert(isequal(round(s_coordinate,4),round(true_s_coordinate,4)));
+% assert(isequal(round(first_path_point_index,4),round(true_first_path_point_index,4)));
+% assert(isequal(round(second_path_point_index,4),round(true_second_path_point_index,4)));
+% assert(isequal(round(percent_along_length,4),round(true_percent_along_length,4)));
+% assert(isequal(round(distance_real,4),round(true_distance_real,4)));
+% assert(isequal(round(distance_imaginary,4),round(true_distance_imaginary,4)));
+% 
+% % Print results to the workspace
+% fprintf(1,'Figure: %d\n',fignum);
+% fprintf(1,'\t\t Closest point is: %.2f %.2f \n',...
+%     closest_path_point(1,1),closest_path_point(1,2));
+% fprintf(1,'\t\t Matched to the path segment given by indices %d and %d, \n',...
+%     first_path_point_index,second_path_point_index);
+% fprintf(1,'\t\t S-coordinate is: %.2f, \n',...
+%         s_coordinate);
+% fprintf(1,'\t\t percent_along_length is: %.2f\n',percent_along_length);
+
 
 %% BASIC example 0.1
 % A simple line segment, a simple query, zero distance in rear segments,

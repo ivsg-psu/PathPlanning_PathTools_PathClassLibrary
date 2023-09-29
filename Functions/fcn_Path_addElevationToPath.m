@@ -47,7 +47,8 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 %      -- allow empty figure argument to avoid plotting
 
 % TODO:
-%   Remove the for loop after fcn_snapPointOntoNearestPath is vectorized
+% Remove the for loop after fcn_snapPointOntoNearestPath is vectorized
+% Transition code to use fcn_Path_snapPointToPathViaVectors instead
 
 flag_do_debug = 0; % Flag to plot the results for debugging
 flag_check_inputs = 1; % Flag to perform input checking

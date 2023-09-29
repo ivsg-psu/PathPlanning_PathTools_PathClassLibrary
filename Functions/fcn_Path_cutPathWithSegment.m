@@ -43,7 +43,6 @@ function [cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToC
 %
 %     fcn_Path_checkInputsToFunctions
 %     fcn_Path_findProjectionHitOntoPath
-%     fcn_Path_snapPointOntoNearestPath
 %
 % This function was written on 2023_09_26 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
@@ -128,7 +127,7 @@ if isnan(distance) || distance<0
 
 else
     [~,s_coordinate_of_cut] = ...
-        fcn_Path_snapPointOntoNearestPath(location_of_crossing, pathToCut);
+        fcn_Path_snapPointToPathViaVectors(location_of_crossing, pathToCut);
 
     traversalToCut = fcn_Path_convertPathToTraversalStructure(pathToCut);
 

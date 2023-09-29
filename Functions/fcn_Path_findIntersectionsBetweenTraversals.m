@@ -168,7 +168,7 @@ for i_segment_path_1 = 2:length(traversal_1.X)
             
             % Find the s-coordinate for traversal 1
             [~,s_coordinate_1_this_hit,first_path_point_index,second_path_point_index,percent_along_length] = ...
-                fcn_Path_snapPointOntoNearestPath(point, path_of_traversal_1); %#ok<ASGLU>
+                fcn_Path_snapPointToPathViaVectors(point, path_of_traversal_1); %#ok<ASGLU>
             
             % Interpolate the s-coordinate in 1
             s_diff_1_this_hit = ...
@@ -200,7 +200,7 @@ for i_segment_path_1 = 2:length(traversal_1.X)
 
             % Find the s-coordinate for traversal 2
             [~,s_coordinate_2_this_hit,first_path_point_index,second_path_point_index,percent_along_length] = ...
-                fcn_Path_snapPointOntoNearestPath(point, path_of_traversal_2); %#ok<ASGLU>
+                fcn_Path_snapPointToPathViaVectors(point, path_of_traversal_2); %#ok<ASGLU>
 
             % Interpolate the s-coordinate in 2
             s_diff_2_this_hit = ...
