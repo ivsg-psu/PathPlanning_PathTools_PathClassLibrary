@@ -1,6 +1,6 @@
-function [TransitionCurves, ...
-    closest_path_point1, closest_path_point2,...
-    angle_start_radians, angle_end_radians] = ...
+function [arc_points, line_segment_1, line_segment_2,...
+    radius_of_arc, circle_center,...
+    start_angle_radians, end_angle_radians] = ...
     fcn_Path_joinSegmentsWithArc(segment_1, segment_2,varargin)
 %% fcn_Path_joinSegmentsWithArc
 % Fits an arc to connect two line segments.
@@ -12,16 +12,13 @@ function [TransitionCurves, ...
 %
 % FORMAT:
 %
-%       [ TransitionCurves, ...
-%         closest_path_point1, closest_path_point2,...
-%         angle_point1_deg,angle_point2_deg] = ...
+%       [arc_points, line_segment_1, line_segment_2,...
+%        radius_of_arc, circle_center,...
+%        start_angle_radians, end_angle_radians] = ...
 %         fcn_Path_joinSegmentsWithArc(...
 %         segment_1, ...
 %         segment_2,...
 %         (number_of_points_on_curve),...
-%         (plot_color),...
-%         (plot_line_width),...
-%         (plot_text),...
 %         (fig_num))
 %
 % INPUTS:
@@ -35,47 +32,37 @@ function [TransitionCurves, ...
 %      (OPTIONAL INPUTS)
 %
 %      number_of_points_on_curve: the number of points the user wants on
-%      the transition curve which will be equidistant throughout the curve
-%
-%      plot_color: the color of the plot of the transition curve as a string (eg. 'yellow' or 'y') or as a
-%      RGB matrix (eg. [1 1 0] for yellow)
-%
-%      plot_line_width: the line width of the plot of the transition curve
-%      in the forn of a number
-%
-%      plot_text: text to be shown on the plot in the form of a string (eg.
-%      'Transition curve 1') in the color defined by plot_color
+%      the transition curve which will be equidistant throughout the curve.
+%      Default is 5;
 %      
 %      fig_num: a figure number to plot result
 %
 % OUTPUTS:
 %
-%      TransitionCurves: array of XY coordinates of the transition curve
-%      between the given line segments and with the given radius. The array
-%      always starts on Intersection_point1 and ends at
-%      Intersection_point2.
+%      arc_points: array of XY coordinates of the arc connecting segment_1
+%      to segment_2, ordered from segment_1 to segment_2
 %
-%      radius_of_curve : radius of the transition curve between the two
-%       line segmnets. Is positive for a curve to the left side according
-%       to the direction of travel and negative to the right side of the
-%       direction of travel.
+%      line_segment_1: array of XY points connecting end of segment_1 to
+%      the start of the arc. It will be [nan nan] if arc starts exactly at
+%      end of segment_1.
 %
-%      Intersection_point1 : Point on line segment 1 that intersects the
-%      Intersection_point1 : Point on path_1 that intersects the
-%      transition curve orthogonally, this is the first point on the
-%      transition curve
+%      line_segment_2: array of XY points connecting end of arc to the
+%      start of the segment_2. It will be [nan nan] if arc ends exactly at
+%      start of segment_2.
 %
-%      Intersection_point2 : Point on path_2 that intersects the
-%      transition curve orthogonally, this is the last point on the
-%      transition curve
+%      radius_of_arc : radius of the curve between the two
+%       line segments.
+%   
+%      circle_center: the coordinates for the center of the circle defining
+%      the arc.
 %
-%      angle_start_radians: Angle of the intersection point between the
-%      transition curve and path_1 measured from the center of
-%      the transition curve, relative to the x-axis
+%      start_angle_radians : the angle, in radians, where the arc starts
+%      relative to the center of the circle. Angles are measured relative
+%      to the x-axis.
 %
-%      angle_end_radians: Angle of the intersection point between the
-%      transition curve and path_2 measured from the center of
-%      the transition curve, relative to the x-axis
+%      end_angle_radians : the angle, in radians, where the arc ends
+%      relative to the center of the circle. Positive values are
+%      counter-clockwise, negative values are counter-clockwise.
 %
 % DEPENDENCIES:
 %
@@ -121,11 +108,12 @@ end
 
 if flag_check_inputs == 1
     % Are there the right number of inputs?
-    narginchk(2,7);
+    narginchk(2,4);
 
 end
 
-number_of_points_on_curve = 50; % Default is 50 points on the transition curve
+% Does user want to specify number_of_points_on_curve?
+number_of_points_on_curve = 5; % Default is 5 points on the transition curve
 if 3 <= nargin
     temp = varargin{1};
     if ~isempty(temp)
@@ -138,32 +126,9 @@ if 3 <= nargin
     end
 end
 
-plot_color = 'red'; % Default color to plot the transition curve is red
-if 4 <= nargin
-    temp = varargin{2};
-    if ~isempty(temp)
-        plot_color = temp;
-    end
-end
-
-plot_line_width = 2; % Default line width to plot the transition curve is 2
-if 5 <= nargin
-    temp = varargin{3};
-    if ~isempty(temp)
-        plot_line_width = temp;
-    end
-end
-
-plot_text = 'Transition_Curve'; % Default 
-if 6 <= nargin
-    temp = varargin{4};
-    if ~isempty(temp)
-        plot_text = temp;
-    end
-end
-
+% Does user want to specify fig_num?
 flag_do_plots = 0; % Default is not to plot the data
-if 7 <= nargin
+if 4 <= nargin
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
@@ -198,11 +163,14 @@ end
 
 % vector of line segment1 start
 unit_v_lineSegment1 = fcn_INTERNAL_calcUnitVector(segment_1(1,:),segment_1(2,:));
+unit_v_lineSegment1_orthogonal = unit_v_lineSegment1*[0 1; -1 0];
 
 % vector of line segment2 start
 unit_v_lineSegment2 = fcn_INTERNAL_calcUnitVector(segment_2(1,:),segment_2(2,:));
+unit_v_lineSegment2_orthogonal = unit_v_lineSegment2*[0 1; -1 0];
 
-flag_point_to_left = crossProduct(unit_v_lineSegment1,unit_v_lineSegment2)>0;
+cross_product_unit_vectors = crossProduct(unit_v_lineSegment1,unit_v_lineSegment2);
+flag_point_to_left = cross_product_unit_vectors>0;
 
 % Show the results?
 if flag_do_debug == 1
@@ -224,6 +192,9 @@ if flag_do_debug == 1
     quiver(segment_1(2,1), segment_1(2,2),unit_v_lineSegment1(1,1),unit_v_lineSegment1(1,2),0,'-','LineWidth',5,'ShowArrowHead','on','Color',[0 1 0],'MaxHeadSize',4)
     quiver(segment_2(1,1), segment_2(1,2),unit_v_lineSegment2(1,1),unit_v_lineSegment2(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 0 1],'MaxHeadSize',4)
 
+    quiver(segment_1(2,1), segment_1(2,2),unit_v_lineSegment1_orthogonal(1,1),unit_v_lineSegment1_orthogonal(1,2),0,'-','LineWidth',5,'ShowArrowHead','on','Color',[0 1 0],'MaxHeadSize',4)
+    quiver(segment_2(1,1), segment_2(1,2),unit_v_lineSegment2_orthogonal(1,1),unit_v_lineSegment2_orthogonal(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 0 1],'MaxHeadSize',4)
+
     plot(segment_1(:,1), segment_1(:,2),'.','color',[0 0 0],'LineWidth',7,'MarkerSize',15);
     plot(segment_2(:,1), segment_2(:,2),'.','color',[0 0 0],'LineWidth',5,'MarkerSize',15);
     title('Original Line Segments and their unit vectors','fontsize',12)
@@ -236,374 +207,132 @@ end
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_type),(fig_num))  
 
-[distance,location,path_segment, distance_along_segment_2, distance_along_segment_1] = ...
+[~,~,~, percentage_distance_along_segment_2, percentage_distance_along_segment_1] = ...
     fcn_Path_findProjectionHitOntoPath(segment_2,segment_1(1,:),segment_1(2,:),1);
-
-% Check that distance is not equal to zero
 
 length_segment_1 = sum((segment_1(2,:)-segment_1(1,:)).^2,2).^0.5;
 length_segment_2 = sum((segment_2(2,:)-segment_2(1,:)).^2,2).^0.5;
 
-hit_point_1 = segment_1(1,:) + length_segment_1*distance_along_segment_1*unit_v_lineSegment1;
-hit_point_2 = segment_2(1,:) + length_segment_2*distance_along_segment_2*unit_v_lineSegment2;
+hit_point_1 = segment_1(1,:) + length_segment_1*percentage_distance_along_segment_1*unit_v_lineSegment1;
+hit_point_2 = segment_2(1,:) + length_segment_2*percentage_distance_along_segment_2*unit_v_lineSegment2;
 
+% Check that we get the same answer from both segments for where they cross
 if max(abs(hit_point_2 - hit_point_1))>1E-8
     error('Different intersection points calculated from each of the segments. This indicates an error.');
+end
+
+% Check that distance is not equal to zero
+if percentage_distance_along_segment_1>0 && percentage_distance_along_segment_1<1
+    warning('on','backtrace');
+    warning('Intersection was found between segments indicating that the segments cannot be joined with an arc, resulting in zero radius.');
+    arc_points = [nan nan];
+    line_segment_1 = [nan nan];
+    line_segment_2 = [nan nan];
+    radius_of_arc = 0;
+    circle_center = hit_point_1;
+    start_angle_radians = nan;
+    end_angle_radians = nan;
+    return;
 end
 
 % Find which one is closer
 distance_squared_to_1 = sum((hit_point_1 - segment_1(2,:)).^2,2);
 distance_squared_to_2 = sum((hit_point_1 - segment_2(1,:)).^2,2);
 
-if distance_squared_to_2 > distance_squared_to_1
+if distance_squared_to_2 < distance_squared_to_1
     flag_point_1_is_closest = 0;
+    distance = abs(distance_squared_to_2)^0.5;
 else
     flag_point_1_is_closest = 1;    
+    distance = abs(distance_squared_to_1)^0.5;
 end
 
-URHERE
 %% Find the apex angle
+angle_between_vectors_radians  = fcn_INTERNAL_findAngleBetweenUnitVectors(unit_v_lineSegment1, unit_v_lineSegment2);
+apex_angle_radians = pi - abs(angle_between_vectors_radians);
+apex_angle_degrees = apex_angle_radians*180/pi;
 
 %% Find the side distance and center of the circle
+radius_of_arc = distance*sin(apex_angle_radians);
+
+if flag_point_1_is_closest
+    end_point_on_1 = segment_1(2,:);
+    if flag_point_to_left
+        circle_center = segment_1(2,:) + unit_v_lineSegment1_orthogonal*radius_of_arc;
+        start_point_on_2 = circle_center - unit_v_lineSegment2_orthogonal*radius_of_arc;
+    else
+        circle_center = segment_1(2,:) - unit_v_lineSegment1_orthogonal*radius_of_arc;
+        start_point_on_2 = circle_center + unit_v_lineSegment2_orthogonal*radius_of_arc;
+    end
+else
+    start_point_on_2 = segment_2(1,:);
+    if flag_point_to_left
+        circle_center = segment_2(1,:) + unit_v_lineSegment2_orthogonal*radius_of_arc;
+        end_point_on_1 = circle_center - unit_v_lineSegment1_orthogonal*radius_of_arc;
+    else
+        circle_center = segment_2(1,:) - unit_v_lineSegment2_orthogonal*radius_of_arc;
+        end_point_on_1 = circle_center + unit_v_lineSegment1_orthogonal*radius_of_arc;
+    end
+end
+
+% Show the results?
+if flag_do_debug == 1
+    figure(fig_debug);
+
+
+    % Show the circle center
+    plot(circle_center(:,1), circle_center(:,2),'+','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+
+    % Show the start and end points of segments
+    plot(end_point_on_1(:,1), end_point_on_1(:,2),'.','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+    plot(start_point_on_2(:,1), start_point_on_2(:,2),'.','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+end
 
 %% Find the start and end angles
+% NOTE: this is vectorized. Comes from the geometry library.
+[...
+    angles] ...
+    = ...
+    fcn_geometry_findAngleUsing2PointsOnCircle(...
+    circle_center,...
+    radius_of_arc,...
+    end_point_on_1,...
+    start_point_on_2,...
+    flag_point_to_left);
 
-%% Find the points
+vector_from_center_to_1 = end_point_on_1 - circle_center;
+start_angle_radians = atan2(vector_from_center_to_1(1,2),vector_from_center_to_1(1,1));
+end_angle_radians   = start_angle_radians + angles;
+angles_to_calculate = linspace(start_angle_radians,end_angle_radians,number_of_points_on_curve)';
 
+%% Find the points and line segments
+arc_points = circle_center + radius_of_arc*[cos(angles_to_calculate) sin(angles_to_calculate)];
 
-% convert the extended paths to traversals 
-% This is so that we can use them in the PathClass Library function to find
-% intersectinos and offsets to the path
+if flag_point_1_is_closest
+    line_segment_1 = [nan nan];
+    line_segment_2 = [start_point_on_2; segment_2(1,:)];
 
-% Convert the extended versions
-path_1_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_1_extended);
-path_2_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_2_extended);
-
-
-%% 1. calculate if and how the extended paths intersect
-% 1a. use function from PathClass to find the intersection
-% 1b. check the type of intersection
-% 1c. find the segments that are intersecting
-
-% Step 1a. find the intersections
-[extended_paths_intersections,...
-    s_coordinates_in_traversal_1,...
-    s_coordinates_in_traversal_2] = ...
-    fcn_Path_findIntersectionsBetweenTraversals(...
-    path_1_extended_traversal,...
-    path_2_extended_traversal);
-
-% Show the results?
-if flag_do_debug == 1
-    figure(fig_debug);
-    plot(extended_paths_intersections(:,1), extended_paths_intersections(:,2),'color','black','Marker','o','MarkerSize',10);
-end
-
-%% 1b. check the type of intersection
-
-% get the intersection point of the extended paths
-number_of_extended_intersections = length(extended_paths_intersections(:,1));
-
-if number_of_extended_intersections == 0
-    % If paths never intersect, throw an error! 
-    error('Paths never intersect, transition curve not possible');
-elseif isequal(path_1, path_2)
-    % If paths are identical, throw an error
-    error('Paths are collinear, curve is not possible between them');
-
-elseif number_of_extended_intersections >= 1
-    % THIS IS THE TYPICAL CASE:
-
-    % Check for infinite intersections - this will show up if the first
-    % point of intersection, then second point of intersection, etc. are
-    % all on path_1, and the sequence is either on the same segment of
-    % path_1 or follows the end-points of path_1 (or both). If there are
-    % infinite, we want the LAST point of correspondence as the "first"
-    % intersection of point.
-
-
-
-    % 1.b.1 if they intersect multiple times, use first as intersection pt ( flag as
-    % intersection exists)
-    extended_intersection_point = extended_paths_intersections(1,:);
-    s_coordinate_in_traversal_1 = s_coordinates_in_traversal_1(1);
-    s_coordinate_in_traversal_2 = s_coordinates_in_traversal_2(1);
 else
-    error('Unknown case detected in an if statement - debugging required.')
+    line_segment_2 = [nan nan];
+    line_segment_1 = [end_point_on_1; segment_1(2,:)];
 end
 
-%% 1c. find the segments that are intersecting
-% Then use these to find the vectors in/out
-prior_segment_path_1 = fcn_INTERNAL_findPriorIntersectingSegment(path_1_extended_traversal,s_coordinate_in_traversal_1);
-post_segment_path_2  = fcn_INTERNAL_findPostIntersectingSegment(path_2_extended_traversal,s_coordinate_in_traversal_2);
-
-% Show the results?
-if flag_do_debug == 1
-    figure(fig_debug);
-    plot(...
-        [path_1_extended(prior_segment_path_1,1) extended_intersection_point(1,1)],...
-        [path_1_extended(prior_segment_path_1,2) extended_intersection_point(1,2)],...
-        '-','color',[1 0 1],'LineWidth',2);
-    plot(...
-        [extended_intersection_point(1,1) path_2_extended(post_segment_path_2+1,1)],...
-        [extended_intersection_point(1,2) path_2_extended(post_segment_path_2+1,2)],...
-        '-','color',[0 1 1],'LineWidth',2);
-end
-
-unit_vector_into_intersection  = fcn_INTERNAL_calcUnitVector(path_1_extended(prior_segment_path_1,:),extended_intersection_point);
-unit_vector_outof_intersection = fcn_INTERNAL_calcUnitVector(extended_intersection_point,path_2_extended(post_segment_path_2+1,:));
-
-% Show the results?
-if flag_do_debug == 1
-    figure(fig_debug);
-    start_point_1 = extended_intersection_point - unit_vector_into_intersection;
-    quiver(start_point_1(1,1), start_point_1(1,2),unit_vector_into_intersection(1,1),unit_vector_into_intersection(1,2),0,'-','LineWidth',5,'ShowArrowHead','on','Color',[1 0 1],'MaxHeadSize',4)
-    quiver(extended_intersection_point(1,1), extended_intersection_point(1,2),unit_vector_outof_intersection(1,1),unit_vector_outof_intersection(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 1 1],'MaxHeadSize',4)
-end
-
-%% offset the paths by the distance of the radius in the direction where radius will be positive as default
-
-% 2 find what quadrant are allowed for the curve, find where segment 2 is
-% wrt 1 and the intersection point
-% 2.1 then take first segment of path_2 that sticks out in the direction
-% of the radius and take the point of contact with the segment that sticks
-% out and the path_1 as the intersection point
-% 2.2 if no parts stick out in correct direction, throw an error
-% (error! infinite overlap and unable to resolve a correct side to use)
-
-% 3 find the angle between the intersecting segments to determine which
-% side of traversal 2 to use 
-
-% Calculate the angle between the unit vectors
-% FORMAT: angle_between_vectors_radians = fcn_INTERNAL_findAngleBetweenUnitVectors(from_unit_vector,to_unit_vector)
-angle_change_radians = fcn_INTERNAL_findAngleBetweenUnitVectors(unit_vector_into_intersection,unit_vector_outof_intersection);
-
-% get direction to offset the path segments
-offset_direction_relative_to_1 = sign(angle_change_radians);
-offset_amount = offset_direction_relative_to_1*radius_of_curve;
-
-% offset the path segments in the in the direction of their travel (where
-% direction of travel is in the order of the points in the matrix of the
-% path segments)
-[offset_traversal_1_start, offset_traversal_1_end] = fcn_INTERNAL_findOrthogonalOffsetTraversal(path_1_extended_traversal, offset_amount); % offset for traversal 1
-[offset_traversal_2_start, offset_traversal_2_end] = fcn_INTERNAL_findOrthogonalOffsetTraversal(path_2_extended_traversal, offset_amount); % offset for traversal 2
-
-% BELOW uses Path Library function, which is not actually a perfect offset
-% - See Example 6 - because it is averaging the end points. These examples
-% will fail because of this imperfection!
-%
-% offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_1_extended_traversal, offset_amount); % offset for traversal 1
-% offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_2_extended_traversal, offset_amount); % offset for traversal 2
-
-% Show the results?
-if flag_do_debug == 1
-    figure(fig_debug);
-    % Plot the offsets, blending them by a bit of white to make them
-    % lighter
-    for ith_segment = 1:length(offset_traversal_1_start(:,1))
-        plot(...
-            [offset_traversal_1_start(ith_segment,1) offset_traversal_1_end(ith_segment,1)],...
-            [offset_traversal_1_start(ith_segment,2) offset_traversal_1_end(ith_segment,2)],...
-            '.-','color',[0 1 0]+0.7*[1 0 1],'LineWidth',3,'MarkerSize',30);
-        
-        text(...
-            (offset_traversal_1_start(ith_segment,1)+offset_traversal_1_end(ith_segment,1))/2,...
-            (offset_traversal_1_start(ith_segment,2)+offset_traversal_1_end(ith_segment,2))/2,...
-            sprintf('offset1 %.0d',ith_segment),'color','k','Interpreter','none');
-    end
-    
-    for ith_segment = 1:length(offset_traversal_2_start(:,1))
-        
-        plot(...
-            [offset_traversal_2_start(ith_segment,1) offset_traversal_2_end(ith_segment,1)],...
-            [offset_traversal_2_start(ith_segment,2) offset_traversal_2_end(ith_segment,2)],...
-            '.-','color',[0 0 1]+0.7*[1 1 0],'LineWidth',3,'MarkerSize',30);
-        
-        text(...
-            (offset_traversal_2_start(ith_segment,1)+offset_traversal_2_end(ith_segment,1))/2,...
-            (offset_traversal_2_start(ith_segment,2)+offset_traversal_2_end(ith_segment,2))/2,...
-            sprintf('offset2 %.0d',ith_segment),'color','k','Interpreter','none');
-    end
-    text(...
-        offset_traversal_1_start(1,1),...
-        offset_traversal_1_start(1,2),...
-        'offset1','color','k','Interpreter','none');
-    
-    text(...
-        offset_traversal_2_start(1,1),...
-        offset_traversal_2_start(1,2),...
-        'offset2','color','k','Interpreter','none');
-end
-
-%% find the intersection point of the offsets, this is the center of the transition curves
-% The following is a horrible way to do this, as it is very computational.
-% However, it works and is "clean" to understand. It would greatly help to
-% rewrite the below search process to be faster.
-% This works by taking every segment in path 1, segment by segment, and
-% converting each to a traversal, then checking for an intersection with every
-% segment in path 2 and keeping the closest intersection if one is found.
-
-flag_an_intersection_was_found = 0;
-center_transition_curve = nan(1,2);
-closest_distance = inf;
-path_1_segment_hit = nan;
-path_2_segment_hit = nan;
-
-% Convert all segment_2's into traversals
-% Initialize with an empty struct
-segment_1_traversals{length(offset_traversal_1_start(:,1))} = struct; 
-segment_2_traversals{length(offset_traversal_2_start(:,1))} = struct; 
-
-% Fill in all the traversals possible for path_1
-for ith_segment_in_path1 = 1:length(offset_traversal_1_start(:,1))
-    segment_1_traversals{ith_segment_in_path1} = fcn_Path_convertPathToTraversalStructure([offset_traversal_1_start(ith_segment_in_path1,:); offset_traversal_1_end(ith_segment_in_path1,:)]);
-end
-
-% Fill in all the traversals possible for path_2
-for jth_segment_in_path2 = 1:length(offset_traversal_2_start(:,1))
-    segment_2_traversals{jth_segment_in_path2} = fcn_Path_convertPathToTraversalStructure([offset_traversal_2_start(jth_segment_in_path2,:); offset_traversal_2_end(jth_segment_in_path2,:)]);
-end
-
-% Now loop through all the path 1 segments, checking each segment from path
-% 2 for an intersection, keeping the closest intersection to start of path
-% 1.
-for ith_segment_in_path1 = 1:length(offset_traversal_1_start(:,1))
-    if flag_an_intersection_was_found==0
-        segment_1_traversal_to_check = segment_1_traversals{ith_segment_in_path1};
-        
-        for jth_segment_in_path2 = 1:length(offset_traversal_2_start(:,1))
-            segment_2_traversal_to_check = segment_2_traversals{jth_segment_in_path2};
-            
-            [intersection_point,...
-                s_coordinates_in_traversal_1,...
-                ~] = ...
-                fcn_Path_findIntersectionsBetweenTraversals(...
-                segment_1_traversal_to_check,...
-                segment_2_traversal_to_check);
-            if ~isempty(intersection_point)
-                flag_an_intersection_was_found = 1;
-                if s_coordinates_in_traversal_1<closest_distance
-                    center_transition_curve = intersection_point;
-                    closest_distance = s_coordinates_in_traversal_1;
-                    path_1_segment_hit = ith_segment_in_path1;
-                    path_2_segment_hit = jth_segment_in_path2;
-                end 
-            end
-            
-        end
-    end
-end
-
-if isempty(center_transition_curve)
-    error('No intersections found - not possible to create a transition curve.');
-end
-
-% Show the results?
-if flag_do_debug == 1
-    figure(fig_debug);
-    % plot the intersection point of the offset paths, this is the center of
-    % the transition curve
-    plot(center_transition_curve(:,1),center_transition_curve(:,2),'Color','k','Marker','*','MarkerSize',20);
-    text(center_transition_curve(:,1),center_transition_curve(:,2),'Center used for arc','color','k','Interpreter','none');
-end
-
-
-
-%% find the closest point from the center of the transition curve to both paths
-% these are the intersection points of the curve and the paths 
-% when the curve is tangent to the paths respectively
-
-% Convert all segments in path 1 and 2 into traversals
-% Initialize with an empty struct
-path_1_traversals{length(offset_traversal_1_start(:,1))} = struct; 
-path_2_traversals{length(offset_traversal_2_start(:,1))} = struct; 
-
-% Fill in all the traversals possible for path_1
-N_segments_path_1 = length(path_1_extended_traversal.X(:,1))-1;
-N_segments_path_2 = length(path_2_extended_traversal.X(:,1))-1;
-
-% Fill in all the traversals possible for path_1
-for ith_segment_in_path1 = 1:N_segments_path_1
-    path_1_traversals{ith_segment_in_path1} = fcn_Path_convertPathToTraversalStructure(...
-        [path_1_extended_traversal.X(ith_segment_in_path1,1) path_1_extended_traversal.Y(ith_segment_in_path1,1); ...
-        path_1_extended_traversal.X(ith_segment_in_path1+1,1) path_1_extended_traversal.Y(ith_segment_in_path1+1,1)]);
-end
-
-% Fill in all the traversals possible for path_2
-for jth_segment_in_path2 = 1:N_segments_path_2
-    path_2_traversals{jth_segment_in_path2} = fcn_Path_convertPathToTraversalStructure(...
-        [path_2_extended_traversal.X(jth_segment_in_path2,1) path_2_extended_traversal.Y(jth_segment_in_path2,1); ...
-        path_2_extended_traversal.X(jth_segment_in_path2+1,1) path_2_extended_traversal.Y(jth_segment_in_path2+1,1)]);
-end
-
-
-% snap point onto path_1
-[closest_path_point1,~,~,~,...
-    ~,~] = ...
-    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_1_traversals{path_1_segment_hit});
-
-% snap point onto path_2
-[closest_path_point2,~,~,~,...
-    ~,~] = ...
-    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_2_traversals{path_2_segment_hit});
-
-% Check results
-distance_1 = sum((center_transition_curve - closest_path_point1).^2,2).^0.5;
-distance_2 = sum((center_transition_curve - closest_path_point2).^2,2).^0.5;
-if abs(distance_1 - distance_2)>0.00001*distance_2
-   error('Distances do not match! Stop here...')
-end
 
 % Show the results?
 if flag_do_debug == 1
     figure(fig_debug);
 
-    % plot the closest point fron the center to the original paths, 
-    % this is the intersection point of the transition curve 
-    % and paths, where the curve will be orthogonal to the paths
-    plot(closest_path_point1(:,1),closest_path_point1(:,2),'Color','g','Marker','.','MarkerSize',40);
-    text(closest_path_point1(:,1),closest_path_point1(:,2),'Transition_start','color','k','Interpreter','none','VerticalAlignment','bottom');
-    plot(closest_path_point2(:,1),closest_path_point2(:,2),'Color','b','Marker','.','MarkerSize',40);
-    text(closest_path_point2(:,1),closest_path_point2(:,2),'Transition_end','color','k','Interpreter','none','VerticalAlignment','bottom');
-end
 
-%% have a transition curve from start to end point with given radius and center of the transition curve
+    % Show the arc_points
+    plot(arc_points(:,1), arc_points(:,2),'.-','color',[1 0 1],'LineWidth',3,'MarkerSize',30);
+    plot(arc_points(:,1), arc_points(:,2),'.-','color',[0 0 0],'LineWidth',3,'MarkerSize',15);
 
+    % Show the start and end line segment
+    plot(line_segment_1(:,1), line_segment_1(:,2),'.-','color',[0 1 1],'LineWidth',3,'MarkerSize',30);
+    plot(line_segment_2(:,1), line_segment_2(:,2),'.-','color',[0 1 1],'LineWidth',3,'MarkerSize',30);
+    plot(line_segment_1(:,1), line_segment_1(:,2),'.', 'color',[0 0 0],'LineWidth',3,'MarkerSize',15);
+    plot(line_segment_2(:,1), line_segment_2(:,2),'.', 'color',[0 0 0],'LineWidth',3,'MarkerSize',15);
 
-unit_vector_to_point1  = fcn_INTERNAL_calcUnitVector(center_transition_curve,closest_path_point1);
-unit_vector_to_point2  = fcn_INTERNAL_calcUnitVector(center_transition_curve,closest_path_point2);
-
-% Find angle between unit vectors
-% FORMAT: angle_between_vectors_radians = fcn_INTERNAL_findAngleBetweenUnitVectors(from_unit_vector,to_unit_vector)
-angle_change_radians = fcn_INTERNAL_findAngleBetweenUnitVectors(unit_vector_to_point1,unit_vector_to_point2);
-
-% calculation of the angle for the intersection points wrt the x-axis
-
-% make sure n >= 2
-if number_of_points_on_curve < 2
-    error('This number of points on transition curve is not possible, please increase the number');
-else
-    % continue with code
-end
-
-start_center_diff = closest_path_point1 - center_transition_curve;
-angle_start_radians = atan2(start_center_diff(:,2), start_center_diff(:,1));
-angle_end_radians = angle_start_radians + angle_change_radians;
-
-% to get n number of equally spaced points on the transition curve
-thetas_radians = (linspace(angle_start_radians,angle_end_radians,number_of_points_on_curve))'; 
-TransitionCurves = center_transition_curve + radius_of_curve*[cos(thetas_radians) sin(thetas_radians)]; % data for n points on circle
-
-% Show the results?
-if flag_do_debug == 1
-    figure(fig_debug);
-
-    % Show the transition curve
-    plot(TransitionCurves(:,1),TransitionCurves(:,2),'r.-','LineWidth',2);
-
-    % plot the start and end points of the curve after using atan2
-    plot(TransitionCurves(1,1), TransitionCurves(1,2),'color','green','Marker','o','MarkerSize',20);
-    plot(TransitionCurves(end,1), TransitionCurves(end,2),'color','blue','Marker','o','MarkerSize',20);
 end
 
 
@@ -620,9 +349,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots == 1 % only plot if the user has given a fig_num
-
-    %preparing the figure
-    figure(fig_num);
+    figure(fig_debug);
     clf;
     hold on;
     grid on;
@@ -630,25 +357,38 @@ if flag_do_plots == 1 % only plot if the user has given a fig_num
     ylabel('Y [m]');
     axis equal;
 
+
     % Show the inputs
-    plot(path_1(:,1), path_1(:,2),'-','color',[0 1 0],'LineWidth',1.5);
-    plot(path_2(:,1), path_2(:,2),'-','color',[0 0 1],'LineWidth',1.5);
+    plot(segment_1(:,1), segment_1(:,2),'.-','color',[0 1 0],'LineWidth',7,'MarkerSize',30);
+    plot(segment_2(:,1), segment_2(:,2),'.-','color',[0 0 1],'LineWidth',5,'MarkerSize',30);
+
 
     % Show the directions
-    quiver(path_1(1,1), path_1(1,2),unit_v_lineSegment1(1,1),unit_v_lineSegment1(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 1 0],'MaxHeadSize',4)
-    quiver(path_2(1,1), path_2(1,2),unit_v_lineSegment2(1,1),unit_v_lineSegment2(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 0 1],'MaxHeadSize',4)
+    quiver(segment_1(2,1), segment_1(2,2),unit_v_lineSegment1(1,1),unit_v_lineSegment1(1,2),0,'-','LineWidth',5,'ShowArrowHead','on','Color',[0 1 0],'MaxHeadSize',4)
+    quiver(segment_2(1,1), segment_2(1,2),unit_v_lineSegment2(1,1),unit_v_lineSegment2(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 0 1],'MaxHeadSize',4)
 
-    % Show the center of the arc
-    plot(center_transition_curve(:,1),center_transition_curve(:,2),'Color','k','Marker','*','MarkerSize',20);
-    text(center_transition_curve(:,1),center_transition_curve(:,2),'Center used for arc','color','k','Interpreter','none');
-        
-    % Show the transition curve
-    plot(TransitionCurves(:,1),TransitionCurves(:,2),'.-','Color',plot_color, 'LineWidth',plot_line_width);
+    quiver(segment_1(2,1), segment_1(2,2),unit_v_lineSegment1_orthogonal(1,1),unit_v_lineSegment1_orthogonal(1,2),0,'-','LineWidth',5,'ShowArrowHead','on','Color',[0 1 0],'MaxHeadSize',4)
+    quiver(segment_2(1,1), segment_2(1,2),unit_v_lineSegment2_orthogonal(1,1),unit_v_lineSegment2_orthogonal(1,2),0,'-','LineWidth',3,'ShowArrowHead','on','Color',[0 0 1],'MaxHeadSize',4)
 
-    % plot the start and end points of the curve after using atan2
-    plot(TransitionCurves(1,1), TransitionCurves(1,2),'color','green','Marker','o','MarkerSize',20);
-    plot(TransitionCurves(end,1), TransitionCurves(end,2),'color','blue','Marker','o','MarkerSize',20);
-    text(TransitionCurves(1,1), TransitionCurves(1,2),plot_text,'Interpreter','none');
+    plot(segment_1(:,1), segment_1(:,2),'.','color',[0 0 0],'LineWidth',7,'MarkerSize',15);
+    plot(segment_2(:,1), segment_2(:,2),'.','color',[0 0 0],'LineWidth',5,'MarkerSize',15);
+
+    % Show the circle center
+    plot(circle_center(:,1), circle_center(:,2),'+','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+
+    % Show the start and end points of segments
+    plot(end_point_on_1(:,1), end_point_on_1(:,2),'.','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+    plot(start_point_on_2(:,1), start_point_on_2(:,2),'.','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+
+    % Show the arc_points
+    plot(arc_points(:,1), arc_points(:,2),'.-','color',[1 0 1],'LineWidth',3,'MarkerSize',30);
+    plot(arc_points(:,1), arc_points(:,2),'.-','color',[0 0 0],'LineWidth',3,'MarkerSize',15);
+
+    % Show the start and end line segment
+    plot(line_segment_1(:,1), line_segment_1(:,2),'.-','color',[0 1 1],'LineWidth',3,'MarkerSize',30);
+    plot(line_segment_2(:,1), line_segment_2(:,2),'.-','color',[0 1 1],'LineWidth',3,'MarkerSize',30);
+    plot(line_segment_1(:,1), line_segment_1(:,2),'.', 'color',[0 0 0],'LineWidth',3,'MarkerSize',15);
+    plot(line_segment_2(:,1), line_segment_2(:,2),'.', 'color',[0 0 0],'LineWidth',3,'MarkerSize',15);
 end
 
 
@@ -681,96 +421,6 @@ function result = crossProduct(v,w)
 result = v(:,1).*w(:,2)-v(:,2).*w(:,1);
 end
 
-%% fcn_INTERNAL_findPriorIntersectingSegment
-function prior_intersecting_segment_number = fcn_INTERNAL_findPriorIntersectingSegment(traversal_to_check,s_coordinate)
-path_1_segment_intersecting_start = find(traversal_to_check.Station<s_coordinate,1,'last');
-path_1_segment_intersecting_end   = find(traversal_to_check.Station>s_coordinate,1,'first');
-path_1_segment_intersecing_on     = interp1(traversal_to_check.Station,(1:length(traversal_to_check.Station))',s_coordinate);
-prior_intersecting_segment_number       = floor(path_1_segment_intersecing_on);
-
-% If the intersection is on a vertex, then the current intersecting segment
-% may be greater than the prior one
-if path_1_segment_intersecting_start < prior_intersecting_segment_number
-    prior_intersecting_segment_number = path_1_segment_intersecting_start;
-end
-
-% Check if the intersection is exactly at the end of the traversal - if so,
-% then need to use the prior segment number
-if isempty(path_1_segment_intersecting_end) || (prior_intersecting_segment_number == length(traversal_to_check.Station))
-    prior_intersecting_segment_number = length(traversal_to_check.Station) - 1;
-end
-end % Ends fcn_INTERNAL_findPriorIntersectingSegment
-
-%% fcn_INTERNAL_findPostIntersectingSegment
-function post_intersecting_segment_number = fcn_INTERNAL_findPostIntersectingSegment(traversal_to_check,s_coordinate)
-path_1_segment_intersecting_end   = find(traversal_to_check.Station>s_coordinate,1,'first');
-path_1_segment_intersecing_on     = interp1(traversal_to_check.Station,(1:length(traversal_to_check.Station))',s_coordinate);
-post_intersecting_segment_number       = floor(path_1_segment_intersecing_on);
-
-% If the intersection is on a vertex, then the rounding down will match the
-% current position. If so, we want to use the vertex that follows
-if path_1_segment_intersecing_on == post_intersecting_segment_number
-    post_intersecting_segment_number = post_intersecting_segment_number+1;
-end
-
-% Check if the intersection is exactly at the end of the traversal - if so,
-% then need to use the prior segment number
-if isempty(path_1_segment_intersecting_end) || (post_intersecting_segment_number >= length(traversal_to_check.Station))
-    post_intersecting_segment_number = length(traversal_to_check.Station) - 1;
-end
-end % Ends fcn_INTERNAL_findPostIntersectingSegment
-
-%% fcn_INTERNAL_findOrthogonalOffsetTraversal
-function [offset_segments_start, offset_segments_end] = fcn_INTERNAL_findOrthogonalOffsetTraversal(reference_traversal,offset)
-
-N_segments = length(reference_traversal.Station) - 1;
-offset_segments_start = zeros(N_segments,2);
-offset_segments_end   = zeros(N_segments,2);
-
-
-
-% For each segment, project an offset, and find its coordinates
-for ith_segment = 1:N_segments
-    segment_coordinates = [reference_traversal.X(ith_segment:ith_segment+1) reference_traversal.Y(ith_segment:ith_segment+1)];
-    segment_traversal = fcn_Path_convertPathToTraversalStructure(segment_coordinates);
-    segment_stations = segment_traversal.Station;
-
-    % Set the projection type to use. 1 indicates using the prior segment
-    % to project a vertex
-    projection_type = 1; 
-    [unit_normal_vector_start, unit_normal_vector_end] = ...
-    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    segment_stations(:,1),segment_traversal,projection_type);
-
-    % Use the unit vectors to find the offsets
-    unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
-    offset_segment = unit_normal_vector_start + unit_vectors.*offset;
-
-
-    % Save results into an array of offset segments
-    offset_segments_start(ith_segment,:) = offset_segment(1,:);
-    offset_segments_end(ith_segment,:)   = offset_segment(2,:);
-end
-
-% For debugging
-if 1==0
-    figure(12323);
-    clf
-    hold on;
-    grid on;
-    axis equal;
-    plot(reference_traversal.X,reference_traversal.Y,'b.-','MarkerSize',10);
-    for ith_segment = 1:N_segments
-        plot(...
-            [offset_segments_start(ith_segment,1) offset_segments_end(ith_segment,1)],...
-            [offset_segments_start(ith_segment,2) offset_segments_end(ith_segment,2)],...
-            'r.-','MarkerSize',10);
-    end
-end
-
-end % Ends fcn_INTERNAL_findOrthogonalOffsetTraversal
-
-
 %% fcn_INTERNAL_findAngleBetweenUnitVectors
 function angle_between_vectors_radians = fcn_INTERNAL_findAngleBetweenUnitVectors(from_unit_vector,to_unit_vector)
 cross_result = cross([from_unit_vector(1,1:2) 0],[to_unit_vector(1,1:2) 0]);
@@ -779,3 +429,96 @@ angle_magnitude = real(acos(dot_result));
 angle_sign = sign(cross_result(3));
 angle_between_vectors_radians = angle_sign*angle_magnitude;
 end % Ends fcn_INTERNAL_findAngleBetweenUnitVectors
+
+%% fcn_geometry_findAngleUsing2PointsOnCircle
+function [...
+    angles] ...
+    = ...
+    fcn_geometry_findAngleUsing2PointsOnCircle(...
+    centers,...
+    radii,...
+    start_points_on_circle,...
+    end_points_on_circle,...
+    cross_products)
+
+% fcn_geometry_findAngleUsing2PointsOnCircle -  This function calculates
+% the angle from the start_points location to the end_points, in the
+% direction of the vector given by is_clockwise.
+%
+% FORMAT:
+%
+% [angles] ...
+%     = ...
+%     fcn_geometry_findAngleUsing2PointsOnCircle(...
+%     centers,...
+%     radii,...
+%     start_points_on_circle,...
+%     end_points_on_circle,...
+%     cross_products,...
+%     varargin)
+%
+% INPUTS:
+%
+%      centers: an [N x 2] vector in [x y] of the points of circle centers
+%
+%      radii: a [N x 1] vector of the radii of the circles (to avoid
+%      calculation time)
+%
+%      start_points_on_circle: an [N x 2] vector in [x y] of the points
+%      where sectors start
+%
+%      end_points_on_circle: an [N x 2] vector in [x y] of the points
+%      where sectors end
+%
+%      cross_products: an [N x 1] vector denoting the cross product
+%      direction to follow from input point to output point
+%
+%      (OPTIONAL INPUTS)
+%
+%      fig_num: a figure number to plot results.
+%
+% OUTPUTS:
+%
+%      angles: an [N x 1] vector of the angles, in radians, between input
+%      points and output points
+%
+% DEPENDENCIES:
+%
+%      fcn_geometry_checkInputsToFunctions
+%      fcn_geometry_plotCircle
+%
+% EXAMPLES:
+%
+% See the script: script_test_fcn_geometry_findAngleUsing2PointsOnCircle
+% for a full test suite.
+%
+% This function was written on 2020_05_22 by S. Brennan
+% Questions or comments? sbrennan@psu.edu
+
+% Use number of radii to calculate the number of centers
+num_circles = length(centers(:,1));
+
+%% Step 1: calculate unit vectors for incoming and outgoing points
+% Makes things easy later
+unit_radial_to_inpoints = (start_points_on_circle - centers)./radii;
+unit_radial_to_outpoints = (end_points_on_circle - centers)./radii;
+
+%% Step 2: calculate the dot product angle from in and out unit vectors
+dot_product = sum(unit_radial_to_inpoints.*unit_radial_to_outpoints,2);
+angles = acos(dot_product);
+
+%% Step 3: calculate the cross products from in to out
+cross_in_to_out = cross(...
+    [unit_radial_to_inpoints, zeros(num_circles,1)],...
+    [unit_radial_to_outpoints, zeros(num_circles,1)]);
+
+%% Step 4: check if the cross product matches
+% If the cross_in_to_out is in opposite direction from
+% given cross products, then we need to take the refelex angle.
+need_reflex_angles = (cross_in_to_out(:,3)...
+    .*cross_products)<0;
+angles(need_reflex_angles)=2*pi - angles(need_reflex_angles);
+
+end % Ends fcn_geometry_findAngleUsing2PointsOnCircle
+
+
