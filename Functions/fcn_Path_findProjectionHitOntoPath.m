@@ -1,10 +1,10 @@
-function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(path,sensor_vector_start,sensor_vector_end,varargin)   
+function [distance,location,path_segment, t, u] = fcn_Path_findProjectionHitOntoPath(path,sensor_vector_start,sensor_vector_end,varargin)   
 % fcn_Path_findProjectionHitOntoPath calculates hits between a sensor
 % projection and a path, returning the distance and location of the hit.
 %
 % FORMAT: 
 %
-%      [distance,location,path_segment] = ...
+%      [distance,location,path_segment, t, u] = ...
 %         fcn_Path_findProjectionHitOntoPath(path,...
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_type),(fig_num))  
@@ -27,7 +27,7 @@ function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(p
 %            the given sensor_vector overlaps the path (this is the
 %            default)
 %
-%            1: return distane and location of first intersection if any
+%            1: return distance and location of first intersection if any
 %            projection of the sensor vector, in any direction, hits the
 %            path (in other words, if there is any intersection). Note that
 %            distance returned will be negative if the nearest intersection
@@ -51,7 +51,9 @@ function [distance,location,path_segment] = fcn_Path_findProjectionHitOntoPath(p
 %      path_segment: the segment number of the path that was hit (1 is the
 %      first segment, 2 is the second, etc)
 %
-
+%       t and u: t is distance along the path, and u is distance
+%       along the sensor, as fractions of the input vector lengths.    
+%
 % DEPENDENCIES:
 %
 %      fcn_Path_checkInputsToFunctions

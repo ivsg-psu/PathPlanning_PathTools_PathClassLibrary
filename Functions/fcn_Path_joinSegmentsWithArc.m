@@ -202,6 +202,8 @@ unit_v_lineSegment1 = fcn_INTERNAL_calcUnitVector(segment_1(1,:),segment_1(2,:))
 % vector of line segment2 start
 unit_v_lineSegment2 = fcn_INTERNAL_calcUnitVector(segment_2(1,:),segment_2(2,:));
 
+flag_point_to_left = crossProduct(unit_v_lineSegment1,unit_v_lineSegment2)>0;
+
 % Show the results?
 if flag_do_debug == 1
     figure(fig_debug);
@@ -228,7 +230,38 @@ if flag_do_debug == 1
 end
 
 %% Find the intersection
+% FORMAT: 
+%      [distance,location,path_segment, t, u] = ...
+%         fcn_Path_findProjectionHitOntoPath(path,...
+%         sensor_vector_start,sensor_vector_end,...
+%         (flag_search_type),(fig_num))  
 
+[distance,location,path_segment, distance_along_segment_2, distance_along_segment_1] = ...
+    fcn_Path_findProjectionHitOntoPath(segment_2,segment_1(1,:),segment_1(2,:),1);
+
+% Check that distance is not equal to zero
+
+length_segment_1 = sum((segment_1(2,:)-segment_1(1,:)).^2,2).^0.5;
+length_segment_2 = sum((segment_2(2,:)-segment_2(1,:)).^2,2).^0.5;
+
+hit_point_1 = segment_1(1,:) + length_segment_1*distance_along_segment_1*unit_v_lineSegment1;
+hit_point_2 = segment_2(1,:) + length_segment_2*distance_along_segment_2*unit_v_lineSegment2;
+
+if max(abs(hit_point_2 - hit_point_1))>1E-8
+    error('Different intersection points calculated from each of the segments. This indicates an error.');
+end
+
+% Find which one is closer
+distance_squared_to_1 = sum((hit_point_1 - segment_1(2,:)).^2,2);
+distance_squared_to_2 = sum((hit_point_1 - segment_2(1,:)).^2,2);
+
+if distance_squared_to_2 > distance_squared_to_1
+    flag_point_1_is_closest = 0;
+else
+    flag_point_1_is_closest = 1;    
+end
+
+URHERE
 %% Find the apex angle
 
 %% Find the side distance and center of the circle
@@ -642,6 +675,11 @@ vector_to_calculate    = point_end - point_start;
 magnitude_vector_to_calculate = sum(vector_to_calculate.^2,2).^0.5;
 unit_vector = vector_to_calculate./magnitude_vector_to_calculate;
 end % Ends fcn_INTERNAL_calcUnitVector
+
+%% Calculate cross products
+function result = crossProduct(v,w)
+result = v(:,1).*w(:,2)-v(:,2).*w(:,1);
+end
 
 %% fcn_INTERNAL_findPriorIntersectingSegment
 function prior_intersecting_segment_number = fcn_INTERNAL_findPriorIntersectingSegment(traversal_to_check,s_coordinate)

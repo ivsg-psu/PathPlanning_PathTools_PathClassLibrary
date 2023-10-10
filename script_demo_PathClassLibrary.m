@@ -52,7 +52,7 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_
 
 
 %% Clear paths and folders, if needed
-if 1==1
+if 1==0
 
    fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 
