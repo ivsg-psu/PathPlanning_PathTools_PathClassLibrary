@@ -83,7 +83,7 @@ function [arc_points, line_segment_1, line_segment_2,...
 % -- start writing function
 
 
-flag_do_debug = 1; % Flag to show the results for debugging
+flag_do_debug = 0; % Flag to show the results for debugging
 % flag_do_plots = 0; % Flag to plot the final results (set below, so
 % commented out)
 flag_check_inputs = 1; % Flag to perform input checking
@@ -247,13 +247,21 @@ else
     distance = abs(distance_squared_to_1)^0.5;
 end
 
+% Show the results?
+if flag_do_debug == 1
+    figure(fig_debug);
+
+    % Show the hit_point_1
+    plot(hit_point_1(:,1), hit_point_1(:,2),'+','color',[1 1 0],'LineWidth',7,'MarkerSize',30);
+end
+
 %% Find the apex angle
 angle_between_vectors_radians  = fcn_INTERNAL_findAngleBetweenUnitVectors(unit_v_lineSegment1, unit_v_lineSegment2);
 apex_angle_radians = pi - abs(angle_between_vectors_radians);
 apex_angle_degrees = apex_angle_radians*180/pi;
 
 %% Find the side distance and center of the circle
-radius_of_arc = distance*sin(apex_angle_radians);
+radius_of_arc = distance*tan(apex_angle_radians/2);
 
 if flag_point_1_is_closest
     end_point_on_1 = segment_1(2,:);
@@ -290,6 +298,11 @@ end
 
 %% Find the start and end angles
 % NOTE: this is vectorized. Comes from the geometry library.
+if flag_point_to_left
+    cross_product_direction = 1;
+else
+    cross_product_direction = -1;
+end
 [...
     angles] ...
     = ...
@@ -298,7 +311,7 @@ end
     radius_of_arc,...
     end_point_on_1,...
     start_point_on_2,...
-    flag_point_to_left);
+    cross_product_direction);
 
 vector_from_center_to_1 = end_point_on_1 - circle_center;
 start_angle_radians = atan2(vector_from_center_to_1(1,2),vector_from_center_to_1(1,1));
@@ -349,7 +362,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if flag_do_plots == 1 % only plot if the user has given a fig_num
-    figure(fig_debug);
+    figure(fig_num);
     clf;
     hold on;
     grid on;
@@ -374,7 +387,7 @@ if flag_do_plots == 1 % only plot if the user has given a fig_num
     plot(segment_2(:,1), segment_2(:,2),'.','color',[0 0 0],'LineWidth',5,'MarkerSize',15);
 
     % Show the circle center
-    plot(circle_center(:,1), circle_center(:,2),'+','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
+    plot(circle_center(:,1), circle_center(:,2),'+','color',[1 0 0],'LineWidth',2,'MarkerSize',10);
 
     % Show the start and end points of segments
     plot(end_point_on_1(:,1), end_point_on_1(:,2),'.','color',[1 0 0],'LineWidth',7,'MarkerSize',30);
@@ -505,7 +518,9 @@ unit_radial_to_outpoints = (end_points_on_circle - centers)./radii;
 
 %% Step 2: calculate the dot product angle from in and out unit vectors
 dot_product = sum(unit_radial_to_inpoints.*unit_radial_to_outpoints,2);
-angles = acos(dot_product);
+
+% Correct the sign of the angle as well to match the cross product input
+angles = acos(dot_product).*cross_products;
 
 %% Step 3: calculate the cross products from in to out
 cross_in_to_out = cross(...
