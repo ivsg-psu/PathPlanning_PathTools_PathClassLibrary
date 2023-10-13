@@ -32,6 +32,11 @@ clear all_traversals
 % turn, adjoint to the 2nd segment
 
 fig_num = 4501;
+figure(fig_num);
+clf;
+grid on;
+hold on;
+
 segment_1 = [0 0; 1 1];
 segment_2 = [2 3; 1 4];
 number_of_points_on_curve = 50;

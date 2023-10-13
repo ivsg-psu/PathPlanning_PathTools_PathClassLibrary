@@ -327,7 +327,7 @@ if flag_point_1_is_closest
 
 else
     line_segment_2 = [nan nan];
-    line_segment_1 = [end_point_on_1; segment_1(2,:)];
+    line_segment_1 = [segment_1(2,:); end_point_on_1];
 end
 
 
@@ -402,6 +402,13 @@ if flag_do_plots == 1 % only plot if the user has given a fig_num
     plot(line_segment_2(:,1), line_segment_2(:,2),'.-','color',[0 1 1],'LineWidth',3,'MarkerSize',30);
     plot(line_segment_1(:,1), line_segment_1(:,2),'.', 'color',[0 0 0],'LineWidth',3,'MarkerSize',15);
     plot(line_segment_2(:,1), line_segment_2(:,2),'.', 'color',[0 0 0],'LineWidth',3,'MarkerSize',15);
+
+    % Show the start and end points of segments
+    plot(line_segment_1(1,1), line_segment_1(1,2),'o','color',[0 1 0],'LineWidth',1,'MarkerSize',10);
+    plot(line_segment_1(end,1), line_segment_1(end,2),'x','color',[1 0 0],'LineWidth',1,'MarkerSize',10);
+    plot(line_segment_2(1,1), line_segment_2(1,2),'o','color',[0 1 0],'LineWidth',1,'MarkerSize',10);
+    plot(line_segment_2(end,1), line_segment_2(end,2),'x','color',[1 0 0],'LineWidth',1,'MarkerSize',10);
+
 end
 
 
