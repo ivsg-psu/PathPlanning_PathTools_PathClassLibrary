@@ -268,12 +268,18 @@ intersections = NaN*ones(length(p(:,1)),2);
 % Note: could speed this up with nested if logical statements, but only if
 % are doing checks on single segments at a time. Since doing many segments
 % at once, need to use vector form.
+% Tolerance added as numerical errors can cause points to be missed for
+% some segments that pass through points. This biases - very slightly - the
+% data to include intersections.
+tolerance = eps*1000;
+zero_threshold = 0 - tolerance;
+one_threshold  = 1 + tolerance;
 if 0 == flag_search_type
-    good_vector = ((0<=t).*(1>=t).*(0<=u).*(1>=u));
+    good_vector = ((zero_threshold<=t).*(one_threshold>=t).*(zero_threshold<=u).*(one_threshold>=u));
 elseif 1 == flag_search_type
-    good_vector = ((0<=t).*(1>=t));
+    good_vector = ((zero_threshold<=t).*(one_threshold>=t));
 elseif 2 == flag_search_type
-    good_vector = ((0<=t).*(1>=t).*(0<=u).*(1>=u));
+    good_vector = ((zero_threshold<=t).*(one_threshold>=t).*(zero_threshold<=u).*(one_threshold>=u));
 else
     error('Incorrect flag_search_type entered');
 end
