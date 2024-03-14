@@ -9,7 +9,7 @@
 %      2021_01_09
 %      -- cleared up a few function names in the script
 close all
-clc
+
 
 % Clear any old variables
 clear all_traversals

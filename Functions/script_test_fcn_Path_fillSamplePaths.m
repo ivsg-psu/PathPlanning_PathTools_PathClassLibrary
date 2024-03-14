@@ -8,7 +8,7 @@
 %     -- cleanup to include trajectories functions
 
 close all
-clc
+
 
 % Call the function to fill in an array of "path" type
 paths_array = fcn_Path_fillSamplePaths;

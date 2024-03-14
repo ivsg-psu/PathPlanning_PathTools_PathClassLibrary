@@ -16,11 +16,6 @@
 %      -- added examples to illustrate 2D and 3D basic plotting
 
 close all
-clc
-
-% Fill in some dummy data
-paths_array = fcn_Path_fillSamplePaths;
-
 
 %% Example 1.1 - show how it works for 2D
 % Basic call 
@@ -45,6 +40,8 @@ xlabel('X [m]');
 ylabel('Y [m]');
 
 %% Example 1.3 - show how it works
+% Fill in some dummy data
+paths_array = fcn_Path_fillSamplePaths;
 
 % Basic call with a figure option to plot output repeatedly onto figure
 fig_num = 13;
@@ -64,6 +61,15 @@ ylabel('Y [m]');
 % Plot station markers
 
 fig_num = 2;
+
+paths_array = fcn_Path_fillSamplePaths;
+
+% Basic call with a figure option to plot output repeatedly onto figure
+fig_num = 13;
+for i_traveral = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_traveral},fig_num);
+    data.traversal{i_traveral} = traversal;
+end
 
 figure(fig_num);
 clf;

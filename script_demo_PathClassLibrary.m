@@ -13,6 +13,25 @@
 % 2023_08_25 to 2-23_09_06 by S. Brennan
 % -- added examples of XY to St conversions, and vice versa
 % -- added tools to calculate the centerline of paths
+% 2024_03_14 by S. Brennan
+% -- added the fix to the intersection calculation code to allow
+% intersection options where the path segments are extended, not just the
+% sensor segment
+% -- deprecated fcn_Path_snapPointOntoNearestPath, replaced it with fcn_Path_snapPointToPathViaVectors
+% -- fixed 2D / 3D bugs in addElevation - this is still not working
+% correctly, but at least not throwing errors (it is close to correct, but
+% need assertion and careful testing)
+% -- fixed many of the scripts that were failing during the automated
+% script testing.
+
+
+% TO-DO:
+% 2024_03_14 - S. Brennan 
+% - need to add environmental variable methods for debugging.
+% See for example the Geometry class. This will require that EVERY function
+% will be fixed.
+% - Need to use the Debug libraray, not Path library, to check inputs.
+% - fix addElevation
 
 %% Prep the workspace
 close all

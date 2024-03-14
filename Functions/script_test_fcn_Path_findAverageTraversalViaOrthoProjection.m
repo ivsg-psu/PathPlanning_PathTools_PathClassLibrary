@@ -26,7 +26,11 @@
 %            (fig_num));
 
 close all;
-clc;
+
+
+
+
+%% Example 1: Basic call 
 
 clear data
 
@@ -47,8 +51,6 @@ if 1==0
     fcn_Path_plotTraversalsXY(data,fig_num);
 end
 
-
-%% Example 1: Basic call 
 path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data);
 
 % Plot the final XY result of orthogonal
@@ -66,6 +68,26 @@ path_points_fig = 444444;
 figure(path_points_fig);
 clf;
 hold on;
+
+
+clear data
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
+% Plot the results?
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(data,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(data,fig_num);
+end
 
 [path_average_final4, closestXs, closestYs, closestDistances]  = ...
     fcn_Path_findAverageTraversalViaOrthoProjection(data);
@@ -100,6 +122,27 @@ title('Histogram of distances of paths from the final average path');
 
 
 %% Example 2: Basic call showing effect of reference traversal
+
+
+clear data
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
+% Plot the results?
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(data,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(data,fig_num);
+end
+
 % choose first one for traversal
 reference_traversal = data.traversal{1};
 path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal);
@@ -154,6 +197,27 @@ ylabel('Y [m]')
 
 
 %% Example 2: Basic call showing effect of num_iterations
+
+
+clear data
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
+% Plot the results?
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(data,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(data,fig_num);
+end
+
 reference_traversal = data.traversal{3};
 
 % Show the effect of one iteration
@@ -201,6 +265,27 @@ xlabel('X [m]')
 ylabel('Y [m]')
 
 %% Example 3: Basic call showing effect of weight_for_averaging
+
+
+clear data
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
+% Plot the results?
+if 1==0
+    fig_num = 12;
+    fcn_Path_plotTraversalsYaw(data,fig_num);
+    fig_num = 13;
+    fcn_Path_plotTraversalsXY(data,fig_num);
+end
+
 reference_traversal = data.traversal{3};
 num_iterations = 40;
 

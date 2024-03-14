@@ -11,7 +11,7 @@
 %      -- lots of bug fixes as we demo for the team (lol)
 
 close all;
-clc;
+
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -32,7 +32,16 @@ end
 
 %% Call the station-averaging function
 
-[aligned_Data_ByStation,mean_Data] = ...
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
+[~,mean_Data] = ...
     fcn_Path_findAverageTraversalViaStationAlignment(data);
 
 % Plot the final XY result of mean station
@@ -46,6 +55,15 @@ ylabel('Y [m]')
 
 
 %% Call the closest point averaging function
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
 path_average_final2 = fcn_Path_findAverageTraversalViaClosestPoint(data);
 
 % Plot the final XY result of closest point
@@ -58,6 +76,15 @@ xlabel('X [m]')
 ylabel('Y [m]')
 
 %% Call the orthogonal projection averaging function
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
 path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data);
 
 % Plot the final XY result of orthogonal
@@ -71,10 +98,28 @@ ylabel('Y [m]')
 
 
 %% Plot the final XY results of all three
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
 path_points_fig = 123;
 figure(path_points_fig);
 clf;
 hold on
+
+
+[~,mean_Data] = ...
+    fcn_Path_findAverageTraversalViaStationAlignment(data);
+
+path_average_final2 = fcn_Path_findAverageTraversalViaClosestPoint(data);
+
+path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data);
+
 plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
 plot(path_average_final2.X,path_average_final2.Y,'Linewidth',4);
 plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
@@ -89,6 +134,15 @@ path_points_fig = 444444;
 figure(path_points_fig);
 clf;
 hold on;
+
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
 
 [path_average_final4, closestXs, closestYs, closestDistances]  = ...
     fcn_Path_findAverageTraversalViaOrthoProjection(data);
@@ -106,7 +160,7 @@ for i_path = 1:length(closestXs(1,:))
 end
 
 % Calculate the standard deviation
-std_deviation = std(closestDistances,0,'all');
+std_deviation = std(closestDistances,0,'all','omitnan');
 
 % Overlay the average with 3 times the standard deviations
 fcn_Path_plotTraversalXYWithVarianceBands(path_average_final4,...

@@ -14,7 +14,7 @@
 %     argument on fprintf function
 
 close all;
-clc
+
 
 
 %% BASIC example 1

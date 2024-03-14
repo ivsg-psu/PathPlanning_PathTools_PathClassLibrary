@@ -183,8 +183,10 @@ Y_central       = central_traversal.Y;
 
 %% Find the midpoint and joint tangent vectors for all segments 
 % Call the function fcn_Path_findPathOrthogonalVectors
+
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
     fcn_Path_findPathOrthogonalVectors([X_central Y_central],flag_rounding_type);
+
 tangent_unit_vectors_at_midpoints = normal_unit_vectors_at_midpoints*[0 -1; 1 0];
 
 

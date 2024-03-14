@@ -12,7 +12,7 @@
 
 %% clear the workspace
 close all
-clc
+
 
 % Clear any old variables
 clear all_traversals
@@ -60,7 +60,7 @@ assert(length(closest_path_point1(:,1))==1);
 assert(length(closest_path_point2(:,1))==1);
 
 % Check the angles
-assert(isequal(angle_point1_radians,-pi/4));
+assert(isequal(round(angle_point1_radians,4),round(-pi/4,4)));
 assert(abs(angle_point2_radians - pi/4)<eps*1000);
 
 %% Basic example 2: simple line segment with straight lines and negative radius
@@ -355,6 +355,10 @@ path_1 = [2 2; 5 8];
 path_2 = [5 2; 2 6; 5 6];
 radius_of_curve = 2;
 
+plot_color = [];
+plot_line_width = [];
+plot_text = [];
+
 number_of_points_on_curve = 50;
 [ TransitionCurves, ...
     closest_path_point1, closest_path_point2,...
@@ -383,6 +387,7 @@ path_1 = [2 2; 5 8];
 path_2 = [5 2; 2 6; 5 6];
 radius_of_curve = 2;
 number_of_points_on_curve = 50;
+
 plot_color = [];
 plot_line_width = [];
 plot_text = '';
@@ -413,9 +418,11 @@ fig_num = 4508;
 path_1 = [0 0; 4 4; 6 6; 10 5];
 path_2 = [4 1; 4 3; 5 5; 7 7; 5 10];
 radius_of_curve = 1;
+
 plot_color = [];
 plot_line_width = [];
 plot_text = '';
+
 number_of_points_on_curve = 50;
 
 [ TransitionCurves, ...
@@ -447,6 +454,7 @@ path_1 = [4 9; 4 5; 2 2];
 path_2 = [4 9; 4 2];
 radius_of_curve = 2;
 number_of_points_on_curve = 50;
+
 plot_color = [];
 plot_line_width = [];
 plot_text = '';

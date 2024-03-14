@@ -11,8 +11,16 @@
 %     -- fixed small typo in function name 
 
 close all
-clc
 
+
+
+
+
+%% Call the plot command to show how it works. First, put it into our figure
+% to show that it will auto-label the axes and create a new figure (NOT
+% figure 11 here) to plot the data.
+
+fig_num = 11;
 
 % Fill in some dummy data
 paths = fcn_Path_fillSamplePaths;
@@ -24,15 +32,33 @@ for i_traveral = 1:length(paths)
     data.traversal{i_traveral} = traversal;
 end
 
+figure(fig_num);
+clf;
+temp = figure(fig_num);
 
-%% Call the plot command to show how it works. First, put it into our figure
-% to show that it will auto-label the axes and create a new figure (NOT
-% figure 11 here) to plot the data.
-figure(11);
 fcn_Path_plotTraversalsXY(data);
 
+assert(isempty(temp.Children))
 
 %% Next, specify the figure number to show that it will NOT auto-label the
 % axes if figure is already given and it puts the plots into this figure.
-fig_num = 12;
+
+fig_num = 11;
+
+% Fill in some dummy data
+paths = fcn_Path_fillSamplePaths;
+ 
+
+% Convert paths into traversals
+for i_traveral = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_traveral});
+    data.traversal{i_traveral} = traversal;
+end
+
+figure(fig_num);
+clf;
+temp = figure(fig_num);
+
 fcn_Path_plotTraversalsXY(data,fig_num);
+
+assert(~isempty(temp.Children))

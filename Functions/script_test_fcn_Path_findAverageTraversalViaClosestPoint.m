@@ -6,7 +6,7 @@
 %      -- first write of the code
 
 close all;
-clc;
+
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -41,7 +41,7 @@ ylabel('Y [m]')
 %% Example 2: Set the reference traversal 
 % and show they give same results if lots of iterations
 
-clc;
+
 
 reference_traversal_1 = data.traversal{1};
 reference_traversal_2 = data.traversal{2};
@@ -72,7 +72,7 @@ ylabel('Y [m]')
 num_iterations = 1;
 
 close all;
-clc;
+
 
 reference_traversal_1 = data.traversal{1};
 reference_traversal_2 = data.traversal{2};
@@ -99,7 +99,7 @@ ylabel('Y [m]')
 %% Example 4: Basic call with a figure number
 % This turns on quite a bit of debug plotting
 close all;
-clc;
+
 
 path_points_fig = 44444;
 path_average_final_4 = fcn_Path_findAverageTraversalViaClosestPoint(...

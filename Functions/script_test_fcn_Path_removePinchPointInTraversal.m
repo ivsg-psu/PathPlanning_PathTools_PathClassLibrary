@@ -7,7 +7,7 @@
 
 
 close all
-clc
+
 
 
 %% Test case 1: simple test case
@@ -133,7 +133,8 @@ end
 % Grab the "curve" of the path
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
 offsets = (0:1:10)'; 
-offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,fig_num);
+flag_rounding_type = []; % Use default
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type, fig_num);
 
 % Fill in an array of "fixed" traversals
 clear fixed_traversals

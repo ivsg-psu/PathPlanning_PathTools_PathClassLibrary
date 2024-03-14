@@ -129,7 +129,10 @@ function [closest_path_points,...
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-% 2023_09_28 - first write of the code, using fcn_Path_snapPointOntoNearestPath
+% 2023_09_28 - S. Brennan
+% --  first write of the code, using fcn_Path_snapPointOntoNearestPath 
+% 2024_03_14 - S. Brennan
+% -- fixed bug where snap breaks if path is passed in as a 3D vector
 
 
 flag_do_debug = 0; % Flag to plot the results for debugging
@@ -241,7 +244,7 @@ path_segment_lengths = sum(diff(path,1,1).^2,2).^0.5;
 path_stations = [0; cumsum(path_segment_lengths)];
 % Make sure last point has a "length"
 path_segment_lengths = [path_segment_lengths; path_segment_lengths(end,:)];
-
+path_dimension = length(path(1,:));
 
 %% STEP 1. Find the unit orthogonal vectors of each path segment
 % Find unit orthogonal and unit tangent vectors for each segment in the
@@ -259,7 +262,17 @@ path_segment_lengths = [path_segment_lengths; path_segment_lengths(end,:)];
 back_orthogonal_flag_rounding_type = 1;
 [unit_orthogonal_vectors_at_midpoints, ~] = ...
     fcn_Path_findPathOrthogonalVectors(path,back_orthogonal_flag_rounding_type);
-unit_tangential_vectors_at_midpoints = unit_orthogonal_vectors_at_midpoints*[0 -1; 1 0];
+
+if path_dimension == 2
+    unit_tangential_vectors_at_midpoints = unit_orthogonal_vectors_at_midpoints*[0 -1; 1 0];
+elseif  path_dimension == 3 
+    unit_tangential_vectors_at_midpoints = unit_orthogonal_vectors_at_midpoints*[0 1 0; -1 0 0; 0 0 1];
+else
+    error('A 2D or 3D vector is expected');
+end
+
+
+
 
 % Show the vectors?
 if flag_do_debug
@@ -299,7 +312,7 @@ second_path_point_indicies  = zeros(Npoints,1);
 percent_along_length        = zeros(Npoints,1);
 distances_real              = zeros(Npoints,1);
 distances_imaginary         = zeros(Npoints,1);
-ortho_vector_used           = zeros(Npoints,2);
+ortho_vector_used           = zeros(Npoints,path_dimension);
 
 
 % For each of the points, compare to the path to calculate key values

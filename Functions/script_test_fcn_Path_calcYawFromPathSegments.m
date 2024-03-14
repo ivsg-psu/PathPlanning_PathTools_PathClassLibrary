@@ -9,7 +9,6 @@
 %      -- minor comment clean-ups
 
 close all
-clc
 
 % Clear any old variables
 clear all_traversals
@@ -40,7 +39,6 @@ yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num); %#ok<*NASG
 
 %% Test case 2: Multiple paths
 close all;
-clc
 
 for i_path = 1:length(paths_array)
     % Pick first path as reference_traversal structure

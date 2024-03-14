@@ -93,29 +93,29 @@ function [closest_path_points,closest_distances] = ...
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2020_11_14:
-%      -- first write of the code
-%      2020_12_25:
-%      -- changed plot style for situation where query overlaps the central
-%      path (so have different line styles)
-%      -- fixed a bug where the index was being used, instead of station, to
-%      define a search area
-%      -- isolated plotting functionality from debugging functionality
-%      2021_01_07 
-%      -- updated the name to fix path notation to traversal or traversals
-%      2021_01_09
-%      -- added input argument checking
-%      -- converted all internal SXY variables to traversals
-%      -- updated dependencies
-%      2021_12_27
-%      -- changed name to singular traversal since code only works with one
-%      traversal at a time
-%      2022_01_03
-%      -- found a bug in the constrainted search functionality, 
-%      -- updated plotting function to show both positive and neg vectors
-%      -- fixed typo in variable name
-%      -- fixed inequality which was cause of bug
-%      -- made distance outputs positive and neg, based on directionality
+% 2020_11_14:
+% -- first write of the code
+% 2020_12_25:
+% -- changed plot style for situation where query overlaps the central
+% path (so have different line styles)
+% -- fixed a bug where the index was being used, instead of station, to
+% define a search area
+% -- isolated plotting functionality from debugging functionality
+% 2021_01_07 
+% -- updated the name to fix path notation to traversal or traversals
+% 2021_01_09
+% -- added input argument checking
+% -- converted all internal SXY variables to traversals
+% -- updated dependencies
+% 2021_12_27
+% -- changed name to singular traversal since code only works with one
+% traversal at a time
+% 2022_01_03
+% -- found a bug in the constrainted search functionality, 
+% -- updated plotting function to show both positive and neg vectors
+% -- fixed typo in variable name
+% -- fixed inequality which was cause of bug
+% -- made distance outputs positive and neg, based on directionality
 
 
 flag_do_debug = 0; % Flag to debug the results
@@ -166,7 +166,13 @@ if flag_check_inputs == 1
         fprintf(1,'Min of query stations: %.2f\n',min(query_stations));
         fprintf(1,'Max of central_traversal stations: %.2f\n',central_traversal.Station(end,1));
         fprintf(1,'Max of query stations: %.2f\n',max(query_stations));        
-        error('The station query locations must be within the full range of stations within the central_traversal');
+        warning('The station query locations should be within the full range of stations within the central_traversal. Rounding to closest station.');
+        bad_queries = (query_stations<central_traversal.Station(1,1));
+        query_stations(bad_queries) = central_traversal.Station(1,1);
+        bad_queries = (query_stations>central_traversal.Station(end,1));
+        query_stations(bad_queries) = central_traversal.Station(end,1);
+
+
     end
        
 end

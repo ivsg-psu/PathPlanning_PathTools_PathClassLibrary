@@ -8,7 +8,7 @@
 %      -- first write of the code
 
 close all;
-clc;
+
 
 
 %% BASIC example 1 - string is too long

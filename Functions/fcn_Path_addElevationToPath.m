@@ -32,19 +32,21 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 %
 % DEPENDENCIES:
 %
-%     fcn_Path_snapPointOntoNearestPath
+%     fcn_Path_snapPointToPathViaVectors
 %     fcn_Path_checkInputsToFunctions
 %
 % This function was written on 2021_03_06 by Satya Prasd
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2021_03_06 
+%      2021_03_06 - S. Brennan
 %      -- wrote the code
-%      2022_01_07
+%      2022_01_07 - S. Brennan
 %      -- updated header to fix input definitions
-%      2022_08_20
+%      2022_08_20 - S. Brennan
 %      -- allow empty figure argument to avoid plotting
+%      2024_03_14 - S. Brennan
+%      -- defaulted plotting view to 3D
 
 % TODO:
 % Remove the for loop after fcn_snapPointOntoNearestPath is vectorized
@@ -119,7 +121,7 @@ Ndimensions = length(path(1,:));
 for i = 1:Npoints
     %     [closest_point_on_reference_path(i,:), ~, vector_first_path_point_index(i), ...
     %         vector_second_path_point_index(i), vector_percent_along_length(i)] ...
-    %         = fcn_Path_snapPointOntoNearestPath(path(i,:), reference_elevated_path(:,[1,2]));
+    %         = fcn_Path_snapPointToPathViaVectors(path(i,:), reference_elevated_path(:,[1,2]));
     
     if 2 == Ndimensions
         query_point = [path(i,:) 0];
@@ -131,7 +133,7 @@ for i = 1:Npoints
 
     [closest_point_on_reference_path(i,:), ~, vector_first_path_point_index(i), ...
         vector_second_path_point_index(i), vector_percent_along_length(i)] ...
-        = fcn_Path_snapPointOntoNearestPath(query_point, reference_elevated_path);
+        = fcn_Path_snapPointToPathViaVectors(query_point, reference_elevated_path);
 end
 % % estimate the elevation as an average
 % elevation = (1-vector_percent_along_length).*reference_elevated_path(vector_first_path_point_index,3)+...
@@ -188,6 +190,8 @@ if flag_do_plots
     xlabel('xEast')
     ylabel('yNorth')
     zlabel('zUp')
+
+    view(3);
 end % Ends the flag_do_debug if statement
 
 end % Ends the function

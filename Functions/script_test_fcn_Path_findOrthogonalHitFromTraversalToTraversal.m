@@ -259,6 +259,7 @@ title('Vertex projection via averaging everywhere (flag=4)');
 
 
 %% NEGATIVE examples
+fig_num = 20;
 
 % Prep the example and workspace
 central_path = [-2 1; 1 4; 3 2];
@@ -366,6 +367,7 @@ title('Vertex projection via averaging everywhere (flag=4), search radius limite
 
 %% NEGATIVE examples with search radius limitation
 
+
 % Prep the example and workspace
 central_path = [-2 1; 1 4; 3 2];
 central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
@@ -420,6 +422,7 @@ title('Vertex projection via averaging everywhere (flag=4)');
 
 %% MULTICROSS examples
 close all;
+search_radius = 1.5;
 
 % Setup
 central_path = [-2 1; 1 4; 3 2; 5 2; 6 3; 7 2];
@@ -478,6 +481,8 @@ title('Multicross example using projection via averaging of prior and following 
 
 %% Real path examples
 close all;
+
+search_radius = 1.5;
 
 % Fill in some dummy data
 paths_array = fcn_Path_fillSamplePaths;
