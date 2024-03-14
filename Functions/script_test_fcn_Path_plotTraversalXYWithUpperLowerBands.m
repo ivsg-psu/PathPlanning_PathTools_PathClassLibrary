@@ -6,7 +6,7 @@
 %      -- first write of the code
 
 close all
-clc
+
 
 %% Test case 1: basic call for one trajectory
 fig_num = 23333;

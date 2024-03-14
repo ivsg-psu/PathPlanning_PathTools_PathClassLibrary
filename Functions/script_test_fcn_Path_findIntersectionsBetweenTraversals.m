@@ -8,7 +8,7 @@
 %      -- first write of the code
 
 close all;
-clc;
+
 
 % FORMAT:
 % [intersection_points,...

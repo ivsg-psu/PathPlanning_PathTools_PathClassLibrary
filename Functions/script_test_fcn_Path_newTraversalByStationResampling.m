@@ -7,7 +7,7 @@
 %     fcn_Path_findAverageTraversalViaOrthoProjection
 
 close all;
-clc;
+
 
 %% Basic example 1 - start at zero
 % Fill in sample paths (as a starter)

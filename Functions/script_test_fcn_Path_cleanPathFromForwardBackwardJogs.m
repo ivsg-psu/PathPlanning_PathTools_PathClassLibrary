@@ -7,7 +7,6 @@
 %     -- need to add more test cases
 
 close all;
-clc;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;

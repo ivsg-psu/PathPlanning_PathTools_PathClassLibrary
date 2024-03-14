@@ -3,7 +3,7 @@
 % 2020_05_20 - fixed bug on the yaw angle plots
 % 2020_06_20 - add raw data query functions
 %% Clear the command window and workspace
-clc
+
 clear all %#ok<CLALL>
 
 % Add driver for database

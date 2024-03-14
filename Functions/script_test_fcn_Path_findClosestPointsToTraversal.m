@@ -89,6 +89,9 @@ nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 data.traversal{1} = nearby_traversal;
 
+flag_yaw = 0;
+flag_3D = 0;
+
 % AVERAGING example 1 - default setting
 fig_num = 1;
 [closestXs,closestYs,closestZs] = ...
@@ -105,6 +108,8 @@ nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 data.traversal{1} = nearby_traversal;
 
+flag_yaw = 0;
+flag_3D = 0;
 
 % NEGATIVE example 1 - default setting
 fig_num = 1;
@@ -123,6 +128,10 @@ nearby_path = [-1 0.5; 0.5 2; 1.5 2; 3 0.5; 4 3; 5 4; 6 3; 7 1];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 data.traversal{1} = nearby_traversal;
 
+
+flag_yaw = 0;
+flag_3D = 0;
+
 % MULTICROSS example 1 - default setting
 fig_num = 1;
 [closestXs,closestYs,closestZs] = ...
@@ -132,6 +141,10 @@ fig_num = 1;
 
 %% Real path examples
 close all;
+
+
+flag_yaw = 0;
+flag_3D = 0;
 
 % Fill in some dummy data
 paths_array = fcn_Path_fillSamplePaths;

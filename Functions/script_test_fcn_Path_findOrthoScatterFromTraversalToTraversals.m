@@ -221,6 +221,18 @@ if 1==0
 end
 
 %% Test case 1: basic call
+clear paths_array all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = ...
+        fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    all_traversals.traversal{i_Path} = traversal;
+end
+
 reference_traversal = all_traversals.traversal{2};
 reference_station_points = (0:10:reference_traversal.Station(end))';
 flag_rounding_type = 3; % Use average of projections at end points
@@ -235,6 +247,18 @@ title('Histogram of all orthogonal distance projections');
 
 
 %% Test case 2: basic call with finer resolution
+clear paths_array all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = ...
+        fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    all_traversals.traversal{i_Path} = traversal;
+end
+
 reference_traversal = all_traversals.traversal{2};
 reference_station_points = (0:1:reference_traversal.Station(end))';
 flag_rounding_type = 3;
@@ -254,6 +278,19 @@ title('Histogram of all orthogonal distance projections');
 %% Test case 3: basic call but with random weird traversal nearby
 % Used to teach the search radius criteria
 weird_path = [100 20; 90 50; 100 70; 100 90];
+
+clear paths_array all_traversals
+
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths_array)
+    traversal = ...
+        fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    all_traversals.traversal{i_Path} = traversal;
+end
+
 traversal = ...
         fcn_Path_convertPathToTraversalStructure(weird_path);
     all_traversals.traversal{end+1} = traversal;

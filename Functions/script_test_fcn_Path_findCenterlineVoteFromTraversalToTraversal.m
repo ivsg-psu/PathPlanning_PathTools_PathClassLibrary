@@ -9,7 +9,7 @@
 % -- first write of the code
 
 close all;
-clc;
+
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -84,7 +84,7 @@ to_traversal =  data.traversal{2};
 flag_rounding_type = 1;
 search_radius = 10;
 flag_project_full_distance = 0;
-fig_num = fig_num+1;
+fig_num = 4;
 
 [centerline_points_projected,unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...

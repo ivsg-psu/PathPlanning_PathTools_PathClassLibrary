@@ -8,7 +8,7 @@
 %      -- lots of bug fixes as we demo for the team (lol)
 
 close all;
-clc;
+
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;

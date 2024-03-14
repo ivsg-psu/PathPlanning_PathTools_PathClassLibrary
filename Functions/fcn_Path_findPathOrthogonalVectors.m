@@ -5,7 +5,9 @@ function [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
 % Given a central traversal, finds the orthogonal vectors of that
 % traversal. Includes special flag input to define the meaning of
 % orthogonal vectors at verticies and ends, as these may not match the
-% midpoint vectors.
+% midpoint vectors. If the input path is in 3D, the orthogonal vectors are
+% not clearly defined and the projection is ONLY done in XY space, leaving
+% the z-component of the projection as zero.
 % 
 % FORMAT: 
 %
@@ -77,9 +79,12 @@ function [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
 % Questions or comments? sbrennan@psu.edu 
 
 % Revision history:
-%      2023_08_27:
-%      -- first write of the code via modification from 
-%      fcn_Path_ findOrthogonalTraversalVectorsAtStations
+% 2023_08_27 - S. Brennan
+% -- first write of the code via modification from 
+% fcn_Path_ findOrthogonalTraversalVectorsAtStations
+%
+% 2024_03_14 - S. Brennan
+% -- fixed bug where snap breaks if path is passed in as a 3D vector
 
 
 % TO DO:
@@ -159,7 +164,14 @@ end
 tangent_vectors_at_midpoints = diff(path); 
 magnitudes = sum(tangent_vectors_at_midpoints.^2,2).^0.5;
 tangent_unit_vectors_at_midpoints = tangent_vectors_at_midpoints./magnitudes;
-normal_unit_vectors_at_midpoints= tangent_unit_vectors_at_midpoints*[0 1; -1 0];
+
+if length(tangent_unit_vectors_at_midpoints(1,:))==2
+    normal_unit_vectors_at_midpoints= tangent_unit_vectors_at_midpoints*[0 1; -1 0];
+elseif  length(tangent_unit_vectors_at_midpoints(1,:))==3
+    normal_unit_vectors_at_midpoints= tangent_unit_vectors_at_midpoints*[0 1 0; -1 0 0; 0 0 1];
+else
+    error('A 2D or 3D vector is expected');
+end
 
 %% Find the joint tangent vectors for all joints in the central path 
 % The joint projection vector for each joint will depend on the input

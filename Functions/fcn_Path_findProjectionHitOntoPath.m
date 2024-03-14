@@ -1,10 +1,19 @@
-function [distance,location,path_segment, t, u] = fcn_Path_findProjectionHitOntoPath(path,sensor_vector_start,sensor_vector_end,varargin)   
-% fcn_Path_findProjectionHitOntoPath calculates hits between a sensor
-% projection and a path, returning the distance and location of the hit.
+function [distance,location,path_segment, t, u] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path, ...
+    sensor_vector_start, ...
+    sensor_vector_end, ...
+    varargin)   
+%% fcn_Path_findProjectionHitOntoPath 
+% calculates hits between a sensor projection and a path, returning the
+% distance and location of the hit. Also returns as optional outputs which
+% path segment number was hit (e.g. segment 1, 2, 3, etc.) and the distance
+% along both that specific path segment (t) and the distance in the sensor
+% direction (u).
 %
 % FORMAT: 
 %
-%      [distance,location,path_segment, t, u] = ...
+%      [distance, location, path_segment, t, u] = ...
 %         fcn_Path_findProjectionHitOntoPath(path,...
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_type),(fig_num))  
@@ -23,21 +32,44 @@ function [distance,location,path_segment, t, u] = fcn_Path_findProjectionHitOnto
 %      (OPTIONAL INPUTS)
 %      flag_search_type: an integer specifying the type of search.
 %
-%            0: return distance and location of first intersection only if
+%            0: returns distance and location of first intersection only if
 %            the given sensor_vector overlaps the path (this is the
 %            default)
 %
-%            1: return distance and location of first intersection if any
+%            1: returns distance and location of FIRST intersection if ANY
 %            projection of the sensor vector, in any direction, hits the
 %            path (in other words, if there is any intersection). Note that
-%            distance returned will be negative if the nearest intersection
-%            is in the opposite direction of the given sensor vector.
+%            distance returned could be negative if the nearest
+%            intersection is in the opposite direction of the given sensor
+%            vector.
 %
-%            2: returns distances and locations as M x 1 and M x 2 vectors
-%            respectively, where the M rows represent ALL the detected
-%            intersections. In cases where the sensor vector completely
-%            overlaps a path segment, the start and end of overlap are
-%            given.
+%            2: returns distances and locations of ALL the detected
+%            intersections of where the given sensor_vector overlaps the
+%            path (e.g., this gives ALL the results of the flag=0 case).
+%            Outputs results as M x 1 and M x 2 vectors respectively, where
+%            the M rows represent the ordered intersections.  In cases
+%            where the sensor vector completely overlaps a path segment and
+%            thus there are infinite points, only the start and end of
+%            overlap are given. Note that distance returned will always be
+%            positive because only the given sensor vector is checked.
+%
+%            3: returns distance and location of the FIRST intersection if
+%            ANY projection of the path segments, in any direction, hits
+%            the sensor (in other words, if there is any intersection).
+%            This is the opposite behavior of the flag=1 case. Note that
+%            distance returned will always be positive because only the
+%            given sensor vector is checked.
+%
+%            4: returns distance and location of the FIRST intersection of
+%            any projection of the path segment vector, in any direction,
+%            hits the sensor or if any projection of the sensor vector, in
+%            any direction, hits the path segment (in other words, if there
+%            is any intersection of the lines that fit the sensor and every
+%            path segment). Note that distance returned will be negative if
+%            the nearest intersection is in the opposite direction of the
+%            given sensor vector.  If multple segments hit at the
+%            same intersection, the segment number of the first segment is
+%            returned.
 %
 %      fig_num: a figure number to plot results. Turns debugging on.
 %
@@ -68,32 +100,37 @@ function [distance,location,path_segment, t, u] = fcn_Path_findProjectionHitOnto
 % Questions or comments? sbrennan@psu.edu 
 
 % Revision history:
-%      2020_11_14 
+%      2020_11_14 - S. Brennan
 %      - wrote the code
-%      2020_12_29 
+%      2020_12_29 - S. Brennan
 %      - fixed bug with missing sensor vector if starts on a path
 %      - added better comments
-%      2020_12_31 
+%      2020_12_31 - S. Brennan 
 %      - fixed the input arguments so that they are more clear (start/end)
 %      - fixed the incorrect location of the debug echo at top of the code
 %      - fixed flag usage to decouple plotting with debugging
 %      2021_01_08 
 %      -- Added input check on path type
-%      2021_01_23
+%      2021_01_23 - S. Brennan
 %      -- Added flag_search_type = 2 option, to allow multiple cross points
 %      to be returned
 %      -- Fixed bug with partially overlapping vectors not returning a
 %      result
 %      -- Added path segment output so that we can ID which segment was hit
-%      2021_01_24
+%      2021_01_24 - S. Brennan
 %      -- Fixed bug with overlapping colinear where two path segments
 %      identified when there is only one
-%      2021_12_27
+%      2021_12_27 - S. Brennan
 %      -- Added better comments on flags
+%      2024_03_14 - S. Brennan
+%      -- Added better comments
+%      -- Fixed bug where the figure plotting breaks if someone gives an
+%      empty figure number
+%      -- Added flag 3 and 4 cases
+
 
 %% Set up for debugging
 flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plot = 0; % Flag to plot the results for debugging
 flag_check_inputs = 1; % Flag to perform input checking
 
 if flag_do_debug
@@ -133,13 +170,16 @@ end
 
 
 % Does user want to show the plots?
-if 5 == nargin
-    fig_num = varargin{2};
-    figure(fig_num);
-    flag_do_plot = 1;
+flag_do_plot = 0; % Default is to NOT show plots
+if (5 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp)
+        fig_num = temp;
+        flag_do_plot = 1;
+    end
 else
     if flag_do_debug
-        fig = figure;
+        fig = figure; 
         fig_num = fig.Number;
         flag_do_plot = 1;
     end
@@ -265,12 +305,15 @@ end
 % Initialize all intersections to infinity
 intersections = NaN*ones(length(p(:,1)),2);
 
-% Note: could speed this up with nested if logical statements, but only if
-% are doing checks on single segments at a time. Since doing many segments
-% at once, need to use vector form.
-% Tolerance added as numerical errors can cause points to be missed for
-% some segments that pass through points. This biases - very slightly - the
-% data to include intersections.
+% Note: Since doing many segments at once, need to use vector form (e.g.
+% the .* format of dot products).
+% 
+% Note: Tolerance added as numerical errors can cause points to be missed
+% for some segments that right next to or through points. This biases -
+% very slightly - the data to include intersections along segments that
+% "graze" next to each other. For example, the segment from (0,0) to
+% (1,0) barely grazes the segment from (0.5,0) to (0.5,1).
+
 tolerance = eps*1000;
 zero_threshold = 0 - tolerance;
 one_threshold  = 1 + tolerance;
@@ -280,6 +323,10 @@ elseif 1 == flag_search_type
     good_vector = ((zero_threshold<=t).*(one_threshold>=t));
 elseif 2 == flag_search_type
     good_vector = ((zero_threshold<=t).*(one_threshold>=t).*(zero_threshold<=u).*(one_threshold>=u));
+elseif 3 == flag_search_type           % Changed on 2024_03_14
+    good_vector = ((zero_threshold<=u).*(one_threshold>=u));
+elseif 4 == flag_search_type           % Changed on 2024_03_14
+    good_vector = ((Inf>u).*(Inf>t));
 else
     error('Incorrect flag_search_type entered');
 end
@@ -297,19 +344,26 @@ end
 % calculate t*r as a length
 distances_squared = sum((intersections - sensor_vector_start).^2,2);
 
-if flag_search_type ~=2
+if (flag_search_type ==0) || (flag_search_type==1) || (flag_search_type ==3) || (flag_search_type ==4)
     % Keep just the minimum distance
     [closest_distance_squared,closest_index] = min(distances_squared);
     
     distance = closest_distance_squared^0.5*sign(u(closest_index));
     location = intersections(closest_index,:);
     path_segment = path_segments(closest_index);
-else
+
+    if isnan(distance)
+        path_segment = nan;
+    end
+elseif flag_search_type ==2
     % Return all the results
     good_indices = find(~isnan(distances_squared));
     distance = distances_squared(good_indices).^0.5.*sign(u(good_indices));
     location = intersections(good_indices,:);
     path_segment = path_segments(good_indices);
+
+else
+    error('unexpected flag_search_type')
 end
 
 %% Any debugging?

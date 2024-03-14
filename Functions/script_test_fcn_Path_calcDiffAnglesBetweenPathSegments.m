@@ -8,7 +8,6 @@
 %      -- fixed typos in the comments, minor header clean-ups
 
 close all
-clc
 
 % Clear any old variables
 clear all_traversals

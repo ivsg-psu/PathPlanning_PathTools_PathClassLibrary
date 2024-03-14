@@ -61,7 +61,7 @@ fcn_Path_checkInputsToFunctions(station_test, 'stations');
 
 
 %% Test the path type (success)
-clc;
+
 path_test = [4 1; 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
 
@@ -77,7 +77,7 @@ fcn_Path_checkInputsToFunctions(path_test, 'path');
 %  |_|                                               
 
 %% Test the path2or3D type (success)
-clc;
+;
 path_test = [4 1; 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
@@ -95,7 +95,7 @@ fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 %                                                                 
 %                                                                 
 %% Test the elevated path type (success)
-clc;
+
 elevated_path_test = [4 1 0.1; 2 1 0.2];
 fcn_Path_checkInputsToFunctions(elevated_path_test, 'elevated_path');
 
@@ -112,7 +112,7 @@ fcn_Path_checkInputsToFunctions(elevated_path_test, 'elevated_path');
 
 
 %% Test the paths type (success)
-clc;
+
 paths_test = [4 1; 2 1; 3 2];
 fcn_Path_checkInputsToFunctions(paths_test, 'paths');
 
@@ -163,7 +163,7 @@ for i_Path = 1:length(paths)
     test_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
     test_traversals.traversal{i_Path} = test_traversal;
 end
-clc;
+
 fcn_Path_checkInputsToFunctions(test_traversals, 'traversals');
 
 
@@ -230,18 +230,18 @@ fcn_Path_checkInputsToFunctions(station_test, 'stations');
 
 
 %% Test the path type (success)
-clc;
+
 path_test = [4 1; 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
 
 
 %% Test the path type (fail since only one column)
-clc
+
 path_test = [4; 2];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
 
 %% Test the path type (fail since only one row)
-clc
+
 path_test = [4 2];
 fcn_Path_checkInputsToFunctions(path_test, 'path');
 
@@ -257,7 +257,7 @@ fcn_Path_checkInputsToFunctions(path_test, 'path');
 %  |_|                                               
 
 %% Test the path2or3D type (success)
-clc;
+
 path_test = [4 1; 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
@@ -265,12 +265,12 @@ path_test = [4 1 0; 2 1 4];
 fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
 %% Test the path type (fail since only one column)
-clc
+
 path_test = [4; 2];
 fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
 %% Test the path type (fail since only one row)
-clc
+
 path_test = [4 2 1];
 fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
@@ -288,18 +288,18 @@ fcn_Path_checkInputsToFunctions(path_test, 'path2or3D');
 
 
 %% Test the paths type (success)
-clc;
+
 paths_test = [4 1; 2 1; 3 2];
 fcn_Path_checkInputsToFunctions(paths_test, 'paths');
 
 
 %% Test the paths type (fail since only one column)
-clc
+
 paths_test = [4; 2];
 fcn_Path_checkInputsToFunctions(paths_test, 'paths');
 
 %% Test the paths type (fail since only two rows)
-clc
+
 paths_test = [4 2; 0 0];
 fcn_Path_checkInputsToFunctions(paths_test, 'paths');
 
@@ -328,13 +328,13 @@ fcn_Path_checkInputsToFunctions(test_traversal, 'traversal');
 
 
 %% Test the traversal type (fail since field is missing)
-clc
+
 clear test_traversal_bad
 test_traversal_bad = 3;
 fcn_Path_checkInputsToFunctions(test_traversal_bad, 'traversal');
 
 %% Test the traversal type (fail since field is not numeric)
-clc;
+
 clear test_traversal_bad
 test_traversal_bad.X = 'junk';
 test_traversal_bad.Y = 'junk';
@@ -343,7 +343,7 @@ test_traversal_bad.Station = 'junk';
 fcn_Path_checkInputsToFunctions(test_traversal_bad, 'traversal');
 
 %% Test the traversal type (fail since fields are not columns)
-clc;
+
 clear test_traversal_bad
 test_traversal_bad.X = eye(2);
 test_traversal_bad.Y = eye(2);
@@ -352,7 +352,7 @@ test_traversal_bad.Station = eye(2);
 fcn_Path_checkInputsToFunctions(test_traversal_bad, 'traversal');
 
 %% Test the traversal type (fail since fields have different lengths)
-clc;
+
 clear test_traversal_bad
 test_traversal_bad.X = [1; 2; 3];
 test_traversal_bad.Y = [1; 2; 3];
@@ -361,7 +361,7 @@ test_traversal_bad.Station = [1; 2];
 fcn_Path_checkInputsToFunctions(test_traversal_bad, 'traversal');
 
 %% Test the traversal type (fail since Station field is not strictly increasing)
-clc;
+
 clear test_traversal_bad
 test_traversal_bad.X = [1; 2; 3];
 test_traversal_bad.Y = [1; 2; 3];
@@ -389,18 +389,18 @@ for i_Path = 1:length(paths)
     test_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
     test_traversals.traversal{i_Path} = test_traversal;
 end
-clc;
+
 fcn_Path_checkInputsToFunctions(test_traversals, 'traversals');
 
 
 %% Test the traversals type (fail since field is missing)
-clc
+
 clear test_traversals_bad
 test_traversals_bad = 3;
 fcn_Path_checkInputsToFunctions(test_traversals_bad, 'traversals');
 
 %% Test the traversals type (fail since second index is bad)
-clc
+
 clear test_traversals_bad
 test_traversals_bad.traversal{1} = test_traversal;
 

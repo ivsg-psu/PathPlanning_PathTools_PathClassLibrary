@@ -453,6 +453,8 @@ fprintf(1,['Figure: %d,\n\t\t Closest point is: %.2f %.2f \n' ...
 points = [0.5 -1];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
+flag_snap_type = 1;
+
 fignum = 222;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointToPathViaVectors(points, pathXY,flag_snap_type,fignum);
@@ -466,6 +468,8 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [-0.5 1];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
+flag_snap_type = 1;
+
 fignum = 333;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointToPathViaVectors(points, pathXY,flag_snap_type,fignum);
@@ -478,6 +482,8 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 % A simple line segment, a pre-start query, negative distance
 points = [-0.5 -0.2];
 pathXY = [0 0;3 0; 5 2; 8 2];
+
+flag_snap_type = 1;
 
 
 fignum = 444;
@@ -493,6 +499,8 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [9 3];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
+flag_snap_type = 1;
+
 fignum = 555;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
     fcn_Path_snapPointToPathViaVectors(points, pathXY,flag_snap_type,fignum);
@@ -506,6 +514,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [9 1];
 pathXY = [0 0;3 0; 5 2; 8 2];
 
+flag_snap_type = 1;
 
 fignum = 6661;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -522,6 +531,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [1 1];
 pathXY = [1 0;0 0; 0 1];
 
+flag_snap_type = 1;
 
 fignum = 7771;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -536,6 +546,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [0.5 0.5];
 pathXY = [1 0;0 0; 0 1];
 
+flag_snap_type = 1;
 
 fignum = 7771;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -550,6 +561,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [0.40 0.5];
 pathXY = [1 0;0 0; 0 1];
 
+flag_snap_type = 1;
 
 fignum = 7772;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -564,6 +576,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 points = [0.40 0.5];
 pathXY = [1 0;0 0; 0 1];
 
+flag_snap_type = 1;
 
 fignum = 7772;
 [closest_path_point,s_coordinate,first_path_point_index,second_path_point_index,percent_along_length] = ...
@@ -1035,6 +1048,8 @@ view(30,50)
 title('Percent along path');
 
 %% BASIC example 3 - positive s-coords (after path ends)
+flag_snap_type = 1;
+
 points = [4 0.2];
 pathXY = [0 0; 1 0; 2 0];
 
@@ -1053,6 +1068,7 @@ fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the p
 %% BASIC example 4 - an example of percentage along segment greater than 100% even though "inside" path
 points = [0.8 1.3];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
+flag_snap_type = 1;
 
 fignum = 444;
 % [closest_path_point,s_coordinate] = ...
@@ -1133,6 +1149,7 @@ text(path1(1,1),path1(1,2),'Start');
 % Create a query
 fignum = 2222;
 points = [75 45];
+flag_snap_type = 1;
 [closest_path_point,s_coordinate] = ...
     fcn_Path_snapPointToPathViaVectors(points, path1,flag_snap_type,fignum);
 fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
@@ -1142,6 +1159,7 @@ fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fi
 npoints = 20;
 Ntests = 10;
 seeds{Ntests} = 0;
+flag_snap_type = 1;
 for i_test = 1:Ntests
     seeds{i_test} = rng;    
     rng(seeds{i_test});

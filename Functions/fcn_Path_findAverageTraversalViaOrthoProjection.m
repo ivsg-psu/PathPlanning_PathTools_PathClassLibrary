@@ -99,31 +99,34 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 
 % Revision history:
 %     
-%     2020_11_15: 
-%     -- wrote the code originally - lots of bugs
-%     2020_12_25:
-%     -- added more comments
-%     2021_01_01
-%     -- fixed the errors with interpolation
-%     -- fixed the bug with the end point truncating toward start
-%     2021_01_06
-%     -- added functions for input checking
-%     2021_01_07
-%     -- deleted unused functions
-%     -- renamed function to reflect the traversal output, not path
-%     2021_01_09:
-%     -- corrected terminology in comments
-%     -- fixed the input argument notation to be traversals
-%     2021_12_27:
-%     -- corrected dependencies in comments
-%     2022_01_03:
-%     -- corrected typos in comments
-%     -- fixed a bug where the Z value is not defined in loop
-%     2022_01_06:
-%     -- refactored code, added weighted averaging to prevent iteration
+% 2020_11_15  - S. Brennan
+% -- wrote the code originally - lots of bugs
+% 2020_12_25  - S. Brennan
+% -- added more comments
+% 2021_01_01  - S. Brennan
+% -- fixed the errors with interpolation
+% -- fixed the bug with the end point truncating toward start
+% 2021_01_06  - S. Brennan
+% -- added functions for input checking
+% 2021_01_07  - S. Brennan
+% -- deleted unused functions
+% -- renamed function to reflect the traversal output, not path
+% 2021_01_09:  - S. Brennan
+% -- corrected terminology in comments
+% -- fixed the input argument notation to be traversals
+% 2021_12_27:  - S. Brennan
+% -- corrected dependencies in comments
+% 2022_01_03:  - S. Brennan
+% -- corrected typos in comments
+% -- fixed a bug where the Z value is not defined in loop
+% 2022_01_06:  - S. Brennan
+% -- refactored code, added weighted averaging to prevent iteration
 %     bouncing
-%     2022_01_10:
-%     -- shut off debugging commentsclose
+% 2022_01_10:  - S. Brennan
+% -- shut off debugging commentsclose
+% 2024_03_14 - S. Brennan
+% -- shut off traversal_average.Station calculation as it is giving wrong
+% length
 
 % TO DO
 % Need to clean up the code - lots of code "lint"
@@ -392,7 +395,7 @@ end
 
 % Use final average path to define "true" s-coordinates of the original trajectories, using projection
 traversal_average = fcn_Path_convertPathToTraversalStructure([path_mean_no_nan(:,1), path_mean_no_nan(:,2)]);  
-traversal_average.Station = reference_station_points; % The calculation of station is a bit off in the conversion, so fix it here.
+% traversal_average.Station = reference_station_points; % The calculation of station is a bit off in the conversion, so fix it here.
  
 % Calculate final results
 [closestXs, closestYs, closestDistances] = ...

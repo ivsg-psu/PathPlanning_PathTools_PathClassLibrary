@@ -10,10 +10,10 @@
 %     -- added more comments during clean-up
 
 
-%% Create some dummy test paths
+%% BASIC Example
 
 % Call the function that fills in sample paths (as a starter)
-paths_array = fcn_Path_fillSamplePaths;
+paths = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
 for i_Path = 1:length(paths)
@@ -29,7 +29,7 @@ if 1==1
     fcn_Path_plotTraversalsXY(data,fig_num);
 end
 
-%% Call the function
+% Call the function
 
 index_of_longest = fcn_Path_findTraversalWithMostData(data);
 fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n',length(data.traversal),index_of_longest,length(data.traversal{index_of_longest}.X));

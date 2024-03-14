@@ -8,7 +8,6 @@
 %      -- minor clean-up of comments
 
 close all
-clc
 
 % Clear any old variables
 clear all_traversals
