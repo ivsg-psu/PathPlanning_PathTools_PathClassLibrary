@@ -127,16 +127,46 @@ function [distance,location,path_segment, t, u] = ...
 %      -- Fixed bug where the figure plotting breaks if someone gives an
 %      empty figure number
 %      -- Added flag 3 and 4 cases
+%      2024_05_14 - Aneesh Batchu
+%      -- Added max speed options
 
 
 %% Set up for debugging
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_check_inputs = 1; % Flag to perform input checking
+
+flag_max_speed = 0;
+if (nargin==5 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS");
+    MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG = getenv("MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS);
+    end
+end
+
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
-    fprintf(1,'Starting function: %s, in file: %s\n',st(1).name,st(1).file);
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 34838; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
+
+% 
+% flag_do_debug = 0; % Flag to plot the results for debugging
+% flag_check_inputs = 1; % Flag to perform input checking
+% 
+% if flag_do_debug
+%     st = dbstack; %#ok<*UNRCH>
+%     fprintf(1,'Starting function: %s, in file: %s\n',st(1).name,st(1).file);
+% end
 
 %% check input arguments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,14 +183,47 @@ end
 % Set default values
 flag_search_type = 0;
 
-% check input arguments
-if flag_check_inputs == 1
-    if nargin < 3 || nargin > 5
-        error('Incorrect number of input arguments.')
+% % check input arguments
+% if flag_check_inputs == 1
+%     if nargin < 3 || nargin > 5
+%         error('Incorrect number of input arguments.')
+%     end
+% 
+%     % Check path input
+%     fcn_Path_checkInputsToFunctions(path, 'path');    
+% end
+% 
+% % Does user wish to specify search type?
+% if 4 <= nargin
+%     flag_search_type = varargin{1};
+% end
+% 
+% 
+% % Does user want to show the plots?
+% flag_do_plot = 0; % Default is to NOT show plots
+% if (5 == nargin) 
+%     temp = varargin{end};
+%     if ~isempty(temp)
+%         fig_num = temp;
+%         flag_do_plot = 1;
+%     end
+% else
+%     if flag_do_debug
+%         fig = figure; 
+%         fig_num = fig.Number;
+%         flag_do_plot = 1;
+%     end
+% end
+
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(3,5);
+
+        % Check path input
+        fcn_Path_checkInputsToFunctions(path, 'path');
+
     end
-    
-    % Check path input
-    fcn_Path_checkInputsToFunctions(path, 'path');    
 end
 
 % Does user wish to specify search type?
@@ -168,22 +231,17 @@ if 4 <= nargin
     flag_search_type = varargin{1};
 end
 
-
-% Does user want to show the plots?
-flag_do_plot = 0; % Default is to NOT show plots
-if (5 == nargin) 
+% Does user want to specify fig_num?
+fig_num = []; % Default is to have no figure
+flag_do_plots = 0;
+if (0==flag_max_speed) && (5<= nargin)
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
-        flag_do_plot = 1;
-    end
-else
-    if flag_do_debug
-        fig = figure; 
-        fig_num = fig.Number;
-        flag_do_plot = 1;
+        flag_do_plots = 1;
     end
 end
+
 
 
 %% Calculations begin here
@@ -377,7 +435,7 @@ end
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_plot
+if flag_do_plots
     
     % Set up the figure
     figure(fig_num);

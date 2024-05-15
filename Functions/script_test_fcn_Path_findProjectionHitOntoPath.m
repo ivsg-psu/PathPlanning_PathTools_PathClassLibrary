@@ -26,9 +26,31 @@
 % 2021_01_24 - S. Brennan
 % -- Added assertions to force checking
 % -- Added test cases for flag=3 flag=4 options
-
+%
+% 2024_05_15 - Aneesh Batchu
+% -- Added a BUG case
 
 close all
+
+%% BUG: When flag_search_type = 1, Sensor vector is extended to intersect with the path. However, this does not happen in this case. 
+% The intersection point is not found even when flag_search_type is set to
+% 2,3 or 4. 
+
+fprintf(1,'Simple intersection result: \n');
+path = [0 10; 10 10];
+sensor_vector_start = [13 10]; 
+sensor_vector_end   = [11 10];
+fig_debugging = 2343;
+flag_search_type = 1;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+% assert(isequal(round(distance,4),9.2043));
+% assert(isequal(round(location,4),[3.9286,10.0000]));
+
 
 %% Simple test 1 - a simple intersection
 fprintf(1,'Simple intersection result: \n');

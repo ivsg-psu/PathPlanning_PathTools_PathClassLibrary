@@ -8,7 +8,7 @@
 % 2023_04_22 S. Brennan, sbrennan@psu.edu
 % -- updated loading conditions
 % -- improved comments and README.MD
-% 2023_06_05 S. Brennan, sbrennan@psu.edu
+% 2023_06_05 S. Brennan, sbrennan@psu.edu""
 % -- cleaned up the workspace codes to use functions, work on MacOS
 % 2023_08_25 to 2-23_09_06 by S. Brennan
 % -- added examples of XY to St conversions, and vice versa
@@ -32,6 +32,9 @@
 % will be fixed.
 % - Need to use the Debug libraray, not Path library, to check inputs.
 % - fix addElevation
+% 2024_05_15 - Aneesh Batchu
+% -- Found a bug in "fcn_Path_findProjectionHitOntoPath". A test case to
+% demonstrate the BUG was written in "script_test_fcn_Path_findProjectionHitOntoPath"
 
 %% Prep the workspace
 close all
