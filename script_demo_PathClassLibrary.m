@@ -35,6 +35,8 @@
 % 2024_05_15 - Aneesh Batchu
 % -- Found a bug in "fcn_Path_findProjectionHitOntoPath". A test case to
 % demonstrate the BUG was written in "script_test_fcn_Path_findProjectionHitOntoPath"
+% 2024_09_26 - Sean Brennan
+% -- Updated function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
 
 %% Prep the workspace
 close all
@@ -1537,12 +1539,21 @@ clear flag*
 clear path
 
 % Clear out any path directories under Utilities
-path_dirs = regexp(path,'[;]','split');
+if ispc
+    path_dirs = regexp(path,'[;]','split');
+elseif ismac
+    path_dirs = regexp(path,'[:]','split');
+elseif isunix
+    path_dirs = regexp(path,'[;]','split');
+else
+    error('Unknown operating system. Unable to continue.');
+end
+
 utilities_dir = fullfile(pwd,filesep,'Utilities');
 for ith_dir = 1:length(path_dirs)
     utility_flag = strfind(path_dirs{ith_dir},utilities_dir);
     if ~isempty(utility_flag)
-        rmpath(path_dirs{ith_dir});
+        rmpath(path_dirs{ith_dir})
     end
 end
 
@@ -1555,7 +1566,6 @@ if  exist(utilities_dir,'dir')
 end
 
 end % Ends fcn_INTERNAL_clearUtilitiesFromPathAndFolders
-
 %% fcn_INTERNAL_initializeUtilities
 function  fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders)
 % Reset all flags for installs to empty
