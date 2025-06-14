@@ -34,14 +34,14 @@ function [distance,location,path_segment, t, u] = ...
 %
 %            0: returns distance and location of first intersection only if
 %            the given sensor_vector overlaps the path (this is the
-%            default)
+%            default). Returns [nan nan] if no overlap found.
 %
 %            1: returns distance and location of FIRST intersection if ANY
 %            projection of the sensor vector, in any direction, hits the
 %            path (in other words, if there is any intersection). Note that
 %            distance returned could be negative if the nearest
 %            intersection is in the opposite direction of the given sensor
-%            vector.
+%            vector. Returns [nan nan] if no overlap found.
 %
 %            2: returns distances and locations of ALL the detected
 %            intersections of where the given sensor_vector overlaps the
@@ -129,42 +129,66 @@ function [distance,location,path_segment, t, u] = ...
 %      -- Added flag 3 and 4 cases
 %      2024_06_19 - S. Brennan
 %      -- fixed tolerance issue with overlapping vertical lines
+%      2025_06_14 - S. Brennan
+%      -- added expanded plotting so not tight
+%      -- added fast mode, global flags, better input checking
 
-%% Set up for debugging
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_check_inputs = 1; % Flag to perform input checking
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==5 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATH_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATH_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATH_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATH_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATH_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATH_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATH_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATH_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
-    fprintf(1,'Starting function: %s, in file: %s\n',st(1).name,st(1).file);
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Set default values
-flag_search_type = 0;
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(3,5);
 
-% check input arguments
-if flag_check_inputs == 1
-    if nargin < 3 || nargin > 5
-        error('Incorrect number of input arguments.')
+        % Check the path input
+        fcn_DebugTools_checkInputsToFunctions(path, 'path');
     end
-    
-    % Check path input
-    fcn_Path_checkInputsToFunctions(path, 'path');    
 end
 
-% Does user wish to specify search type?
+% Is the user entering a flag_search_type?
+flag_search_type = 0;
 if 4 <= nargin
     flag_search_type = varargin{1};
 end
@@ -172,7 +196,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plot = 0; % Default is to NOT show plots
-if (5 == nargin) 
+if (0==flag_max_speed) && (5 == nargin) 
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
@@ -383,35 +407,80 @@ end
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
-    
-    % Set up the figure
-    figure(fig_num);
-    clf;
+     % check whether the figure already has data
+    h_fig = figure(fig_num);
+    flag_rescale_axis = 0; 
+    if isempty(get(h_fig,'Children')) 
+        flag_rescale_axis = 1; 
+    else
+        child_handle = get(h_fig,'Children');
+        if isfield(child_handle,'TileArrangement') && strcmp(get(child_handle,'TileArrangement'),'flow')
+            flag_rescale_axis = 1;
+        end
+    end
+
     hold on;
     axis equal;
     grid on; grid minor;
     
+
+    % Find size of plotting domain
+    allPoints = [path; sensor_vector_start; sensor_vector_end];
+
+    max_plotValues = max(allPoints);
+    min_plotValues = min(allPoints);
+    sizePlot = max(max_plotValues) - min(min_plotValues);
+    nudge = sizePlot*0.006; %#ok<NASGU>
+
+    % Set size of plotting domain
+    if flag_rescale_axis
+        
+        percent_larger = 0.3;
+        axis_range = max_plotValues - min_plotValues;
+        if (0==axis_range(1,1))
+            axis_range(1,1) = 2/percent_larger;
+        end
+        if (0==axis_range(1,2))
+            axis_range(1,2) = 2/percent_larger;
+        end
+        
+        % Force the axis to be equal
+        min_vertexValuesInPlot = min(min_plotValues);
+        max_vertexValuesInPlot = max(max_plotValues);
+
+        % Stretch the axes
+        stretched_min_vertexValues = min_vertexValuesInPlot - percent_larger.*axis_range;
+        stretched_max_vertexValues = max_vertexValuesInPlot + percent_larger.*axis_range;
+        axesTogether = [stretched_min_vertexValues; stretched_max_vertexValues];
+        newAxis = reshape(axesTogether, 1, []);
+        axis(newAxis);
+
+    end
+    % goodAxis = axis;
+
     % Plot the path in black
     plot(path(:,1),path(:,2),'k.-','Linewidth',5);
     handle_text = text(path(1,1),path(1,2),'Path');
     set(handle_text,'Color',[0 0 0]);
-       
+
     % Plot the sensor vector
     quiver(q(:,1),q(:,2),s(:,1),s(:,2),'r','Linewidth',3);
+    plot(sensor_vector_start(:,1),sensor_vector_start(:,2),'r.','Markersize',20);
     plot(sensor_vector_end(:,1),sensor_vector_end(:,2),'r.','Markersize',10);
-    
+
     handle_text = text(q(:,1),q(:,2),'Sensor');
     set(handle_text,'Color',[1 0 0]);
-    
+
     axis_size = axis;
     y_range = axis_size(4)-axis_size(3);
-        
+
     % Plot any hits in blue
     for i_result = 1:length(distance)
         plot(location(i_result,1),location(i_result,2),'bo','Markersize',30);
         handle_text = text(location(i_result,1),location(i_result,2)-0.05*y_range,sprintf('Hit at distance: %.2f',distance(i_result)));
         set(handle_text,'Color',[0 0 1]);
     end
+    
     
 end
 

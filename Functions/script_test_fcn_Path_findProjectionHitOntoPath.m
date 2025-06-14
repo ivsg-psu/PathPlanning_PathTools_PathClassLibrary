@@ -29,34 +29,185 @@
 %
 % 2024_05_15 - Aneesh Batchu
 % -- Added a BUG case
+%
+% 2024_05_15 - S. Brennan
+% -- Organized sections
+% -- Added fast mode tests
+% -- Added figure open/close assertions
 
 close all
 
-%% BUG: When flag_search_type = 1, Sensor vector is extended to intersect with the path. However, this does not happen in this case. 
-% The intersection point is not found even when flag_search_type is set to
-% 2,3 or 4. 
+%%%%%%%%%%%%
+% FIGURE NUMBERING:
+% FSIXXX
+%
+% F is First figure number, starting with:
+% 1: demonstration cases
+% 2: single point intersection cases
+% 3: non intersection cases
+% 4: infinite intersection cases
+% 5: multi-hit cases
+% 6: multi-hit overlapping cases
+% 7: multi-hit multi-path cases
+% 8: fast mode cases
+% 9: known bug cases
+%
+% S is second figure number, flag_search_type:
+% 0: first intersection if there is any overlap
+% 1: first intersection of sensor vector to the path, for ANY directional extension of the sensor. 
+% 2: same as flag_search_type 0, except all intersections if there is overlap, and only first and last ones if infinte  
+% 3: first intersection of sensor vector to path, for ANY directional extension of the path. Note: this is opposite of flag 1  
+% 4: first intersection of sensor vector to path, for ANY directional extension of the path OR the sensor. Note: this is the combinations of flags 1 and 3 
+%
+% XXX: 2nd to 5th number: a counter that counts up through the cases in this
+% section.
+%
+% Example:
+% 24006 plots a single point intersection, flag type 4, 6th test case
 
-fprintf(1,'Simple intersection result: \n');
-path = [0 10; 10 10];
-sensor_vector_start = [13 10]; 
-sensor_vector_end   = [11 10];
-fig_debugging = 2343;
-flag_search_type = 1;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
 
-% assert(isequal(round(distance,4),9.2043));
-% assert(isequal(round(location,4),[3.9286,10.0000]));
+%% Demonstration cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% _____                                 _             _   _                _____                    
+% |  __ \                               | |           | | (_)              / ____|
+% | |  | | ___ _ __ ___   ___  _ __  ___| |_ _ __ __ _| |_ _  ___  _ __   | |     __ _ ___  ___  ___
+% | |  | |/ _ \ '_ ` _ \ / _ \| '_ \/ __| __| '__/ _` | __| |/ _ \| '_ \  | |    / _` / __|/ _ \/ __|
+% | |__| |  __/ | | | | | (_) | | | \__ \ |_| | | (_| | |_| | (_) | | | | | |___| (_| \__ \  __/\__ \
+% |_____/ \___|_| |_| |_|\___/|_| |_|___/\__|_|  \__,_|\__|_|\___/|_| |_|  \_____\__,_|___/\___||___/
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Demonstration%20Cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All demonstration case figures start with the number 1
 
 
-%% Simple test 1 - a simple intersection
-fprintf(1,'Simple intersection result: \n');
+
+
+%% Single point intersection cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____ _             _        _____      _       _     _____       _                          _   _
+%  / ____(_)           | |      |  __ \    (_)     | |   |_   _|     | |                        | | (_)
+% | (___  _ _ __   __ _| | ___  | |__) |__  _ _ __ | |_    | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
+%  \___ \| | '_ \ / _` | |/ _ \ |  ___/ _ \| | '_ \| __|   | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
+%  ____) | | | | | (_| | |  __/ | |  | (_) | | | | | |_   _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
+% |_____/|_|_| |_|\__, |_|\___| |_|   \___/|_|_| |_|\__| |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
+%                  __/ |
+%                 |___/
+% 
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Single%20Point%20Intersections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All single point intersection figures start with the number 2
+
+close all;
+
+%% Single point intersection (2), flag (0), test 1 - a simple intersection
+
+fig_num = 20001;
+figure(fig_num); clf;
+
+fprintf(1,'\nSingle point intersection (2), flag (0), test 1 result: \n');
+
 path = [0 10; 10 10];
 sensor_vector_start = [2 1]; 
 sensor_vector_end   = [5 15];
+flag_search_type = 0;
+
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_num);
+print_results(distance,location);
+
+
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+assert(isequal(round(distance,4),9.2043));
+assert(isequal(round(location,4),[3.9286,10.0000]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% Single point intersection (2), flag (0), test 2 - intersection through a vertex
+
+fig_num = 20002;
+figure(fig_num); clf;
+
+fprintf(1,'\nSingle point intersection (2), flag (0), test 2 - intersection through a vertex result: \n');
+
+path = [0 5; 4 5; 8 2];
+sensor_vector_start = [4 0]; 
+sensor_vector_end   = [4 8];
+flag_search_type = 0;
+
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_num);
+print_results(distance,location);
+
+
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+assert(isequal(round(distance,4),5));
+assert(isequal(round(location,4),[4 5]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% Single point intersection (2), flag (0), test 3 -  intersection at start of sensor
+
+fig_num = 20003;
+figure(fig_num); clf;
+
+fprintf(1,'\nSingle point intersection (2), flag (0), test 3 -  intersection at start of sensor result: \n');
+
+path = [0 5; 4 5; 8 2];
+sensor_vector_start = [4 5]; 
+sensor_vector_end   = [4 8];
+flag_search_type = 0;
+
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_num);
+print_results(distance,location);
+
+
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+assert(isequal(round(distance,4),0));
+assert(isequal(round(location,4),[4 5]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+% URHERE
+%% Simple test 6 - intersection at end of sensor
+fprintf(1,'Intersection at end of sensor result: \n');
+path = [0 5; 4 5; 8 2];
+sensor_vector_start = [4 0]; 
+sensor_vector_end   = [4 5];
 fig_debugging = 2343;
 flag_search_type = 0;
 [distance,location] = ...
@@ -65,18 +216,14 @@ flag_search_type = 0;
     flag_search_type,fig_debugging);
 print_results(distance,location);
 
-assert(isequal(round(distance,4),9.2043));
-assert(isequal(round(location,4),[3.9286,10.0000]));
+assert(isequal(round(distance,4),5));
+assert(isequal(round(location,4),[4 5]));
 
-%% Simple test 2 - no intersections, returns NaN
-% No intersection result: 
-% Distance 	 Location X 	 Location Y 
-% NaN 		 NaN 			 NaN
-
-fprintf(1,'No intersection result: \n');
-path = [-4 10; 2 10];
-sensor_vector_start = [0 0]; 
-sensor_vector_end   = [5 12];
+%% Advanced test 1 - intersection beyond a sensor's range with flag
+fprintf(1,'Intersection beyond sensor range result: \n');
+path = [0 5; 4 5; 8 2];
+sensor_vector_start = [4 0]; 
+sensor_vector_end   = [4 2];
 fig_debugging = 2343;
 flag_search_type = 0;
 [distance,location] = ...
@@ -87,6 +234,361 @@ print_results(distance,location);
 
 assert(isnan(distance));
 assert(all(isnan(location)));
+
+
+fig_debugging = 2344;
+flag_search_type = 1;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+
+assert(isequal(round(distance,4),5));
+assert(isequal(round(location,4),[4 5]));
+
+% Test the negative condition
+sensor_vector_start = [4 6]; 
+sensor_vector_end   = [4 8];
+fig_debugging = 2345;
+flag_search_type = 0;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+
+% Test showing that a sensor pointing away from a path "hits" the path with
+% a negative distance
+fig_debugging = 2346;
+flag_search_type = 1;
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),-1));
+assert(isequal(round(location,4),[4 5]));
+
+
+%% Simple test - Extend wall vector (for flag_search_type = 3)
+fig_debugging = 34341;
+fprintf(1,'Simple test result, flag = 3, long sensor: \n');
+path = [-4 10; 2 10];
+sensor_vector_start = [0 0];
+sensor_vector_end   = 2*[4 6];
+
+flag_search_type =3;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),12.0185));
+assert(isequal(round(location,4),[6.6667   10.0000]));
+assert(isequal(path_segments,1));
+
+%% Advanced test 1 - intersection beyond a sensor's range with flag (for flag_search_type = 4)
+fprintf(1,'Intersection beyond sensor range result: \n');
+path = [0 5; 4 5; 8 2];
+
+sensor_vector_start = [4 0];
+sensor_vector_end   = [4 2];
+fig_debugging = 34345;
+
+flag_search_type =0;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+title('Intersection beyond sensor range result, Flag = 0')
+print_results(distance,location);
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+assert(isnan(path_segments));
+
+fig_debugging = 34346;
+
+flag_search_type = 4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+title('Intersection beyond sensor range result, Flag = 4')
+print_results(distance,location);
+
+assert(isequal(round(distance,4),5));
+assert(isequal(round(location,4),[4 5]));
+assert(isequal(path_segments,1));
+
+% Test the negative condition
+sensor_vector_start = [4 6];
+sensor_vector_end   = [4 8];
+fig_debugging = 34347;
+
+flag_search_type = 0;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+title('Intersection beyond sensor range result, Flag = 0')
+print_results(distance,location);
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+assert(isnan(path_segments));
+
+fig_debugging = 34348;
+flag_search_type = 4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+title('Intersection beyond sensor range result, Flag = 4')
+print_results(distance,location);
+
+assert(isequal(round(distance,4),-1));
+assert(isequal(round(location,4),[4 5]));
+assert(isequal(path_segments,1));
+
+
+%% Simple test - Extend both the vectors (for flag_search_type = 4)
+fig_debugging = 34343;
+fprintf(1,'Simple test result, flag = 4, long sensor: \n');
+path = [-4 10; 2 10];
+sensor_vector_start = [0 0];
+sensor_vector_end   = 2*[4 6];
+
+flag_search_type =4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),12.0185));
+assert(isequal(round(location,4),[6.6667   10.0000]));
+assert(isequal(path_segments,1));
+
+%% Simple test - Extend both the vectors (for flag_search_type = 4)
+fig_debugging = 34344;
+fprintf(1,'Simple test result, flag = 4, short sensor: \n');
+path = [-4 10; 2 10];
+sensor_vector_start = [0 0];
+sensor_vector_end   = [4 6];
+
+flag_search_type =4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),12.0185));
+assert(isequal(round(location,4),[6.6667   10.0000]));
+assert(isequal(path_segments,1));
+
+%% Multi-hit test - flag_search_type = 3
+fig_debugging = 343433;
+fprintf(1,'No intersection result: \n');
+path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
+sensor_vector_start = [0 0];
+sensor_vector_end   = [0 4];
+
+flag_search_type = 3;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),0));
+assert(isequal(round(location,4),[0   0]));
+assert(isequal(path_segments,1));
+
+%% Multi-hit test - flag_search_type = 4
+fig_debugging = 343434;
+fprintf(1,'No intersection result: \n');
+path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
+sensor_vector_start = [0 0];
+sensor_vector_end   = [0 4];
+
+flag_search_type = 4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),0));
+assert(isequal(round(location,4),[0   0]));
+assert(isequal(path_segments,1));
+
+%% Multi-hit test - flag_search_type = 4
+fig_debugging = 343438;
+fprintf(1,'No intersection result: \n');
+path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
+sensor_vector_start = [0 1];
+sensor_vector_end   = [0 4];
+
+flag_search_type = 4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isequal(round(distance,4),-1));
+assert(isequal(round(location,4),[0   0]));
+assert(isequal(path_segments,1));
+
+
+%% Non intersection cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  _   _               _____       _                          _   _
+% | \ | |             |_   _|     | |                        | | (_)
+% |  \| | ___  _ __     | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
+% | . ` |/ _ \| '_ \    | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
+% | |\  | (_) | | | |  _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
+% |_| \_|\___/|_| |_| |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
+% 
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Non%20Intersections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All non intersection figures start with the number 3
+
+close all;
+
+%% Non intersection (3), flag (0), test 1
+fig_num = 30001;
+figure(fig_num); clf;
+
+fprintf(1,'\nNon intersection (3), flag (0), test 1 result: \n');
+
+path = [-4 10; 2 10];
+sensor_vector_start = [0 0]; 
+sensor_vector_end   = [5 12];
+flag_search_type = 0;
+
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_num);
+print_results(distance,location);
+
+
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+assert(isnan(distance));
+assert(all(isnan(location)));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% Simple test - No intersection (for flag_search_type = 3)
+fig_debugging = 34342;
+fprintf(1,'Simple test result, flag = 3, short sensor: \n');
+path = [-4 10; 2 10];
+sensor_vector_start = [0 0];
+sensor_vector_end   = [4 6];
+
+flag_search_type =3;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+assert(isnan(path_segments));
+
+%% Parallel test for flag_search_type = 3
+fig_debugging = 3434666;
+fprintf(1,'Parallel test for flag=3: \n');
+path = [0 0; 10 0];
+sensor_vector_start = [0 1];
+sensor_vector_end   = [10 1];
+
+flag_search_type =3;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+assert(isnan(path_segments));
+
+%% Parallel test for flag_search_type = 4
+fig_debugging = 3434777;
+fprintf(1,'Parallel test for flag=4: \n');
+path = [0 0; 10 0];
+sensor_vector_start = [0 1];
+sensor_vector_end   = [10 1];
+
+flag_search_type =4;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+assert(isnan(path_segments));
+
+
+%% Multi-hit test - flag_search_type = 3
+fig_debugging = 343437;
+fprintf(1,'No intersection result: \n');
+path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
+sensor_vector_start = [0 1];
+sensor_vector_end   = [0 4];
+
+flag_search_type = 3;
+[distance,location,path_segments] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_debugging);
+print_results(distance,location);
+
+assert(isnan(distance));
+assert(all(isnan(location)));
+assert(isnan(path_segments));
+
+
+
+%% Infinite intersection cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  _____        __ _       _ _         _____       _                          _   _
+% |_   _|      / _(_)     (_) |       |_   _|     | |                        | | (_)
+%   | |  _ __ | |_ _ _ __  _| |_ ___    | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
+%   | | | '_ \|  _| | '_ \| | __/ _ \   | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
+%  _| |_| | | | | | | | | | | ||  __/  _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
+% |_____|_| |_|_| |_|_| |_|_|\__\___| |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
+%
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Infinite%20Intersections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All infinte intersection figures start with the number 4
+
+close all;
 
 %% Simple test 3 - multiple intersections, returns only the first one
 fprintf(1,'Multiple intersections result: \n');
@@ -104,56 +606,6 @@ print_results(distance,location);
 assert(isequal(round(distance,4),2.6));
 assert(isequal(round(location,4),[1.0000    2.4000]));
 
-
-%% Simple test 4 - intersection through a vertex
-fig_debugging = 345454;
-
-fprintf(1,'Intersection through a vertex result: \n');
-path = [0 5; 4 5; 8 2];
-sensor_vector_start = [4 0]; 
-sensor_vector_end   = [4 8];
-flag_search_type = 0;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),5));
-assert(isequal(round(location,4),[4 5]));
-
-
-%% Simple test 5 - intersection at start of sensor
-fprintf(1,'Intersection at start of sensor result: \n');
-path = [0 5; 4 5; 8 2];
-sensor_vector_start = [4 5]; 
-sensor_vector_end   = [4 8];
-fig_debugging = 2343;
-flag_search_type = 0;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),0));
-assert(isequal(round(location,4),[4 5]));
-
-%% Simple test 6 - intersection at end of sensor
-fprintf(1,'Intersection at end of sensor result: \n');
-path = [0 5; 4 5; 8 2];
-sensor_vector_start = [4 0]; 
-sensor_vector_end   = [4 5];
-fig_debugging = 2343;
-flag_search_type = 0;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),5));
-assert(isequal(round(location,4),[4 5]));
 
 
 %% Simple test 7 - identically overlapping colinear 
@@ -437,6 +889,7 @@ print_results(distance,location);
 assert(isnan(distance));
 assert(all(isnan(location)));
 
+
 %% Simple test 15 - non overlapping colinear 2
 fprintf(1,'Non overlapping colinear result: \n');
 path = [0 10; 10 10];
@@ -453,62 +906,8 @@ print_results(distance,location);
 assert(isnan(distance));
 assert(all(isnan(location)));
 
-%% Advanced test 1 - intersection beyond a sensor's range with flag
-fprintf(1,'Intersection beyond sensor range result: \n');
-path = [0 5; 4 5; 8 2];
-sensor_vector_start = [4 0]; 
-sensor_vector_end   = [4 2];
-fig_debugging = 2343;
-flag_search_type = 0;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isnan(distance));
-assert(all(isnan(location)));
 
 
-fig_debugging = 2344;
-flag_search_type = 1;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-
-assert(isequal(round(distance,4),5));
-assert(isequal(round(location,4),[4 5]));
-
-% Test the negative condition
-sensor_vector_start = [4 6]; 
-sensor_vector_end   = [4 8];
-fig_debugging = 2345;
-flag_search_type = 0;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-
-assert(isnan(distance));
-assert(all(isnan(location)));
-
-% Test showing that a sensor pointing away from a path "hits" the path with
-% a negative distance
-fig_debugging = 2346;
-flag_search_type = 1;
-[distance,location] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),-1));
-assert(isequal(round(location,4),[4 5]));
 
 %% Multi-hit tests
 %   __  __       _ _   _ _    _ _ _   
@@ -520,6 +919,7 @@ assert(isequal(round(location,4),[4 5]));
 %                                     
 %                                     
 
+close all;
 
 %% Advanced test 2 - multiple intersections
 fprintf(1,'Single intersections reporting only first result: \n');
@@ -599,6 +999,7 @@ assert(isequal(round(location,4),[2.5000    6.0000
 %                                                                  | |   | |             __/ |
 %                                                                  |_|   |_|            |___/ 
 
+close all;
 
 %% Advanced Multihit Overlapping test - identically overlapping colinear 
 fprintf(1,'identically overlapping colinear result: \n');
@@ -915,6 +1316,7 @@ assert(isempty(location));
 %                                                                               
 %                                                                               
 
+close all;
 
 %% Advanced Multihit Overlapping test - identically overlapping colinear 
 fprintf(1,'identically overlapping colinear result: \n');
@@ -1288,336 +1690,204 @@ assert(isequal(round(location,4),[    14    10
     14    10
     15    10]));
 
-%% flag equal to 3 and 4 tests
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% BUG cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  ______ _                          ____
-% |  ____| |               ______   |___ \
-% | |__  | | __ _  __ _   |______|    __) |
-% |  __| | |/ _` |/ _` |   ______    |__ <
-% | |    | | (_| | (_| |  |______|   ___) |
-% |_|    |_|\__,_|\__, |            |____/
-%                  __/ |
-%                 |___/
-%                  _
-%                 | |
-%   __ _ _ __   __| |
-%  / _` | '_ \ / _` |
-% | (_| | | | | (_| |
-%  \__,_|_| |_|\__,_|
+%  ____  _    _  _____
+% |  _ \| |  | |/ ____|
+% | |_) | |  | | |  __    ___ __ _ ___  ___  ___
+% |  _ <| |  | | | |_ |  / __/ _` / __|/ _ \/ __|
+% | |_) | |__| | |__| | | (_| (_| \__ \  __/\__ \
+% |____/ \____/ \_____|  \___\__,_|___/\___||___/
+%
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=BUG%20cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All bug case figures start with the number 9
+
+close all;
+
+%% BUG - infinite point intersection (4), flag (1), test 1 - should be infinite intersections
+
+fig_num = 91001;
+figure(fig_num); clf;
+
+fprintf(1,'\n BUG - infinite point intersection (4), flag (1), test 1 - should be infinite intersections result: \n');
+
+path = [0 10; 10 10];
+sensor_vector_start = [13 10]; 
+sensor_vector_end   = [11 10];
+flag_search_type = 1;
+
+[distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,fig_num);
+print_results(distance,location);
+
+
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+% assert(isequal(round(distance,4),9.2043));
+% assert(isequal(round(location,4),[3.9286,10.0000]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+
+
+
+%% Fast Mode Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  ______        _     __  __           _        _______        _
+% |  ____|      | |   |  \/  |         | |      |__   __|      | |
+% | |__ __ _ ___| |_  | \  / | ___   __| | ___     | | ___  ___| |_ ___
+% |  __/ _` / __| __| | |\/| |/ _ \ / _` |/ _ \    | |/ _ \/ __| __/ __|
+% | | | (_| \__ \ |_  | |  | | (_) | (_| |  __/    | |  __/\__ \ |_\__ \
+% |_|  \__,_|___/\__| |_|  |_|\___/ \__,_|\___|    |_|\___||___/\__|___/
 %
 %
-%  ______ _                         _  _
-% |  ____| |               ______  | || |
-% | |__  | | __ _  __ _   |______| | || |_
-% |  __| | |/ _` |/ _` |   ______  |__   _|
-% | |    | | (_| | (_| |  |______|    | |
-% |_|    |_|\__,_|\__, |              |_|
-%                  __/ |
-%                 |___/
-%
-%
-%   ___ __ _ ___  ___  ___
-%  / __/ _` / __|/ _ \/ __|
-% | (_| (_| \__ \  __/\__ \
-%  \___\__,_|___/\___||___/
-%
-% http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Flag%20%20%3D%20%203%0Aand%0AFlag%20%20%3D%204%0Acases
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Fast%20Mode%20Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figures start with 8
 
-%% Simple test - Extend wall vector (for flag_search_type = 3)
-fig_debugging = 34341;
-fprintf(1,'Simple test result, flag = 3, long sensor: \n');
-path = [-4 10; 2 10];
-sensor_vector_start = [0 0];
-sensor_vector_end   = 2*[4 6];
+close all;
 
-flag_search_type =3;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
+%% Basic example - NO FIGURE
 
-assert(isequal(round(distance,4),12.0185));
-assert(isequal(round(location,4),[6.6667   10.0000]));
-assert(isequal(path_segments,1));
+fig_num = 80001;
+figure(fig_num); 
+close(fig_num);
 
-%% Simple test - No intersection (for flag_search_type = 3)
-fig_debugging = 34342;
-fprintf(1,'Simple test result, flag = 3, short sensor: \n');
-path = [-4 10; 2 10];
-sensor_vector_start = [0 0];
-sensor_vector_end   = [4 6];
+fprintf(1,'\nSingle point intersection (2), flag (0), test 1 result: \n');
 
-flag_search_type =3;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isnan(distance));
-assert(all(isnan(location)));
-assert(isnan(path_segments));
-
-%% Simple test - Extend both the vectors (for flag_search_type = 4)
-fig_debugging = 34343;
-fprintf(1,'Simple test result, flag = 4, long sensor: \n');
-path = [-4 10; 2 10];
-sensor_vector_start = [0 0];
-sensor_vector_end   = 2*[4 6];
-
-flag_search_type =4;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),12.0185));
-assert(isequal(round(location,4),[6.6667   10.0000]));
-assert(isequal(path_segments,1));
-
-%% Simple test - Extend both the vectors (for flag_search_type = 4)
-fig_debugging = 34344;
-fprintf(1,'Simple test result, flag = 4, short sensor: \n');
-path = [-4 10; 2 10];
-sensor_vector_start = [0 0];
-sensor_vector_end   = [4 6];
-
-flag_search_type =4;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),12.0185));
-assert(isequal(round(location,4),[6.6667   10.0000]));
-assert(isequal(path_segments,1));
-
-%% Parallel test for flag_search_type = 3
-fig_debugging = 3434666;
-fprintf(1,'Parallel test for flag=3: \n');
-path = [0 0; 10 0];
-sensor_vector_start = [0 1];
-sensor_vector_end   = [10 1];
-
-flag_search_type =3;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isnan(distance));
-assert(all(isnan(location)));
-assert(isnan(path_segments));
-
-%% Parallel test for flag_search_type = 4
-fig_debugging = 3434777;
-fprintf(1,'Parallel test for flag=4: \n');
-path = [0 0; 10 0];
-sensor_vector_start = [0 1];
-sensor_vector_end   = [10 1];
-
-flag_search_type =4;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isnan(distance));
-assert(all(isnan(location)));
-assert(isnan(path_segments));
-
-
-%% Multi-hit test - flag_search_type = 3
-fig_debugging = 343433;
-fprintf(1,'No intersection result: \n');
-path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
-sensor_vector_start = [0 0];
-sensor_vector_end   = [0 4];
-
-flag_search_type = 3;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),0));
-assert(isequal(round(location,4),[0   0]));
-assert(isequal(path_segments,1));
-
-%% Multi-hit test - flag_search_type = 4
-fig_debugging = 343434;
-fprintf(1,'No intersection result: \n');
-path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
-sensor_vector_start = [0 0];
-sensor_vector_end   = [0 4];
-
-flag_search_type = 4;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),0));
-assert(isequal(round(location,4),[0   0]));
-assert(isequal(path_segments,1));
-
-%% Multi-hit test - flag_search_type = 3
-fig_debugging = 343437;
-fprintf(1,'No intersection result: \n');
-path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
-sensor_vector_start = [0 1];
-sensor_vector_end   = [0 4];
-
-flag_search_type = 3;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isnan(distance));
-assert(all(isnan(location)));
-assert(isnan(path_segments));
-
-
-%% Multi-hit test - flag_search_type = 4
-fig_debugging = 343438;
-fprintf(1,'No intersection result: \n');
-path = [-4 0; -2 0; 0 -2; 2 0; 4 0];
-sensor_vector_start = [0 1];
-sensor_vector_end   = [0 4];
-
-flag_search_type = 4;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-print_results(distance,location);
-
-assert(isequal(round(distance,4),-1));
-assert(isequal(round(location,4),[0   0]));
-assert(isequal(path_segments,1));
-
-%% Advanced test 1 - intersection beyond a sensor's range with flag (for flag_search_type = 4)
-fprintf(1,'Intersection beyond sensor range result: \n');
-path = [0 5; 4 5; 8 2];
-
-sensor_vector_start = [4 0];
-sensor_vector_end   = [4 2];
-fig_debugging = 34345;
-
-flag_search_type =0;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-title('Intersection beyond sensor range result, Flag = 0')
-print_results(distance,location);
-
-assert(isnan(distance));
-assert(all(isnan(location)));
-assert(isnan(path_segments));
-
-fig_debugging = 34346;
-
-flag_search_type = 4;
-[distance,location,path_segments] = ...
-    fcn_Path_findProjectionHitOntoPath(...
-    path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-title('Intersection beyond sensor range result, Flag = 4')
-print_results(distance,location);
-
-assert(isequal(round(distance,4),5));
-assert(isequal(round(location,4),[4 5]));
-assert(isequal(path_segments,1));
-
-% Test the negative condition
-sensor_vector_start = [4 6];
-sensor_vector_end   = [4 8];
-fig_debugging = 34347;
-
+path = [0 10; 10 10];
+sensor_vector_start = [2 1]; 
+sensor_vector_end   = [5 15];
 flag_search_type = 0;
-[distance,location,path_segments] = ...
+
+[distance,location] = ...
     fcn_Path_findProjectionHitOntoPath(...
     path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-title('Intersection beyond sensor range result, Flag = 0')
+    flag_search_type,[]);
 print_results(distance,location);
 
-assert(isnan(distance));
-assert(all(isnan(location)));
-assert(isnan(path_segments));
 
-fig_debugging = 34348;
-flag_search_type = 4;
-[distance,location,path_segments] = ...
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+assert(isequal(round(distance,4),9.2043));
+assert(isequal(round(location,4),[3.9286,10.0000]));
+
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
+
+%% Basic fast mode - NO FIGURE, FAST MODE
+fig_num = 80002;
+figure(fig_num); 
+close(fig_num);
+
+fprintf(1,'\nSingle point intersection (2), flag (0), test 1 result: \n');
+
+path = [0 10; 10 10];
+sensor_vector_start = [2 1]; 
+sensor_vector_end   = [5 15];
+flag_search_type = 0;
+
+[distance,location] = ...
     fcn_Path_findProjectionHitOntoPath(...
     path,sensor_vector_start,sensor_vector_end,...
-    flag_search_type,fig_debugging);
-title('Intersection beyond sensor range result, Flag = 4')
+    flag_search_type,-1);
 print_results(distance,location);
 
-assert(isequal(round(distance,4),-1));
-assert(isequal(round(location,4),[4 5]));
-assert(isequal(path_segments,1));
+
+% Check variable types
+assert(isnumeric(distance));
+assert(isnumeric(location));
+
+% Check variable sizes
+assert(isequal(size(distance),[1 1]));
+assert(isequal(size(location),[1 2]));
+
+% Check variable values
+assert(isequal(round(distance,4),9.2043));
+assert(isequal(round(location,4),[3.9286,10.0000]));
+
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
 
 
-%% Test of fast implementation mode 
-% NOT IMPLEMENTED YET
-% 
-% % Perform the calculation in slow mode
-% fig_num = [];
-% REPS = 100; minTimeSlow = Inf; 
-% tic;
-% for i=1:REPS
-%     tstart = tic;
-%     [distance,location] = ...
-%     fcn_geometry_findIntersectionOfSegments(...
-%     wall_start, wall_end,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type, (fig_num));
-%     telapsed = toc(tstart);
-%     minTimeSlow = min(telapsed,minTimeSlow);
-% end
-% averageTimeSlow = toc/REPS;
-% 
-% % Perform the operation in fast mode
-% fig_num = -1;
-% minTimeFast = Inf; nsum = 10;
-% tic;
-% for i=1:REPS
-%     tstart = tic;
-%     [distance,location] = ...
-%     fcn_geometry_findIntersectionOfSegments(...
-%     wall_start, wall_end,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type, (fig_num));
-%     telapsed = toc(tstart);
-%     minTimeFast = min(telapsed,minTimeFast);
-% end
-% averageTimeFast = toc/REPS;
-% 
-% fprintf(1,'\n\nComparison of fast and slow modes of fcn_geometry_fitVectorToNPoints:\n');
-% fprintf(1,'N repetitions: %.0d\n',REPS);
-% fprintf(1,'Slow mode average speed per call (seconds): %.5f\n',averageTimeSlow);
-% fprintf(1,'Slow mode fastest speed over all calls (seconds): %.5f\n',minTimeSlow);
-% fprintf(1,'Fast mode average speed per call (seconds): %.5f\n',averageTimeFast);
-% fprintf(1,'Fast mode fastest speed over all calls (seconds): %.5f\n',minTimeFast);
-% fprintf(1,'Average ratio of fast mode to slow mode (unitless): %.3f\n',averageTimeSlow/averageTimeFast);
-% fprintf(1,'Fastest ratio of fast mode to slow mode (unitless): %.3f\n',minTimeSlow/minTimeFast);
+%% Compare speeds of pre-calculation versus post-calculation versus a fast variant
+fig_num = 80003;
+figure(fig_num); 
+close(fig_num);
 
+fprintf(1,'\nSingle point intersection (2), flag (0), test 1 result: \n');
+
+path = [0 10; 10 10];
+sensor_vector_start = [2 1]; 
+sensor_vector_end   = [5 15];
+flag_search_type = 0;
+
+Niterations = 100;
+
+% Do calculation without pre-calculation
+tic;
+for ith_test = 1:Niterations
+    % Call the function
+    [distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,[]);
+end
+slow_method = toc;
+
+% Do calculation with pre-calculation, FAST_MODE on
+tic;
+for ith_test = 1:Niterations
+    % Call the function
+    [distance,location] = ...
+    fcn_Path_findProjectionHitOntoPath(...
+    path,sensor_vector_start,sensor_vector_end,...
+    flag_search_type,-1);
+
+end
+fast_method = toc;
+
+% Plot results as bar chart
+figure(373737);
+clf;
+X = categorical({'Normal mode','Fast mode'});
+X = reordercats(X,{'Normal mode','Fast mode'}); % Forces bars to appear in this exact order, not alphabetized
+Y = [slow_method fast_method ]*1000/Niterations;
+bar(X,Y)
+ylabel('Execution time (Milliseconds)')
+
+
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
 
 %%
 function print_results(distance,location)
-fprintf(1,'\nDistance \t Location X \t Location Y \n');
+fprintf(1,'Distance \t Location X \t Location Y \n');
 if ~isempty(distance)
     for i_result = 1:length(distance(:,1))
         fprintf(1,'%.3f \t\t %.3f \t\t\t %.3f\n',distance(i_result),location(i_result,1),location(i_result,2));

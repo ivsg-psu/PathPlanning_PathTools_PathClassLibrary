@@ -23,6 +23,12 @@
 % need assertion and careful testing)
 % -- fixed many of the scripts that were failing during the automated
 % script testing.
+% 2024_09_26 - Sean Brennan
+% -- Updated function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
+% 2025_06_14 by S. Brennan
+% -- fixed small bug in fcn_Path_findProjectionHitOntoPath
+% -- updated DebugTools_v2024_12_18
+% -- updated script_test_all_functions to latest version
 
 
 % TO-DO:
@@ -35,8 +41,6 @@
 % 2024_05_15 - Aneesh Batchu
 % -- Found a bug in "fcn_Path_findProjectionHitOntoPath". A test case to
 % demonstrate the BUG was written in "script_test_fcn_Path_findProjectionHitOntoPath"
-% 2024_09_26 - Sean Brennan
-% -- Updated function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
 
 %% Prep the workspace
 close all
@@ -53,9 +57,9 @@ clc
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2023_04_22';
+library_name{ith_library}    = 'DebugTools_v2024_12_18';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2023_04_22.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2024_12_18.zip';
 
 ith_library = ith_library+1;
 library_name{ith_library}    = 'GPSClass_v2023_06_29';
@@ -63,7 +67,6 @@ library_folders{ith_library} = {'Functions'};
 library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_GPSRelatedCodes_GPSClass/archive/refs/tags/GPSClass_v2023_06_29.zip';
 
 
- 
 % ith_library = ith_library+1;
 % library_name{ith_library}    = 'GetUserInputPath_v2023_02_01';
 % library_folders{ith_library} = {''};
@@ -77,10 +80,17 @@ library_url{ith_library}     = 'https://github.com/ivsg-psu/FieldDataCollection_
 
 %% Clear paths and folders, if needed
 if 1==0
-
-   fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
-
+    clear flag_PathClass_Folders_Initialized;
+    fcn_INTERNAL_clearUtilitiesFromPathAndFolders;
 end
+
+%% Set environment flags for input checking
+% These are values to set if we want to check inputs or do debugging
+% setenv('MATLABFLAG_GEOMETRY_FLAG_CHECK_INPUTS','1');
+% setenv('MATLABFLAG_GEOMETRY_FLAG_DO_DEBUG','1');
+setenv('MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS','1');
+setenv('MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG','0');
+
 
 %% Do we need to set up the work space?
 if ~exist('flag_PathClass_Folders_Initialized','var')
@@ -103,6 +113,8 @@ end
 %                               |___/                                      
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+disp('Welcome to the PathClass library!')
 
 %% Show how input arguments are checked, fcn_Path_checkInputsToFunctions
 % TO-DO - move debug tools into utilities and remove the checkinputs capability out of Path class
