@@ -16,7 +16,7 @@ function [distance,location,path_segment, t, u] = ...
 %      [distance, location, path_segment, t, u] = ...
 %         fcn_Path_findProjectionHitOntoPath(path,...
 %         sensor_vector_start,sensor_vector_end,...
-%         (flag_search_type),(fig_num))  
+%         (flag_search_return_type), (flag_search_range_type), (fig_num))  
 %
 % INPUTS:
 %
@@ -30,46 +30,42 @@ function [distance,location,path_segment, t, u] = ...
 %      sensor's end location
 %
 %      (OPTIONAL INPUTS)
-%      flag_search_type: an integer specifying the type of search.
+%      flag_search_return_type: an integer specifying how many points to
+%      return
 %
-%            0: returns distance and location of first intersection only if
-%            the given sensor_vector overlaps the path (this is the
-%            default). Returns [nan nan] if no overlap found.
+%            0: (default) returns distance and location of FIRST
+%            intersection only if the given sensor_vector overlaps the
+%            path. Returns [nan nan] if no overlap found.  In cases where
+%            the sensor vector completely overlaps a path segment and thus
+%            there are infinite points, only the starting point of overlap
+%            is given. If a sensor starts on top of a path segment, the
+%            sensor's starting point is returned. If a sensor overlaps
+%            multiple path segments at the start, only the first path
+%            segment is given.
 %
-%            1: returns distance and location of FIRST intersection if ANY
-%            projection of the sensor vector, in any direction, hits the
-%            path (in other words, if there is any intersection). Note that
-%            distance returned could be negative if the nearest
-%            intersection is in the opposite direction of the given sensor
-%            vector. Returns [nan nan] if no overlap found.
+%            1: returns distance and location of ALL intersections where
+%            the given sensor_vector overlaps the path. Returns [nan nan]
+%            if no overlap found.  In cases where the sensor vector
+%            completely overlaps a path segment and thus there are infinite
+%            points, the starting point of overlap is given. If a sensor
+%            starts on top of a path segment, the sensor's starting point
+%            and ending points are returned. If a sensor overlaps multiple
+%            path segments, the first and last point of overlap for each
+%            path segment is given. Outputs results as M x 1 and M x 2
+%            vectors respectively, where the M rows represent the ordered
+%            intersections. Some intersections may be repeated locations
+%            because if they occur on different path segments.
 %
-%            2: returns distances and locations of ALL the detected
-%            intersections of where the given sensor_vector overlaps the
-%            path (e.g., this gives ALL the results of the flag=0 case).
-%            Outputs results as M x 1 and M x 2 vectors respectively, where
-%            the M rows represent the ordered intersections.  In cases
-%            where the sensor vector completely overlaps a path segment and
-%            thus there are infinite points, only the start and end of
-%            overlap are given. Note that distance returned will always be
-%            positive because only the given sensor vector is checked.
+%      flag_search_range_type: an integer specifying if the range of the
+%      sensor and/or path segments to be evaluated. When projections are
+%      used, the range extends in the vector direction of the sensor and/or
+%      path, in both the negative and positive directions. Distances in the
+%      negative sensor direction are reported as negative values.
 %
-%            3: returns distance and location of the FIRST intersection if
-%            ANY projection of the path segments, in any direction, hits
-%            the sensor (in other words, if there is any intersection).
-%            This is the opposite behavior of the flag=1 case. Note that
-%            distance returned will always be positive because only the
-%            given sensor vector is checked.
-%
-%            4: returns distance and location of the FIRST intersection of
-%            any projection of the path segment vector, in any direction,
-%            hits the sensor or if any projection of the sensor vector, in
-%            any direction, hits the path segment (in other words, if there
-%            is any intersection of the lines that fit the sensor and every
-%            path segment). Note that distance returned will be negative if
-%            the nearest intersection is in the opposite direction of the
-%            given sensor vector.  If multple segments hit at the
-%            same intersection, the segment number of the first segment is
-%            returned.
+%            0: (default) the GIVEN sensor and GIVEN path used.
+%            1: ANY projection of the sensor used with the GIVEN path
+%            2: ANY projection of the path used with the GIVEN sensor
+%            3: ANY projection of BOTH the path and sensor
 %
 %      fig_num: a figure number to plot results. Turns debugging on.
 %
@@ -88,7 +84,7 @@ function [distance,location,path_segment, t, u] = ...
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_checkInputsToFunctions
+%      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
 %      
@@ -132,6 +128,7 @@ function [distance,location,path_segment, t, u] = ...
 %      2025_06_14 - S. Brennan
 %      -- added expanded plotting so not tight
 %      -- added fast mode, global flags, better input checking
+%      -- changed flag inputs to give more options and clearer usage
 
 %% Debugging and Input checks
 

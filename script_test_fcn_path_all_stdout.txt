@@ -1,0 +1,460 @@
+all_scripts.name
+
+ans =
+
+    'script_test_fcn_Path_addElevationToPath.m'
+
+
+ans =
+
+    'script_test_fcn_Path_calcDiffAnglesBetweenPathSegments.m'
+
+
+ans =
+
+    'script_test_fcn_Path_calcSingleTraversalStandardDeviation.m'
+
+
+ans =
+
+    'script_test_fcn_Path_calcYawFromPathSegments.m'
+
+
+ans =
+
+    'script_test_fcn_Path_calculateTransitionCurves.m'
+
+
+ans =
+
+    'script_test_fcn_Path_checkInputsToFunctions.m'
+
+
+ans =
+
+    'script_test_fcn_Path_cleanPathFromForwardBackwardJogs.m'
+
+
+ans =
+
+    'script_test_fcn_Path_convertPathToTraversalStructure.m'
+
+
+ans =
+
+    'script_test_fcn_Path_convertSt2XY.m'
+
+
+ans =
+
+    'script_test_fcn_Path_convertTraversalXYtoSy.m'
+
+
+ans =
+
+    'script_test_fcn_Path_convertXY2St.m'
+
+
+ans =
+
+    'script_test_fcn_Path_cutPathWithSegment.m'
+
+
+ans =
+
+    'script_test_fcn_Path_debugPrintStringToNCharacters.m'
+
+
+ans =
+
+    'script_test_fcn_Path_fillOffsetTraversalsAboutTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_fillPathViaUserInputs.m'
+
+
+ans =
+
+    'script_test_fcn_Path_fillRandomTraversalsAboutTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_fillSamplePaths.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findAverageTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findAverageTraversalViaClosestPoint.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findAverageTraversalViaOrthoProjection.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findAverageTraversalViaStationAlignment.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findCenterPathBetweenTwoPaths.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findCenterlineVoteFromTraversalToTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findClosestPointsToTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findIntersectionsBetweenTraversals.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findNearestPathPoints.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findOrthoScatterFromTraversalToTraversals.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findOrthogonalHitFromTraversalToTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findOrthogonalTraversalVectorsAtStations.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findPathOrthogonalVectors.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findProjectionHitOntoPath.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findTraversalStationSegment.m'
+
+
+ans =
+
+    'script_test_fcn_Path_findTraversalWithMostData.m'
+
+
+ans =
+
+    'script_test_fcn_Path_joinSegmentsWithArc.m'
+
+
+ans =
+
+    'script_test_fcn_Path_newTraversalByStationResampling.m'
+
+
+ans =
+
+    'script_test_fcn_Path_plotTraversalXYWithUpperLowerBands.m'
+
+
+ans =
+
+    'script_test_fcn_Path_plotTraversalXYWithVarianceBands.m'
+
+
+ans =
+
+    'script_test_fcn_Path_plotTraversalsXY.m'
+
+
+ans =
+
+    'script_test_fcn_Path_plotTraversalsYaw.m'
+
+
+ans =
+
+    'script_test_fcn_Path_removePinchPointInTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_snapPointOntoNearestTraversal.m'
+
+
+ans =
+
+    'script_test_fcn_Path_snapPointToPathViaVectors.m'
+
+whos all_scripts
+  Name              Size            Bytes  Class     Attributes
+
+  all_scripts      42x1             39028  struct              
+
+all_scripts(30)
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+       name: 'script_test_fcn_Path_findPathOrthogonalVectors.m'
+     folder: 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions'
+       date: '18-Jan-2024 13:48:44'
+      bytes: 3928
+      isdir: 0
+    datenum: 7.3927e+05
+
+all_scripts(31)
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+       name: 'script_test_fcn_Path_findProjectionHitOntoPath.m'
+     folder: 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions'
+       date: '15-Jun-2025 06:01:52'
+      bytes: 75350
+      isdir: 0
+    datenum: 7.3978e+05
+
+if system_dependent('IsDebugMode')==1, dbquit; end
+script_test_all_functions
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+file_name_extended
+
+file_name_extended =
+
+    'script_test_fcn_Path_findProjectionHitOntoPath.m'
+
+if system_dependent('IsDebugMode')==1, dbquit; end
+
+Single point intersection (2), flag (0), test 1 result: 
+Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('assert')" style="font-weight:bold">assert</a>
+Assertion failed.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 2123)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',2123,0)">line 2123</a>)
+        assert(isa(actual,expectedType));
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 137)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',137,0)">line 137</a>)
+fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
+
+opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',2123,0)
+script_test_fcn_Path_findProjectionHitOntoPath
+
+Single point intersection (2), flag (0), test 1 result: 
+<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',2112,1)">2112 </a>for ith_field = 1:Nfields
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+{Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('round')" style="font-weight:bold">round</a>
+First argument must be a numeric, logical, or char array.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 2123)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',2123,0)">line 2123</a>)
+        if ~isa(actual,expectedType) && isequal(size(actual),expectedSize) && isequal(round(actual,expectedValueDigits),expectedValue)
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 137)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',137,0)">line 137</a>)
+fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
+} 
+script_test_fcn_Path_findProjectionHitOntoPath
+
+Single point intersection (2), flag (0), test 1 result: 
+<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',2112,1)">2112 </a>for ith_field = 1:Nfields
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbcont; end
+{Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('isfield')" style="font-weight:bold">isfield</a>
+Not enough input arguments.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 2142)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',2142,0)">line 2142</a>)
+if isfield(plotting.FigureExpected) && plotting.FigureExpected==1
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 137)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',137,0)">line 137</a>)
+fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
+} 
+matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath>fcn_INTERNAL_checkTestCases', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 2142)
+help isfield
+ <strong>isfield</strong> True if field is in structure array.
+    <strong>isfield</strong>(S,FIELD) returns true if FIELD is the name of a field in the
+    structure array S. FIELD can be a character vector or a string.
+ 
+    TF = <strong>isfield</strong>(S,FIELDNAMES) returns a logical array, TF, the same size
+    as that of FIELDNAMES.  FIELDNAMES can be a string array or cell array of
+    character vectors. TF contains true for the elements of FIELDNAMES that
+    are the names of fields in the structure array S and false otherwise.
+ 
+    NOTE: TF is false when FIELD or FIELDNAMES are empty.
+ 
+    Example:
+       s = struct('one',1,'two',2);
+       fields = isfield(s,{'two','pi','One',3.14})
+ 
+    See also <a href="matlab:help getfield -displayBanner">getfield</a>, <a href="matlab:help setfield -displayBanner">setfield</a>, <a href="matlab:help fieldnames -displayBanner">fieldnames</a>, <a href="matlab:help orderfields -displayBanner">orderfields</a>, <a href="matlab:help rmfield -displayBanner">rmfield</a>,
+    <a href="matlab:help isstruct -displayBanner">isstruct</a>, <a href="matlab:help struct -displayBanner">struct</a>.
+
+    <a href="matlab:doc isfield">Documentation for isfield</a>
+    <a href="matlab:matlab.internal.language.introspective.overloads.displayOverloads('isfield')">Other uses of isfield</a>
+
+script_test_fcn_Path_findProjectionHitOntoPath
+
+Single point intersection (2), flag (0), test 1 result: 
+Distance 	 Location X 	 Location Y 
+10.000 		 5.000 			 10.000
+script_test_all_functions
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbcont; end
+<strong> </strong><strong>Testing script: 31 of 42, script_test_fcn_Path_findProjectionHitOntoPath
+
+</strong>Running script_test_fcn_Path_findProjectionHitOntoPath
+
+Single point intersection (2), flag (0), test 1 result: 
+Distance 	 Location X 	 Location Y 
+10.000 		 5.000 			 10.000
+...
+Done script_test_fcn_Path_findProjectionHitOntoPath
+__________
+
+if system_dependent('IsDebugMode')==1, dbcont; end
+<strong> </strong><strong>Testing script: 31 of 42, script_test_fcn_Path_findProjectionHitOntoPath
+
+</strong>Running script_test_fcn_Path_findProjectionHitOntoPath
+
+Single point intersection (2), flag (0), test 1 result: 
+
+================================================================================
+<strong>Error occurred in script_test_fcn_Path_findProjectionHitOntoPath/DemonstrationCases and it did not run to completion.</strong>
+    ---------
+    Error ID:
+    ---------
+    'MATLAB:narginchk:notEnoughInputs'
+    --------------
+    Error Details:
+    --------------
+    Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('distance')" style="font-weight:bold">distance</a>
+    Not enough input arguments.
+    
+    Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_test_fcn_Path_findProjectionHitOntoPath', 'D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m', 136)" style="font-weight:bold">script_test_fcn_Path_findProjectionHitOntoPath</a> (<a href="matlab: opentoline('D:\GitHubRepos\IVSG\PathPlanning\PathTools\PathClassLibrary\Functions\script_test_fcn_Path_findProjectionHitOntoPath.m',136,0)">line 136</a>)
+    fcn_INTERNAL_printResults(distance,location);
+================================================================================
+...
+Done script_test_fcn_Path_findProjectionHitOntoPath
+__________
+
+Failure Summary:
+
+     Name                                                               Failed  Incomplete  Reason(s)
+    ==================================================================================================
+     script_test_fcn_Path_findProjectionHitOntoPath/DemonstrationCases    X         X       Errored.
+<strong> </strong><strong>Testing script: 31 of 42, script_test_fcn_Path_findProjectionHitOntoPath
+
+</strong>Running script_test_fcn_Path_findProjectionHitOntoPath
+
+Single point intersection (2), flag (0), test 1 result: 
+Distance 	 Location X 	 Location Y 
+10.000 		 5.000 			 10.000
+...
+Done script_test_fcn_Path_findProjectionHitOntoPath
+__________
+
+<strong> </strong><strong>Testing script: 31 of 42, script_test_fcn_Path_findProjectionHitOntoPath
+
+</strong>Running script_test_fcn_Path_findProjectionHitOntoPath
+.
+Single point intersection (2), flag (0), test 1 result: 
+Distance 	 Location X 	 Location Y 
+10.000 		 5.000 			 10.000
+.
+Single point intersection (2), flag (0), test 1 result: 
+Distance 	 Location X 	 Location Y 
+10.000 		 5.000 			 10.000
+...
+Done script_test_fcn_Path_findProjectionHitOntoPath
+__________
+
+<strong> </strong><strong>Testing script: 31 of 42, script_test_fcn_Path_findProjectionHitOntoPath
+
+</strong>Running script_test_fcn_Path_findProjectionHitOntoPath
+.Figure: 10001 :Demo of short format checking
+.Figure: 10002 :Demo of long format checking
+..Figure: 20001 :Single point intersection (2), flag (0) - a simple intersection  
+.Figure: 20002 : Single point intersection (2), flag (0) - intersection through an acute vertex  
+.Figure: 20003 : Single point intersection (2), flag (0) - intersection through an obtuse vertex  
+.Figure: 20004 : Single point intersection (2), flag (0) - intersection at start of sensor  
+.Figure: 20005 : Single point intersection (2), flag (0) - intersection at end of sensor  
+.Figure: 20006 : Single point intersection (2), flag (0) - intersection at start of path  
+. Figure: 20007 : Single point intersection (2), flag (0), - intersection at end of path  
+.Figure: 21001 : Single point intersection (2), flag (1), - using flag to find intersection beyond sensor range, one path  
+.Figure: 21002 : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, one path  
+.Figure: 21003 : Single point intersection (2), flag (1), - using flag to find intersection beyond sensor range, multi path  
+.Figure: 21004 : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, multi path  
+.Figure: 21004 : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, multi path  
+.Simple test result, flag = 3, long sensor: 
+Distance 	 Location X 	 Location Y 
+12.019 		 6.667 			 10.000
+.Intersection beyond sensor range  
+Distance 	 Location X 	 Location Y 
+NaN 		 NaN 			 NaN
+Distance 	 Location X 	 Location Y 
+5.000 		 4.000 			 5.000
+Distance 	 Location X 	 Location Y 
+NaN 		 NaN 			 NaN
+Distance 	 Location X 	 Location Y 
+-1.000 		 4.000 			 5.000
+.Simple test result, flag = 4, long sensor: 
+Distance 	 Location X 	 Location Y 
+12.019 		 6.667 			 10.000
+.Simple test result, flag = 4, short sensor: 
+Distance 	 Location X 	 Location Y 
+12.019 		 6.667 			 10.000
+. No intersection  
+Distance 	 Location X 	 Location Y 
+0.000 		 0.000 			 0.000
+.No intersection  
+Distance 	 Location X 	 Location Y 
+0.000 		 0.000 			 0.000
+.No intersection  
+Distance 	 Location X 	 Location Y 
+-1.000 		 0.000 			 0.000
+..
+Done script_test_fcn_Path_findProjectionHitOntoPath
+__________
+
