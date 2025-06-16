@@ -547,9 +547,16 @@ if flag_do_plot
     end
     % goodAxis = axis;
 
-    % Plot the path in black
-    plot(path(:,1),path(:,2),'k.-','Linewidth',5);
-    handle_text = text(path(1,1),path(1,2),'Path');
+    % Plot the walls in black
+    Nwalls = length(wall_start(:,1));
+    allWallsX = [wall_start(:,1) wall_end(:,1) nan(Nwalls,1)];
+    allWallsX = reshape(allWallsX',1,[]);
+    allWallsY = [wall_start(:,2) wall_end(:,2) nan(Nwalls,1)];
+    allWallsY = reshape(allWallsY',1,[]);
+    allWalls = [allWallsX allWallsY];
+    
+    plot(allWalls(:,1),allWalls(:,2),'k.-','Linewidth',5);
+    handle_text = text(allWalls(1,1),allWalls(1,2),'Walls');
     set(handle_text,'Color',[0 0 0]);
 
     % Plot the sensor vector

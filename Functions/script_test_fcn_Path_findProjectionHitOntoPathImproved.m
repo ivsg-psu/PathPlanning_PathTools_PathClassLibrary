@@ -189,6 +189,41 @@ close all;
 %% Single point intersection (2), flag (0), test 1 - a simple intersection
 
 fig_num = 20001;
+plotting.FigureExpected = 1;
+
+testCases = fcn_INTERNAL_fillTestCases(fig_num);
+
+for ith_testCase = 1:length(testCases)
+    clear inputs
+    inputs.fig_num = fig_num;
+    inputs.path = [0 10; 10 10];
+    inputs.sensor_vector_start = [5 0];
+    inputs.sensor_vector_end   = [5 15];
+    inputs.flag_search_type = 0;
+
+    % SHORT format checking
+    clear expected
+    expected.distance = 10;
+    expected.location = [5 10];
+    expected.path_segment = 1;
+    expected.t = 0.5;
+    expected.u = 0.6667;
+
+    actual = struct;
+    [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
+        fcn_Path_findProjectionHitOntoPathImproved(...
+        inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
+        inputs.flag_search_type,inputs.fig_num);
+
+    fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
+    %fcn_INTERNAL_printResults(actual.distance,actual.location);
+
+end
+
+
+%% Single point intersection (2), flag (0), test 1 - a simple intersection
+
+fig_num = 20001;
 fprintf(1,'Figure: %.0f :Single point intersection (2), flag (0) - a simple intersection  \n',fig_num);
 figure(fig_num); clf;
 plotting.FigureExpected = 1;
@@ -2339,32 +2374,159 @@ end
 end
 
 %% fcn_INTERNAL_fillTestCases
-function testCases = fcn_INTERNAL_fillTestCases
+function testCases = fcn_INTERNAL_fillTestCases(fig_num)
+
+%%%%%%%%%%%%
+% FIGURE NUMBERING:
+% FSTXXX
+%
+% F is First figure number, starting with:
+% 1: demonstration cases
+% 2: single point intersection cases
+% 3: non intersection cases
+% 4: infinite intersection cases
+% 5: multi-hit cases
+% 6: multi-hit overlapping cases
+% 7: multi-hit multi-path cases
+% 8: fast mode cases
+% 9: known bug cases
+%
+% S is second figure number, flag_search_return_type:
+% 0: first intersection if there is any overlap
+% 1: all intersections, if there is overlap
+
+
+temp = sprintf('%.0d',fig_num);
+firstFigureNumber = str2double(temp(1));
+secondFigureNumber = str2double(temp(2));
+thirdFigureNumber = str2double(temp(3));
+fourthFigureNumber = str2double(temp(4));
+
+
+
+switch firstFigureNumber
+    case {2,3,4} % Single, nonIntersect, infinite intersect
+        % All are tested with single wall
+        wall_starts          = [0 0];
+        wall_ends            = [1 0];
+        Nintersections = 1;
+    case {5,6,7} % All multi-hit cases
+        % All are tested with single wall
+        wall_starts          = [0 0; 1 0;];
+        wall_ends            = [1 0; 1 1];
+        switch secondFigureNumber
+            case {0} % First intersection only
+                Nintersections = 1;
+            case {1} % First intersection only
+                Nintersections = 1;
+            otherwise
+                error('Second figure number not recognized');
+        end
+    otherwise
+        error('First figure number not recognized');
+end
+
+
+% T is second figure number, flag_search_range_type:
+% 0: (default) the GIVEN sensor and GIVEN path used.
+% 1: ANY projection of the sensor used with the GIVEN path
+% 2: ANY projection of the path used with the GIVEN sensor
+% 3: ANY projection of BOTH the path and sensor
+% The yStarts represents the y value that each sensor vector will start at
+% The xStarts represents the x value that each sensor vector will start at
+switch thirdFigureNumber
+    case {0}
+        xStartsWithIntersections = [0 0.5 1];
+        yStartsWithIntersections = [-1 -0.5 0];
+    case {1}
+        xStartsWithIntersections = [0 0.5 1];
+        yStartsWithIntersections = [-2 -1 -0.5 0 1];
+    case {2}
+        xStartsWithIntersections = [-1 0 0.5 1 2];
+        yStartsWithIntersections = [-1 -0.5 0];
+    case {3}
+        xStartsWithIntersections = [-1 0 0.5 1 2];
+        yStartsWithIntersections = [-2 -1 -0.5 0 1];
+    otherwise
+        error('THird figure number not recognized');
+end
+
+% t: is tolerance settings
+% 0: uses defaults
+% 1: uses positive tolerances
+% 2: uses negative tolerances
+switch fourthFigureNumber
+    case {0, 1}
+        % do nothing
+    case {2}
+        % xStarts are trimmed
+        if isequal(xStartsWithIntersections, [0 0.5 1])
+            xStartsWithIntersections = 0.5;
+        end
+        if isequal(yStartsWithIntersections,[-1 -0.5 0])
+            yStartsWithIntersections = 0.5;
+        end
+    otherwise
+        error('Fourth figure number not recognized');
+end
+
 ith_case = 0;
-
 testCases = struct;
+all_yStarts = [-2 -1 -0.5 0 1];
+all_xStarts = [-1 0 0.5 1 2];
 
-% One wall situations
-WallHeadContact = [0 0];
-WallMidContact  = [0.5 0];
-WallEndContact  = [1 0];
-
-yStarts = [-2 -1 -0.5 0 1];
-for jth_yStart = 1:length(yStarts)
-    thisY = yStarts(jth_yStart);
-    xStarts = [-1 0 0.5 1 2];
-    for ith_xStart = 1:length(xStarts)
-        thisX = xStarts(ith_xStart);
-
+% Fill in all the test cases
+for jth_yStart = 1:length(all_yStarts)
+    thisY = all_yStarts(jth_yStart);
+    for ith_xStart = 1:length(all_xStarts)
+        thisX = all_xStarts(ith_xStart);
         ith_case = ith_case+1;
-        testCases(ith_case).wall_start          = [0 0];
-        testCases(ith_case).wall_end            = [1 0];
+        testCases(ith_case).wall_start          = wall_starts;
+        testCases(ith_case).wall_end            = wall_ends;
         testCases(ith_case).sensor_vector_start = [thisX thisY];
         testCases(ith_case).sensor_vector_end   = [thisX thisY+1];
-        testCases(ith_case).expectedSolution    = WallHeadContact;
-        testCases(ith_case).expectedSolution    = WallMidContact;
-        testCases(ith_case).expectedSolution    = PathEndContact;
-        
+
+        if ismember(thisY,yStartsWithIntersections) && ismember(thisX, xStartsWithIntersections)
+            if Nintersections==1
+                testCases(ith_case).expectedSolution    = [thisX 0];
+            else
+                testCases(ith_case).expectedSolution    = [thisX 0; thisX 1];
+            end
+        else
+            testCases(ith_case).expectedSolution    = [nan nan];
+        end
+    end
+end
+
+
+% Plot all the test case results
+figure(fig_num);
+clf; hold on;
+axis equal;
+grid on;
+grid minor;
+
+% Plot the walls in black
+Nwalls = length(wall_starts(:,1));
+allWallsX = [wall_starts(:,1) wall_ends(:,1) nan(Nwalls,1)];
+allWallsX = reshape(allWallsX',1,[]);
+allWallsY = [wall_starts(:,2) wall_ends(:,2) nan(Nwalls,1)];
+allWallsY = reshape(allWallsY',1,[]);
+allWalls = [allWallsX' allWallsY'];
+
+plot(allWalls(:,1),allWalls(:,2),'k.-','Linewidth',1);
+
+for ith_testCase = 1:length(testCases)
+    handle_text = text(allWalls(1,1),allWalls(1,2),'Walls');
+    set(handle_text,'Color',[0 0 0]);
+
+    % Plot the sensor vector
+    quiver(testCases(ith_testCase).sensor_vector_start(1,1),testCases(ith_testCase).sensor_vector_start(1,2),0,1,'b','Linewidth',1,'MaxHeadSize',1);
+    
+    % Plot the predicted solution
+    solution = testCases(ith_testCase).expectedSolution;
+    if ~all(isnan(solution))
+        plot(solution(:,1),solution(:,2),'r.','MarkerSize',10);
     end
 end
 
