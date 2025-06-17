@@ -1,18 +1,18 @@
-function [distance,location,path_segment, t, u] = ...
+function [distance,location,wall_segment, t, u] = ...
     fcn_Path_findProjectionHitOntoPathImproved(...
     wall_start, wall_end, ...
     sensor_vector_start, sensor_vector_end, ...
     varargin)   
 %% fcn_Path_findProjectionHitOntoPathImproved 
-% calculates hits between a sensor projection and a path, returning the
+% calculates hits between a sensor projection and a wall, returning the
 % distance and location of the hit. Also returns as optional outputs which
-% path segment number was hit (e.g. segment 1, 2, 3, etc.) and the distance
-% along both that specific path segment (t) and the distance in the sensor
+% wall segment number was hit (e.g. segment 1, 2, 3, etc.) and the distance
+% along both that specific wall segment (t) and the distance in the sensor
 % direction (u).
 %
 % FORMAT: 
 %
-%      [distance, location, path_segment, t, u] = ...
+%      [distance, location, wall_segment, t, u] = ...
 %         fcn_Path_findProjectionHitOntoPathImproved(...
 %         wall_start, wall_end,...
 %         sensor_vector_start,sensor_vector_end,...
@@ -40,37 +40,37 @@ function [distance,location,path_segment, t, u] = ...
 %
 %            0: (default) returns distance and location of FIRST
 %            intersection only if the given sensor_vector overlaps the
-%            path. Returns [nan nan] if no overlap found.  In cases where
-%            the sensor vector completely overlaps a path segment and thus
+%            wall. Returns [nan nan] if no overlap found.  In cases where
+%            the sensor vector completely overlaps a wall segment and thus
 %            there are infinite points, only the starting point of overlap
-%            is given. If a sensor starts on top of a path segment, the
+%            is given. If a sensor starts on top of a wall segment, the
 %            sensor's starting point is returned. If a sensor overlaps
-%            multiple path segments at the start, only the first path
+%            multiple wall segments at the start, only the first wall
 %            segment is given.
 %
 %            1: returns distance and location of ALL intersections where
-%            the given sensor_vector overlaps the path. Returns [nan nan]
+%            the given sensor_vector overlaps the wall. Returns [nan nan]
 %            if no overlap found.  In cases where the sensor vector
-%            completely overlaps a path segment and thus there are infinite
+%            completely overlaps a wall segment and thus there are infinite
 %            points, the starting point of overlap is given. If a sensor
-%            starts on top of a path segment, the sensor's starting point
+%            starts on top of a wall segment, the sensor's starting point
 %            and ending points are returned. If a sensor overlaps multiple
-%            path segments, the first and last point of overlap for each
-%            path segment is given. Outputs results as M x 1 and M x 2
+%            wall segments, the first and last point of overlap for each
+%            wall segment is given. Outputs results as M x 1 and M x 2
 %            vectors respectively, where the M rows represent the ordered
 %            intersections. Some intersections may be repeated locations
-%            because if they occur on different path segments.
+%            because if they occur on different wall segments.
 %
 %      flag_search_range_type: an integer specifying if the range of the
-%      sensor and/or path segments to be evaluated. When projections are
+%      sensor and/or wall segments to be evaluated. When projections are
 %      used, the range extends in the vector direction of the sensor and/or
-%      path, in both the negative and positive directions. Distances in the
+%      wall, in both the negative and positive directions. Distances in the
 %      negative sensor direction are reported as negative values.
 %
-%            0: (default) the GIVEN sensor and GIVEN path used.
-%            1: ANY projection of the sensor used with the GIVEN path
-%            2: ANY projection of the path used with the GIVEN sensor
-%            3: ANY projection of BOTH the path and sensor
+%            0: (default) the GIVEN sensor and GIVEN wall used.
+%            1: ANY projection of the sensor used with the GIVEN wall
+%            2: ANY projection of the wall used with the GIVEN sensor
+%            3: ANY projection of BOTH the wall and sensor
 %
 %      tolerance: (default is 1000*eps) How close points must be to a
 %      segment to be counted as intersecting. Positive values are
@@ -95,14 +95,14 @@ function [distance,location,path_segment, t, u] = ...
 % OUTPUTS:
 %
 %      distance: a 1 x 1 scalar representing the distance to the closest
-%      intersection of the sensor with the path
+%      intersection of the sensor with the wall
 %
 %      location: a 1 x 2 vector of the X,Y location of intersection point
 %
-%      path_segment: the segment number of the path that was hit (1 is the
+%      wall_segment: the segment number of the wall that was hit (1 is the
 %      first segment, 2 is the second, etc)
 %
-%       t and u: t is distance along the path, and u is distance
+%       t and u: t is distance along the wall, and u is distance
 %       along the sensor, as fractions of the input vector lengths.    
 %
 % DEPENDENCIES:
@@ -122,22 +122,22 @@ function [distance,location,path_segment, t, u] = ...
 %      2020_11_14 - S. Brennan
 %      - wrote the code
 %      2020_12_29 - S. Brennan
-%      - fixed bug with missing sensor vector if starts on a path
+%      - fixed bug with missing sensor vector if starts on a wall
 %      - added better comments
 %      2020_12_31 - S. Brennan 
 %      - fixed the input arguments so that they are more clear (start/end)
 %      - fixed the incorrect location of the debug echo at top of the code
 %      - fixed flag usage to decouple plotting with debugging
 %      2021_01_08 
-%      -- Added input check on path type
+%      -- Added input check on wall type
 %      2021_01_23 - S. Brennan
 %      -- Added flag_search_type = 2 option, to allow multiple cross points
 %      to be returned
 %      -- Fixed bug with partially overlapping vectors not returning a
 %      result
-%      -- Added path segment output so that we can ID which segment was hit
+%      -- Added wall segment output so that we can ID which segment was hit
 %      2021_01_24 - S. Brennan
-%      -- Fixed bug with overlapping colinear where two path segments
+%      -- Fixed bug with overlapping colinear where two wall segments
 %      identified when there is only one
 %      2021_12_27 - S. Brennan
 %      -- Added better comments on flags
@@ -222,24 +222,33 @@ end
 % Is the user entering a flag_search_return_type?
 flag_search_return_type = 0;
 if 5 <= nargin
-    flag_search_return_type = varargin{1};
+    temp = varargin{1};
+    if ~isempty(temp)
+        flag_search_return_type = temp;
+    end
 end
 
 % Is the user entering a flag_search_range_type?
 flag_search_range_type = 0;
 if 6 <= nargin
-    flag_search_range_type = varargin{2};
+    temp = varargin{2};
+    if ~isempty(temp)
+        flag_search_range_type = temp;
+    end
 end
 
 % Is the user entering a tolerance?
 tolerance = eps*1000;
 if 7 <= nargin
-    tolerance = varargin{3};
+    temp = varargin{3};
+    if ~isempty(temp)
+        tolerance = temp;
+    end
 end
 
 % Does user want to show the plots?
 flag_do_plot = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (5 == nargin) 
+if (0==flag_max_speed) && (8 == nargin) 
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
@@ -383,10 +392,10 @@ end
 
 
 
-% Calculate t and u, where t is distance along the path, and u is distance
+% Calculate t and u, where t is distance along the wall, and u is distance
 % along the sensor.
 
-t = q_minus_p_cross_s./r_cross_s; % Distance along the path
+t = q_minus_p_cross_s./r_cross_s; % Distance along the wall
 u = q_minus_p_cross_r./r_cross_s; % Distance along the sensor
 
 % Fix any situations that are parallel and non-intersecting, as these will
@@ -420,9 +429,17 @@ if any(colinear_indices)
 
 end
 
-% Initialize all intersections to infinity
-intersections = NaN*ones(length(p(:,1)),2);
 
+%% Apply flag_search_range_type
+% 0: (default) the GIVEN sensor and GIVEN wall used.
+% 1: ANY projection of the sensor used with the GIVEN wall
+% 2: ANY projection of the wall used with the GIVEN sensor
+% 3: ANY projection of BOTH the wall and sensor
+% 
+% To apply these, we impose restrictions on:
+% t: the scalar denoting the percentage along the wall vector of intersect
+% u: the scalar denoting the percentage along the sensor vector of intersect
+%
 % Note: Since doing many segments at once, need to use vector form (e.g.
 % the .* format of dot products).
 % 
@@ -432,56 +449,79 @@ intersections = NaN*ones(length(p(:,1)),2);
 % "graze" next to each other. For example, the segment from (0,0) to
 % (1,0) barely grazes the segment from (0.5,0) to (0.5,1).
 
-tolerance = eps*1000;
-zero_threshold = 0 - tolerance;
+zero_threshold = 0 - tolerance;  % Positive tolerance assumed
 one_threshold  = 1 + tolerance;
-if 0 == flag_search_type
+if 0 == flag_search_range_type
+    % 0: (default) the GIVEN sensor and GIVEN wall used.
+    % This constrains both t (wall extent) and u (sensor extent)
     good_vector = ((zero_threshold<=t).*(one_threshold>=t).*(zero_threshold<=u).*(one_threshold>=u));
-elseif 1 == flag_search_type
+elseif 1 == flag_search_range_type
+    % 1: ANY projection of the sensor used with the GIVEN wall
+    % This constrains ONLY t (wall extent) 
     good_vector = ((zero_threshold<=t).*(one_threshold>=t));
-elseif 2 == flag_search_type
-    good_vector = ((zero_threshold<=t).*(one_threshold>=t).*(zero_threshold<=u).*(one_threshold>=u));
-elseif 3 == flag_search_type           % Changed on 2024_03_14
+elseif 2 == flag_search_range_type
+    % 2: ANY projection of the wall used with the GIVEN sensor
+    % This constrains ONLY u (sensor extent) 
     good_vector = ((zero_threshold<=u).*(one_threshold>=u));
-elseif 4 == flag_search_type           % Changed on 2024_03_14
+elseif 3 == flag_search_range_type
+    % 3: ANY projection of BOTH the wall and sensor
+    % NO constraints
     good_vector = ((Inf>u).*(Inf>t));
 else
-    error('Incorrect flag_search_type entered');
+    warning('on','backtrace');
+    warning('Expecting a flag_search_range_type as integer in range of 0 to 3, but found: %.3f',flag_search_range_type);
+    error('Bad flag_search_range_type encountered');
 end
 
 % Keep only the indices that work
 good_indices = find(good_vector>0);
 
+% Initialize all intersections to infinity
+intersections = NaN*ones(length(p(:,1)),2);
 if ~isempty(good_indices)
+    % Calculate the intersection point (finally)
     result = p + t.*r; 
     intersections(good_indices,:) = result(good_indices,:);    
 end
+
+
+%% Apply flag_search_return_type
+% 0: (default) returns results of FIRST intersection
+% 1: returns distance and location of ALL intersections
+
 
 % Find the distances via Euclidian distance to the sensor's origin
 % note: a faster way to do this might be to just
 % calculate t*r as a length
 distances_squared = sum((intersections - sensor_vector_start).^2,2);
 
-if (flag_search_type ==0) || (flag_search_type==1) || (flag_search_type ==3) || (flag_search_type ==4)
-    % Keep just the minimum distance
+if 0==flag_search_return_type
+    % Keep only the minimum distance
     [closest_distance_squared,closest_index] = min(distances_squared);
     
     distance = closest_distance_squared^0.5*sign(u(closest_index));
     location = intersections(closest_index,:);
-    path_segment = wall_indexes(closest_index);
+    wall_segment = wall_indexes(closest_index);
 
     if isnan(distance)
-        path_segment = nan;
+        wall_segment = nan;
     end
-elseif flag_search_type ==2
+elseif 1==flag_search_return_type
     % Return all the results
-    good_indices = find(~isnan(distances_squared));
-    distance = distances_squared(good_indices).^0.5.*sign(u(good_indices));
-    location = intersections(good_indices,:);
-    path_segment = wall_indexes(good_indices);
-
+    if all(isnan(distances_squared))
+        distance = nan;
+        location = [nan nan];
+        wall_segment = nan;
+    else
+        good_indices = find(~isnan(distances_squared));
+        distance = distances_squared(good_indices).^0.5.*sign(u(good_indices));
+        location = intersections(good_indices,:);
+        wall_segment = wall_indexes(good_indices);
+    end
 else
-    error('unexpected flag_search_type')
+    warning('on','backtrace');
+    warning('Expecting a flag_search_return_type as integer with values of 0 or 1, but found: %.3f',flag_search_return_type);
+    error('Bad flag_search_range_type encountered');
 end
 
 %% Any debugging?
@@ -512,9 +552,17 @@ if flag_do_plot
     axis equal;
     grid on; grid minor;
     
+    % Find all the walls in one plottable format
+    Nwalls = length(wall_start(:,1));
+    allWallsX = [wall_start(:,1) wall_end(:,1) nan(Nwalls,1)];
+    allWallsX = reshape(allWallsX',1,[]);
+    allWallsY = [wall_start(:,2) wall_end(:,2) nan(Nwalls,1)];
+    allWallsY = reshape(allWallsY',1,[]);
+    allWalls = [allWallsX' allWallsY'];
+
 
     % Find size of plotting domain
-    allPoints = [path; sensor_vector_start; sensor_vector_end];
+    allPoints = [allWalls; sensor_vector_start; sensor_vector_end];
 
     max_plotValues = max(allPoints);
     min_plotValues = min(allPoints);
@@ -547,14 +595,7 @@ if flag_do_plot
     end
     % goodAxis = axis;
 
-    % Plot the walls in black
-    Nwalls = length(wall_start(:,1));
-    allWallsX = [wall_start(:,1) wall_end(:,1) nan(Nwalls,1)];
-    allWallsX = reshape(allWallsX',1,[]);
-    allWallsY = [wall_start(:,2) wall_end(:,2) nan(Nwalls,1)];
-    allWallsY = reshape(allWallsY',1,[]);
-    allWalls = [allWallsX allWallsY];
-    
+    % Plot the walls in black   
     plot(allWalls(:,1),allWalls(:,2),'k.-','Linewidth',5);
     handle_text = text(allWalls(1,1),allWalls(1,2),'Walls');
     set(handle_text,'Color',[0 0 0]);
