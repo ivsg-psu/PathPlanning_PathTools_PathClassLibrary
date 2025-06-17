@@ -39,13 +39,13 @@ close all
 % 2: ANY projection of the wall used with the GIVEN sensor
 % 3: ANY projection of BOTH the wall and sensor
 %
-% t: is tolerance 
+% t: is tolerance
 % 0: uses defaults
 % 1: uses positive tolerances
 % 2: uses negative tolerances
 %
 % XX: 4th to 6th number: a counter that counts up through the cases in this
-% section. 
+% section.
 %
 % Example:
 % 213206 plots a single point intersection, flag_search_return_type type 4, flag_search_range_type of 3, negative tolerances, 6th test case
@@ -71,7 +71,7 @@ plotting.FigureExpected = 1;
 
 clear inputs
 inputs.fig_num = fig_num;
-inputs.wall_start = [0 10]; 
+inputs.wall_start = [0 10];
 inputs.wall_end   = [10 10];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 15];
@@ -108,7 +108,7 @@ Nsolutions = 1;
 
 clear inputs
 inputs.fig_num = fig_num;
-inputs.wall_start = [0 10]; 
+inputs.wall_start = [0 10];
 inputs.wall_end   = [10 10];
 
 inputs.sensor_vector_start = [5 0];
@@ -175,7 +175,7 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 close all;
 
-%% Single point intersection 2XXX1 cases 
+%% Single point intersection 2XXX1 cases
 % flag_search_return_type 0: first intersection if there is any overlap
 % flag_search_range_type  0: (default) the GIVEN sensor and GIVEN wall used.
 % tolerance 0: uses defaults
@@ -1432,6 +1432,7 @@ if length(vector)>2
 else
     trimmed = vector;
 end
+end
 
 %% fcn_INTERNAL_fillTestCases
 function testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num)
@@ -1466,16 +1467,18 @@ switch firstFigureNumber
         sensorLengthY = 1;
         totalRangeX = [-1 0 0.5 1 2];
         totalRangeY = [-2 -1 -0.5 0 1];
-        
+        flag_testTolerance = 1;
+
         Nintersections = 1;
     case {3} % Infinite intersect cases
         % All are tested with single wall
         wall_starts          = [0 0];
         wall_ends            = [1 0];
-        sensorLengthX = 0;
-        sensorLengthY = 1;
-        totalRangeX = [-1 0 0.5 1 2];
-        totalRangeY = [-2 -1 -0.5 0 1];
+        sensorLengthX = 1;
+        sensorLengthY = 0;
+        totalRangeX = [-0.5 0 0.5];
+        totalRangeY = 0;
+        flag_testTolerance = 0;
 
         Nintersections = 2;
     case {5,6,7} % All multi-hit cases
@@ -1536,7 +1539,7 @@ switch thirdFigureNumber
         error('Third figure number not recognized');
 end
 
-% t: is tolerance 
+% t: is tolerance
 % 0: uses defaults
 % 1: uses positive tolerances
 % 2: uses negative tolerances
@@ -1550,12 +1553,14 @@ switch fourthFigureNumber
     case {2}
         % Negative tolerance
         tolerance = -0.001;
-        % xStarts are trimmed
-        if isequal(xStartsWithIntersections, [0 0.5 1])
-            xStartsWithIntersections = 0.5;
-        end
-        if isequal(yStartsWithIntersections,[-1 -0.5 0])
-            yStartsWithIntersections = -0.5;
+        % xStarts are trimmed?
+        if flag_testTolerance == 1
+            if isequal(xStartsWithIntersections, [0 0.5 1])
+                xStartsWithIntersections = 0.5;
+            end
+            if isequal(yStartsWithIntersections,[-1 -0.5 0])
+                yStartsWithIntersections = -0.5;
+            end
         end
     otherwise
         warning('on','backtrace');
