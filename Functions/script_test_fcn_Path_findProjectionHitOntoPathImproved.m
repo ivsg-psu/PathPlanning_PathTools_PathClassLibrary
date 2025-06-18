@@ -261,8 +261,8 @@ close all;
 % URHERE
 
 intersectionTestType = 3;
-return_flags = 0; % [0 1];
-range_flags  = 1;  % [0 1 2 3];
+return_flags = [0 1];
+range_flags  = [0 1 2 3];
 tolerance_flags = 0; %[0 1 2];
 thisCase = 1;
 
@@ -281,7 +281,7 @@ for ith_return = 1:length(return_flags)
             % Build the test cases
             testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
 
-            for ith_testCase = 5:length(testCases)
+            for ith_testCase = 1:length(testCases)
 
                 % Plot the sensor vector in red, to highlight which one we're on
                 vectorX = testCases(ith_testCase).sensor_vector_end(1,1) - testCases(ith_testCase).sensor_vector_start(1,1);
@@ -1298,6 +1298,19 @@ end % Ends loop throough return flags
 % figHandles = get(groot, 'Children');
 % assert(~any(figHandles==fig_num));
 
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
 %% fcn_INTERNAL_printResults
 function fcn_INTERNAL_printResults(distance,location) %#ok<DEFNU>
 fprintf(1,'Distance \t Location X \t Location Y \n');
@@ -1367,7 +1380,7 @@ for ith_field = 1:Nfields
     catch
         disp('stop here');
     end
-    if all(isnan(thisVariable)) && ~all(isnan(thisVariable))
+    if all(isnan(thisVariable),'all') && ~all(isnan(thisVariable),'all')
         flag_errorWillBeThrown = 1;
     end
     if 1==flag_errorWillBeThrown
@@ -1489,7 +1502,7 @@ switch firstFigureNumber
         totalRangeY = [-2 -1 -0.5 0 1];
         flag_testTolerance = 1;
 
-        Nintersections = 1;
+        % Nintersections = 1;
 
         % If ANY projections are used, the end points of the range will have
         % intersections. But if GIVEN projections are used, only the values from
@@ -1611,9 +1624,9 @@ for jth_yStart = 1:length(all_yStarts)
         thisX = all_xStarts(ith_xStart);
         ith_case = ith_case+1;
         % FOR DEBUGGING
-        % if ith_case == 5
-        %     disp('stop here');
-        % end
+        if ith_case == 4
+            disp('stop here');
+        end
         testCases(ith_case).wall_start          = wall_starts;
         testCases(ith_case).wall_end            = wall_ends;
         testCases(ith_case).sensor_vector_start = [thisX thisY];
@@ -1626,52 +1639,91 @@ for jth_yStart = 1:length(all_yStarts)
         % Fill in expected values
         switch firstFigureNumber
             case {2} % Single intersect cases
+                wall_segments    = [1; 1]; % Default
                 if ismember(thisY,yStartsWithIntersections) && ismember(thisX, xStartsWithIntersections)
-                    testCases(ith_case).expected.Intersection    = [thisX 0];
-                    testCases(ith_case).expected.Distance    = 0 - thisY;
+                    intersections    = [thisX 0];
+                    distances    = 0 - thisY;
                     testCases(ith_case).expected.wall_segment = 1;
                 else
-                    testCases(ith_case).expected.Intersection    = [nan nan];
-                    testCases(ith_case).expected.Distance    = nan;
+                    intersections    = [nan nan];
+                    distances    = nan;
                     testCases(ith_case).expected.wall_segment = nan;
                 end
-                testCases(ith_case).expected.t     = thisX;
-                testCases(ith_case).expected.u     = -thisY;
+                tValues     = thisX;
+                uValues     = -thisY;
 
             case {3} % Infinite intersect cases
+                wall_segments    = [1; 1]; % Default
+                if thisX<0
+                    distanceSensorStartToWallStart = 0 - thisX;
+                elseif thisX>=0 && thisX<=1
+                    distanceSensorStartToWallStart = 0;
+                else
+                    distanceSensorStartToWallStart = 1 - thisX;                    
+                end
+                maxXstart = max(thisX,0);
+                minXend   = min(thisX+1,1);
+
+                % URHERE
+
                 % If tolerance is negative, the lines NEVER intersect
                 % (fourthFigureNumber == 2)
                 if ismember(thisX, xStartsWithIntersections) && fourthFigureNumber~=2
-                    maxXstart = max(thisX,0);
-                    minXend   = min(thisX+1,1);
-                    if thisX<0
-                        distanceStart = -thisX;
-                    else
-                        distanceStart = 0;
+                    switch flag_search_range_type
+                        case {0}
+                            if thirdFigureNumber==0 || secondFigureNumber==0
+                                intersections    = [maxXstart 0];
+                            else
+                                intersections    = [maxXstart 0; minXend 0];
+                            end
+                            distances   = distanceSensorStartToWallStart;
+                            tValues     = [maxXstart; minXend];
+                            uValues     = [distanceSensorStartToWallStart; minXend-thisX];
+                        case {1}
+                            intersections = [0 0; 1 0];
+                            distances     = [0-thisX; 1-thisX];
+                            tValues       = [0; 1];
+                            uValues       = [0-thisX; 0-thisX+1];
+                            if thisX>1 && flag_search_return_type==0
+                                % Vector is beyond end of segment, so
+                                % closest intersection is the endpoint
+                                intersections = flipud(intersections);
+                                distances     = flipud(distances);
+                                tValues       = flipud(tValues);
+                                uValues       = flipud(uValues);
+                            end
+                        otherwise
+
                     end
-                    if thirdFigureNumber==0 || secondFigureNumber==0
-                        testCases(ith_case).expected.Intersection    = [maxXstart 0];
-                    else
-                        testCases(ith_case).expected.Intersection    = [maxXstart 0; minXend 0];
-                    end
-                    testCases(ith_case).expected.Distance        = distanceStart;
-                    testCases(ith_case).expected.wall_segment = 1;
-                    testCases(ith_case).expected.t     = [maxXstart; minXend];
-                    testCases(ith_case).expected.u     = [distanceStart; minXend-thisX];
 
                 else
-                    testCases(ith_case).expected.Intersection    = [nan nan];
-                    testCases(ith_case).expected.Distance    = nan;
-                    testCases(ith_case).expected.wall_segment = nan;
-                    testCases(ith_case).expected.t     = nan;
-                    testCases(ith_case).expected.u     = nan;
+                    intersections    = [nan nan];
+                    distances     = nan;
+                    wall_segments = nan;
+                    tValues       = nan;
+                    uValues       = nan;
                 end
+
+
             otherwise
                 warning('on','backtrace');
                 warning('Expecting a first figure number with integer values of 2 to 7, but found: %.3f',firstFigureNumber);
                 error('Third figure number not recognized');
         end
-
+        % Check if 2 solutions or 1 solution requested
+        if flag_search_return_type==0
+            testCases(ith_case).expected.Intersection    = intersections(1,:);
+            testCases(ith_case).expected.Distance        = distances(1);
+            testCases(ith_case).expected.wall_segment    = wall_segments(1);
+            testCases(ith_case).expected.t               = tValues(1);
+            testCases(ith_case).expected.u               = uValues(1);
+        else
+            testCases(ith_case).expected.Intersection    = intersections;
+            testCases(ith_case).expected.Distance        = distances;
+            testCases(ith_case).expected.wall_segment    = wall_segments;
+            testCases(ith_case).expected.t               = tValues;
+            testCases(ith_case).expected.u               = uValues;
+        end
     end
 end
 

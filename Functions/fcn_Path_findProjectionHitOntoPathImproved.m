@@ -300,10 +300,10 @@ r = wall_end - wall_start;
 s = sensor_vector_end - sensor_vector_start;
 
 % Define useful intermediate terms. CrossProduct if function defined below.
-r_cross_s = crossProduct(r,s);
+r_cross_s = fcn_INTERNAL_crossProduct(r,s);
 q_minus_p =  q - p;
-q_minus_p_cross_s = crossProduct(q_minus_p,s);
-q_minus_p_cross_r = crossProduct(q_minus_p,r);
+q_minus_p_cross_s = fcn_INTERNAL_crossProduct(q_minus_p,s);
+q_minus_p_cross_r = fcn_INTERNAL_crossProduct(q_minus_p,r);
 
 %% Step 1: find t and u values for all cases
 
@@ -324,8 +324,8 @@ end
 % Calculate t and u, where t is distance along the wall, and u is distance
 % along the sensor.
 
-t = q_minus_p_cross_s./r_cross_s; % Distance along the wall
-u = q_minus_p_cross_r./r_cross_s; % Distance along the sensor
+tValues = q_minus_p_cross_s./r_cross_s; % Distance along the wall
+uValues = q_minus_p_cross_r./r_cross_s; % Distance along the sensor
 
 %%%%%
 % Parallel cases are nan
@@ -338,8 +338,8 @@ u = q_minus_p_cross_r./r_cross_s; % Distance along the sensor
 %
 % Fix any situations that are parallel as these will give wrong calculation
 % results from the t and u calculations above
-t(flag_isParallel) = nan;
-u(flag_isParallel) = nan;
+tValues(flag_isParallel) = nan;
+uValues(flag_isParallel) = nan;
 
 %%%%
 % Fix these collinear cases (e.g. on same line)
@@ -380,8 +380,8 @@ if any(collinear_indices)
     r_dot_r = sum(r.*r,2);
     s_dot_s = sum(s.*s,2);
     q_minus_p_dot_r = sum(q_minus_p.*r,2);
-    p_minus_q_dot_s = sum(-q_minus_p.*s,2);
-    r_minus_q_dot_s = sum((r - q).*s,2);
+    % p_minus_q_dot_s = -q_minus_p_dot_r; % sum(-q_minus_p.*s,2);
+    % r_minus_q_dot_s = sum((r - q).*s,2);
     s_dot_r = sum(s.*r,2);
 
     % Calculate raw t's and u's. As a reminder, the t coordinates say where
@@ -391,8 +391,8 @@ if any(collinear_indices)
     % useful and are returned as function outputs.
     t0_alongwall = q_minus_p_dot_r./r_dot_r;
     t1_alongwall = t0_alongwall + s_dot_r./r_dot_r;
-    u0_alongsensor = p_minus_q_dot_s./s_dot_s;
-    u1_alongsensor = u0_alongsensor + s_dot_r./s_dot_s;
+    % u0_alongsensor = -q_minus_p_dot_r./s_dot_s;
+    % u1_alongsensor = u0_alongsensor + s_dot_r./s_dot_s;
     
        
     %%%%%
@@ -405,7 +405,7 @@ if any(collinear_indices)
     % 3: ANY projection of BOTH the wall and sensor
 
     % Are we not in "any projection of the wall mode"?
-    if flag_search_range_type==0 || flag_search_range_type==1
+    if flag_search_range_type==0 
         % Check whether there is overlap by seeing of the t0 and t1 values are
         % within the interval of [0 1], endpoint inclusive. The meaning of the
         % variables is as follows:
@@ -420,52 +420,65 @@ if any(collinear_indices)
         rangefixed_collinear_indices_t = intersect(collinear_indices,within_indices);
 
         % Fix the ranges to be within 0 and 1
-        t0_alongwall(rangefixed_collinear_indices_t) = max(0,t0_alongwall(rangefixed_collinear_indices_t));
-        t0_alongwall(rangefixed_collinear_indices_t) = min(1,t0_alongwall(rangefixed_collinear_indices_t));
+        t0_alongwall(rangefixed_collinear_indices_t) = fcn_INTERNAL_saturateRange(t0_alongwall(rangefixed_collinear_indices_t));       
+        t1_alongwall(rangefixed_collinear_indices_t) = fcn_INTERNAL_saturateRange(t1_alongwall(rangefixed_collinear_indices_t));       
 
-        t1_alongwall(rangefixed_collinear_indices_t) = max(0,t1_alongwall(rangefixed_collinear_indices_t));
-        t1_alongwall(rangefixed_collinear_indices_t) = min(1,t1_alongwall(rangefixed_collinear_indices_t));
+        % The following converts t-values into u-values
+        u0_alongsensor = (-q_minus_p_dot_r+t0_alongwall)*r_dot_r/s_dot_s; % p_minus_q_dot_s./r_dot_r;
+        u1_alongsensor = (-q_minus_p_dot_r+t1_alongwall)*r_dot_r/s_dot_s; %r_minus_q_dot_s./r_dot_r;
 
-    else
-        % Any projection of the wall is used, so wall defaults to 0 and 1
-        rangefixed_collinear_indices_t = collinear_indices;
+        % Fix the u0 and u1 values to be within range of 0 and 1
+        u0_alongsensor(rangefixed_collinear_indices_t) = fcn_INTERNAL_saturateRange(u0_alongsensor(rangefixed_collinear_indices_t));
+        u1_alongsensor(rangefixed_collinear_indices_t) = fcn_INTERNAL_saturateRange(u1_alongsensor(rangefixed_collinear_indices_t));
+
+    elseif flag_search_range_type==1
+        % This is the case where the sensor projects, but the wall stays
+        % where it is at. So the sensor ALWAYS hits the wall at t=0 and
+        % t=1, because it always overlaps the wall
         t0_alongwall(collinear_indices) = 0;
         t1_alongwall(collinear_indices) = 1;
-    end
 
-    % Are we not in "any projection of the sensor mode"?
-    if flag_search_range_type==0 || flag_search_range_type==2
-
-        % Fix the sensor range also
-        % Check whether there is overlap by seeing of the r0 and r1 values are
-        % within the interval of [0 1], endpoint inclusive. The meaning of the
-        % variables is as follows:
-        % r0_inside means the start of the wall is "inside" a sensor.
-        % r1_inside means the end of the wall is "inside" a sensor.
-        % (NOT USED) r0_r1_surround means the wall starts before a sensor and ends after a sensor.
-        u0_inside = (u0_alongsensor>=0)&(u0_alongsensor<=1); % Wall inside sensor's start
-        u1_inside = (u1_alongsensor>=0)&(u1_alongsensor<=1); % Wall inside sensor's end
-        % r0_r1_surround = (r0_alongsensor<0)&(r1_alongsensor>1) | (r1_alongsensor<0)&(r0_alongsensor>1);
-        any_within = u0_inside | u1_inside; % | r0_r1_surround;
-        within_indices = find(any_within);
-        rangefixed_collinear_indices_u = intersect(collinear_indices,within_indices);
-
-        % Fix the ranges to be within 0 and 1
-        u0_alongsensor(rangefixed_collinear_indices_u) = max(0,u0_alongsensor(rangefixed_collinear_indices_u));
-        u0_alongsensor(rangefixed_collinear_indices_u) = min(1,u0_alongsensor(rangefixed_collinear_indices_u));
-
-        u1_alongsensor(rangefixed_collinear_indices_u) = max(0,u1_alongsensor(rangefixed_collinear_indices_u));
-        u1_alongsensor(rangefixed_collinear_indices_u) = min(1,u1_alongsensor(rangefixed_collinear_indices_u));
-
+        % The following converts t-values into u-values
+        u0_alongsensor = -t0_alongwall*r_dot_r/s_dot_s; % p_minus_q_dot_s./r_dot_r;
+        u1_alongsensor = -t1_alongwall*r_dot_r/s_dot_s; %r_minus_q_dot_s./r_dot_r;
     else
-        % Any projection of the sensor is used, so sensor defaults to wall
-        % NOTE: in sensor coordinates (u values), the wall starts at: 
-        % p_minus_q_dot_s./r_dot_r
-        % and ends at:
-        % r_minus_q_dot_s./r_dot_r
-        u0_alongsensor(collinear_indices) = p_minus_q_dot_s./r_dot_r;
-        u1_alongsensor(collinear_indices) = r_minus_q_dot_s./r_dot_r;
+        % Any projection of the wall is used, the wall will be hit at t0
+        % and t1 values previously calculated
     end
+
+    % % Are we not in "any projection of the sensor mode"?
+    % if flag_search_range_type==0 || flag_search_range_type==2
+    % 
+    %     % Fix the sensor range also
+    %     % Check whether there is overlap by seeing of the r0 and r1 values are
+    %     % within the interval of [0 1], endpoint inclusive. The meaning of the
+    %     % variables is as follows:
+    %     % r0_inside means the start of the wall is "inside" a sensor.
+    %     % r1_inside means the end of the wall is "inside" a sensor.
+    %     % (NOT USED) r0_r1_surround means the wall starts before a sensor and ends after a sensor.
+    %     u0_inside = (u0_alongsensor>=0)&(u0_alongsensor<=1); % Wall inside sensor's start
+    %     u1_inside = (u1_alongsensor>=0)&(u1_alongsensor<=1); % Wall inside sensor's end
+    %     % r0_r1_surround = (r0_alongsensor<0)&(r1_alongsensor>1) | (r1_alongsensor<0)&(r0_alongsensor>1);
+    %     any_within = u0_inside | u1_inside; % | r0_r1_surround;
+    %     within_indices = find(any_within);
+    %     rangefixed_collinear_indices_u = intersect(collinear_indices,within_indices);
+    % 
+    %     % % Fix the ranges to be within 0 and 1
+    %     % u0_alongsensor(rangefixed_collinear_indices_u) = max(0,u0_alongsensor(rangefixed_collinear_indices_u));
+    %     % u0_alongsensor(rangefixed_collinear_indices_u) = min(1,u0_alongsensor(rangefixed_collinear_indices_u));
+    %     % 
+    %     % u1_alongsensor(rangefixed_collinear_indices_u) = max(0,u1_alongsensor(rangefixed_collinear_indices_u));
+    %     % u1_alongsensor(rangefixed_collinear_indices_u) = min(1,u1_alongsensor(rangefixed_collinear_indices_u));
+    % 
+    % else
+    %     % Any projection of the sensor is used, so sensor defaults to wall
+    %     % NOTE: in sensor coordinates (u values), the wall starts at: 
+    %     % p_minus_q_dot_s./r_dot_r
+    %     % and ends at:
+    %     % r_minus_q_dot_s./r_dot_r
+    % 
+    % end
+
 
 
     % Fix any situations that are colinear. For these, we save the start point
@@ -473,8 +486,8 @@ if any(collinear_indices)
     % Note that this creates NEW intersections beyond the number of segements.
 
     % Fill t vector with collinear starting points
-    t(collinear_indices) = t0_alongwall(collinear_indices);
-    u(collinear_indices) = u0_alongsensor(collinear_indices);
+    tValues(collinear_indices) = t0_alongwall(collinear_indices);
+    uValues(collinear_indices) = u0_alongsensor(collinear_indices);
     
     %%%%%
     % Allow multiple intersections because of overlap. At this point, we do
@@ -487,8 +500,8 @@ if any(collinear_indices)
     % calculated in special case of overlaps
     p = [p; p(indices_hit_different_point,:)];
     r = [r; r(indices_hit_different_point,:)];
-    t = [t; t1_alongwall(indices_hit_different_point)];   
-    u = [u; u1_alongsensor(indices_hit_different_point)];
+    tValues = [tValues; t1_alongwall(indices_hit_different_point)];   
+    uValues = [uValues; u1_alongsensor(indices_hit_different_point)];
     wall_indexes = [wall_indexes; wall_indexes(indices_hit_different_point)];
 
 end
@@ -520,18 +533,18 @@ one_threshold  = 1 + tolerance;
 if 0 == flag_search_range_type
     % 0: (default) the GIVEN sensor and GIVEN wall used.
     % This constrains both t (wall extent) and u (sensor extent)
-    good_vector = ((zero_threshold<=t0_alongwall).*(one_threshold>=t1_alongwall).*(zero_threshold<=u0_alongsensor).*(one_threshold>=u1_alongsensor));
+    good_vector = ((zero_threshold<=tValues).*(one_threshold>=tValues).*(zero_threshold<=uValues).*(one_threshold>=uValues));
 elseif 1 == flag_search_range_type
     % 1: ANY projection of the sensor used with the GIVEN wall
-    good_vector = ~isnan(u);
+    good_vector = ((zero_threshold<=tValues).*(one_threshold>=tValues));
 elseif 2 == flag_search_range_type
     % 2: ANY projection of the wall used with the GIVEN sensor
     % This constrains ONLY u (sensor extent) 
-    good_vector = ((zero_threshold<=u).*(one_threshold>=u));
+    good_vector = ((zero_threshold<=uValues).*(one_threshold>=uValues));
 elseif 3 == flag_search_range_type
     % 3: ANY projection of BOTH the wall and sensor
     % NO constraints
-    good_vector = ((Inf>u).*(Inf>t));
+    good_vector = ((Inf>uValues).*(Inf>tValues));
 else
     warning('on','backtrace');
     warning('Expecting a flag_search_range_type as integer in range of 0 to 3, but found: %.3f',flag_search_range_type);
@@ -545,7 +558,7 @@ within_indices = find(good_vector>0);
 intersections = NaN*ones(length(p(:,1)),2);
 if ~isempty(within_indices)
     % Calculate the intersection point (finally)
-    result = p + t.*r; 
+    result = p + tValues.*r; 
     intersections(within_indices,:) = result(within_indices,:);    
 end
 
@@ -559,34 +572,39 @@ end
 % note: a faster way to do this might be to just
 % calculate t*r as a length
 distances_squared = sum((intersections - sensor_vector_start).^2,2);
+if all(isnan(distances_squared))
+    distance = nan;
+    location = [nan nan];
+    wall_segment = nan;
+    t = nan;
+    u = nan;
+else
+    if 0==flag_search_return_type
+        % Keep only the minimum distance result
+        [closest_distance_squared,closest_index] = min(distances_squared);
 
-if 0==flag_search_return_type
-    % Keep only the minimum distance
-    [closest_distance_squared,closest_index] = min(distances_squared);
-    
-    distance = closest_distance_squared^0.5*sign(u(closest_index));
-    location = intersections(closest_index,:);
-    wall_segment = wall_indexes(closest_index);
+        distance = closest_distance_squared^0.5*sign(uValues(closest_index));
+        location = intersections(closest_index,:);
+        wall_segment = wall_indexes(closest_index);
+        t = tValues(closest_index);
+        u = uValues(closest_index);
 
-    if isnan(distance)
-        wall_segment = nan;
-    end
-elseif 1==flag_search_return_type
-    % Return all the results
-    if all(isnan(distances_squared))
-        distance = nan;
-        location = [nan nan];
-        wall_segment = nan;
-    else
+        if isnan(distance)
+            wall_segment = nan;
+        end
+    elseif 1==flag_search_return_type
+        % Return all the results
         within_indices = find(~isnan(distances_squared));
-        distance = distances_squared(within_indices).^0.5.*sign(u(within_indices));
+        distance = distances_squared(within_indices).^0.5.*sign(uValues(within_indices));
         location = intersections(within_indices,:);
         wall_segment = wall_indexes(within_indices);
+        t = tValues(within_indices);
+        u = uValues(within_indices);
+    else
+        warning('on','backtrace');
+        warning('Expecting a flag_search_return_type as integer with values of 0 or 1, but found: %.3f',flag_search_return_type);
+        error('Bad flag_search_range_type encountered');
     end
-else
-    warning('on','backtrace');
-    warning('Expecting a flag_search_return_type as integer with values of 0 or 1, but found: %.3f',flag_search_return_type);
-    error('Bad flag_search_range_type encountered');
 end
 
 %% Any debugging?
@@ -691,12 +709,26 @@ if flag_do_debug
 end
 end
 
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-
-%% Calculate cross products
-function result = crossProduct(v,w)
+%% fcn_INTERNAL_crossProduct
+% Calculate cross products
+function result = fcn_INTERNAL_crossProduct(v,w)
 result = v(:,1).*w(:,2)-v(:,2).*w(:,1);
-end
+end % Ends fcn_INTERNAL_crossProduct
 
-
-
+%% fcn_INTERNAL_saturateRange
+function valueOut = fcn_INTERNAL_saturateRange(valueIn)
+valueOut = max(0,valueIn);
+valueOut = min(1,valueOut);
+end % Ends fcn_INTERNAL_saturateRange
