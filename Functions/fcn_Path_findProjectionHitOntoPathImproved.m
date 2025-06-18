@@ -80,15 +80,17 @@ function [distance,location,wall_segment, t, u] = ...
 %            B: from [0.5 0] to [0.5 1],
 %            C: from [1 0] to [2 0]
 %      if the tolerance is 0, whether or not A and B intersect can be
-%      unclear and is strongly affected by the numerical accuray of number
+%      unclear as this is strongly affected by the numerical accuray of number
 %      representations. If the tolerance is higher than numberical accuracy
 %      amounts (say, 1000 times larger than this value or 1000*eps), then A
 %      and B definitely intersect at 1 point that is -almost- exactly in
 %      the middle of A, and -almost- exactly at the start of B. However,
-%      for the same tolerance, A and C overlap at infinite points.
+%      for the same tolerance, A and C technically overlap at infinite points.
 %      Similarly, for negative tolerances that are sufficiently large, A
 %      and B do NOT overlap, nor do A and C. The use of tolerance allows
-%      the desirable definition of "near miss" situations.
+%      the desirable definition of "near miss" situations. The primary
+%      effect of tolerance is for when the sensor and wall are collinear -
+%      a negative tolerance will ALWAYS have the sensor "miss" the wall.
 %
 %      fig_num: a figure number to plot results. Turns debugging on.
 %
@@ -303,132 +305,196 @@ q_minus_p =  q - p;
 q_minus_p_cross_s = crossProduct(q_minus_p,s);
 q_minus_p_cross_r = crossProduct(q_minus_p,r);
 
-%% Step 1: classify all the solutions
+%% Step 1: find t and u values for all cases
 
-% Find which walls are parallel to the sensor.
+%%%%
+% Avoid division by zero for parallel cases
 % If r × s = 0, then the two lines are parallel
 flag_isParallel = (near_zero>=abs(r_cross_s));
 
-% Are any of these parallel and non-intersecting?
-% If r × s = 0 and (q − p) × r ≠ 0, then the two lines are parallel and non-intersecting
-parallel_non_intersecting_indices = find(flag_isParallel.*(near_zero<abs(q_minus_p_cross_r)));
-if any(parallel_non_intersecting_indices)
-    % If they are colinear or parallel, make dummy length that is removed
-    % later, to avoid divide by zero in intermediate calculations.
-    r_cross_s(parallel_non_intersecting_indices) = 1; 
+if any(flag_isParallel)
+    % If any walls are parallel to sensor, make dummy length that is
+    % removed later, to avoid divide by zero in intermediate calculations.
+    r_cross_s(flag_isParallel) = 1; 
 end
 
 
-% Are any of these collinear (e.g. on same line)? If they are collinear, then
-% need to find whether there is overlapping, e.g. there may be infinite
-% solutions. In other words, we need to know when the t-value, the
-% percentage along each wall, starts (t0) and stops (t1). For a given wall,
-% these values can never be larger than 1 or less than 0, physcially. So we
-% need to "cap" t0 and t1 at these values.
-%
-% If r × s = 0 and (q − p) × r = 0, then the two lines are collinear. 
-% NOTE: later steps require division by r x s, so we need to be careful to
-% set this value to 1 to avoid division by zero.
-% 
-% In this case, express the endpoints of the second segment (q and q + s)
-% in terms of the equation of the first line segment (p + t r):
-% 
-% t0 = (q − p) · r / (r · r)
-% 
-% t1 = (q + s − p) · r / (r · r) = t0 + s · r / (r · r)
-% 
-% If the interval between t0 and t1 intersects the interval [0, 1] then the
-% line segments are collinear and overlapping; otherwise they are collinear
-% and disjoint.
-% 
-% Note that if s and r point in opposite directions, then s · r < 0 and so
-% the interval to be checked is [t1, t0] rather than [t0, t1].
-
-colinear_indices = find(flag_isParallel.*(near_zero>=abs(q_minus_p_cross_r)));
-
-if any(colinear_indices)
-    r_cross_s(colinear_indices) = 1; % They are colinear or parallel, so make dummy length
-    r_dot_r = sum(r.*r,2);
-    q_minus_p_dot_r = sum(q_minus_p.*r,2);
-    s_dot_r = sum(s.*r,2);
-    t0 = q_minus_p_dot_r./r_dot_r;
-    t1 = t0 + s_dot_r./r_dot_r;
-    
-    % Keep only the good indices
-    %     % For debugging:
-    %     conditions = [-0.5 -0.4; -0.5 0; -0.5 .2; 0 0.2; 0.2 0.4; 0.2 1; 0.2 1.2; 1 1.2; 1.2 1.3; -0.5 1.2]
-    %     t0 = conditions(:,1);
-    %     t1 = conditions(:,2);
-    %     t0_inside = (t0>=0)&(t0<=1);
-    %     t1_inside = (t1>=0)&(t1<=1);
-    %     t0_t1_surround = (t0<0)&(t1>1) | (t1<0)&(t0>1);
-    %     any_within = t0_inside | t1_inside | t0_t1_surround;
-    %     fprintf(1,'t0 inside flag:\n');
-    %     [conditions t0_inside]
-    %     fprintf(1,'t1 inside flag:\n');
-    %     [conditions t1_inside]
-    %     fprintf(1,'surround flag:\n');
-    %     [conditions t0_t1_surround]
-    %     fprintf(1,'any_within flag:\n');
-    %     [conditions any_within]
-    
-    % Check whether there is overlap by seeing of the t0 and t1 values are
-    % within the interval of [0 1], endpoint inclusive
-    t0_inside = (t0>=0)&(t0<=1);
-    t1_inside = (t1>=0)&(t1<=1);
-    t0_t1_surround = (t0<0)&(t1>1) | (t1<0)&(t0>1);
-    any_within = t0_inside | t1_inside | t0_t1_surround;
-    good_indices = find(any_within);
-    good_colinear_indices = intersect(colinear_indices,good_indices);
-    
-    % Fix the ranges to be within 0 and 1
-    t0(good_colinear_indices) = max(0,t0(good_colinear_indices));
-    t0(good_colinear_indices) = min(1,t0(good_colinear_indices));
-
-    t1(good_colinear_indices) = max(0,t1(good_colinear_indices));
-    t1(good_colinear_indices) = min(1,t1(good_colinear_indices));
-
-end
-
-
-
+%%%%%
+% General case for t and u calculations
 % Calculate t and u, where t is distance along the wall, and u is distance
 % along the sensor.
 
 t = q_minus_p_cross_s./r_cross_s; % Distance along the wall
 u = q_minus_p_cross_r./r_cross_s; % Distance along the sensor
 
-% Fix any situations that are parallel and non-intersecting, as these will
-% give wrong calculation results from the t and u calculations above
-t(parallel_non_intersecting_indices) = inf;
-u(parallel_non_intersecting_indices) = inf;
+%%%%%
+% Parallel cases are nan
+% NOTE: this includes non-intersecting cases
+% If r × s = 0 and (q − p) × r ≠ 0, then the two lines are parallel and non-intersecting
+% NOTE: the way to calculate this is as follows. The code that follows does
+% not need this variable, but it is included anyway in case future
+% modifications are needed:
+% parallel_non_intersecting_indices = find(flag_isParallel.*(near_zero<abs(q_minus_p_cross_r)));
+%
+% Fix any situations that are parallel as these will give wrong calculation
+% results from the t and u calculations above
+t(flag_isParallel) = nan;
+u(flag_isParallel) = nan;
 
-% Fix any situations that are colinear. For these, we save the start point
-% as the point where overlap starts, and the end point where overlap ends.
-% Note that this creates NEW intersections beyond the number of segements
-if any(colinear_indices)
-    % Shut off colinear ones to start
-    t(colinear_indices) = inf;
-    u(colinear_indices) = inf;
+%%%%
+% Fix these collinear cases (e.g. on same line)
+% IF wall segments and sensor are collinear, then there may be overlap
+% producing infinite intersections.
+% If r × s = 0 (e.g., it is parallel) and (q − p) × r = 0, then the two
+% lines are collinear.
+collinear_indices = find(flag_isParallel.*(near_zero>=abs(q_minus_p_cross_r)));
+if any(collinear_indices)
+
+    % If they are collinear, then need to find whether there is overlapping,
+    % e.g. there may be infinite solutions. In other words, we need to know
+    % when the t-value, the percentage along each wall, starts (t0) and stops
+    % (t1), and where the sensor projection starts (u0) and stops (u1). For a
+    % given wall, these values can never be larger than 1 or less than 0,
+    % physcially. So, depending on flag_search_range_type, we need to "cap" t0
+    % and t1 at these values.
+    %
+    %
+    % In this case, express the endpoints of the second segment (q and q + s)
+    % in terms of the equation of the first line segment (p + t r):
+    % t = (q − p) × s / (r × s) becomes:
+    % t0 = (q − p) · r / (r · r)
+    % t1 = (q + s − p) · r / (r · r) = t0 + s · r / (r · r)
+    % And in terms of the sensor coordinate, u:
+    % u = (p − q) × r / (s × r) becomes:
+    % u0 = (p - q) · s / (s · s)
+    % u1 = (p + r - q) · s / (s · s) = u0 + r · s / (s · s)
+    %
+    % If the interval between t0 and t1 intersects the interval [0, 1] then the
+    % line segments are collinear and overlapping; otherwise they are collinear
+    % and disjoint.
+    %
+    % Note that if s and r point in opposite directions, then s · r < 0 and so
+    % the interval to be checked is [t1, t0] rather than [t0, t1].
+
+    % Fill in vector calculations
+    r_dot_r = sum(r.*r,2);
+    s_dot_s = sum(s.*s,2);
+    q_minus_p_dot_r = sum(q_minus_p.*r,2);
+    p_minus_q_dot_s = sum(-q_minus_p.*s,2);
+    r_minus_q_dot_s = sum((r - q).*s,2);
+    s_dot_r = sum(s.*r,2);
+
+    % Calculate raw t's and u's. As a reminder, the t coordinates say where
+    % the sensor "hits" in wall coordinates, and the u coordinates say
+    % where the wall "hits" in sensor coordinates. When calculating the
+    % intersections, we ONLY use the t-values. However, the u-values are
+    % useful and are returned as function outputs.
+    t0_alongwall = q_minus_p_dot_r./r_dot_r;
+    t1_alongwall = t0_alongwall + s_dot_r./r_dot_r;
+    u0_alongsensor = p_minus_q_dot_s./s_dot_s;
+    u1_alongsensor = u0_alongsensor + s_dot_r./s_dot_s;
     
-    % Correct the t values
-    u(good_colinear_indices) = 1;
-    t(good_colinear_indices) = t0(good_colinear_indices);
+       
+    %%%%%
+    % The following steps "saturate" the t and u values to the interval of
+    % 0 and 1. As a reminder, flag_search_range_type means:
+    %
+    % 0: (default) the GIVEN sensor and GIVEN wall used. 
+    % 1: ANY projection of the sensor used with the GIVEN wall
+    % 2: ANY projection of the wall used with the GIVEN sensor
+    % 3: ANY projection of BOTH the wall and sensor
 
-    % Do we need to add more hit points?
-    indices_hit_different_point = find(t0~=t1);
-    more_indices = intersect(indices_hit_different_point,good_colinear_indices);
+    % Are we not in "any projection of the wall mode"?
+    if flag_search_range_type==0 || flag_search_range_type==1
+        % Check whether there is overlap by seeing of the t0 and t1 values are
+        % within the interval of [0 1], endpoint inclusive. The meaning of the
+        % variables is as follows:
+        % t0_inside means the start of the sensor is "inside" a wall.
+        % t1_inside means the end of the sensor is "inside" a wall.
+        % t0_t1_surround means the sensor starts before a wall and ends after a wall.
+        t0_inside = (t0_alongwall>=0)&(t0_alongwall<=1);
+        t1_inside = (t1_alongwall>=0)&(t1_alongwall<=1);
+        t0_t1_surround = (t0_alongwall<0)&(t1_alongwall>1) | (t1_alongwall<0)&(t0_alongwall>1);
+        any_within = t0_inside | t1_inside | t0_t1_surround;
+        within_indices = find(any_within);
+        rangefixed_collinear_indices_t = intersect(collinear_indices,within_indices);
+
+        % Fix the ranges to be within 0 and 1
+        t0_alongwall(rangefixed_collinear_indices_t) = max(0,t0_alongwall(rangefixed_collinear_indices_t));
+        t0_alongwall(rangefixed_collinear_indices_t) = min(1,t0_alongwall(rangefixed_collinear_indices_t));
+
+        t1_alongwall(rangefixed_collinear_indices_t) = max(0,t1_alongwall(rangefixed_collinear_indices_t));
+        t1_alongwall(rangefixed_collinear_indices_t) = min(1,t1_alongwall(rangefixed_collinear_indices_t));
+
+    else
+        % Any projection of the wall is used, so wall defaults to 0 and 1
+        rangefixed_collinear_indices_t = collinear_indices;
+        t0_alongwall(collinear_indices) = 0;
+        t1_alongwall(collinear_indices) = 1;
+    end
+
+    % Are we not in "any projection of the sensor mode"?
+    if flag_search_range_type==0 || flag_search_range_type==2
+
+        % Fix the sensor range also
+        % Check whether there is overlap by seeing of the r0 and r1 values are
+        % within the interval of [0 1], endpoint inclusive. The meaning of the
+        % variables is as follows:
+        % r0_inside means the start of the wall is "inside" a sensor.
+        % r1_inside means the end of the wall is "inside" a sensor.
+        % (NOT USED) r0_r1_surround means the wall starts before a sensor and ends after a sensor.
+        u0_inside = (u0_alongsensor>=0)&(u0_alongsensor<=1); % Wall inside sensor's start
+        u1_inside = (u1_alongsensor>=0)&(u1_alongsensor<=1); % Wall inside sensor's end
+        % r0_r1_surround = (r0_alongsensor<0)&(r1_alongsensor>1) | (r1_alongsensor<0)&(r0_alongsensor>1);
+        any_within = u0_inside | u1_inside; % | r0_r1_surround;
+        within_indices = find(any_within);
+        rangefixed_collinear_indices_u = intersect(collinear_indices,within_indices);
+
+        % Fix the ranges to be within 0 and 1
+        u0_alongsensor(rangefixed_collinear_indices_u) = max(0,u0_alongsensor(rangefixed_collinear_indices_u));
+        u0_alongsensor(rangefixed_collinear_indices_u) = min(1,u0_alongsensor(rangefixed_collinear_indices_u));
+
+        u1_alongsensor(rangefixed_collinear_indices_u) = max(0,u1_alongsensor(rangefixed_collinear_indices_u));
+        u1_alongsensor(rangefixed_collinear_indices_u) = min(1,u1_alongsensor(rangefixed_collinear_indices_u));
+
+    else
+        % Any projection of the sensor is used, so sensor defaults to wall
+        % NOTE: in sensor coordinates (u values), the wall starts at: 
+        % p_minus_q_dot_s./r_dot_r
+        % and ends at:
+        % r_minus_q_dot_s./r_dot_r
+        u0_alongsensor(collinear_indices) = p_minus_q_dot_s./r_dot_r;
+        u1_alongsensor(collinear_indices) = r_minus_q_dot_s./r_dot_r;
+    end
+
+
+    % Fix any situations that are colinear. For these, we save the start point
+    % as the point where overlap starts, and the end point where overlap ends.
+    % Note that this creates NEW intersections beyond the number of segements.
+
+    % Fill t vector with collinear starting points
+    t(collinear_indices) = t0_alongwall(collinear_indices);
+    u(collinear_indices) = u0_alongsensor(collinear_indices);
+    
+    %%%%%
+    % Allow multiple intersections because of overlap. At this point, we do
+    % not know which intersection to keep since there may be many, so we
+    % have to generate all possibilities and search through them later. Do
+    % we need to add more hit points
+    indices_hit_different_point = find(t0_alongwall~=t1_alongwall);
          
     % Make p and r, t and u longer so that additional hit points are
     % calculated in special case of overlaps
-    p = [p; p(more_indices,:)];
-    r = [r; r(more_indices,:)];
-    u = [u; u(more_indices)];
-    t = [t; t1(more_indices)];   
-    wall_indexes = [wall_indexes; wall_indexes(more_indices)];
+    p = [p; p(indices_hit_different_point,:)];
+    r = [r; r(indices_hit_different_point,:)];
+    t = [t; t1_alongwall(indices_hit_different_point)];   
+    u = [u; u1_alongsensor(indices_hit_different_point)];
+    wall_indexes = [wall_indexes; wall_indexes(indices_hit_different_point)];
 
 end
 
+% At this point, all the u and t vectors should be filled with "stacked"
+% points
 
 %% Apply flag_search_range_type
 % 0: (default) the GIVEN sensor and GIVEN wall used.
@@ -454,11 +520,10 @@ one_threshold  = 1 + tolerance;
 if 0 == flag_search_range_type
     % 0: (default) the GIVEN sensor and GIVEN wall used.
     % This constrains both t (wall extent) and u (sensor extent)
-    good_vector = ((zero_threshold<=t).*(one_threshold>=t).*(zero_threshold<=u).*(one_threshold>=u));
+    good_vector = ((zero_threshold<=t0_alongwall).*(one_threshold>=t1_alongwall).*(zero_threshold<=u0_alongsensor).*(one_threshold>=u1_alongsensor));
 elseif 1 == flag_search_range_type
     % 1: ANY projection of the sensor used with the GIVEN wall
-    % This constrains ONLY t (wall extent) 
-    good_vector = ((zero_threshold<=t).*(one_threshold>=t));
+    good_vector = ~isnan(u);
 elseif 2 == flag_search_range_type
     % 2: ANY projection of the wall used with the GIVEN sensor
     % This constrains ONLY u (sensor extent) 
@@ -474,14 +539,14 @@ else
 end
 
 % Keep only the indices that work
-good_indices = find(good_vector>0);
+within_indices = find(good_vector>0);
 
 % Initialize all intersections to infinity
 intersections = NaN*ones(length(p(:,1)),2);
-if ~isempty(good_indices)
+if ~isempty(within_indices)
     % Calculate the intersection point (finally)
     result = p + t.*r; 
-    intersections(good_indices,:) = result(good_indices,:);    
+    intersections(within_indices,:) = result(within_indices,:);    
 end
 
 
@@ -513,10 +578,10 @@ elseif 1==flag_search_return_type
         location = [nan nan];
         wall_segment = nan;
     else
-        good_indices = find(~isnan(distances_squared));
-        distance = distances_squared(good_indices).^0.5.*sign(u(good_indices));
-        location = intersections(good_indices,:);
-        wall_segment = wall_indexes(good_indices);
+        within_indices = find(~isnan(distances_squared));
+        distance = distances_squared(within_indices).^0.5.*sign(u(within_indices));
+        location = intersections(within_indices,:);
+        wall_segment = wall_indexes(within_indices);
     end
 else
     warning('on','backtrace');

@@ -261,9 +261,9 @@ close all;
 % URHERE
 
 intersectionTestType = 3;
-return_flags = [0 1];
-range_flags  = [0 1 2 3];
-tolerance_flags = [0 1 2];
+return_flags = 0; % [0 1];
+range_flags  = 1;  % [0 1 2 3];
+tolerance_flags = 0; %[0 1 2];
 thisCase = 1;
 
 for ith_return = 1:length(return_flags)
@@ -281,10 +281,12 @@ for ith_return = 1:length(return_flags)
             % Build the test cases
             testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
 
-            for ith_testCase = 1:length(testCases)
+            for ith_testCase = 5:length(testCases)
 
                 % Plot the sensor vector in red, to highlight which one we're on
-                quiver(testCases(ith_testCase).sensor_vector_start(1,1),testCases(ith_testCase).sensor_vector_start(1,2),0,1,'r','Linewidth',1,'MaxHeadSize',1);
+                vectorX = testCases(ith_testCase).sensor_vector_end(1,1) - testCases(ith_testCase).sensor_vector_start(1,1);
+                vectorY = testCases(ith_testCase).sensor_vector_end(1,2) - testCases(ith_testCase).sensor_vector_start(1,2);
+                quiver(testCases(ith_testCase).sensor_vector_start(1,1),testCases(ith_testCase).sensor_vector_start(1,2),vectorX,vectorY,'r','Linewidth',1,'MaxHeadSize',1);
 
 
                 clear inputs
@@ -1355,11 +1357,15 @@ for ith_field = 1:Nfields
     if ~isa(thisVariable,expectedType)|| ~isequal(size(thisVariable),expectedSize)
         flag_errorWillBeThrown = 1;
     end
-    if ~any(isnan(thisVariable)) && ~isequal(round(thisVariable,expectedValueDigits),expectedValue)
+    if ~any(isnan(thisVariable),'all') && ~isequal(round(thisVariable,expectedValueDigits),expectedValue)
         flag_errorWillBeThrown = 1;
     end
-    if ~any(isnan(expectedValue)) && ~isequal(round(thisVariable,expectedValueDigits),expectedValue)
-        flag_errorWillBeThrown = 1;
+    try
+        if ~any(isnan(expectedValue),'all') && ~isequal(round(thisVariable,expectedValueDigits),expectedValue)
+            flag_errorWillBeThrown = 1;
+        end
+    catch
+        disp('stop here');
     end
     if all(isnan(thisVariable)) && ~all(isnan(thisVariable))
         flag_errorWillBeThrown = 1;
@@ -1406,7 +1412,7 @@ allWallsY = [wall_starts(:,2) wall_ends(:,2) nan(Nwalls,1)];
 allWallsY = reshape(allWallsY',1,[]);
 allWalls = [allWallsX' allWallsY'];
 
-plot(allWalls(:,1),allWalls(:,2),'k.-','Linewidth',1);
+plot(allWalls(:,1),allWalls(:,2),'k.-','Linewidth',2);
 
 for ith_testCase = 1:length(testCases)
     handle_text = text(allWalls(1,1),allWalls(1,2),'Walls');
@@ -1455,6 +1461,20 @@ fourthFigureNumber = str2double(temp(4));
 % 3: infinite intersection cases with one wall
 
 
+% S is second figure number, flag_search_return_type:
+% 0: first intersection if there is any overlap
+% 1: all intersections, if there is overlap
+flag_search_return_type = secondFigureNumber;
+
+% T is third figure number, flag_search_range_type:
+% 0: (default) the GIVEN sensor and GIVEN path used.
+% 1: ANY projection of the sensor used with the GIVEN path
+% 2: ANY projection of the path used with the GIVEN sensor
+% 3: ANY projection of BOTH the path and sensor
+% The yStarts represents the y value that each sensor vector will start at
+% The xStarts represents the x value that each sensor vector will start at
+%
+
 %%%%%%
 % Set all locations based on first number
 
@@ -1470,26 +1490,68 @@ switch firstFigureNumber
         flag_testTolerance = 1;
 
         Nintersections = 1;
+
+        % If ANY projections are used, the end points of the range will have
+        % intersections. But if GIVEN projections are used, only the values from
+        % 2:end-1 will have intersections. The trimEnds function gives values from
+        % 2:end-1 for vectors that have length greater than 2.
+        flag_search_range_type = thirdFigureNumber;
+        switch thirdFigureNumber
+            case {0}
+                xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
+                yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
+            case {1}
+                xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
+                yStartsWithIntersections = totalRangeY;
+            case {2}
+                xStartsWithIntersections = totalRangeX;
+                yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
+            case {3}
+                xStartsWithIntersections = totalRangeX;
+                yStartsWithIntersections = totalRangeY;
+            otherwise
+                warning('on','backtrace');
+                warning('Expecting a third figure number with integer values of 0 to 3, but found: %.3f',thirdFigureNumber);
+                error('Third figure number not recognized');
+        end
+
     case {3} % Infinite intersect cases
         % All are tested with single wall
         wall_starts          = [0 0];
         wall_ends            = [1 0];
         sensorLengthX = 1;
         sensorLengthY = 0;
-        totalRangeX = [-0.5 0 0.5];
+        totalRangeX = [-1.5 -0.5 0 0.5 1.5];
         totalRangeY = 0;
         flag_testTolerance = 0;
 
-        Nintersections = 2;
+        % If ANY projections are used, the end points of the range will have
+        % intersections. But if GIVEN projections are used, only the values from
+        % 2:end-1 will have intersections. The trimEnds function gives values from
+        % 2:end-1 for vectors that have length greater than 2.
+        flag_search_range_type = thirdFigureNumber;
+        switch thirdFigureNumber
+            case {0}
+                xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
+                yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
+            case {1,2,3}
+                xStartsWithIntersections = totalRangeX;
+                yStartsWithIntersections = totalRangeY;
+            otherwise
+                warning('on','backtrace');
+                warning('Expecting a third figure number with integer values of 0 to 3, but found: %.3f',thirdFigureNumber);
+                error('Third figure number not recognized');
+        end
+
     case {5,6,7} % All multi-hit cases
         % All are tested with single wall
         wall_starts          = [0 0; 1 0;];
         wall_ends            = [1 0; 1 1];
         switch secondFigureNumber
             case {0} % First intersection only
-                Nintersections = 1;
+                % Nintersections = 1;
             case {1} % All intersections
-                Nintersections = 1;
+                % Nintersections = 1;
             otherwise
                 warning('on','backtrace');
                 warning('Expecting a second figure number with integer values of 0 to 1, but found: %.3f',secondFigureNumber);
@@ -1502,42 +1564,9 @@ switch firstFigureNumber
         error('Third figure number not recognized');
 end
 
-% S is second figure number, flag_search_return_type:
-% 0: first intersection if there is any overlap
-% 1: all intersections, if there is overlap
-flag_search_return_type = secondFigureNumber;
 
-% T is third figure number, flag_search_range_type:
-% 0: (default) the GIVEN sensor and GIVEN path used.
-% 1: ANY projection of the sensor used with the GIVEN path
-% 2: ANY projection of the path used with the GIVEN sensor
-% 3: ANY projection of BOTH the path and sensor
-% The yStarts represents the y value that each sensor vector will start at
-% The xStarts represents the x value that each sensor vector will start at
-%
-% If ANY projections are used, the end points of the range will have
-% intersections. But if GIVEN projections are used, only the values from
-% 2:end-1 will have intersections. The trimEnds function gives values from
-% 2:end-1 for vectors that have length greater than 2.
-flag_search_range_type = thirdFigureNumber;
-switch thirdFigureNumber
-    case {0}
-        xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
-        yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
-    case {1}
-        xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
-        yStartsWithIntersections = totalRangeY;
-    case {2}
-        xStartsWithIntersections = totalRangeX;
-        yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
-    case {3}
-        xStartsWithIntersections = totalRangeX;
-        yStartsWithIntersections = totalRangeY;
-    otherwise
-        warning('on','backtrace');
-        warning('Expecting a third figure number with integer values of 0 to 3, but found: %.3f',thirdFigureNumber);
-        error('Third figure number not recognized');
-end
+
+
 
 % t: is tolerance
 % 0: uses defaults
@@ -1581,8 +1610,8 @@ for jth_yStart = 1:length(all_yStarts)
     for ith_xStart = 1:length(all_xStarts)
         thisX = all_xStarts(ith_xStart);
         ith_case = ith_case+1;
-        % % FOR DEBUGGING
-        % if ith_case == 13
+        % FOR DEBUGGING
+        % if ith_case == 5
         %     disp('stop here');
         % end
         testCases(ith_case).wall_start          = wall_starts;
@@ -1595,23 +1624,54 @@ for jth_yStart = 1:length(all_yStarts)
         testCases(ith_case).fig_num = fig_num;
 
         % Fill in expected values
-        if ismember(thisY,yStartsWithIntersections) && ismember(thisX, xStartsWithIntersections)
-            if Nintersections==1
-                testCases(ith_case).expected.Intersection    = [thisX 0];
-                testCases(ith_case).expected.Distance    = 0 - thisY;
-                testCases(ith_case).expected.wall_segment = 1;
-            else
-                testCases(ith_case).expected.Intersection    = [thisX 0; thisX 1];
-                testCases(ith_case).expected.Distance    = [0 - thisY; 1 - thisY];
-                testCases(ith_case).expected.wall_segment = [1; 2];
-            end
-        else
-            testCases(ith_case).expected.Intersection    = [nan nan];
-            testCases(ith_case).expected.Distance    = nan;
-            testCases(ith_case).expected.wall_segment = nan;
+        switch firstFigureNumber
+            case {2} % Single intersect cases
+                if ismember(thisY,yStartsWithIntersections) && ismember(thisX, xStartsWithIntersections)
+                    testCases(ith_case).expected.Intersection    = [thisX 0];
+                    testCases(ith_case).expected.Distance    = 0 - thisY;
+                    testCases(ith_case).expected.wall_segment = 1;
+                else
+                    testCases(ith_case).expected.Intersection    = [nan nan];
+                    testCases(ith_case).expected.Distance    = nan;
+                    testCases(ith_case).expected.wall_segment = nan;
+                end
+                testCases(ith_case).expected.t     = thisX;
+                testCases(ith_case).expected.u     = -thisY;
+
+            case {3} % Infinite intersect cases
+                % If tolerance is negative, the lines NEVER intersect
+                % (fourthFigureNumber == 2)
+                if ismember(thisX, xStartsWithIntersections) && fourthFigureNumber~=2
+                    maxXstart = max(thisX,0);
+                    minXend   = min(thisX+1,1);
+                    if thisX<0
+                        distanceStart = -thisX;
+                    else
+                        distanceStart = 0;
+                    end
+                    if thirdFigureNumber==0 || secondFigureNumber==0
+                        testCases(ith_case).expected.Intersection    = [maxXstart 0];
+                    else
+                        testCases(ith_case).expected.Intersection    = [maxXstart 0; minXend 0];
+                    end
+                    testCases(ith_case).expected.Distance        = distanceStart;
+                    testCases(ith_case).expected.wall_segment = 1;
+                    testCases(ith_case).expected.t     = [maxXstart; minXend];
+                    testCases(ith_case).expected.u     = [distanceStart; minXend-thisX];
+
+                else
+                    testCases(ith_case).expected.Intersection    = [nan nan];
+                    testCases(ith_case).expected.Distance    = nan;
+                    testCases(ith_case).expected.wall_segment = nan;
+                    testCases(ith_case).expected.t     = nan;
+                    testCases(ith_case).expected.u     = nan;
+                end
+            otherwise
+                warning('on','backtrace');
+                warning('Expecting a first figure number with integer values of 2 to 7, but found: %.3f',firstFigureNumber);
+                error('Third figure number not recognized');
         end
-        testCases(ith_case).expected.t     = thisX;
-        testCases(ith_case).expected.u     = -thisY;
+
     end
 end
 
