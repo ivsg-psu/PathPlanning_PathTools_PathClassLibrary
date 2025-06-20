@@ -24,8 +24,9 @@ close all
 % 2: single point intersection cases with one wall
 % 3: infinite intersection cases with one wall
 % 4: multi-hit cases
-% 6: multi-hit overlapping cases
-% 7: multi-hit multi-wall cases
+% 5: wall as single point cases
+% 6: infinite intersection cases with one wall BACKWARDS
+% 7: infinite intersection multi-wall cases
 % 8: fast mode cases
 % 9: known bug cases
 %
@@ -253,17 +254,16 @@ end % Ends loop throough return flags
 
 close all;
 
+
 %% Infinite intersection 3XXX1 cases
 % flag_search_return_type 0: first intersection if there is any overlap
 % flag_search_range_type  0: (default) the GIVEN sensor and GIVEN wall used.
 % tolerance 0: uses defaults
 
-% URHERE
-
 intersectionTestType = 3;
 return_flags = [0 1];
-range_flags  = 1; %[0 1 2 3];
-tolerance_flags = 0; %[0 1 2];
+range_flags  = [0 1 2 3];
+tolerance_flags = 2; % [0 1 2];
 thisCase = 1;
 
 for ith_return = 1:length(return_flags)
@@ -322,402 +322,87 @@ end % Ends loop throough return flags
 %%
 
 
-% %% Multi-hit tests
-% %   __  __       _ _   _ _    _ _ _
-% %  |  \/  |     | | | (_) |  | (_) |
-% %  | \  / |_   _| | |_ _| |__| |_| |_
-% %  | |\/| | | | | | __| |  __  | | __|
-% %  | |  | | |_| | | |_| | |  | | | |_
-% %  |_|  |_|\__,_|_|\__|_|_|  |_|_|\__|
-% %
-% %
+%% Multi-hit tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% close all;
-%
-% %% Advanced test 2 - multiple intersections
-% fprintf(1,'Single intersections reporting only first  \n');
-% path = [0 10; 10 10; 0 6; 10 6; 0 2];
-% sensor_vector_start = [0 0];
-% sensor_vector_end   = [5 12];
-% fig_debugging = 23487;
-% flag_search_type = 0;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),2.6));
-% assert(isequal(round(location,4),[1 2.4]));
-%
-% fprintf(1,'Multiple intersections reporting all results: \n');
-% path = [0 10; 10 10; 0 6; 10 6; 0 2];
-% sensor_vector_start = [0 0];
-% sensor_vector_end   = [5 12];
-% fig_debugging = 23488;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance',4),[10.8333    7.8000    6.5000    2.6000]));
-% assert(isequal(round(location,4),[    4.1667   10.0000
-%     3.0000    7.2000
-%     2.5000    6.0000
-%     1.0000    2.4000]));
-%
-% %% Advanced test 3 - multiple intersections possible, but no hits
-% fprintf(1,'Multiple intersections possible but no hits, reporting all results: \n');
-% path = [0 10; 10 10; 0 6; 10 6; 0 2];
-% sensor_vector_start = [0 0];
-% sensor_vector_end   = [0.5 1.2];
-% fig_debugging = 23499;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isempty(distance));
-% assert(isempty(location));
-%
-% %% Advanced test 4 - multiple intersections possible, but few hits
-% fprintf(1,'Multiple intersections possible but few hits, reporting all results: \n');
-% path = [0 10; 10 10; 0 6; 10 6; 0 2];
-% sensor_vector_start = [0 0];
-% sensor_vector_end   = [2.5 6];
-% fig_debugging = 1010;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[6.5; 2.6]));
-% assert(isequal(round(location,4),[2.5000    6.0000
-%     1.0000    2.4000]));
+%  __  __       _ _   _   _    _ _ _     _____       _                          _   _
+% |  \/  |     | | | (_) | |  | (_) |   |_   _|     | |                        | | (_)
+% | \  / |_   _| | |_ _  | |__| |_| |_    | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
+% | |\/| | | | | | __| | |  __  | | __|   | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
+% | |  | | |_| | | |_| | | |  | | | |_   _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
+% |_|  |_|\__,_|_|\__|_| |_|  |_|_|\__| |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
 %
 %
-% %% Multi-hit overlapping tests
-% %   __  __       _ _   _ _    _ _ _    ____                 _                   _
-% %  |  \/  |     | | | (_) |  | (_) |  / __ \               | |                 (_)
-% %  | \  / |_   _| | |_ _| |__| |_| |_| |  | |_   _____ _ __| | __ _ _ __  _ __  _ _ __   __ _
-% %  | |\/| | | | | | __| |  __  | | __| |  | \ \ / / _ \ '__| |/ _` | '_ \| '_ \| | '_ \ / _` |
-% %  | |  | | |_| | | |_| | |  | | | |_| |__| |\ V /  __/ |  | | (_| | |_) | |_) | | | | | (_| |
-% %  |_|  |_|\__,_|_|\__|_|_|  |_|_|\__|\____/  \_/ \___|_|  |_|\__,_| .__/| .__/|_|_| |_|\__, |
-% %                                                                  | |   | |             __/ |
-% %                                                                  |_|   |_|            |___/
-%
-% close all;
-%
-% %% Advanced Multihit Overlapping test - identically overlapping colinear
-% fprintf(1,'identically overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [0 10];
-% sensor_vector_end   = [10 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segments] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-% fcn_INTERNAL_printMoreResults(distance,location,path_segments);
-%
-% assert(isequal(round(distance,4),[0; 10]));
-% assert(isequal(round(location,4),[     0    10
-%     10    10]));
-%
-%
-% %% Advanced Multihit Overlapping  test 8 - partially overlapping colinear 1
-% fprintf(1,'Partially overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [-2 10];
-% sensor_vector_end   = [10 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[2; 12]));
-% assert(isequal(round(location,4),[     0    10
-%     10    10]));
-%
-% %% Advanced Multihit Overlapping  test 9 - partially overlapping colinear 1
-% fprintf(1,'Partially overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [-2 10];
-% sensor_vector_end   = [5 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[2; 7]));
-% assert(isequal(round(location,4),[0   10.0000
-%     5.0000   10.0000]));
-%
-% %% Advanced Multihit Overlapping  test 10 - partially overlapping colinear 1
-% fprintf(1,'Partially overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [3 10];
-% sensor_vector_end   = [5 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[0; 2]));
-% assert(isequal(round(location,4),[     3    10
-%      5    10]));
-%
-% %% Advanced Multihit Overlapping  test 11 - partially overlapping colinear 1
-% fprintf(1,'Partially overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [3 10];
-% sensor_vector_end   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[0; 7]));
-% assert(isequal(round(location,4),[     3    10
-%     10    10]));
-%
-% %% Advanced Multihit Overlapping  test 12 - super overlapping colinear 1
-% fprintf(1,'Super overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [-3 10];
-% sensor_vector_end   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[3; 13]));
-% assert(isequal(round(location,4),[0    10
-%     10    10]));
-%
-% %% Advanced Multihit Overlapping  test 13 - end overlapping colinear 1
-% fprintf(1,'End overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [-3 10];
-% sensor_vector_end   = [0 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),3));
-% assert(isequal(round(location,4),[ 0    10]));
-%
-% %% Advanced Multihit Overlapping  test 14 - end overlapping colinear 2
-% fprintf(1,'End overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [10 10];
-% sensor_vector_end   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),0));
-% assert(isequal(round(location,4),[10 10]));
-%
-%
-% %% Advanced Multihit Overlapping  test 27 - identically overlapping colinear BACKWARDS
-% fprintf(1,'identically overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [0 10];
-% sensor_vector_start   = [10 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[0; 10]));
-% assert(isequal(round(location,4),[    10    10
-%      0    10]));
-%
-% %% Advanced Multihit Overlapping  test 28 - partially overlapping colinear 1 BACKWARDS
-% fprintf(1,'Partially overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [-2 10];
-% sensor_vector_start   = [10 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[0; 10]));
-% assert(isequal(round(location,4),[    10    10
-%      0    10]));
-%
-% %% Advanced Multihit Overlapping  test 29 - partially overlapping colinear 1 BACKWARDS
-% fprintf(1,'Partially overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [-2 10];
-% sensor_vector_start   = [5 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[0; 5]));
-% assert(isequal(round(location,4),[    5    10
-%      0    10]));
-%
-% %% Advanced Multihit Overlapping  test 30 - partially overlapping colinear 1 BACKWARDS
-% fprintf(1,'Partially overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [3 10];
-% sensor_vector_start   = [5 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[0; 2]));
-% assert(isequal(round(location,4),[    5    10
-%      3    10]));
-%
-% %% Advanced Multihit Overlapping  test 31 - partially overlapping colinear 1 BACKWARDS
-% fprintf(1,'Partially overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [3 10];
-% sensor_vector_start   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[5; 12]));
-% assert(isequal(round(location,4),[    10    10
-%      3    10]));
-%
-% %% Advanced Multihit Overlapping  test 32 - super overlapping colinear 1 BACKWARDS
-% fprintf(1,'Super overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [-3 10];
-% sensor_vector_start   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),[5; 15]));
-% assert(isequal(round(location,4),[    10    10
-%      0    10]));
-%
-% %% Advanced Multihit Overlapping  test 33 - end overlapping colinear 1 BACKWARDS
-% fprintf(1,'End overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [-3 10];
-% sensor_vector_start   = [0 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),0));
-% assert(isequal(round(location,4),[    0    10]));
-%
-% %% Advanced Multihit Overlapping  test 34 - end overlapping colinear 2 BACKWARDS
-% fprintf(1,'End overlapping colinear BACKWARDS  \n');
-% path = [0 10; 10 10];
-% sensor_vector_end = [10 10];
-% sensor_vector_start   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isequal(round(distance,4),5));
-% assert(isequal(round(location,4),[10    10]));
-%
-%
-% %% Advanced Multihit Overlapping  test 15 - non overlapping colinear 1
-% fprintf(1,'Non overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [-3 10];
-% sensor_vector_end   = [-1 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isempty(distance));
-% assert(isempty(location));
-%
-% %% Advanced Multihit Overlapping  test 15 - non overlapping colinear 2
-% fprintf(1,'Non overlapping colinear  \n');
-% path = [0 10; 10 10];
-% sensor_vector_start = [13 10];
-% sensor_vector_end   = [15 10];
-% fig_debugging = 2343;
-% flag_search_type = 2;
-% [distance,location,path_segment, t, u] = ...
-%     fcn_Path_findProjectionHitOntoPathImproved(...
-%     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_debugging);
-% fcn_INTERNAL_printResults(distance,location);
-%
-% assert(isempty(distance));
-% assert(isempty(location));
-%
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Multi%20Hit%20Intersections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All multi-hit intersection figures start with the number 4
+
+close all;
+
+%% Multi hit intersection 4XXX1 cases
+
+% URHERE
+
+intersectionTestType = 4;
+return_flags = [0 1];
+range_flags  = 1; %[0 1 2 3];  
+tolerance_flags = [0 1 2];
+thisCase = 1;
+
+for ith_return = 1:length(return_flags)
+    thisReturn = return_flags(ith_return);
+    for ith_range = 1:length(range_flags)
+        thisRange = range_flags(ith_range);
+        for ith_tolerance = 1:length(tolerance_flags)
+            thisTolerance = tolerance_flags(ith_tolerance);
+
+            % Build the figure number
+            fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
+            fig_num = str2double(fig_string);
+            plotting.FigureExpected = 1;
+
+            % Build the test cases
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+
+            for ith_testCase = 1:length(testCases)
+
+                % Plot the sensor vector in red, to highlight which one we're on
+                quiver(testCases(ith_testCase).sensor_vector_start(1,1),testCases(ith_testCase).sensor_vector_start(1,2),0,1,'r','Linewidth',1,'MaxHeadSize',1);
+
+
+                clear inputs
+                inputs = testCases(ith_testCase);
+
+                % SHORT format checking
+                clear expected
+                expected.distance = testCases(ith_testCase).expected.Distance;
+                expected.location = testCases(ith_testCase).expected.Intersection;
+                expected.wall_segment = testCases(ith_testCase).expected.wall_segment;
+                expected.t = testCases(ith_testCase).expected.t;
+                expected.u = testCases(ith_testCase).expected.u;
+
+                actual = struct;
+                [actual.distance, actual.location, actual.wall_segment, actual.t, actual.u] = ...
+                    fcn_Path_findProjectionHitOntoPathImproved(...
+                    inputs.wall_start, inputs.wall_end,...
+                    inputs.sensor_vector_start,inputs.sensor_vector_end,...
+                    (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
+                    (inputs.tolerance), (inputs.fig_num));
+
+                fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
+                %fcn_INTERNAL_printResults(actual.distance,actual.location);
+
+            end % Ends loop through cases
+
+            close all;
+
+        end % Ends loop through tolerance flags
+    end % Ends loop through range flags
+end % Ends loop throough return flags
+
+
+
+
 %
 % %% multiple hits with multiple paths
 % %   __  __       _ _   _ _    _ _ _   __  __       _ _ _   _____      _   _
@@ -1486,7 +1171,9 @@ flag_search_return_type = secondFigureNumber;
 % 3: ANY projection of BOTH the path and sensor
 % The yStarts represents the y value that each sensor vector will start at
 % The xStarts represents the x value that each sensor vector will start at
-%
+
+% Tolerance is the fourth number
+flag_testTolerance = fourthFigureNumber;
 
 %%%%%%
 % Set all locations based on first number
@@ -1509,7 +1196,7 @@ switch firstFigureNumber
         % 2:end-1 will have intersections. The trimEnds function gives values from
         % 2:end-1 for vectors that have length greater than 2.
         flag_search_range_type = thirdFigureNumber;
-        switch thirdFigureNumber
+        switch flag_search_range_type
             case {0}
                 xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
                 yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
@@ -1534,20 +1221,148 @@ switch firstFigureNumber
         wall_ends            = [1 0];
         sensorLengthX = 1;
         sensorLengthY = 0;
-        totalRangeX = [-1.5 -0.5 0 0.5-100*eps 1.5];
+        totalRangeX = [-1.5 -0.4 0 0.4 1.5];
         totalRangeY = 0;
-        flag_testTolerance = 0;
 
         % If ANY projections are used, the end points of the range will have
         % intersections. But if GIVEN projections are used, only the values from
         % 2:end-1 will have intersections. The trimEnds function gives values from
         % 2:end-1 for vectors that have length greater than 2.
         flag_search_range_type = thirdFigureNumber;
-        switch thirdFigureNumber
+        switch flag_search_range_type
             case {0}
                 xStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeX);
                 yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
             case {1,2,3}
+                xStartsWithIntersections = totalRangeX;
+                yStartsWithIntersections = totalRangeY;
+            otherwise
+                warning('on','backtrace');
+                warning('Expecting a third figure number with integer values of 0 to 3, but found: %.3f',thirdFigureNumber);
+                error('Third figure number not recognized');
+        end
+
+    case {4} % Multi-hit cases
+        % All are tested with three walls. The walls are spaced so that,
+        % typically, only 1 or 2 are hit. The third wall is spaced far away
+        % so that sensor extensions cause it to be hit also.
+        wall_starts          = [0 0; 0 0.5; -1 3];
+        wall_ends            = [1 0; 1 0.5; 2 3];
+        sensorLengthX = 0;
+        sensorLengthY = 1;
+        totalRangeX = [-1 0 0.5 1 2];
+        totalRangeY = [-2 -1 -0.5 -0.25 0 1];
+
+        % If ANY projections are used, the end points of the range will have
+        % intersections. But if GIVEN projections are used, only the values from
+        % 2:end-1 will have intersections. The trimEnds function gives values from
+        % 2:end-1 for vectors that have length greater than 2.
+
+        % intersections    = [nan nan];
+        % distances     = nan;
+        % wall_segments = nan;
+        % tValues       = nan;
+        % uValues       = nan;
+
+        flag_search_range_type = thirdFigureNumber;
+        switch flag_search_range_type
+            case {0}
+                % Limited sensor, limited wall
+                clear intersection_counts
+                intersection_counts = cell(2,3);
+
+                IntersectionNumber = 1;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = [0 0.5 1];
+                    y_values = -1;
+                else
+                    x_values =  0.5;
+                    y_values = [-0.5 0];
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];                        
+                    end
+                end
+
+                IntersectionNumber = 2;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = [0 0.5 1];
+                    y_values = [-0.5 -0.25 0];
+                else
+                    x_values = 0.5;
+                    y_values = -0.25;
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
+
+            case {1}
+
+                % URHERE
+
+                wall_starts          = [0 0; 0 0.5; -1 3];
+                wall_ends            = [1 0; 1 0.5; 2 3];
+                totalRangeX = [-1 0 0.5 1 2];
+                totalRangeY = [-2 -1 -0.5 -0.25 0 1];
+
+
+                % Infinite sensor, limited wall
+                clear intersection_counts
+                intersection_counts = cell(2,3);
+
+                IntersectionNumber = 1;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = [-1  2];
+                    y_values = [-2 -1 -0.5 -0.25 0 1];
+                    URHERE
+                else
+                    x_values =  0.5;
+                    y_values = [-0.5 0];
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];                        
+                    end
+                end
+
+                IntersectionNumber = 2;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = [0 0.5 1];
+                    y_values = [-0.5 -0.25 0];
+                else
+                    x_values = 0.5;
+                    y_values = -0.25;
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
+            case {2}
+                % Limited sensor, infinite wall
+                xStartsWithIntersections = totalRangeX;
+                yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
+            case {3}
+                % Infinite sensor, infinite wall
                 xStartsWithIntersections = totalRangeX;
                 yStartsWithIntersections = totalRangeY;
             otherwise
@@ -1585,7 +1400,7 @@ end
 % 0: uses defaults
 % 1: uses positive tolerances
 % 2: uses negative tolerances
-switch fourthFigureNumber
+switch flag_testTolerance
     case {0}
         % do nothing
         tolerance = [];
@@ -1595,8 +1410,8 @@ switch fourthFigureNumber
     case {2}
         % Negative tolerance
         tolerance = -0.001;
-        % xStarts are trimmed?
-        if flag_testTolerance == 1
+        if firstFigureNumber<4
+            % xStarts are trimmed?
             if isequal(xStartsWithIntersections, [0 0.5 1])
                 xStartsWithIntersections = 0.5;
             end
@@ -1623,10 +1438,10 @@ for jth_yStart = 1:length(all_yStarts)
     for ith_xStart = 1:length(all_xStarts)
         thisX = all_xStarts(ith_xStart);
         ith_case = ith_case+1;
-        % FOR DEBUGGING
-        if ith_case == 4
-            disp('stop here');
-        end
+        % % FOR DEBUGGING
+        % if ith_case == 23
+        %     disp('stop here');
+        % end
         testCases(ith_case).wall_start          = wall_starts;
         testCases(ith_case).wall_end            = wall_ends;
         testCases(ith_case).sensor_vector_start = [thisX thisY];
@@ -1656,6 +1471,7 @@ for jth_yStart = 1:length(all_yStarts)
                 end
 
             case {3} % Infinite intersect cases
+
                 wall_segments    = [1; 1]; % Default
                 if thisX<0
                     distanceSensorStartToWallStart = 0 - thisX;
@@ -1667,22 +1483,25 @@ for jth_yStart = 1:length(all_yStarts)
                 maxXstart = max(thisX,0);
                 minXend   = min(thisX+1,1);
 
-                % URHERE
 
                 % If tolerance is negative, the lines NEVER intersect
                 % (fourthFigureNumber == 2)
                 if ismember(thisX, xStartsWithIntersections) && fourthFigureNumber~=2
                     switch flag_search_range_type
                         case {0}
-                            if thirdFigureNumber==0 || secondFigureNumber==0
-                                intersections    = [maxXstart 0];
-                            else
-                                intersections    = [maxXstart 0; minXend 0];
-                            end
-                            distances   = distanceSensorStartToWallStart;
+
+                            % Finite sensor, finite walls
+                            % if thirdFigureNumber==0 || secondFigureNumber==0
+                            %     intersections    = [maxXstart 0; minXend 0];
+                            % else
+                            %     intersections    = [maxXstart 0; minXend 0];
+                            % end
+                            intersections    = [maxXstart 0; minXend 0];
+                            distances   = sum(([thisX 0; thisX 0] - intersections).^2,2).^0.5;
                             tValues     = [maxXstart; minXend];
                             uValues     = [distanceSensorStartToWallStart; minXend-thisX];
                         case {1}
+                            % Infinite sensor, finite walls
                             intersections = [0 0; 1 0];
                             distances     = [0-thisX; 1-thisX];
                             tValues       = [0; 1];
@@ -1695,6 +1514,18 @@ for jth_yStart = 1:length(all_yStarts)
                                 tValues       = flipud(tValues);
                                 uValues       = flipud(uValues);
                             end
+                        case {2}
+                            % Finite sensor, infinite walls
+                            intersections = [thisX 0; thisX+1 0];
+                            distances     = [0; 1];
+                            tValues       = [thisX; thisX+1];
+                            uValues       = [0; 1];
+                        case {3}
+                            % Infinite sensor, infinite walls
+                            intersections = [-inf 0; inf 0];
+                            distances     = [-inf; inf];
+                            tValues       = [-inf; inf];
+                            uValues       = [-inf; inf];
                         otherwise
 
                     end
@@ -1707,6 +1538,58 @@ for jth_yStart = 1:length(all_yStarts)
                     uValues       = nan;
                 end
 
+            case {4} % Multi-hit cases
+
+                % Find how many intersections there are, and where                
+                % intersections are at
+                Num_intersections = 0; % Default value
+                intersectionCountSize = size(intersection_counts);
+                for nth_interection = 1:intersectionCountSize(1)
+                    for jth_case = 1:intersectionCountSize(2)
+                        this_intersection = intersection_counts{nth_interection,jth_case};
+                        if isequal([thisX thisY], this_intersection)
+                            Num_intersections = nth_interection;
+                        end
+                    end
+                end
+                % wall_starts          = [0 0; 0 0.5; -1 3];
+                % wall_ends            = [1 0; 1 0.5; 2 3];
+                if Num_intersections==1
+                    intersections = [thisX 0];
+                    distances     = -thisY;
+                    wall_segments = 1;
+                    tValues       = thisX;
+                    uValues       = distances;
+
+                    % This is a very special case - hard to program so just
+                    % hard code the result
+                    if ith_case == 23 && 2==flag_testTolerance && 0==flag_search_range_type
+                        intersections = [thisX 0.5];
+                        distances     = 0.5;
+                        wall_segments = 2;
+                        tValues       = thisX;
+                        uValues       = distances;
+                        
+                    end
+                elseif Num_intersections==2
+                    intersections = [thisX 0; thisX 0.5];
+                    distances     = [0-thisY; 0.5-thisY];
+                    wall_segments = [1; 2];
+                    tValues       = [thisX; thisX];
+                    uValues       = distances;                    
+                elseif Num_intersections==3
+                    intersections = [thisX 0; thisX 0.5; thisX 3];
+                    distances     = [0-thisY; 0.5-thisY; 3-thisY];
+                    wall_segments = [1; 2; 3];
+                    tValues       = [thisX; thisX; (thisX+1)/3];
+                    uValues       = distances;                    
+                else
+                    intersections    = [nan nan];
+                    distances     = nan;
+                    wall_segments = nan;
+                    tValues       = nan;
+                    uValues       = nan;
+                end
 
             otherwise
                 warning('on','backtrace');

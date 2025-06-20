@@ -413,7 +413,7 @@ elseif 2 == flag_search_range_type
 elseif 3 == flag_search_range_type
     % 3: ANY projection of BOTH the wall and sensor
     % NO constraints
-    good_vector = ((Inf>uValues).*(Inf>tValues));
+    good_vector = ((Inf>=uValues).*(-Inf<=tValues));
 else
     warning('on','backtrace');
     warning('Expecting a flag_search_range_type as integer in range of 0 to 3, but found: %.3f',flag_search_range_type);
@@ -428,7 +428,16 @@ intersections = NaN*ones(length(p(:,1)),2);
 if ~isempty(within_indices)
     % Calculate the intersection point (finally)
     result = p + tValues.*r; 
-    intersections(within_indices,:) = result(within_indices,:);    
+    if any(isinf(tValues))
+        % Will get a NaN value if multiply infinity by zero. Force NaN
+        % values to be zero
+        infiniteIndices = isinf(tValues);
+        fixedResults = result(infiniteIndices,:);
+        fixedResults(isnan(fixedResults))=0;
+        result(infiniteIndices,:) = fixedResults;
+    end
+    intersections(within_indices,:) = result(within_indices,:);  
+    
 end
 
 %% Apply flag_search_return_type
@@ -439,20 +448,20 @@ if isempty(within_indices)
     distance = nan;
     location = [nan nan];
     wall_segment = nan;
-    p = [nan nan];
-    r = [nan nan];
     t = nan;
+    u = nan;
 else
-    distance = distances_squared(within_indices).^0.5.*sign(uValues(within_indices));
     location = intersections(within_indices,:);
     wall_segment = wall_indexes(within_indices);
     p = p(within_indices,:);
     r = r(within_indices,:);
     t = tValues(within_indices);
+    % The following converts t-values into u-values
+    u = fcn_Path_convertPerA2PerB(p, ones(length(p(:,1)),1)*q, r, ones(length(p(:,1)),1)*s, t, -1);
+    validDistancesSquared = distances_squared(within_indices);
+    distance = validDistancesSquared.^0.5.*sign(u);
 end
 
-% The following converts t-values into u-values
-u = fcn_Path_convertPerA2PerB(p, ones(length(p(:,1)),1)*q, r, ones(length(p(:,1)),1)*s, t, -1);
 
 
 
