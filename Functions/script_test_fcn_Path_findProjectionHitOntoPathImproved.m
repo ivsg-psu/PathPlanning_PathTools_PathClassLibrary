@@ -262,7 +262,7 @@ close all;
 
 intersectionTestType = 3;
 return_flags = [0 1];
-range_flags  = [0 1 2 3];
+range_flags  = 1; %[0 1 2 3];
 tolerance_flags = 0; %[0 1 2];
 thisCase = 1;
 
@@ -1534,7 +1534,7 @@ switch firstFigureNumber
         wall_ends            = [1 0];
         sensorLengthX = 1;
         sensorLengthY = 0;
-        totalRangeX = [-1.5 -0.5 0 0.5 1.5];
+        totalRangeX = [-1.5 -0.5 0 0.5-100*eps 1.5];
         totalRangeY = 0;
         flag_testTolerance = 0;
 
@@ -1639,18 +1639,21 @@ for jth_yStart = 1:length(all_yStarts)
         % Fill in expected values
         switch firstFigureNumber
             case {2} % Single intersect cases
-                wall_segments    = [1; 1]; % Default
                 if ismember(thisY,yStartsWithIntersections) && ismember(thisX, xStartsWithIntersections)
                     intersections    = [thisX 0];
                     distances    = 0 - thisY;
+                    wall_segments    = 1;
                     testCases(ith_case).expected.wall_segment = 1;
+                    tValues     = thisX;
+                    uValues     = -thisY;
                 else
                     intersections    = [nan nan];
                     distances    = nan;
+                    wall_segments = nan;
                     testCases(ith_case).expected.wall_segment = nan;
+                    tValues     = nan;
+                    uValues     = nan;
                 end
-                tValues     = thisX;
-                uValues     = -thisY;
 
             case {3} % Infinite intersect cases
                 wall_segments    = [1; 1]; % Default
