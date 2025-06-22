@@ -67,18 +67,18 @@ function [distance,location,wall_segment, t, u] = ...
 %      wall, in both the negative and positive directions. Distances in the
 %      negative sensor direction are reported as negative values.
 %
-%            0: (default) the GIVEN sensor and GIVEN wall used.
-%            1: ANY projection of the sensor used with the GIVEN wall
-%            2: ANY projection of the wall used with the GIVEN sensor
-%            3: ANY projection of BOTH the wall and sensor
+%            0: GIVEN projection of the sensor used with GIVEN projection of wall (default)
+%            1: ANY   projection of the sensor used with GIVEN projection of wall
+%            2: GIVEN projection of the sensor used with ANY   projection of wall
+%            3: ANY   projection of the sensor used with ANY   projection of wall
 %
 %      tolerance: (default is 1000*eps) How close points must be to a
 %      segment to be counted as intersecting. Positive values are
 %      inclusive, negative values are exclusive. For example, consider 3
 %      wall segments:
 %            A: from the origin [0 0] to [1 0], 
-%            B: from [0.5 0] to [0.5 1],
-%            C: from [1 0] to [2 0]
+%            B: from [0.5 0] to [0.5 1] (head of B sits on middle of A)
+%            C: from [1 0] to [2 0]  (head of C sits on tail of A)
 %      if the tolerance is 0, whether or not A and B intersect can be
 %      unclear as this is strongly affected by the numerical accuray of number
 %      representations. If the tolerance is higher than numberical accuracy

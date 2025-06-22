@@ -17,7 +17,7 @@ close all
 
 %%%%%%%%%%%%
 % FIGURE NUMBERING:
-% FSTXXX
+% FSTtXX
 %
 % F is First figure number, starting with:
 % 1: demonstration cases
@@ -40,12 +40,12 @@ close all
 % 2: ANY projection of the wall used with the GIVEN sensor
 % 3: ANY projection of BOTH the wall and sensor
 %
-% t: is tolerance
+% Fourth number, t: is tolerance
 % 0: uses defaults
 % 1: uses positive tolerances
 % 2: uses negative tolerances
 %
-% XX: 4th to 6th number: a counter that counts up through the cases in this
+% XX: 5th to 6th number: a counter that counts up through the cases in this
 % section.
 %
 % Example:
@@ -159,24 +159,24 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 
-%% Single point intersection cases
+%% Single hit intersection cases
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____ _             _        _____      _       _     _____       _                          _   _
-%  / ____(_)           | |      |  __ \    (_)     | |   |_   _|     | |                        | | (_)
-% | (___  _ _ __   __ _| | ___  | |__) |__  _ _ __ | |_    | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
-%  \___ \| | '_ \ / _` | |/ _ \ |  ___/ _ \| | '_ \| __|   | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
-%  ____) | | | | | (_| | |  __/ | |  | (_) | | | | | |_   _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
-% |_____/|_|_| |_|\__, |_|\___| |_|   \___/|_|_| |_|\__| |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
+%
+%   _____ _             _        _    _ _ _     _____       _                          _   _
+%  / ____(_)           | |      | |  | (_) |   |_   _|     | |                        | | (_)
+% | (___  _ _ __   __ _| | ___  | |__| |_| |_    | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
+%  \___ \| | '_ \ / _` | |/ _ \ |  __  | | __|   | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
+%  ____) | | | | | (_| | |  __/ | |  | | | |_   _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
+% |_____/|_|_| |_|\__, |_|\___| |_|  |_|_|\__| |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
 %                  __/ |
 %                 |___/
-%
-% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Single%20Point%20Intersections
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Single%20Hit%20Intersections
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % All single point intersection figures start with the number 2
 
 close all;
 
-%% Single point intersection 2XXX1 cases
+%% Single hit intersection 2XXXX cases
 % flag_search_return_type 0: first intersection if there is any overlap
 % flag_search_range_type  0: (default) the GIVEN sensor and GIVEN wall used.
 % tolerance 0: uses defaults
@@ -339,13 +339,11 @@ end % Ends loop throough return flags
 
 close all;
 
-%% Multi hit intersection 4XXX1 cases
-
-% URHERE
+%% Multi hit intersection 4XXXXX cases
 
 intersectionTestType = 4;
 return_flags = [0 1];
-range_flags  = 1; %[0 1 2 3];  
+range_flags  = [0 1 2 3];  
 tolerance_flags = [0 1 2];
 thisCase = 1;
 
@@ -400,6 +398,91 @@ for ith_return = 1:length(return_flags)
     end % Ends loop through range flags
 end % Ends loop throough return flags
 
+%% Wall as a single point tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% __          __   _ _                        _____ _             _        _____      _       _
+% \ \        / /  | | |                      / ____(_)           | |      |  __ \    (_)     | |
+%  \ \  /\  / /_ _| | |   __ _ ___    __ _  | (___  _ _ __   __ _| | ___  | |__) |__  _ _ __ | |_
+%   \ \/  \/ / _` | | |  / _` / __|  / _` |  \___ \| | '_ \ / _` | |/ _ \ |  ___/ _ \| | '_ \| __|
+%    \  /\  / (_| | | | | (_| \__ \ | (_| |  ____) | | | | | (_| | |  __/ | |  | (_) | | | | | |_
+%     \/  \/ \__,_|_|_|  \__,_|___/  \__,_| |_____/|_|_| |_|\__, |_|\___| |_|   \___/|_|_| |_|\__|
+%                                                            __/ |
+%                                                           |___/
+%   _____       _                          _   _
+%  |_   _|     | |                        | | (_)
+%    | |  _ __ | |_ ___ _ __ ___  ___  ___| |_ _  ___  _ __  ___
+%    | | | '_ \| __/ _ \ '__/ __|/ _ \/ __| __| |/ _ \| '_ \/ __|
+%   _| |_| | | | ||  __/ |  \__ \  __/ (__| |_| | (_) | | | \__ \
+%  |_____|_| |_|\__\___|_|  |___/\___|\___|\__|_|\___/|_| |_|___/
+%
+%
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=Wall%20as%20a%20Single%20Point%0A%20Intersections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All wall as a single point intersection figures start with the number 5
+
+close all;
+
+%% Wall as a single point intersection 5XXXX cases
+
+% URHERE
+
+intersectionTestType = 5;
+return_flags = [0 1];
+range_flags  = [0 1 2 3];  
+tolerance_flags = [0 1 2];
+thisCase = 1;
+
+for ith_return = 1:length(return_flags)
+    thisReturn = return_flags(ith_return);
+    for ith_range = 1:length(range_flags)
+        thisRange = range_flags(ith_range);
+        for ith_tolerance = 1:length(tolerance_flags)
+            thisTolerance = tolerance_flags(ith_tolerance);
+
+            % Build the figure number
+            fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
+            fig_num = str2double(fig_string);
+            plotting.FigureExpected = 1;
+
+            % Build the test cases
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+
+            for ith_testCase = 1:length(testCases)
+
+                % Plot the sensor vector in red, to highlight which one we're on
+                quiver(testCases(ith_testCase).sensor_vector_start(1,1),testCases(ith_testCase).sensor_vector_start(1,2),0,1,'r','Linewidth',1,'MaxHeadSize',1);
+
+
+                clear inputs
+                inputs = testCases(ith_testCase);
+
+                % SHORT format checking
+                clear expected
+                expected.distance = testCases(ith_testCase).expected.Distance;
+                expected.location = testCases(ith_testCase).expected.Intersection;
+                expected.wall_segment = testCases(ith_testCase).expected.wall_segment;
+                expected.t = testCases(ith_testCase).expected.t;
+                expected.u = testCases(ith_testCase).expected.u;
+
+                actual = struct;
+                [actual.distance, actual.location, actual.wall_segment, actual.t, actual.u] = ...
+                    fcn_Path_findProjectionHitOntoPathImproved(...
+                    inputs.wall_start, inputs.wall_end,...
+                    inputs.sensor_vector_start,inputs.sensor_vector_end,...
+                    (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
+                    (inputs.tolerance), (inputs.fig_num));
+
+                fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
+                %fcn_INTERNAL_printResults(actual.distance,actual.location);
+
+            end % Ends loop through cases
+
+            close all;
+
+        end % Ends loop through tolerance flags
+    end % Ends loop through range flags
+end % Ends loop throough return flags
 
 
 
@@ -1055,16 +1138,13 @@ for ith_field = 1:Nfields
     if ~isa(thisVariable,expectedType)|| ~isequal(size(thisVariable),expectedSize)
         flag_errorWillBeThrown = 1;
     end
-    if ~any(isnan(thisVariable),'all') && ~isequal(round(thisVariable,expectedValueDigits),expectedValue)
+    if ~any(isnan(thisVariable),'all') && ~isequal(round(thisVariable,expectedValueDigits),round(expectedValue,expectedValueDigits))
         flag_errorWillBeThrown = 1;
     end
-    try
-        if ~any(isnan(expectedValue),'all') && ~isequal(round(thisVariable,expectedValueDigits),expectedValue)
-            flag_errorWillBeThrown = 1;
-        end
-    catch
-        disp('stop here');
+    if ~any(isnan(expectedValue),'all') && ~isequal(round(thisVariable,expectedValueDigits),round(expectedValue,expectedValueDigits))
+        flag_errorWillBeThrown = 1;
     end
+
     if all(isnan(thisVariable),'all') && ~all(isnan(thisVariable),'all')
         flag_errorWillBeThrown = 1;
     end
@@ -1081,7 +1161,7 @@ for ith_field = 1:Nfields
     if all(isnan(expectedValue))
         assert(all(isnan(thisVariable)));
     else
-        assert(isequal(round(thisVariable,expectedValueDigits),expectedValue));
+        assert(isequal(round(thisVariable,expectedValueDigits),round(expectedValue,expectedValueDigits)));
     end
 
 end
@@ -1308,28 +1388,19 @@ switch firstFigureNumber
                 end
 
             case {1}
-
-                % URHERE
-
-                wall_starts          = [0 0; 0 0.5; -1 3];
-                wall_ends            = [1 0; 1 0.5; 2 3];
-                totalRangeX = [-1 0 0.5 1 2];
-                totalRangeY = [-2 -1 -0.5 -0.25 0 1];
-
-
                 % Infinite sensor, limited wall
                 clear intersection_counts
-                intersection_counts = cell(2,3);
+                intersection_counts = cell(3,4);
 
+                % 1 intersection case
                 IntersectionNumber = 1;
                 N_intersections = 0;
                 if flag_testTolerance ~= 2
                     x_values = [-1  2];
-                    y_values = [-2 -1 -0.5 -0.25 0 1];
-                    URHERE
+                    y_values = [-2 -1 -0.5 -0.25 0 1];                    
                 else
-                    x_values =  0.5;
-                    y_values = [-0.5 0];
+                    x_values = [0 1];
+                    y_values = [-2 -1 -0.5 -0.25 0 1];                    
                 end
                 for jth_y = 1:length(y_values)
                     thisY = y_values(jth_y);
@@ -1340,14 +1411,18 @@ switch firstFigureNumber
                     end
                 end
 
-                IntersectionNumber = 2;
+                % 2 intersection cases
+                % NONE!
+
+                % 3 intersection cases
+                IntersectionNumber = 3;
                 N_intersections = 0;
                 if flag_testTolerance ~= 2
                     x_values = [0 0.5 1];
-                    y_values = [-0.5 -0.25 0];
+                    y_values = [-2 -1 -0.5 -0.25 0 1];
                 else
                     x_values = 0.5;
-                    y_values = -0.25;
+                    y_values = [-2 -1 -0.5 -0.25 0 1];
                 end
                 for jth_y = 1:length(y_values)
                     thisY = y_values(jth_y);
@@ -1359,19 +1434,279 @@ switch firstFigureNumber
                 end
             case {2}
                 % Limited sensor, infinite wall
-                xStartsWithIntersections = totalRangeX;
-                yStartsWithIntersections = fcn_INTERNAL_trimEnds(totalRangeY);
+
+                % 
+
+
+
+                clear intersection_counts
+                intersection_counts = cell(3,4);
+
+                % 1 intersection cases
+                % wall_starts          = [0 0; 0 0.5; -1 3];
+                % wall_ends            = [1 0; 1 0.5; 2 3];
+                % sensorLengthX = 0;
+                % sensorLengthY = 1;
+                % totalRangeX = [-1 0 0.5 1 2];
+                % totalRangeY = [-2 -1 -0.5 -0.25 0 1];
+
+                IntersectionNumber = 1;
+                N_intersections = 0;
+                
+                x_values = [-1 0 0.5 1 2];
+                if flag_testTolerance ~= 2
+                    y_values = -1;
+                else
+                    y_values = [-0.25 -0.5 0];
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];                        
+                    end
+                end
+
+                % 2 intersection cases
+                IntersectionNumber = 2;
+                N_intersections = 0;
+                x_values = [-1 0 0.5 1 2];
+                if flag_testTolerance ~= 2
+                    y_values = [-0.5 -0.25 0];
+                else
+                    y_values = -0.25;
+                end
+
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
+
+                % 3 intersection cases
+                % NONE!
             case {3}
                 % Infinite sensor, infinite wall
-                xStartsWithIntersections = totalRangeX;
-                yStartsWithIntersections = totalRangeY;
+
+                clear intersection_counts
+                intersection_counts = cell(3,4);
+
+                % 1 intersection cases
+                % NONE!
+
+                % 2 intersection cases
+                % NONE!
+
+                % 3 intersection cases
+                % wall_starts          = [0 0; 0 0.5; -1 3];
+                % wall_ends            = [1 0; 1 0.5; 2 3];
+                % sensorLengthX = 0;
+                % sensorLengthY = 1;
+                % totalRangeX = [-1 0 0.5 1 2];
+                % totalRangeY = [-2 -1 -0.5 -0.25 0 1];
+                IntersectionNumber = 3;
+                N_intersections = 0;
+                x_values = [-1 0 0.5 1 2];
+                y_values = [-2 -1 -0.5 -0.25 0 1];
+
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
             otherwise
                 warning('on','backtrace');
                 warning('Expecting a third figure number with integer values of 0 to 3, but found: %.3f',thirdFigureNumber);
                 error('Third figure number not recognized');
         end
 
-    case {5,6,7} % All multi-hit cases
+    case {5} % Wall as a single point case
+
+        % URHERE
+
+        % All are tested one "single point" wall. 
+        wall_starts          = [0 0];
+        wall_ends            = [0 0];
+        sensorLengthX = 0;
+        sensorLengthY = 1;
+        totalRangeX = 0;
+        totalRangeY = [-2 -1 -0.5 0 1];
+
+        flag_search_range_type = thirdFigureNumber;
+        switch flag_search_range_type
+            case {0}
+                % Limited sensor, limited wall
+                clear intersection_counts
+                intersection_counts = cell(2,3);
+
+                %         totalRangeX = [-2 -1 -0.5 0 1];
+
+                IntersectionNumber = 1;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = 0;
+                    y_values =  [-1 -0.5 0 ];
+                else
+                    x_values = 0;
+                    y_values =  -0.5;
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];                        
+                    end
+                end
+
+
+            case {1}
+                % Infinite sensor, limited wall
+                clear intersection_counts
+                intersection_counts = cell(3,4);
+
+                % 1 intersection case
+                IntersectionNumber = 1;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = [-1  2];
+                    y_values = [-2 -1 -0.5 -0.25 0 1];                    
+                else
+                    x_values = [0 1];
+                    y_values = [-2 -1 -0.5 -0.25 0 1];                    
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];                        
+                    end
+                end
+
+                % 2 intersection cases
+                % NONE!
+
+                % 3 intersection cases
+                IntersectionNumber = 3;
+                N_intersections = 0;
+                if flag_testTolerance ~= 2
+                    x_values = [0 0.5 1];
+                    y_values = [-2 -1 -0.5 -0.25 0 1];
+                else
+                    x_values = 0.5;
+                    y_values = [-2 -1 -0.5 -0.25 0 1];
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
+            case {2}
+                % Limited sensor, infinite wall
+
+                % 
+
+
+
+                clear intersection_counts
+                intersection_counts = cell(3,4);
+
+                % 1 intersection cases
+                % wall_starts          = [0 0; 0 0.5; -1 3];
+                % wall_ends            = [1 0; 1 0.5; 2 3];
+                % sensorLengthX = 0;
+                % sensorLengthY = 1;
+                % totalRangeX = [-1 0 0.5 1 2];
+                % totalRangeY = [-2 -1 -0.5 -0.25 0 1];
+
+                IntersectionNumber = 1;
+                N_intersections = 0;
+                
+                x_values = [-1 0 0.5 1 2];
+                if flag_testTolerance ~= 2
+                    y_values = -1;
+                else
+                    y_values = [-0.25 -0.5 0];
+                end
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];                        
+                    end
+                end
+
+                % 2 intersection cases
+                IntersectionNumber = 2;
+                N_intersections = 0;
+                x_values = [-1 0 0.5 1 2];
+                if flag_testTolerance ~= 2
+                    y_values = [-0.5 -0.25 0];
+                else
+                    y_values = -0.25;
+                end
+
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
+
+                % 3 intersection cases
+                % NONE!
+            case {3}
+                % Infinite sensor, infinite wall
+
+                clear intersection_counts
+                intersection_counts = cell(3,4);
+
+                % 1 intersection cases
+                % NONE!
+
+                % 2 intersection cases
+                % NONE!
+
+                % 3 intersection cases
+                % wall_starts          = [0 0; 0 0.5; -1 3];
+                % wall_ends            = [1 0; 1 0.5; 2 3];
+                % sensorLengthX = 0;
+                % sensorLengthY = 1;
+                % totalRangeX = [-1 0 0.5 1 2];
+                % totalRangeY = [-2 -1 -0.5 -0.25 0 1];
+                IntersectionNumber = 3;
+                N_intersections = 0;
+                x_values = [-1 0 0.5 1 2];
+                y_values = [-2 -1 -0.5 -0.25 0 1];
+
+                for jth_y = 1:length(y_values)
+                    thisY = y_values(jth_y);
+                    for ith_x = 1:length(x_values)
+                        thisX = x_values(ith_x);
+                        N_intersections = N_intersections+1;
+                        intersection_counts{IntersectionNumber,N_intersections} = [thisX   thisY];
+                    end
+                end
+            otherwise
+                warning('on','backtrace');
+                warning('Expecting a third figure number with integer values of 0 to 3, but found: %.3f',thirdFigureNumber);
+                error('Third figure number not recognized');
+        end
+    case {6,7} % All multi-hit cases
         % All are tested with single wall
         wall_starts          = [0 0; 1 0;];
         wall_ends            = [1 0; 1 1];
@@ -1438,8 +1773,8 @@ for jth_yStart = 1:length(all_yStarts)
     for ith_xStart = 1:length(all_xStarts)
         thisX = all_xStarts(ith_xStart);
         ith_case = ith_case+1;
-        % % FOR DEBUGGING
-        % if ith_case == 23
+        % FOR DEBUGGING
+        % if ith_case == 21
         %     disp('stop here');
         % end
         testCases(ith_case).wall_start          = wall_starts;
@@ -1552,45 +1887,128 @@ for jth_yStart = 1:length(all_yStarts)
                         end
                     end
                 end
-                % wall_starts          = [0 0; 0 0.5; -1 3];
-                % wall_ends            = [1 0; 1 0.5; 2 3];
-                if Num_intersections==1
-                    intersections = [thisX 0];
-                    distances     = -thisY;
-                    wall_segments = 1;
-                    tValues       = thisX;
-                    uValues       = distances;
+                switch flag_search_range_type
+                    case {0, 2, 3}
+                        if Num_intersections==1
+                            intersections = [thisX 0];
+                            distances     = -thisY;
+                            wall_segments = 1;
+                            tValues       = thisX;
+                            uValues       = distances;
 
-                    % This is a very special case - hard to program so just
-                    % hard code the result
-                    if ith_case == 23 && 2==flag_testTolerance && 0==flag_search_range_type
-                        intersections = [thisX 0.5];
-                        distances     = 0.5;
-                        wall_segments = 2;
-                        tValues       = thisX;
-                        uValues       = distances;
-                        
+                            % This is a very special case where tolerance
+                            % changes hits that count as either 1st or 2nd
+                            if 2==flag_testTolerance
+                                intersections = [thisX thisY+0.5];
+                                distances     = 0.5;
+                                if thisY==-0.5
+                                    wall_segments = 1;
+                                else
+                                    wall_segments = 2;
+                                end
+                                tValues       = thisX;
+                                uValues       = distances;
+
+                            end
+                        elseif Num_intersections==2
+                            intersections = [thisX 0; thisX 0.5];
+                            distances     = [0-thisY; 0.5-thisY];
+                            wall_segments = [1; 2];
+                            tValues       = [thisX; thisX];
+                            uValues       = distances;
+                        elseif Num_intersections==3
+                            intersections = [thisX 0; thisX 0.5; thisX 3];
+                            distances     = [0-thisY; 0.5-thisY; 3-thisY];
+                            wall_segments = [1; 2; 3];
+                            tValues       = [thisX; thisX; (thisX+1)/3];
+                            uValues       = distances;
+                        else
+                            intersections    = [nan nan];
+                            distances     = nan;
+                            wall_segments = nan;
+                            tValues       = nan;
+                            uValues       = nan;
+                        end
+                    case{1}
+                        if Num_intersections==1
+                            intersections = [thisX 3];
+                            distances     = 3-thisY;
+                            wall_segments = 3;
+                            tValues       = (thisX+1)/3;
+                            uValues       = distances;
+                        elseif Num_intersections==2
+                            error('This does not happen?');
+                        elseif Num_intersections==3                            
+                            intersections = [thisX 0; thisX 0.5; thisX 3];
+                            distances     = [0-thisY; 0.5-thisY; 3-thisY];
+                            wall_segments = [1; 2; 3];
+                            tValues       = [thisX; thisX; (thisX+1)/3];
+                            uValues       = distances;
+                        else
+                            intersections    = [nan nan];
+                            distances     = nan;
+                            wall_segments = nan;
+                            tValues       = nan;
+                            uValues       = nan;
+                        end
+                    otherwise
+                end
+            case {5} % Single wall case
+
+                % Find how many intersections there are, and where                
+                % intersections are at
+                Num_intersections = 0; % Default value
+                intersectionCountSize = size(intersection_counts);
+                for nth_interection = 1:intersectionCountSize(1)
+                    for jth_case = 1:intersectionCountSize(2)
+                        this_intersection = intersection_counts{nth_interection,jth_case};
+                        if isequal([thisX thisY], this_intersection)
+                            Num_intersections = nth_interection;
+                        end
                     end
-                elseif Num_intersections==2
-                    intersections = [thisX 0; thisX 0.5];
-                    distances     = [0-thisY; 0.5-thisY];
-                    wall_segments = [1; 2];
-                    tValues       = [thisX; thisX];
-                    uValues       = distances;                    
-                elseif Num_intersections==3
-                    intersections = [thisX 0; thisX 0.5; thisX 3];
-                    distances     = [0-thisY; 0.5-thisY; 3-thisY];
-                    wall_segments = [1; 2; 3];
-                    tValues       = [thisX; thisX; (thisX+1)/3];
-                    uValues       = distances;                    
-                else
-                    intersections    = [nan nan];
-                    distances     = nan;
-                    wall_segments = nan;
-                    tValues       = nan;
-                    uValues       = nan;
                 end
 
+                % URHERE
+
+                switch flag_search_range_type
+                    case {0, 2, 3}
+                        if Num_intersections==1
+                            intersections = [0 0];
+                            distances     = -thisY;
+                            wall_segments = 1;
+                            tValues       = 0;
+                            uValues       = distances;
+                        else
+                            intersections    = [nan nan];
+                            distances     = nan;
+                            wall_segments = nan;
+                            tValues       = nan;
+                            uValues       = nan;
+                        end
+                    case{1}
+                        if Num_intersections==1
+                            intersections = [thisX 3];
+                            distances     = 3-thisY;
+                            wall_segments = 3;
+                            tValues       = (thisX+1)/3;
+                            uValues       = distances;
+                        elseif Num_intersections==2
+                            error('This does not happen?');
+                        elseif Num_intersections==3                            
+                            intersections = [thisX 0; thisX 0.5; thisX 3];
+                            distances     = [0-thisY; 0.5-thisY; 3-thisY];
+                            wall_segments = [1; 2; 3];
+                            tValues       = [thisX; thisX; (thisX+1)/3];
+                            uValues       = distances;
+                        else
+                            intersections    = [nan nan];
+                            distances     = nan;
+                            wall_segments = nan;
+                            tValues       = nan;
+                            uValues       = nan;
+                        end
+                    otherwise
+                end
             otherwise
                 warning('on','backtrace');
                 warning('Expecting a first figure number with integer values of 2 to 7, but found: %.3f',firstFigureNumber);
@@ -1598,11 +2016,16 @@ for jth_yStart = 1:length(all_yStarts)
         end
         % Check if 2 solutions or 1 solution requested
         if flag_search_return_type==0
-            testCases(ith_case).expected.Intersection    = intersections(1,:);
-            testCases(ith_case).expected.Distance        = distances(1);
-            testCases(ith_case).expected.wall_segment    = wall_segments(1);
-            testCases(ith_case).expected.t               = tValues(1);
-            testCases(ith_case).expected.u               = uValues(1);
+            if all(isnan(intersections))
+                closestIndex = 1;
+            else
+                closestIndex = fcn_INTERNAL_selectClosestPoint([thisX thisY], intersections, flag_search_return_type);
+            end
+            testCases(ith_case).expected.Intersection    = intersections(closestIndex,:);
+            testCases(ith_case).expected.Distance        = distances(closestIndex);
+            testCases(ith_case).expected.wall_segment    = wall_segments(closestIndex);
+            testCases(ith_case).expected.t               = tValues(closestIndex);
+            testCases(ith_case).expected.u               = uValues(closestIndex);
         else
             testCases(ith_case).expected.Intersection    = intersections;
             testCases(ith_case).expected.Distance        = distances;
@@ -1616,3 +2039,27 @@ end
 fcn_INTERNAL_plotTestCases(fig_num, wall_starts, wall_ends, testCases);
 
 end % Ends fcn_INTERNAL_fillTestCases
+
+%% fcn_INTERNAL_selectClosestPoint 
+function [within_indices, distances_squared] = fcn_INTERNAL_selectClosestPoint(sensor_vector_start, intersections, flag_search_return_type)
+
+% Find the distances via Euclidian distance to the sensor's origin
+% note: a faster way to do this might be to just
+% calculate t*r as a length
+distances_squared = sum((intersections - sensor_vector_start).^2,2);
+within_indices = find(~isnan(distances_squared));
+if ~isempty(within_indices)
+    if 0==flag_search_return_type
+        % Keep only the minimum distance result
+        [~,within_indices] = min(distances_squared);
+ 
+    elseif 1==flag_search_return_type
+        % Return all the results by default
+    else
+        warning('on','backtrace');
+        warning('Expecting a flag_search_return_type as integer with values of 0 or 1, but found: %.3f',flag_search_return_type);
+        error('Bad flag_search_range_type encountered');
+    end
+end
+
+end % Ends fcn_INTERNAL_selectClosestPoint
