@@ -54,7 +54,11 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %          projections are interpolated from their prior and subsequent
 %          vectors.
 %
-%      fig_num: a figure number to plot results. Turns debugging on.
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -68,7 +72,8 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_checkInputsToFunctions
+%      fcn_DebugTools_checkInputsToFunctions
+%      fcn_Path_findPathOrthogonalVectors
 %
 % EXAMPLES:
 %      
@@ -79,68 +84,93 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 % Questions or comments? sbrennan@psu.edu 
 
 % Revision history:
-%  2020_12_31:
-%  -- first write of the code via modification from 
-%  fcn_Path_FindOrthogonalHitFromPathToPath
-%  2021_01_07
-%  -- renamed to transition from path to traversal notation 
-%  2021_12_27:
-%  -- corrected dependencies in comments
-%  2023_04_29:
-%  -- added capability for interpolated results at endpoints that are
-%  undefined, using imaginary inputs. See flag type 5.
-%  2023_08_27:
-%  -- fixed bug when many points are filled with the first or last
-%  vector, when previous version of code could only handle one point
-%  -- Cleaned up input checking a bit, allowing empty inputs and using
-%  narginchk
+% 2020_12_31:
+% -- first write of the code via modification from
+% fcn_Path_FindOrthogonalHitFromPathToPath
+% 2021_01_07
+% -- renamed to transition from path to traversal notation
+% 2021_12_27:
+% -- corrected dependencies in comments
+% 2023_04_29:
+% -- added capability for interpolated results at endpoints that are
+% undefined, using imaginary inputs. See flag type 5.
+% 2023_08_27:
+% -- fixed bug when many points are filled with the first or last
+% vector, when previous version of code could only handle one point
+% -- Cleaned up input checking a bit, allowing empty inputs and using
+% narginchk
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-% TO DO:
+% TO-DO
 % Define search radius - need to let user define this as an input!
 
-flag_do_debug = 0; % Flag to debug the results for debugging
-flag_do_plots = 0; % Flag to create plots
-flag_check_inputs = 1; % Flag to perform input checking
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==4 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (station,central_traversal,nearby_traversal, (flag_projection_type?))
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,4);
 
+        % Check the station_queries input
+        fcn_DebugTools_checkInputsToFunctions(station_queries, 'station');
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(2,4);
-    
-    % Check the station_queries input
-    fcn_Path_checkInputsToFunctions(station_queries, 'station');
-    
-    % Check the central_traversal input    
-    fcn_Path_checkInputsToFunctions(central_traversal, 'traversal');
-    
-    if any(station_queries<central_traversal.Station(1)) || any(station_queries>central_traversal.Station(end))
-        error('The station query locations must be within the range of stations within the central_traversal');
+        % Check the central_traversal input
+        fcn_DebugTools_checkInputsToFunctions(central_traversal, 'traversal');
+
+        if any(station_queries<central_traversal.Station(1)) || any(station_queries>central_traversal.Station(end))
+            error('The station query locations must be within the range of stations within the central_traversal');
+        end
+
+        if ~issorted(central_traversal.Station,'strictascend')
+            error('The station field on the central traversal must be increasing and contain no duplicates');
+        end
     end
-    
-    if ~issorted(central_traversal.Station,'strictascend')
-        error('The station field on the central traversal must be increasing and contain no duplicates');        
-    end
-    
 end
+
 
 % Does user want to specify the rounding type?
 flag_rounding_type = 1;
@@ -152,20 +182,21 @@ if 3 <= nargin
 end
 
 % Does user want to show the plots?
-if 4 == nargin
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (4 == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
+    end
+else
+    if flag_do_debug
+        fig_debug = 818181; %#ok<NASGU>
     end
 end
 
-
-if flag_do_debug
-    fig_debug = 818181; %#ok<*UNRCH> 
-end
-
-%% Start of main code
+%% Main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _       
 %  |  \/  |     (_)      

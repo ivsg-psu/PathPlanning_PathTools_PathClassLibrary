@@ -33,55 +33,86 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 % DEPENDENCIES:
 %
 %     fcn_Path_snapPointToPathViaVectors
-%     fcn_Path_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %
 % This function was written on 2021_03_06 by Satya Prasd
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2021_03_06 - S. Brennan
-%      -- wrote the code
-%      2022_01_07 - S. Brennan
-%      -- updated header to fix input definitions
-%      2022_08_20 - S. Brennan
-%      -- allow empty figure argument to avoid plotting
-%      2024_03_14 - S. Brennan
-%      -- defaulted plotting view to 3D
+% 2021_03_06 - S. Brennan
+% -- wrote the code
+% 2022_01_07 - S. Brennan
+% -- updated header to fix input definitions
+% 2022_08_20 - S. Brennan
+% -- allow empty figure argument to avoid plotting
+% 2024_03_14 - S. Brennan
+% -- defaulted plotting view to 3D
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-% TODO:
-% Remove the for loop after fcn_snapPointOntoNearestPath is vectorized
-% Transition code to use fcn_Path_snapPointToPathViaVectors instead
+% TO-DO
+% 2025_06_23 - S. Brennan
+% -- Remove the for loop after fcn_Path_findSensorHitOnWall is implemented
+% -- Transition code to use fcn_Path_findSensorHitOnWall instead
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_check_inputs = 1; % Flag to perform input checking
-flag_do_plots = 0; % Flag to perform plotting
+%% Debugging and Input checks
 
-%% check input arguments
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==3 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Are the input vectors the right shape?
-if 1 == flag_check_inputs
-    % Are there the right number of inputs?
-    if 2 > nargin || 3 < nargin
-        error('Incorrect number of input arguments')
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,3);
+
+        % Check the data inputs
+        fcn_DebugTools_checkInputsToFunctions(path, 'path');
+        fcn_DebugTools_checkInputsToFunctions(reference_elevated_path, 'elevated_path');
     end
-    
-    % Check the data input
-    fcn_Path_checkInputsToFunctions(path, 'path');
-    fcn_Path_checkInputsToFunctions(reference_elevated_path, 'elevated_path');
 end
 
 % Does user want to show the plots?
-if 3 == nargin   
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (3 == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -90,7 +121,7 @@ if 3 == nargin
     end
 else
     if flag_do_debug
-        fig = figure;  %#ok<UNRCH>
+        fig = figure;  
         fig_num = fig.Number;
         flag_do_plots = 1;
     end
@@ -194,4 +225,18 @@ if flag_do_plots
     view(3);
 end % Ends the flag_do_debug if statement
 
-end % Ends the function
+end % Ends the main function
+
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+

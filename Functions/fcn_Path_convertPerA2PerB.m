@@ -53,7 +53,7 @@ function B_values = ...
 %
 % EXAMPLES:
 %      
-%       See the script: script_test_fcn_Path_fcn_Path_convertPerA2PerB.m
+%       See the script: script_test_fcn_Path_convertPerA2PerB.m
 %       for a full test suite. 
 %
 % Questions or comments? sbrennan@psu.edu 
@@ -107,9 +107,7 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-NinA = length(start_A(:,1));
-NinB = length(start_B(:,1));
-Ninputs = length(A_values(:,1));
+
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
@@ -122,6 +120,8 @@ if 0==flag_max_speed
         fcn_DebugTools_checkInputsToFunctions(start_B, '2column_of_numbers');
 
         % Check the vector_A input
+        NinA = length(start_A(:,1));
+        NinB = length(start_B(:,1));
         fcn_DebugTools_checkInputsToFunctions(vector_A, '2column_of_numbers', [2 NinA]);
 
         % Check the vector_B input
@@ -131,6 +131,10 @@ if 0==flag_max_speed
         fcn_DebugTools_checkInputsToFunctions(A_values, '1column_of_numbers');
     end
 end
+
+NinA = length(start_A(:,1));
+NinB = length(start_B(:,1));
+Ninputs = length(A_values(:,1));
 
 % Figure out which situation we have
 if NinA==NinB

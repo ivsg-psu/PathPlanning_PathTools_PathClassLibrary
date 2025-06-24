@@ -29,7 +29,7 @@
 % -- fixed small bug in fcn_Path_findProjectionHitOntoPath
 % -- updated DebugTools_v2024_12_18
 % -- updated script_test_all_functions to latest version
-
+% -- rewrote fcn_Path_findProjectionHitOntoPath to be fcn_Path_findSensorHitOnWall
 
 % TO-DO:
 % 2024_03_14 - S. Brennan 
@@ -115,11 +115,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp('Welcome to the PathClass library!')
-
-%% Show how input arguments are checked, fcn_Path_checkInputsToFunctions
-% TO-DO - move debug tools into utilities and remove the checkinputs capability out of Path class
-path_test = [4 1; 2 1];
-fcn_Path_checkInputsToFunctions(path_test, 'path');
 
 %% Show how to load sample paths, fcn_Path_fillSamplePaths  
 % Call the function to fill in an array of "path" type

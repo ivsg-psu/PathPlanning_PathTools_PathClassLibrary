@@ -28,9 +28,13 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 %      N x 1 vector within all of same length. Further, the Station field 
 %      must be strictly increasing. 
 %
-%      (optional inputs) 
+%     (OPTIONAL INPUTS)
 %
-%      figure_number: figure number where results are plotted
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -54,7 +58,7 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 %
 % DEPENDENCIES:
 %
-%     fcn_Path_checkInputsToFunctions
+%     fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
 %
@@ -74,52 +78,86 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 % 2023_09_29 - sbrennan@psu.edu
 % - updated code to use fcn_Path_snapPointToPathViaVectors
 % - fixed bug where it can call a yaw value larger than the array
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-% TO-DO:
+% TO-DO
 % Allow multiple points, e.g.
 %      point: a Nx2 vector where N is the number of points, but at least 1. 
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_check_inputs = 0; % Flag to perform input checking
 
-%% check input arguments
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==3 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,3);
 
-% Are the input vectors the right shape?
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    if nargin < 2 || nargin > 3
-        error('Incorrect number of input arguments')
+        % Check the Path variables
+        fcn_DebugTools_checkInputsToFunctions(traversal, 'traversal');
     end
-    
-    % Check the traversal input
-    fcn_Path_checkInputsToFunctions(traversal, 'traversal');
 end
 
 % Does user want to show the plots?
-if 3 == nargin
-    fig_num = varargin{1};
-    figure(fig_num);
-    flag_do_debug = 1;
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (3 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
     if flag_do_debug
-        fig = figure;  %#ok<UNRCH>
-        fig_num = fig.Number;
+        fig_debug = 38383; %#ok<NASGU>
     end
 end
 
 
-%% Find the closest point
+
+%% Main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _       
 %  |  \/  |     (_)      
@@ -256,10 +294,11 @@ path_point_yaw     = path_yaw(min(first_path_point_index,length(path_yaw)));
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_debug
+if flag_do_plots
     figure(fig_num);
     hold on;
     grid on;
+
     % Plot the path
     plot(path(:,1),path(:,2),'r-','Linewidth',5);       
     plot(path(:,1),path(:,2),'ro','Markersize',20);       
@@ -292,9 +331,23 @@ if flag_do_debug
         [point(:,2) closest_path_point(:,2)],'g-','Linewidth',2);
     
     
-end % Ends the flag_do_debug if statement
+end % Ends the flag_do_plots if statement
 
-
+if flag_do_debug
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+end
 
 end % Ends the function
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 

@@ -57,7 +57,11 @@ function [TransitionCurves, ...
 %      plot_text: text to be shown on the plot in the form of a string (eg.
 %      'Transition curve 1') in the color defined by plot_color
 %      
-%      fig_num: a figure number to plot result
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -134,19 +138,45 @@ function [TransitionCurves, ...
 % (not hard, just not urgent)
 % 2023_08_09 by S. Brennan
 % -- Converted this function over to Path library from LoadWZ library
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
+% TO-DO
+% (none)
 
-flag_do_debug = 0; % Flag to show the results for debugging
-% flag_do_plots = 0; % Flag to plot the final results (set below, so
-% commented out)
-flag_check_inputs = 1; % Flag to perform input checking
+%% Debugging and Input checks
 
-% Tell user where we are
-if flag_do_debug
-    st = dbstack; 
-    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==8 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
 end
-%% check input arguments
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -158,10 +188,22 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(3,8);
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(3,8);
+        % Check the path_1 input
+        fcn_DebugTools_checkInputsToFunctions(path_1, 'path');
+
+        % Check the path_2 input
+        fcn_DebugTools_checkInputsToFunctions(path_2, 'path');
+
+        % Check the radius_of_curve input
+        fcn_DebugTools_checkInputsToFunctions(radius_of_curve, '1column_of_numbers',[1 1]);
+
+    end
+
 
 end
 
@@ -194,6 +236,7 @@ if 6 <= nargin
     end
 end
 
+% Does user want to specify plot_text?
 plot_text = 'Transition_Curve'; % Default 
 if 7 <= nargin
     temp = varargin{4};
@@ -202,23 +245,26 @@ if 7 <= nargin
     end
 end
 
-flag_do_plots = 0; % Default is not to plot the data
-if 8 <= nargin
+
+% Does user want to show the plots?
+flag_do_plots = 0; % Default is to NOT show plots
+fig_debug = []; 
+if (0==flag_max_speed) && (8 == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
+else
+    if flag_do_debug
+        fig_debug = 9999;
         flag_do_plots = 1;
     end
 end
 
-% Setup figures if there is debugging
-if flag_do_debug
-    fig_debug = 9999; 
-else
-    fig_debug = []; %#ok<UNRCH> 
-end
 
-%% Write main code for plotting
+%% Main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
 %  |  \/  |     (_)
@@ -291,8 +337,8 @@ end
 % intersectinos and offsets to the path
 
 % Convert the extended versions
-path_1_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_1_extended);
-path_2_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_2_extended);
+path_1_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_1_extended,-1);
+path_2_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_2_extended,-1);
 
 
 %% 1. calculate if and how the extended paths intersect
@@ -306,7 +352,7 @@ path_2_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_2_exte
     s_coordinates_in_traversal_2] = ...
     fcn_Path_findIntersectionsBetweenTraversals(...
     path_1_extended_traversal,...
-    path_2_extended_traversal);
+    path_2_extended_traversal, -1);
 
 % Show the results?
 if flag_do_debug == 1
@@ -407,8 +453,8 @@ offset_amount = offset_direction_relative_to_1*radius_of_curve;
 % - See Example 6 - because it is averaging the end points. These examples
 % will fail because of this imperfection!
 %
-% offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_1_extended_traversal, offset_amount); % offset for traversal 1
-% offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_2_extended_traversal, offset_amount); % offset for traversal 2
+% offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_1_extended_traversal, offset_amount,-1); % offset for traversal 1
+% offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_2_extended_traversal, offset_amount,-1); % offset for traversal 2
 
 % Show the results?
 if flag_do_debug == 1
@@ -471,12 +517,14 @@ segment_2_traversals{length(offset_traversal_2_start(:,1))} = struct;
 
 % Fill in all the traversals possible for path_1
 for ith_segment_in_path1 = 1:length(offset_traversal_1_start(:,1))
-    segment_1_traversals{ith_segment_in_path1} = fcn_Path_convertPathToTraversalStructure([offset_traversal_1_start(ith_segment_in_path1,:); offset_traversal_1_end(ith_segment_in_path1,:)]);
+    segment_1_traversals{ith_segment_in_path1} = ...
+        fcn_Path_convertPathToTraversalStructure([offset_traversal_1_start(ith_segment_in_path1,:); offset_traversal_1_end(ith_segment_in_path1,:)],-1);
 end
 
 % Fill in all the traversals possible for path_2
 for jth_segment_in_path2 = 1:length(offset_traversal_2_start(:,1))
-    segment_2_traversals{jth_segment_in_path2} = fcn_Path_convertPathToTraversalStructure([offset_traversal_2_start(jth_segment_in_path2,:); offset_traversal_2_end(jth_segment_in_path2,:)]);
+    segment_2_traversals{jth_segment_in_path2} = ...
+    fcn_Path_convertPathToTraversalStructure([offset_traversal_2_start(jth_segment_in_path2,:); offset_traversal_2_end(jth_segment_in_path2,:)],-1);
 end
 
 % Now loop through all the path 1 segments, checking each segment from path
@@ -494,7 +542,8 @@ for ith_segment_in_path1 = 1:length(offset_traversal_1_start(:,1))
                 ~] = ...
                 fcn_Path_findIntersectionsBetweenTraversals(...
                 segment_1_traversal_to_check,...
-                segment_2_traversal_to_check);
+                segment_2_traversal_to_check, -1);
+
             if ~isempty(intersection_point)
                 flag_an_intersection_was_found = 1;
                 if s_coordinates_in_traversal_1<closest_distance
@@ -541,26 +590,26 @@ N_segments_path_2 = length(path_2_extended_traversal.X(:,1))-1;
 for ith_segment_in_path1 = 1:N_segments_path_1
     path_1_traversals{ith_segment_in_path1} = fcn_Path_convertPathToTraversalStructure(...
         [path_1_extended_traversal.X(ith_segment_in_path1,1) path_1_extended_traversal.Y(ith_segment_in_path1,1); ...
-        path_1_extended_traversal.X(ith_segment_in_path1+1,1) path_1_extended_traversal.Y(ith_segment_in_path1+1,1)]);
+        path_1_extended_traversal.X(ith_segment_in_path1+1,1) path_1_extended_traversal.Y(ith_segment_in_path1+1,1)],-1);
 end
 
 % Fill in all the traversals possible for path_2
 for jth_segment_in_path2 = 1:N_segments_path_2
     path_2_traversals{jth_segment_in_path2} = fcn_Path_convertPathToTraversalStructure(...
         [path_2_extended_traversal.X(jth_segment_in_path2,1) path_2_extended_traversal.Y(jth_segment_in_path2,1); ...
-        path_2_extended_traversal.X(jth_segment_in_path2+1,1) path_2_extended_traversal.Y(jth_segment_in_path2+1,1)]);
+        path_2_extended_traversal.X(jth_segment_in_path2+1,1) path_2_extended_traversal.Y(jth_segment_in_path2+1,1)],-1);
 end
 
 
 % snap point onto path_1
 [closest_path_point1,~,~,~,...
     ~,~] = ...
-    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_1_traversals{path_1_segment_hit});
+    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_1_traversals{path_1_segment_hit},-1);
 
 % snap point onto path_2
 [closest_path_point2,~,~,~,...
     ~,~] = ...
-    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_2_traversals{path_2_segment_hit});
+    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_2_traversals{path_2_segment_hit},-1);
 
 % Check results
 distance_1 = sum((center_transition_curve - closest_path_point1).^2,2).^0.5;
@@ -742,7 +791,7 @@ offset_segments_end   = zeros(N_segments,2);
 % For each segment, project an offset, and find its coordinates
 for ith_segment = 1:N_segments
     segment_coordinates = [reference_traversal.X(ith_segment:ith_segment+1) reference_traversal.Y(ith_segment:ith_segment+1)];
-    segment_traversal = fcn_Path_convertPathToTraversalStructure(segment_coordinates);
+    segment_traversal = fcn_Path_convertPathToTraversalStructure(segment_coordinates,-1);
     segment_stations = segment_traversal.Station;
 
     % Set the projection type to use. 1 indicates using the prior segment
@@ -750,7 +799,7 @@ for ith_segment = 1:N_segments
     projection_type = 1; 
     [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    segment_stations(:,1),segment_traversal,projection_type);
+    segment_stations(:,1),segment_traversal,projection_type,-1);
 
     % Use the unit vectors to find the offsets
     unit_vectors = unit_normal_vector_end - unit_normal_vector_start;

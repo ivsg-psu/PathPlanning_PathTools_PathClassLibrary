@@ -5,13 +5,21 @@ function paths_array = fcn_Path_fillSamplePaths(varargin)
 %
 % FORMAT:
 %
-%       paths_array = fcn_Path_fillSamplePaths
+%       paths_array = fcn_Path_fillSamplePaths((path_number),(fig_num))
 %
 % INPUTS:
 %
-%      (path_number) - an input asking for a specific path. If left empty,
-%      only paths 1 to 3 will be filled. The paths beyond this are for
-%      very specific debugging operations.
+%     (OPTIONAL INPUTS)
+%
+%     path_number - an input asking for a specific path. If left empty,
+%     only paths 1 to 3 will be filled. The paths beyond this are for
+%     very specific debugging operations.
+%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -31,24 +39,50 @@ function paths_array = fcn_Path_fillSamplePaths(varargin)
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2020_11_12 
-%      -- wrote the code
-%      2021_01_07 
-%      -- minor updates to comments
-%      -- fixed errors in the header definition example
+% 2020_11_12
+% -- wrote the code
+% 2021_01_07
+% -- minor updates to comments
+% -- fixed errors in the header definition example
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
+% TO-DO
+% (none)
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_grab_user_inputs = 0; % Flag to allow user to click to draw paths
-flag_check_inputs = 1; % Flag to perform input checking
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==2 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -60,18 +94,46 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(0,2);
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(0,1);
-    
+        % % Check the Path variables
+        % fcn_DebugTools_checkInputsToFunctions(Path, 'paths');
+    end
+
+
 end
 
-if nargin == 0
-    path_to_grab = 0;
+% Does user want to specify path_number?
+path_number = 0; % Default 
+if 1 <= nargin
+    temp = varargin{1};
+    if ~isempty(temp)
+        path_number = temp;
+    end
+end
+
+
+% Does user want to show the plots?
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (2 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
-    path_to_grab = varargin{1};
+    if flag_do_debug
+        fig = figure;  
+        fig_num = fig.Number;
+        flag_do_plots = 1;
+    end
 end
+
+
 
 %% Solve for the circle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,6 +145,8 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+flag_grab_user_inputs = 0; % Flag to allow user to click to draw paths
 
 % Build or load Path1
 if 1==flag_grab_user_inputs
@@ -376,85 +440,82 @@ else
         5.8756   89.6501];
 end
 
-if path_to_grab==0
-    return
-end
-
-if path_to_grab<=3
-    paths_array = paths_array{path_to_grab};
-    return
-end
 
 %% Build or load Path 4
 % This path is useful for testing snap functions
 
-if path_to_grab==4
-    if 1==flag_grab_user_inputs
-        % Grab other points manually to create a test path
-        figure(1);
 
-        % Show prior results
-        clf; hold on;
-        grid on;
-        axis equal;
-        reference_path = [0 0; 1 1; 2 0];
-        plot(reference_path(:,1),reference_path(:,2),'-');
-        text(reference_path(1,1),reference_path(1,2),'Start');
-        axis([-1 3 -1 3]);
+if 1==flag_grab_user_inputs
+    % Grab other points manually to create a test path
+    figure(1);
+
+    % Show prior results
+    clf; hold on;
+    grid on;
+    axis equal;
+    reference_path = [0 0; 1 1; 2 0];
+    plot(reference_path(:,1),reference_path(:,2),'-');
+    text(reference_path(1,1),reference_path(1,2),'Start');
+    axis([-1 3 -1 3]);
 
 
-        % Get a set of sampling points
-        [X4,Y4] = ginput;
-        plot(X4,Y4)
-    else
-        paths_array = [
-            -0.1595   -0.6381
-            -0.1751   -0.4669
-            -0.1984   -0.3502
-            -0.1984   -0.2568
-            -0.1751   -0.0778
-            -0.1751    0.1012
-            -0.1518    0.2490
-            -0.0272    0.4202
-            0.0584    0.5370
-            0.1829    0.6070
-            0.2607    0.7315
-            0.2685    0.7938
-            0.2840    0.9183
-            0.3074    0.9961
-            0.3385    1.1128
-            0.4397    1.1673
-            0.5564    1.2218
-            0.6498    1.2218
-            0.8132    1.2218
-            0.8755    1.1595
-            0.9611    1.1751
-            0.9922    1.2218
-            1.0467    1.3074
-            1.1323    1.4475
-            1.2724    1.5331
-            1.4125    1.5331
-            1.4747    1.4163
-            1.5058    1.2918
-            1.5136    1.1751
-            1.5136    1.0506
-            1.6381    0.8794
-            1.7860    0.8093
-            1.9339    0.7393
-            2.0895    0.7004
-            2.1362    0.6148
-            2.1751    0.5058
-            2.2296    0.3502
-            2.2996    0.1945
-            2.2763    0.0856
-            2.2062   -0.0234
-            2.1362   -0.1479
-            2.0895   -0.3035
-            2.0584   -0.4592
-            2.0350   -0.5681];
-    end
+    % Get a set of sampling points
+    [X4,Y4] = ginput;
+    plot(X4,Y4)
+else
+    paths_array{4} = [
+        -0.1595   -0.6381
+        -0.1751   -0.4669
+        -0.1984   -0.3502
+        -0.1984   -0.2568
+        -0.1751   -0.0778
+        -0.1751    0.1012
+        -0.1518    0.2490
+        -0.0272    0.4202
+        0.0584    0.5370
+        0.1829    0.6070
+        0.2607    0.7315
+        0.2685    0.7938
+        0.2840    0.9183
+        0.3074    0.9961
+        0.3385    1.1128
+        0.4397    1.1673
+        0.5564    1.2218
+        0.6498    1.2218
+        0.8132    1.2218
+        0.8755    1.1595
+        0.9611    1.1751
+        0.9922    1.2218
+        1.0467    1.3074
+        1.1323    1.4475
+        1.2724    1.5331
+        1.4125    1.5331
+        1.4747    1.4163
+        1.5058    1.2918
+        1.5136    1.1751
+        1.5136    1.0506
+        1.6381    0.8794
+        1.7860    0.8093
+        1.9339    0.7393
+        2.0895    0.7004
+        2.1362    0.6148
+        2.1751    0.5058
+        2.2296    0.3502
+        2.2996    0.1945
+        2.2763    0.0856
+        2.2062   -0.0234
+        2.1362   -0.1479
+        2.0895   -0.3035
+        2.0584   -0.4592
+        2.0350   -0.5681];
 end
 
+
+if path_number==0
+    % Do nothing - return all values
+else
+    paths_array = {paths_array{path_number}};
+end
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -467,10 +528,10 @@ end
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_debug
+if flag_do_plots
     % Prep a figure location
     close all
-    figure(1);
+    figure(fig_num);
     clf;
     hold on;
     grid minor;
@@ -480,6 +541,11 @@ if flag_do_debug
         plot(paths_array{i_Path}(:,1),paths_array{i_Path}(:,2),'-');
         text(paths_array{i_Path}(1,1),paths_array{i_Path}(1,2),'Start');
     end
+     
+    % traversal_to_check = fcn_Path_convertPathToTraversalStructure(path_to_check);
+    % all_traversals.traversal{i_path} = traversal_to_check;
+    % fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+
 
 end
 
@@ -487,3 +553,15 @@ if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§

@@ -252,8 +252,8 @@ clear expected
 expected.distance = 10;
 expected.location = [5 10];
 expected.path_segment = 1;
-expected.t = [1; 0];
-expected.u = [0.6667; 0.6667];
+expected.t = 1;
+expected.u = 0.6667;
 
 actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
@@ -283,8 +283,8 @@ clear expected
 expected.distance = 10;
 expected.location = [5 10];
 expected.path_segment = 1;
-expected.t = [1; 0];
-expected.u = [0.6667; 0.6667];
+expected.t = 1;
+expected.u = 0.6667;
 
 actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
@@ -526,8 +526,8 @@ clear expected
 expected.distance = 10;
 expected.location = [5 10];
 expected.path_segment = 1;
-expected.t = [0.5; 0.5];
-expected.u = [2; 2.5];
+expected.t = 0.5;
+expected.u = 2;
 
 actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
@@ -558,8 +558,8 @@ clear expected
 expected.distance = -5;
 expected.location = [5 10];
 expected.path_segment = 1;
-expected.t = [0.5; 0.5];
-expected.u = [-1; -1.5];
+expected.t = 0.5;
+expected.u = -1;
 
 actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
@@ -671,8 +671,8 @@ clear expected
 expected.distance = 10;
 expected.location = [15 10];
 expected.path_segment = 1;
-expected.t = [1.5; inf; -1];
-expected.u = [0.6667; inf; 0.6667];
+expected.t = 1.5;
+expected.u = 0.6667;
 
 actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...

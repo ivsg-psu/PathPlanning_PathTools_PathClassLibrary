@@ -90,7 +90,11 @@ function [closest_path_points,...
 %          aligned with the endpoints in the negative and positive
 %          directions, respectively.
 %
-%      figure_number: figure number where results are plotted
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -122,8 +126,8 @@ function [closest_path_points,...
 %
 % DEPENDENCIES:
 %
-%     fcn_Path_checkInputsToFunctions
-%     fcn_Path_convertPathToTraversalStructure
+%     fcn_DebugTools_checkInputsToFunctions
+%     fcn_Path_findPathOrthogonalVectors
 %
 % This function was written on 2023_09_28 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
@@ -133,18 +137,45 @@ function [closest_path_points,...
 % --  first write of the code, using fcn_Path_snapPointOntoNearestPath 
 % 2024_03_14 - S. Brennan
 % -- fixed bug where snap breaks if path is passed in as a 3D vector
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
+% TO-DO
+% (none)
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plots = 0;
-flag_check_inputs = 1; % Flag to perform input checking
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==4 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -156,20 +187,20 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,4);
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(2,4);
+        % Check the data input
+        fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
 
-    % Check the data input
-    fcn_Path_checkInputsToFunctions(path, 'path2or3D');
-
-    % Check that the dimension of the point and path match
-    if length(points(1,:)) ~= length(path(1,:))
-        error('The dimension of the query point, in number of columns, must match the dimension of the path, in number of columnts');
+        % Check that the dimension of the point and path match
+        if length(points(1,:)) ~= length(path(1,:))
+            error('The dimension of the query point, in number of columns, must match the dimension of the path, in number of columnts');
+        end
     end
 end
-
 
 % Does user want to specify the rounding type?
 flag_rounding_type = 1;
@@ -181,13 +212,22 @@ if 3 <= nargin
 end
 
 % Does user want to show the plots?
-if 4 == nargin
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (4 == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
+else
+    if flag_do_debug
+        fig = figure;  
+        fig_num = fig.Number;
         flag_do_plots = 1;
     end
 end
+
 
 if flag_do_debug
     fig_debug = 888; %#ok<*UNRCH>

@@ -21,8 +21,11 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 %      to use the variance in angles along the reference_traversal
 %      multiplied by the average segment length in the reference traversal.
 %
-%      fig_num: a figure number to plot results.
-%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
 %
 % OUTPUTS:
 %
@@ -30,7 +33,7 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_checkInputsToFunctions
+%      fcn_DebugTools_checkInputsToFunctions
 %      fcn_Path_convertPathToTraversalStructure
 %      fcn_Path_calcSingleTraversalStandardDeviation
 %      fcn_Path_findOrthogonalTraversalVectorsAtStations
@@ -45,26 +48,53 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%     2021_01_05:
-%     -- wrote the code originally
-%     2021_01_08:
-%     -- added input checking
-%     2022_01_03:
-%     -- corrected dependency list of functions
-%     -- broke out fcn_Path_plotTraversalXYWithUpperLowerBands into
-%     separate functionality (it is very useful for other functions!)
+% 2021_01_05:
+% -- wrote the code originally
+% 2021_01_08:
+% -- added input checking
+% 2022_01_03:
+% -- corrected dependency list of functions
+% -- broke out fcn_Path_plotTraversalXYWithUpperLowerBands into
+% separate functionality (it is very useful for other functions!)
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to show the results for debugging
-flag_do_plots = 1; % % Flag to plot the final results
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==3 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
-    fprintf(1,'Starting function: %s, in file: %s\n',st(1).name,st(1).file);
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -76,45 +106,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(1,3);
 
-%      random_trajectories = ...
-%      fcn_Path_fillRandomTraversalsAboutTraversal(...
-%            reference_traversal,...
-%            (std_deviation),...
-%            (num_trajectories),...
-%            (num_points),...
-%            (flag_generate_random_stations),...
-%            (spatial_smoothness),...
-%            (fig_num));
+        % Check the reference_traversal input
+        fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
 
-% Check inputs?
-if flag_check_inputs
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 3
-        error('Incorrect number of input arguments')
     end
-    
-    % Check the reference_traversal input
-    fcn_Path_checkInputsToFunctions(reference_traversal, 'traversal');
-    
-    
 end
 
-% Grab key variables
-Station_reference = reference_traversal.Station;
-Nstations = length(Station_reference(:,1));
-
-
-%% Set defaults
-% the default standard deviation
-std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal);
-
-% the default number of points to use
-num_points = Nstations;
-
-%% Check for variable argument inputs (varargin)
-
 % Does the user want to specify standard deviation?
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal); % Default
 if 2 <= nargin
     temp = varargin{1};
     if ~isempty(temp)
@@ -123,14 +127,20 @@ if 2 <= nargin
 end
 
 
-% Does user want to specify the figure to show the plots?
-if 3 == nargin
-    fig_num = varargin{2};
-    figure(fig_num);
+
+% Does user want to show the plots?
+flag_do_plots = 0; % Default is to NOT make a plot
+fig_num = [];
+if (0==flag_max_speed) && (3 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
-    if flag_do_plots
-        fig = figure;
-        fig_num = fig.Number;
+    if flag_do_debug
+        fig_debug = 8838; %#ok<NASGU>
     end
 end
 
@@ -145,7 +155,14 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
+% Grab key variables
+Station_reference = reference_traversal.Station;
+Nstations = length(Station_reference(:,1));
+
+% the default number of points to use
+num_points = Nstations;
+
 %% Fill in the array of stations.
 reference_station_points = Station_reference;
 
@@ -169,8 +186,6 @@ bottom_path = unit_normal_vector_start - unit_vectors.*offsets_from_reference(:,
 upper_traversal = fcn_Path_convertPathToTraversalStructure(top_path);
 lower_traversal = fcn_Path_convertPathToTraversalStructure(bottom_path);
 
-%% plot the final XY result
-fcn_Path_plotTraversalXYWithUpperLowerBands( reference_traversal, upper_traversal, lower_traversal, fig_num);
 
 
 %% Plot the results (for debugging)?
@@ -184,8 +199,8 @@ fcn_Path_plotTraversalXYWithUpperLowerBands( reference_traversal, upper_traversa
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_debug
-    % Nothing to put in here!   
+if flag_do_plots
+    fcn_Path_plotTraversalXYWithUpperLowerBands( reference_traversal, upper_traversal, lower_traversal, fig_num);
 end
 
 if flag_do_debug
@@ -195,5 +210,17 @@ end
 end % Ends main function
 
 
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 

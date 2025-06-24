@@ -53,7 +53,6 @@ This repo supports mathematical operations for paths and trajectories.
           </ul>
         <li><a href="#basic-getting-started-functions">Basic Getting Started Functions</li>
           <ul>
-            <li><a href="#fcn_path_checkinputstofunctions">fcn_Path_checkInputsToFunctions - a general-use input checking function (deprecated by the Debug library, so replaced soon).</li>
             <li><a href="#fcn_path_fillsamplepaths">fcn_Path_fillSamplePaths - Fills test data and includes a click-to-draw.</li>
             <li><a href="#fcn_path_calcdiffanglesbetweenpathsegments">fcn_Path_calcDiffAnglesBetweenPathSegments - Calculates the change in angles between path segments.</li>
             <li><a href="#fcn_path_calcyawfrompathsegments">fcn_Path_calcYawFromPathSegments - Calculates yaw angle for each path segment.</li>
@@ -432,20 +431,6 @@ So, the variable 'Many_ traversals' is a 'traversals' type and contains an array
 ***
 
 ### Basic Getting Started Functions
-
-#### fcn_Path_checkInputsToFunctions
-
- The function fcn_Path_checkInputsToFunctions is a general-use function whose only purpose is to confirm that variables that are passed to it meet the requirements of each type. It is often called repeatedly at the top of other codes to check that the inputs are the correct type. As of Dec. 2021, this function was replaced by those in the "Debug" repository, which are more powerful and general. However, this conversion to the new function has not yet been completed.
-
-```MATLAB
-%% Show how input arguments are checked, fcn_Path_checkInputsToFunctions
-% TO-DO - in future versions, use debug tools as a utility and remove the checkinputs capability out of Path class
-path_test = [4 1; 2 1];
-fcn_Path_checkInputsToFunctions(path_test, 'path');
-
-```
-
-<a href="#pathplanning_pathtools_pathclasslibrary">Back to top</a>
 
 ***
 
@@ -1354,7 +1339,7 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %
 % DEPENDENCIES:
 %
-%      fcn_Path_checkInputsToFunctions
+%      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
 %      
