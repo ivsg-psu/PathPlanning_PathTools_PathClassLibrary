@@ -120,20 +120,45 @@ function [closest_path_points,closest_distances] = ...
 % -- fixed typo in variable name
 % -- fixed inequality which was cause of bug
 % -- made distance outputs positive and neg, based on directionality
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
+% TO-DO
+% (none)
 
-flag_do_debug = 0; % Flag to debug the results
-flag_do_plot = 0; % Flag to plot the results
-flag_check_inputs = 1; % Flag to perform input checking
-flag_limit_station_range = 0; % Flag that limits the range of stations to search
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==6 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -145,40 +170,37 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (station,central_traversal,nearby_traversal, (flag_projection_type?))
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(3,6);
 
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    if nargin < 3 || nargin > 6
-        error('Incorrect number of input arguments')
+        % Check the query_stations input
+        fcn_DebugTools_checkInputsToFunctions(query_stations, 'station');
+
+        % Check the central_traversal input
+        fcn_DebugTools_checkInputsToFunctions(central_traversal, 'traversal');
+
+
+        % Check the nearby_traversal input
+        fcn_DebugTools_checkInputsToFunctions(nearby_traversal, 'traversal');
+
+        % Check cases specific to this function
+        if any(query_stations<central_traversal.Station(1,1)) || any(query_stations>central_traversal.Station(end,1))
+            fprintf(1,'Min of central_traversal stations: %.2f\n',central_traversal.Station(1));
+            fprintf(1,'Min of query stations: %.2f\n',min(query_stations));
+            fprintf(1,'Max of central_traversal stations: %.2f\n',central_traversal.Station(end,1));
+            fprintf(1,'Max of query stations: %.2f\n',max(query_stations));
+            warning('The station query locations should be within the full range of stations within the central_traversal. Rounding to closest station.');
+            bad_queries = (query_stations<central_traversal.Station(1,1));
+            query_stations(bad_queries) = central_traversal.Station(1,1);
+            bad_queries = (query_stations>central_traversal.Station(end,1));
+            query_stations(bad_queries) = central_traversal.Station(end,1);
+
+
+        end
     end
-    
-    % Check the query_stations input
-    fcn_DebugTools_checkInputsToFunctions(query_stations, 'station');
-    
-    % Check the central_traversal input
-    fcn_DebugTools_checkInputsToFunctions(central_traversal, 'traversal');
-
-    
-    % Check the nearby_traversal input
-    fcn_DebugTools_checkInputsToFunctions(nearby_traversal, 'traversal');
-        
-    % Check cases specific to this function
-    if any(query_stations<central_traversal.Station(1,1)) || any(query_stations>central_traversal.Station(end,1))
-        fprintf(1,'Min of central_traversal stations: %.2f\n',central_traversal.Station(1));
-        fprintf(1,'Min of query stations: %.2f\n',min(query_stations));
-        fprintf(1,'Max of central_traversal stations: %.2f\n',central_traversal.Station(end,1));
-        fprintf(1,'Max of query stations: %.2f\n',max(query_stations));        
-        warning('The station query locations should be within the full range of stations within the central_traversal. Rounding to closest station.');
-        bad_queries = (query_stations<central_traversal.Station(1,1));
-        query_stations(bad_queries) = central_traversal.Station(1,1);
-        bad_queries = (query_stations>central_traversal.Station(end,1));
-        query_stations(bad_queries) = central_traversal.Station(end,1);
-
-
-    end
-       
 end
 
 flag_rounding_type = 1;
@@ -195,16 +217,18 @@ end
 
 
 % Does user want to show the plots?
-if 6 == nargin
-    fig_num = varargin{3};
-    figure(fig_num);
-    flag_do_plot = 1;
-else
-    if flag_do_debug
-        fig = figure;
-        fig_num = fig.Number;
-        flag_do_plot = 1;
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (6 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
     end
+end
+
+if flag_do_debug
+    fig_debug = 2345; 
 end
 
 %% Start of main code
@@ -217,14 +241,14 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% query_stations = [44; 45]; % For debugging
+flag_limit_station_range = 0; % Flag that limits the range of stations to search
 
 Nstations = length(query_stations(:,1));
 
 %% Find the unit normal vectors at each of the station points
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    query_stations,central_traversal,flag_rounding_type);
+    query_stations,central_traversal,flag_rounding_type,-1);
 unit_vector_displacement = unit_normal_vector_end - unit_normal_vector_start;
 
 %% Define the sensor vector from the unit vector
@@ -236,7 +260,7 @@ negative_sensor_vector_end = unit_normal_vector_start - unit_vector_displacement
 %% Define the path we are searching from the nearby traversal
 % Need to constrain this to be only within a small range of the s-distance?
 path_to_check = [nearby_traversal.X nearby_traversal.Y];
-traversal_to_check = fcn_Path_convertPathToTraversalStructure(path_to_check);
+traversal_to_check = fcn_Path_convertPathToTraversalStructure(path_to_check, -1);
 
 % Initialize the location of the hits to zeros
 locations_of_hits = zeros(Nstations,2);
@@ -256,7 +280,7 @@ for i_station=1:Nstations
         
         % Format: [pathSXY_segment,flag_outside_start, flag_outside_end] = ...
         [traversal_segment, ~, ~] = ...
-            fcn_Path_findTraversalStationSegment(traversal_to_check, s_coord_start,s_coord_end);
+            fcn_Path_findTraversalStationSegment(traversal_to_check, s_coord_start,s_coord_end,-1);
         
         path_segment_to_check = [traversal_segment.X traversal_segment.Y];
     else
@@ -269,13 +293,13 @@ for i_station=1:Nstations
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
-            positive_sensor_vector_end(i_station,:),0,222222);
+            positive_sensor_vector_end(i_station,:),0,fig_debug);
         
         [negative_distance,negative_location] = ...
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
-            negative_sensor_vector_end(i_station,:),0,222222);
+            negative_sensor_vector_end(i_station,:),0,fig_debug);
         
     else
         % Find results in the search region, no plotting
@@ -283,12 +307,12 @@ for i_station=1:Nstations
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
-            positive_sensor_vector_end(i_station,:),0);
+            positive_sensor_vector_end(i_station,:),0,-1);
         [negative_distance,negative_location] = ...
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
-            negative_sensor_vector_end(i_station,:),0);
+            negative_sensor_vector_end(i_station,:),0,-1);
     end
     
     % make distance outputs positive and neg, based on directionality
@@ -345,9 +369,15 @@ closest_distances = distances_of_hits;
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_plot
-    figure(fig_num);
-    clf;
+if flag_do_plots
+    % Prep the figure for plotting
+    temp_h = figure(fig_num);
+    flag_rescale_axis = 0;
+    if isempty(get(temp_h,'Children'))
+        flag_rescale_axis = 1;
+    end    
+
+    
     hold on;
     grid on;
     
@@ -403,7 +433,14 @@ if flag_do_plot
         text(text_locations(ith_distance,1),text_locations(ith_distance,2),sprintf('%.2f',closest_distances(ith_distance,1)),'Color',[1 0 0]);
     end
     
-    
+    % Make axis slightly larger?
+    if flag_rescale_axis
+        temp = axis;
+        axis_range_x = temp(2)-temp(1);
+        axis_range_y = temp(4)-temp(3);
+        percent_larger = 0.3;
+        axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
+    end
     
     
 end % Ends the flag_do_plot if statement

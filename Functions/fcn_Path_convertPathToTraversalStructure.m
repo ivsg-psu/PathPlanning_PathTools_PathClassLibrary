@@ -175,7 +175,7 @@ end
 
 traversal.Station = cumsum(sqrt(sum(traversal.Diff.^2,2)));
 traversal.Yaw = ...
-    fcn_Path_calcYawFromPathSegments(path(:,1:2)); % NOTE: Yaw should be (N-1) x 1
+    fcn_Path_calcYawFromPathSegments(path(:,1:2), -1); % NOTE: Yaw should be (N-1) x 1
 
 
 %% Any debugging?

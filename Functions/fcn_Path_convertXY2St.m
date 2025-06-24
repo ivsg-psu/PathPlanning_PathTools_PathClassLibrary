@@ -86,37 +86,71 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 % Revision history:
 % 2023_08_26 by S. Brennan
 % -- first write of the code
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plots = 0;
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
 
-%% check input arguments
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
-%    | | | '_ \| '_ \| | | | __/ __|
-%   _| |_| | | | |_) | |_| | |_\__ \
-%  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
-% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Debugging and Input checks
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(2,4);
-    
-    % Check the data input
-    fcn_DebugTools_checkInputsToFunctions(referencePath, 'path2or3D');
-    
-    % Check that the dimension of the point and path match
-    if length(XY_points(1,:)) ~= length(referencePath(1,:))
-        error('The dimension of the XY_points points, in number of columns, must match the dimension of the referencePath, in number of columns');
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==4 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
     end
 end
 
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |
+%              |_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,4);
+
+        % Check the data input
+        fcn_DebugTools_checkInputsToFunctions(referencePath, 'path2or3D');
+
+        % Check that the dimension of the point and path match
+        if length(XY_points(1,:)) ~= length(referencePath(1,:))
+            error('The dimension of the XY_points points, in number of columns, must match the dimension of the referencePath, in number of columns');
+        end
+
+    end
+end
 
 % Does user want to specify the rounding type?
 flag_rounding_type = 1;
@@ -127,17 +161,20 @@ if 3 <= nargin
     end
 end
 
+
 % Does user want to show the plots?
-if 4 == nargin
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (4 == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
     end
 end
 
 if flag_do_debug
-    fig_debug = 888; %#ok<*UNRCH> 
+    fig_debug = 23456; %#ok<NASGU>
 end
 
 
@@ -177,8 +214,13 @@ St_points = [s_coordinates distances_real+distances_imaginary*1i];
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
-    clf;
+    % Prep the figure for plotting
+    temp_h = figure(fig_num);
+    flag_rescale_axis = 0;
+    if isempty(get(temp_h,'Children'))
+        flag_rescale_axis = 1;
+    end
+
     hold on;
     grid on;
     axis equal;
@@ -237,13 +279,14 @@ if flag_do_plots
         %         text(closest_point(1,1),closest_point(1,2),'Snap Point on Path');
     end
     
-    % Make axis slightly larger
-    temp = axis;
-    axis_range_x = temp(2)-temp(1);
-    axis_range_y = temp(4)-temp(3);
-    percent_larger = 0.3;
-    axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
-
+    % Make axis slightly larger?
+    if flag_rescale_axis
+        temp = axis;
+        axis_range_x = temp(2)-temp(1);
+        axis_range_y = temp(4)-temp(3);
+        percent_larger = 0.3;
+        axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
+    end
 end % Ends the flag_do_debug if statement
 
 

@@ -69,18 +69,45 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 % 2023_09_17 by S. Brennan
 % -- added flag_rounding_type to inputs
 % -- fixed some comments
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to show the results for debugging
-flag_do_plots = 0; % % Flag to plot the final results
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==4 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -92,33 +119,19 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,4);
 
+        % Check the reference_traversal input
+        fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
 
-% Check inputs?
-if flag_check_inputs
-    % Are there the right number of inputs?
-    narginchk(2,4)
-        
-    % Check the reference_traversal input
-    fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
-            
-    % Check the offsets input (looks like a station type)
-    fcn_DebugTools_checkInputsToFunctions(offsets, 'station');
-    
+        % Check the offsets input (looks like a station type)
+        fcn_DebugTools_checkInputsToFunctions(offsets, 'station');
+
+    end
 end
-
-Station_reference = reference_traversal.Station;
-Nstations = length(Station_reference);
-
-
-%% Set defaults
-
-% the default number of trajectories to use
-num_trajectories = length(offsets(:,1));
-
-% the default number of points to use
-num_points = Nstations;
-
 % Does user want to specify flag_rounding_type?
 flag_rounding_type = []; % Default is to not do any plotting
 if 3 <= nargin
@@ -128,21 +141,19 @@ if 3 <= nargin
     end
 end
 
-%% Check for variable argument inputs (varargin)
-
 % Does user want to show the plots?
-if 4 == nargin
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (4 == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
     end
-else
-    if flag_do_debug
-        fig = figure;
-        fig_num = fig.Number;
-        flag_do_plots = 1;
-    end
+end
+
+if flag_do_debug
+    fig_debug = 12312; %#ok<NASGU>
 end
 
 
@@ -156,6 +167,17 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Set defaults
+
+Station_reference = reference_traversal.Station;
+Nstations = length(Station_reference);
+% the default number of trajectories to use
+num_trajectories = length(offsets(:,1));
+
+% the default number of points to use
+num_points = Nstations;
+
 
     
 %% Fill in the array of reference station points
@@ -175,7 +197,7 @@ offsets_from_reference = ones(num_points,1)*offsets';
 % Find the unit normal vectors at each of the station points
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    reference_station_points(:,1),reference_traversal,flag_rounding_type);
+    reference_station_points(:,1),reference_traversal,flag_rounding_type, -1);
 unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
 
 %% Perform iterations over trajectories

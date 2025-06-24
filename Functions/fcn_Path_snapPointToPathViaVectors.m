@@ -301,7 +301,7 @@ path_dimension = length(path(1,:));
 % an ortho projection based on points at start and end of a segment
 back_orthogonal_flag_rounding_type = 1;
 [unit_orthogonal_vectors_at_midpoints, ~] = ...
-    fcn_Path_findPathOrthogonalVectors(path,back_orthogonal_flag_rounding_type);
+    fcn_Path_findPathOrthogonalVectors(path,back_orthogonal_flag_rounding_type, -1);
 
 if path_dimension == 2
     unit_tangential_vectors_at_midpoints = unit_orthogonal_vectors_at_midpoints*[0 -1; 1 0];

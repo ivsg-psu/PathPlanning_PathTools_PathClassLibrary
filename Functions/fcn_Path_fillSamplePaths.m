@@ -514,7 +514,7 @@ end
 if path_number==0
     % Do nothing - return all values
 else
-    paths_array = {paths_array{path_number}};
+    paths_array = {paths_array{path_number}}; %#ok<CCAT1>
 end
 
 %% Any debugging?

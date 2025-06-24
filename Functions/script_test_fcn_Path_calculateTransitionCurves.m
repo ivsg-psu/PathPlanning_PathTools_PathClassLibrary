@@ -58,8 +58,8 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
 
 % Check the angles
 assert(isequal(round(angle_point1_radians,4),round(-pi/4,4)));
@@ -97,10 +97,10 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -133,10 +133,10 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -169,10 +169,10 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -210,10 +210,10 @@ plot_text = 'Transition_Curve';
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -257,10 +257,10 @@ plot_text = 'Transition_Curve';
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -304,10 +304,10 @@ plot_text = 'Transition_Curve';
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -344,10 +344,10 @@ plot_text = 'Transition_Curve';
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -382,10 +382,10 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -420,10 +420,10 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -458,10 +458,10 @@ plot_text = '';
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
-assert(length(angle_point1_radians(:,1))==1);
-assert(length(angle_point2_radians(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
+assert(isscalar(angle_point1_radians(:,1)));
+assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -593,8 +593,8 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
 
 % Check the angles
 assert(isequal(round(angle_point1_radians,4),round(-pi/4,4)));
@@ -633,8 +633,8 @@ number_of_points_on_curve = 50;
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
-assert(length(closest_path_point1(:,1))==1);
-assert(length(closest_path_point2(:,1))==1);
+assert(isscalar(closest_path_point1(:,1)));
+assert(isscalar(closest_path_point2(:,1)));
 
 % Check the angles
 assert(isequal(round(angle_point1_radians,4),round(-pi/4,4)));

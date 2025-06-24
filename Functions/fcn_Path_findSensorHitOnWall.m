@@ -419,15 +419,20 @@ if any(collinear_indices)
     uValues = [uValues; 0.5*ones(length(indices_hit_different_point),1)];
     
 
+    % Check if there are 2 hits at different locations. Sometimes the hit
+    % will land at the same location over/over, and we only want the first
+    % one.
     indices_twoHits = collinear_indices(indices_hit_different_point);
 
-    % Duplicate selected values. Note that q (sensor start) and s (sensor
-    % vector) stay 1x2 vectors.
-    p = [p; p(indices_twoHits,:)];
-    r = [r; r(indices_twoHits,:)];
-    wall_indexes = [wall_indexes; wall_indexes(indices_twoHits,:)];
-    NindicesWithTwoHits = length(indices_twoHits(:,1));
-    flag_isCollinear = [flag_isCollinear; ones(NindicesWithTwoHits,1)];
+    if ~isempty(indices_twoHits)
+        % Duplicate selected values. Note that q (sensor start) and s (sensor
+        % vector) stay 1x2 vectors.
+        p = [p; p(indices_twoHits,:)];
+        r = [r; r(indices_twoHits,:)];
+        wall_indexes = [wall_indexes; wall_indexes(indices_twoHits,:)];
+        NindicesWithTwoHits = length(indices_twoHits(:,1));
+        flag_isCollinear = [flag_isCollinear; ones(NindicesWithTwoHits,1)];
+    end
 end
 
 %%%%

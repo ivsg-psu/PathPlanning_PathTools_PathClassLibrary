@@ -33,56 +33,83 @@ function pathXY = fcn_Path_fillPathViaUserInputs(fig_num, varargin)
 % Questions or comments? sbrennan@psu.edu 
 
 % Revision history:
-%      2020_10_15 
-%      -- wrote the code
-%      2021_01_10
-%      -- added interactive capability
-%      -- added ability to call the plot repeatedly
-%      -- allow points to be deleted
+% 2020_10_15
+% -- wrote the code
+% 2021_01_10
+% -- added interactive capability
+% -- added ability to call the plot repeatedly
+% -- allow points to be deleted
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_make_figure = 0;
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==2 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
-    flag_make_figure = 1;
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Are the input vectors the right shape?
-% Npoints = length(points(:,1));
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(1,2);
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 2
-        error('Incorrect number of input arguments')
     end
-    
 end
-
+ 
 % % Does user want to show the plots?
-% if 1 == nargin
-%     fig_num = varargin{1};
-%     figure(fig_num);
-%     flag_make_figure = 1;
-% else
-%     % No figure number given - force a figure to be created
-%     fig = figure;
-%     fig_num = fig.Number;
-%     
+flag_do_plots = 0; % Default is to NOT show plots
+% if (0==flag_max_speed) && (2 == nargin) 
+%     temp = varargin{end};
+%     if ~isempty(temp) % Did the user NOT give an empty figure number?
+%         fig_num = temp;
+%         figure(fig_num);
+%         flag_do_plots = 1;
+%     end
+% end
+% 
+% if flag_do_debug
+%     fig_debug = 9585; 
 % end
 
 
@@ -174,7 +201,7 @@ else
                                         
                     % Grab the data out of the figure so we can update the plot
                     UserData = get(gcf,'UserData');
-                    num_points = UserData.num_points;
+                    % num_points = UserData.num_points;
                     data = UserData.data;
                     
                     % Go backwards
@@ -240,7 +267,7 @@ end
 %                            __/ |
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_make_figure
+if flag_do_plots
     %     figure(fig_num);
     %     hold on;
     %     grid on;
@@ -254,12 +281,24 @@ if flag_do_debug
 end
 end
 
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
 function fcn_Path_fillPathViaUserInputs_startPlot(fig_num)
 % Decide the number of points to use (maximum), initialize data and values
 num_points = 1000;
 data = nan*ones(num_points,2);
 next_point = 1;
-pathXY = [0 0; 0 1];
+% pathXY = [0 0; 0 1];
 
 % Set up the figure
 current_fig = figure(fig_num);
@@ -288,20 +327,6 @@ set(current_fig, 'WindowButtonMotionFcn',...
     @fcn_Path_fillPathViaUserInputs, ...
     'WindowButtonDownFcn',@fcn_Path_fillPathViaUserInputs);
 end
-
-
-%% Functions follow
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   ______                _   _
-%  |  ____|              | | (_)
-%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
-%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
-%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-%
-% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
-
 
 
 

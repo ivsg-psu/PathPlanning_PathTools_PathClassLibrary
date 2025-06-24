@@ -25,22 +25,40 @@
 % script testing.
 % 2024_09_26 - Sean Brennan
 % -- Updated function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
-% 2025_06_14 by S. Brennan
-% -- fixed small bug in fcn_Path_findProjectionHitOntoPath
-% -- updated DebugTools_v2024_12_18
-% -- updated script_test_all_functions to latest version
-% -- rewrote fcn_Path_findProjectionHitOntoPath to be fcn_Path_findSensorHitOnWall
-
-% TO-DO:
-% 2024_03_14 - S. Brennan 
-% - need to add environmental variable methods for debugging.
-% See for example the Geometry class. This will require that EVERY function
-% will be fixed.
-% - Need to use the Debug libraray, not Path library, to check inputs.
-% - fix addElevation
 % 2024_05_15 - Aneesh Batchu
 % -- Found a bug in "fcn_Path_findProjectionHitOntoPath". A test case to
 % demonstrate the BUG was written in "script_test_fcn_Path_findProjectionHitOntoPath"
+% -- fixed in 2025_06_14 release
+% 2025_06_14 by S. Brennan
+% -- fixed small bug in fcn_Path_findProjectionHitOntoPath
+% -- updated DebugTools_v2024_12_18, then to v2024_06_24 after fixing bug
+% -- updated script_test_all_functions to latest version incl assertions
+% -- rewrote fcn_Path_findProjectionHitOntoPath to be fcn_Path_findSensorHitOnWall
+% -- extensively reworked and tested fcn_Path_findSensorHitOnWall. Found
+%    and fixed many latent bugs
+% -- Fixed to use the Debug libraray, not Path library, to check inputs on
+%    all functions
+% -- Added environmental variable methods for debugging.
+
+% TO-DO:
+% 2024_03_14 - S. Brennan 
+% - fix addElevation. Seems to be giving wrong values
+% 2025_06_14 by S. Brennan
+% -- look at script_main_laneChange.m. Can clean this up by taking Guangwei's
+%    functions and adding them into these functions too
+% -- add more test cases to script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+% -- allow weighted averaging of paths (so we can add paths collected later)
+% -- add a function to find where paths diverage, based on user-defined 
+%    metric (e.g. a lane width)
+% -- add a function that finds where intersections and lange changes occur
+%    within many paths by looking at change in yaw of individual paths
+%    relative to mean path
+% -- pull out the spatial smoothing of offsets within function: 
+%    fcn_Path_fillRandomTraversalsAboutTraversal into another stand-alone
+%    function: fcn_Path_spatialLowPassFilter(path, smoothingDistance)
+% -- clean up fcn_Path_findAverageTraversalViaStationAlignment to match
+%    the inputs/header/style of ortho and closest functions. This should
+%    be a very simple function now that station resampling is done
 
 %% Prep the workspace
 close all
@@ -57,9 +75,9 @@ clc
 clear library_name library_folders library_url
 
 ith_library = 1;
-library_name{ith_library}    = 'DebugTools_v2024_12_18';
+library_name{ith_library}    = 'DebugTools_v2025_06_24';
 library_folders{ith_library} = {'Functions','Data'};
-library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2024_12_18.zip';
+library_url{ith_library}     = 'https://github.com/ivsg-psu/Errata_Tutorials_DebugTools/archive/refs/tags/DebugTools_v2025_06_24.zip';
 
 ith_library = ith_library+1;
 library_name{ith_library}    = 'GPSClass_v2023_06_29';

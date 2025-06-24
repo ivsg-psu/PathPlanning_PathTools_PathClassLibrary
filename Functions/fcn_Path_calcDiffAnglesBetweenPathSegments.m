@@ -120,9 +120,7 @@ if (0==flag_max_speed) && (2 == nargin)
     end
 else
     if flag_do_debug
-        fig = figure;  
-        fig_num = fig.Number;
-        flag_do_plots = 1;
+        fig_debug = 4848; %#ok<NASGU>
     end
 end
 

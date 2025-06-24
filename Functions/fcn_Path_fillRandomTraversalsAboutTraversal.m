@@ -86,26 +86,53 @@ function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(referen
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%     2021_01_03:
-%     -- wrote the code originally
-%     2021_01_07
-%     -- added functionalized input checking
-%     -- fixed typos in comments, plotting at end
-%     2021_01_09
-%     -- fixed function calls that were misnamed due to class edits
-%     -- updated dependencies
+% 2021_01_03:
+% -- wrote the code originally
+% 2021_01_07
+% -- added functionalized input checking
+% -- fixed typos in comments, plotting at end
+% 2021_01_09
+% -- fixed function calls that were misnamed due to class edits
+% -- updated dependencies
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to show the results for debugging
-flag_do_plots = 0; % % Flag to plot the final results
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==7 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -117,6 +144,16 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(1,7);
+
+        % Check the reference_traversal variables
+        fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
+
+    end
+end
 
 %      random_trajectories = ...
 %      fcn_Path_fillRandomTraversalsAboutTraversal(...
@@ -128,41 +165,8 @@ end
 %            (spatial_smoothness),...
 %            (fig_num));
 
-% Check inputs?
-if flag_check_inputs
-    % Are there the right number of inputs?
-    if nargin < 1 || nargin > 7
-        error('Incorrect number of input arguments')
-    end
-        
-    % Check the reference_traversal variables
-    fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
-    
-end
-
-Station_reference = reference_traversal.Station;
-Nstations = length(Station_reference);
-
-
-%% Set defaults
-
-% the default standard deviation
-std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal);
-
-% the default number of trajectories to use
-num_trajectories = 1;
-
-% the default number of points to use
-num_points = Nstations;
-
-% the default on generating random station locations
-flag_generate_random_stations = 1;
-
-% the default spatial smoothness
-spatial_smoothness = 40; % Units are meters
-
-%% Check for variable argument inputs (varargin)
 % Does the user want to specify standard deviation?
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal, -1); % the default standard deviation
 if 2 <= nargin
     temp = varargin{1};
     if ~isempty(temp)
@@ -172,6 +176,7 @@ end
 
 
 % Does the user want to specify num_trajectories?
+num_trajectories = 1; % the default number of trajectories to use
 if 3 <= nargin
     temp = varargin{2};
     if ~isempty(temp)
@@ -179,8 +184,10 @@ if 3 <= nargin
     end
 end
 
-
 % Does the user want to specify num_points?
+Station_reference = reference_traversal.Station;
+Nstations = length(Station_reference);
+num_points = Nstations; % the default number of points to use
 if 4 <= nargin
     temp = varargin{3};
     if ~isempty(temp)
@@ -188,8 +195,8 @@ if 4 <= nargin
     end
 end
 
-
 % Does the user want to specify flag_generate_random_stations?
+flag_generate_random_stations = 1; % the default on generating random station locations
 if 5 <= nargin
     temp = varargin{4};
     if ~isempty(temp)
@@ -198,6 +205,7 @@ if 5 <= nargin
 end
 
 % Does user want to specify spatial_smoothness?
+spatial_smoothness = 40; % the default spatial smoothness Units are meters
 if 6 <= nargin
     temp = varargin{5};
     if ~isempty(temp)
@@ -206,16 +214,18 @@ if 6 <= nargin
 end
 
 % Does user want to show the plots?
-if 7 == nargin
-    fig_num = varargin{6};
-    figure(fig_num);
-    flag_do_plots = 1;
-else
-    if flag_do_debug
-        fig = figure;
-        fig_num = fig.Number;
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (7 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
     end
+end
+
+if flag_do_debug
+    fig_debug = 34324; %#ok<NASGU>
 end
 
 
@@ -315,12 +325,12 @@ for ith_trajectory =1:num_trajectories
     % Find the unit normal vectors at each of the station points
     [unit_normal_vector_start, unit_normal_vector_end] = ...
         fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-        reference_station_points(:,ith_trajectory),reference_traversal,flag_rounding_type);
+        reference_station_points(:,ith_trajectory),reference_traversal,flag_rounding_type, -1);
     unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
     
     %% Calculate random path and traversal and save into final structure
     random_path = unit_normal_vector_start + unit_vectors.*offsets_from_reference(:,ith_trajectory);
-    random_traversal = fcn_Path_convertPathToTraversalStructure(random_path);
+    random_traversal = fcn_Path_convertPathToTraversalStructure(random_path, -1);
     random_traversals.traversal{ith_trajectory} = random_traversal;
     
 end
@@ -342,7 +352,6 @@ if flag_do_plots
     
     % plot the final XY result
     figure(fig_num);
-    clf;
     hold on;
     
     % Plot the reference trajectory first

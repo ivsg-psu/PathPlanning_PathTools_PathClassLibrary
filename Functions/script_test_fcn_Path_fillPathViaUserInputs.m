@@ -5,13 +5,13 @@
 % Questions or comments? sbrennan@psu.edu 
 
 % Revisions
-%     2020_10_15
-%     -- First write of the code
-%     2021_01_11
-%     -- Modified to make the code reentrant for stand-alone operation
-%     2021_01_20
-%     -- Fixed minor error in character being used as a number, and missing
-%     argument on fprintf function
+% 2020_10_15
+% -- First write of the code
+% 2021_01_11
+% -- Modified to make the code reentrant for stand-alone operation
+% 2021_01_20
+% -- Fixed minor error in character being used as a number, and missing
+% argument on fprintf function
 
 close all;
 
@@ -54,7 +54,7 @@ if 1==0  % Intentionally comment this out so that doesn't autorun. Forces user t
         paths_array{i_path} = pathXY;
     end
     
-    %% Plot the results
+    % Plot the results
     clear data;
     % Convert paths to traversal structures
     for i_Path = 1:length(paths_array)
