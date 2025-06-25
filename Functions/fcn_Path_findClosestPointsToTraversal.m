@@ -5,13 +5,16 @@ function [closestXs,closestYs,closestZs,closestYaws] = ...
 % reference path by snapping each vertex of the reference traversal onto
 % the nearby traversals. Each "snap" calculates the nearest point within
 % each other traversal by measuring the orthogonal distance from the nearby
-% traversal, to the point on the reference_traversal.
+% traversal, to the point on the reference_traversal. Thus, the "snap
+% points" are always orthogonal to each nearby traversal, and represent the
+% closest that traversal gets to the reference_traversal when measured at
+% the reference_traversal points.
 %
 % FORMAT:
 %
 %      [closestXs,closestYs,closestZs,closestYaws] = ...
-%      fcn_Path_findClosestPointsToTraversal(path,data,...
-%        (flag_yaw), (flag_3D),(fig_num))
+%      fcn_Path_findClosestPointsToTraversal(path, data,...
+%        (flag_yaw), (flag_3D), (fig_num))
 %
 % INPUTS:
 %
@@ -58,29 +61,57 @@ function [closestXs,closestYs,closestZs,closestYaws] = ...
 % Created Date:       2020-07-21
 
 % Revision History
-%      2020_02_22 
-%      -- take yaw into account
-%      2020_11_12 
-%      -- (SNB) added more comments
-%      2021_01_07
-%      -- Added more comments
-%      -- Updated name to reflect change from path to traverals
-%      2021_01_09:
-%      -- corrected terminology in comments
-%      -- updated dependencies
-%      -- fixed snap function name (it was wrong)
-%      -- added input checking
+% 2020_02_22 - S. Brennan
+% -- take yaw into account
+% 2020_11_12 - S. Brennan
+% -- (SNB) added more comments
+% 2021_01_07 - S. Brennan
+% -- Added more comments
+% -- Updated name to reflect change from path to traverals
+% 2021_01_09 - S. Brennan
+% -- corrected terminology in comments
+% -- updated dependencies
+% -- fixed snap function name (it was wrong)
+% -- added input checking
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to debug the results
-flag_do_plot = 0; % Flag to plot the results
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==5 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
 end
 
-%% check input arguments
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____                   _
 %  |_   _|                 | |
@@ -92,41 +123,43 @@ end
 %              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,5);
 
-flag_3D = 0; %#ok<*NASGU> % whether we consider the Z when do the projection
-flag_yaw = 0;
+        % Check the reference_traversal input
+        fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    if nargin < 2 || nargin > 5
-        error('Incorrect number of input arguments')
+        % Check the data input
+        fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
     end
-            
-    % Check the reference_traversal input
-    fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
-    
-    % Check the data input
-    fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
 end
 
+% Does user want to specify flag_yaw?
+flag_yaw = 0;
 if nargin >= 3
     flag_yaw = varargin{1};
 end
 
+% Does user want to specify flag_3D?
+flag_3D = 0; % whether we consider the Z when do the projection
 if nargin >= 4
     flag_3D = varargin{2};
 end
 
 % Does user want to show the plots?
-if 5 == nargin
-    fig_num = varargin{3};
-    figure(fig_num);
-    flag_do_plot = 1;
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (5 == nargin) 
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
 else
     if flag_do_debug
-        fig = figure;
-        fig_num = fig.Number;
-        flag_do_plot = 1;
+        fig_debug = 4848; %#ok<NASGU>
     end
 end
 
@@ -217,7 +250,7 @@ for index_reference_path = 1:length(reference_traversal.X) % loop through all th
         path = [X_tra, Y_tra];
                 
         [closest_path_point,~,first_path_point_index,second_path_point_index,percent_along_length]...
-            = fcn_Path_snapPointToPathViaVectors([X_ref,Y_ref], path);
+            = fcn_Path_snapPointToPathViaVectors([X_ref,Y_ref], path, [], -1);
         
         closestXs(index_reference_path,i_traversal) = closest_path_point(1);
         closestYs(index_reference_path,i_traversal) = closest_path_point(2);
@@ -313,10 +346,65 @@ end % Ends loop through the reference path
 %                            __/ |
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if flag_do_plot
-    figure(fig_num);
+if flag_do_plots
+% Prep the figure for plotting
+    temp_h = figure(fig_num);
+    flag_rescale_axis = 0;
+    if isempty(get(temp_h,'Children'))
+        flag_rescale_axis = 1;
+    end
+    
+    % Is this 2D or 3D?
+    dimension_of_points = 2;
+    
+    % Find size of plotting domain
+    allPointsBeingPlotted = [reference_traversal.X reference_traversal.Y; closestXs(:,1),closestYs(:,1)];
+    for i_traversal = 1:Ntraversals
+        allPointsBeingPlotted = [allPointsBeingPlotted; data.traversal{i_traversal}.X data.traversal{i_traversal}.Y]; %#ok<AGROW>
+    end
+    max_plotValues = max(allPointsBeingPlotted);
+    min_plotValues = min(allPointsBeingPlotted);
+    sizePlot = max(max_plotValues) - min(min_plotValues);
+    nudge = sizePlot*0.006; %#ok<NASGU>
+
+    % Find size of plotting domain
+    if flag_rescale_axis
+        percent_larger = 0.3;
+        axis_range = max_plotValues - min_plotValues;
+        if (0==axis_range(1,1))
+            axis_range(1,1) = 2/percent_larger;
+        end
+        if (0==axis_range(1,2))
+            axis_range(1,2) = 2/percent_larger;
+        end
+        if dimension_of_points==3 && (0==axis_range(1,3))
+            axis_range(1,3) = 2/percent_larger;
+        end
+
+        % Force the axis to be equal?
+        if 1==0
+            min_valuesInPlot = min(min_plotValues);
+            max_valuesInPlot = max(max_plotValues);
+        else
+            min_valuesInPlot = min_plotValues;
+            max_valuesInPlot = max_plotValues;
+        end
+
+        % Stretch the axes
+        stretched_min_vertexValues = min_valuesInPlot - percent_larger.*axis_range;
+        stretched_max_vertexValues = max_valuesInPlot + percent_larger.*axis_range;
+        axesTogether = [stretched_min_vertexValues; stretched_max_vertexValues];
+        newAxis = reshape(axesTogether, 1, []);
+        axis(newAxis);
+
+    end
+    % goodAxis = axis;
+
     hold on;
     grid on;
+
+    xlabel('X [m]');
+    ylabel('Y [m]');
     
     % INPUTS
     % Plot the reference_traversal

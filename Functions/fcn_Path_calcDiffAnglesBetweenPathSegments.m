@@ -176,6 +176,7 @@ if flag_do_plots
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
     end
+    
     % Is this 2D or 3D?
     dimension_of_points = length(diff_angles(1,:));
 

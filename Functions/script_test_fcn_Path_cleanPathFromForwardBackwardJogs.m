@@ -10,12 +10,14 @@ close all;
 
 %% Basic call example
 fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+titleString = sprintf('Basic call example');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 path_with_jogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
 clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
     (path_with_jogs,(fig_num));
+title(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(clean_path));
