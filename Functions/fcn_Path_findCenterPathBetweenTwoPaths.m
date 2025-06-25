@@ -121,32 +121,69 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 % -- rewrote to allow for projections that miss each other, for example
 % cases where a short segment is adjacent to a long segment. uses ST2XY
 % and XY2ST methods.
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plots = 0;
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
 
-%% check input arguments
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==5 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,5);
 
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(2,5);
+        % Check the first_path input
+        fcn_DebugTools_checkInputsToFunctions(first_path, 'path');
 
-    % fcn_DebugTools_checkInputsToFunctions
-    
+        % Check the second_path input
+        fcn_DebugTools_checkInputsToFunctions(second_path, 'path');
+
+    end
 end
-
 
 % Does user want to specify the rounding type?
 flag_rounding_type = 1; % Default
@@ -167,21 +204,18 @@ if 4 <= nargin
 end
 
 % Does user want to show the plots?
-if 5 == nargin
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (5 == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
     end
-end
-
-if flag_do_debug
-    fig_debug = 888; %#ok<*UNRCH> 
-    figure(fig_debug)
-    clf;
-    hold on;
-    grid on;
-
+else
+    if flag_do_debug
+        fig_debug = 888; 
+    end
 end
 
 
@@ -234,20 +268,20 @@ end
 
 
 %% Convert the paths into traversal types
-first_traversal   = fcn_Path_convertPathToTraversalStructure(first_path);
-second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path);
+first_traversal   = fcn_Path_convertPathToTraversalStructure(first_path, -1);
+second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path, -1);
 
 %% Obtain the projections from the traversals toward each other
 flag_project_full_distance = 0;
 [centerline_points_first_to_second,centerline_points_first_to_second_unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     first_traversal,second_traversal,...
-    (flag_rounding_type),(search_radius),(flag_project_full_distance));
+    (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 
 [centerline_points_second_to_first,centerline_points_second_to_first_unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     second_traversal,first_traversal,...
-    (flag_rounding_type),(search_radius),(flag_project_full_distance));
+    (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 
 %% Check for non-intersecting situations
 if all(isnan(centerline_points_first_to_second),'all') && all(isnan(centerline_points_second_to_first),'all')
@@ -275,16 +309,16 @@ if any(isnan(centerline_points_first_to_second),'all') || any(isnan(centerline_p
     % coordinates, converting them back into XY
 
     % Find ST coordinates from 1 to 2
-    St_points_from1_to2 = fcn_Path_convertXY2St(first_path,second_path, flag_rounding_type);
-    reference_stations_from1_to2 = fcn_Path_convertXY2St(first_path,first_path, flag_rounding_type);
+    St_points_from1_to2 = fcn_Path_convertXY2St(first_path,second_path, flag_rounding_type, -1);
+    reference_stations_from1_to2 = fcn_Path_convertXY2St(first_path,first_path, flag_rounding_type, -1);
     St_points_halfway_from1_to2 = [reference_stations_from1_to2(:,1) St_points_from1_to2(:,2)/2];
-    XY_points_halfway_from1_to2 = fcn_Path_convertSt2XY(first_path,St_points_halfway_from1_to2, flag_rounding_type);
+    XY_points_halfway_from1_to2 = fcn_Path_convertSt2XY(first_path,St_points_halfway_from1_to2, flag_rounding_type, -1);
 
     % Find ST coordinates from 2 to 1
-    St_points_from2_to1 = fcn_Path_convertXY2St(second_path, first_path, flag_rounding_type);
-    reference_stations_from2_to1 = fcn_Path_convertXY2St(second_path,second_path, flag_rounding_type);
+    St_points_from2_to1 = fcn_Path_convertXY2St(second_path, first_path, flag_rounding_type, -1);
+    reference_stations_from2_to1 = fcn_Path_convertXY2St(second_path,second_path, flag_rounding_type, -1);
     St_points_halfway_from2_to1 = [reference_stations_from2_to1(:,1) St_points_from2_to1(:,2)/2];
-    XY_points_halfway_from2_to1 = fcn_Path_convertSt2XY(second_path,St_points_halfway_from2_to1, flag_rounding_type);
+    XY_points_halfway_from2_to1 = fcn_Path_convertSt2XY(second_path,St_points_halfway_from2_to1, flag_rounding_type, -1);
 
     % Plot the situation, for debugging?
     if flag_do_debug
@@ -479,16 +513,16 @@ end
 
 %% Obtain the projections from the central traversal back toward 1st and 2nd traversals
 center_path_no_repeats =  unique(round(center_path,8),'rows','stable');
-center_traversal_no_repeats   = fcn_Path_convertPathToTraversalStructure(center_path_no_repeats);
+center_traversal_no_repeats   = fcn_Path_convertPathToTraversalStructure(center_path_no_repeats, -1);
 flag_project_full_distance = 1;
 [first_path_resampled,~] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     center_traversal_no_repeats,first_traversal,...
-    (flag_rounding_type),(search_radius),(flag_project_full_distance));
+    (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 [second_path_resampled,~] = ...
     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
     center_traversal_no_repeats,second_traversal,...
-    (flag_rounding_type),(search_radius),(flag_project_full_distance));
+    (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 
 
 if any(isnan(first_path_resampled),'all') && any(isnan(second_path_resampled),'all')
@@ -533,7 +567,63 @@ end
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
+    % Prep the figure for plotting
+    temp_h = figure(fig_num);
+    flag_rescale_axis = 0;
+    if isempty(get(temp_h,'Children'))
+        flag_rescale_axis = 1;
+    end      
+    % Is this 2D or 3D?
+    dimension_of_points = length(first_path(1,:));
+
+    % Find size of plotting domain
+    allPointsBeingPlotted = [first_path; second_path; center_path; first_path_resampled; second_path_resampled];
+    max_plotValues = max(allPointsBeingPlotted);
+    min_plotValues = min(allPointsBeingPlotted);
+    sizePlot = max(max_plotValues) - min(min_plotValues);
+    nudge = sizePlot*0.006; %#ok<NASGU>
+
+
+    % Find size of plotting domain
+    if flag_rescale_axis
+        percent_larger = 0.3;
+        axis_range = max_plotValues - min_plotValues;
+        if (0==axis_range(1,1))
+            axis_range(1,1) = 2/percent_larger;
+        end
+        if (0==axis_range(1,2))
+            axis_range(1,2) = 2/percent_larger;
+        end
+        if dimension_of_points==3 && (0==axis_range(1,3))
+            axis_range(1,3) = 2/percent_larger;
+        end
+
+        % Force the axis to be equal?
+        if 1==0
+            min_valuesInPlot = min(min_plotValues);
+            max_valuesInPlot = max(max_plotValues);
+        else
+            min_valuesInPlot = min_plotValues;
+            max_valuesInPlot = max_plotValues;
+        end
+
+        % Stretch the axes
+        stretched_min_vertexValues = min_valuesInPlot - percent_larger.*axis_range;
+        stretched_max_vertexValues = max_valuesInPlot + percent_larger.*axis_range;
+        axesTogether = [stretched_min_vertexValues; stretched_max_vertexValues];
+        newAxis = reshape(axesTogether, 1, []);
+        axis(newAxis);
+
+    end
+    % goodAxis = axis;
+
+    hold on;
+    grid on;
+    grid minor;
+    axis equal;
+
+    xlabel('X [m]')
+    ylabel('Y [m]')
     
     % Plot the input traversals
     plot(first_path(:,1),first_path(:,2),'r.-','Linewidth',3,'MarkerSize',30);      
@@ -553,14 +643,6 @@ if flag_do_plots
     line_width = 1;
     plot(first_path_resampled(:,1),first_path_resampled(:,2), '.-','Color',plot_color,'Linewidth',line_width,'Markersize',sizeOfMarkers);
     plot(second_path_resampled(:,1),second_path_resampled(:,2), '.-','Color',plot_color,'Linewidth',line_width,'Markersize',sizeOfMarkers);
-
-
-    % Make axis slightly larger
-    temp = axis;
-    axis_range_x = temp(2)-temp(1);
-    axis_range_y = temp(4)-temp(3);
-    percent_larger = 0.3;
-    axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
 
 end % Ends the flag_do_debug if statement
 

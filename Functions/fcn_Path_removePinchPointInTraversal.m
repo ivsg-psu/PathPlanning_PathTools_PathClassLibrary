@@ -48,8 +48,8 @@ function [traversal_no_pinch_point] = ...
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-%      2021_01_23:
-%      -- first write of the code
+% 2021_01_23:
+% -- first write of the code
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
 

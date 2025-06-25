@@ -170,10 +170,58 @@ diff_angles = sign(a_cross_b).*(acos(a_dot_b./(a_mag.*b_mag)));
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
-    clf;
+    % Prep the figure for plotting
+    temp_h = figure(fig_num);
+    flag_rescale_axis = 0;
+    if isempty(get(temp_h,'Children'))
+        flag_rescale_axis = 1;
+    end
+    % Is this 2D or 3D?
+    dimension_of_points = length(diff_angles(1,:));
+
+    % Find size of plotting domain
+    allPointsBeingPlotted = [(1:length(diff_angles))' diff_angles*180/pi];
+    max_plotValues = max(allPointsBeingPlotted);
+    min_plotValues = min(allPointsBeingPlotted);
+    sizePlot = max(max_plotValues) - min(min_plotValues);
+    nudge = sizePlot*0.006; %#ok<NASGU>
+
+    % Find size of plotting domain
+    if flag_rescale_axis
+        percent_larger = 0.3;
+        axis_range = max_plotValues - min_plotValues;
+        if (0==axis_range(1,1))
+            axis_range(1,1) = 2/percent_larger;
+        end
+        if (0==axis_range(1,2))
+            axis_range(1,2) = 2/percent_larger;
+        end
+        if dimension_of_points==3 && (0==axis_range(1,3))
+            axis_range(1,3) = 2/percent_larger;
+        end
+
+        % Force the axis to be equal?
+        if 1==0
+            min_valuesInPlot = min(min_plotValues);
+            max_valuesInPlot = max(max_plotValues);
+        else
+            min_valuesInPlot = min_plotValues;
+            max_valuesInPlot = max_plotValues;
+        end
+
+        % Stretch the axes
+        stretched_min_vertexValues = min_valuesInPlot - percent_larger.*axis_range;
+        stretched_max_vertexValues = max_valuesInPlot + percent_larger.*axis_range;
+        axesTogether = [stretched_min_vertexValues; stretched_max_vertexValues];
+        newAxis = reshape(axesTogether, 1, []);
+        axis(newAxis);
+
+    end
+    % goodAxis = axis;
+
     hold on;
     grid on;
+
     xlabel('Index');
     ylabel('Angle [deg]');
 

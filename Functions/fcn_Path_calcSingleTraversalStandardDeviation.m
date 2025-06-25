@@ -172,7 +172,7 @@ std_deviation = std_angles*mean_segment_length;
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-       
+
     % Plot the results
     fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
     std_deviation,fig_num);

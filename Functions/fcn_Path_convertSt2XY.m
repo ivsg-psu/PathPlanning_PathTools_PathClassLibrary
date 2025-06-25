@@ -181,13 +181,13 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-central_traversal = fcn_Path_convertPathToTraversalStructure(referencePath);
+central_traversal = fcn_Path_convertPathToTraversalStructure(referencePath, -1);
 
 modified_stations = min(St_input_points(:,1),central_traversal.Station(end));
 modified_stations = max(modified_stations,0);
 
 [unit_normal_vector_start, unit_normal_vector_end] = ...
-    fcn_Path_findOrthogonalTraversalVectorsAtStations(modified_stations,central_traversal, flag_rounding_type);
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(modified_stations,central_traversal, flag_rounding_type, -1);
 
 unit_orthogonal_vectors = unit_normal_vector_end - unit_normal_vector_start;
 

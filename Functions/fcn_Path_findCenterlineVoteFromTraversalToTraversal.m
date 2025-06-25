@@ -17,7 +17,8 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %
 %    [centerline_points_projected,unit_vectors_orthogonal] = ...
 %     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-%     from_traversal,to_traversal,(flag_rounding_type),(search_radius),(fig_num))
+%     from_traversal,to_traversal, ...
+%     (flag_rounding_type),(search_radius), (flag_project_full_distance), (fig_num))
 %
 % INPUTS:
 %
@@ -116,31 +117,62 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 % header
 % 2023_09_15 by S. Brennan
 % -- added flag_project_full_distance to allow full distance projections
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
 
-flag_do_debug = 0; % Flag to plot the results for debugging
-flag_do_plots = 0;
-flag_check_inputs = 1; % Flag to perform input checking
+% TO-DO
+% (none)
 
-%% check input arguments
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+flag_max_speed = 0;
+if (nargin==6 && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if flag_check_inputs == 1
-    % Are there the right number of inputs?
-    narginchk(2,6);
-    
-    % fcn_DebugTools_checkInputsToFunctions
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,6);
+    end
 end
-
 
 % Does user want to specify the rounding type?
 flag_rounding_type = 1; % Default
@@ -170,17 +202,21 @@ if 5 <= nargin
 end
 
 % Does user want to show the plots?
-if 6 == nargin
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (6 == nargin) 
     temp = varargin{end};
-    if ~isempty(temp)
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
+        figure(fig_num);
         flag_do_plots = 1;
+    end
+else
+    if flag_do_debug
+        fig_debug = 4848; %#ok<NASGU>
     end
 end
 
-if flag_do_debug
-    fig_debug = 888; %#ok<*UNRCH> 
-end
+
 
 
 %% Find the closest point
@@ -206,7 +242,7 @@ end
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
     from_traversal.Station,...
     from_traversal,to_traversal,...
-    flag_rounding_type,search_radius);
+    flag_rounding_type,search_radius, -1);
 
 full_distances_between = fillmissing(distances_between, 'nearest');
 
@@ -221,7 +257,7 @@ full_distances_between = fillmissing(distances_between, 'nearest');
        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
        from_traversal.Station,...
        from_traversal,...
-       flag_rounding_type);
+       flag_rounding_type, -1);
 unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
 
 if 0==flag_project_full_distance

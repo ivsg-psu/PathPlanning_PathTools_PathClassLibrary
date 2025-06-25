@@ -9,16 +9,20 @@
 
 close all
 
-%% Test case 1: basic call
+%% Calculation of the angle between path segements
 fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+titleString = sprintf('Calculation of the angle between path segements');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
+
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
 
 diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,fig_num);
+
+title(titleString, 'Interpreter','none');
 
 % Check variable types
 assert(isnumeric(diff_angles));
