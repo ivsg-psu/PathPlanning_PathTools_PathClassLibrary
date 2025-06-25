@@ -9,102 +9,265 @@
 close all;
 
 
-%% BASIC example 1 - start at zero
+%% BASIC example: - start at zero
+fig_num = 10001;
+titleString = sprintf('BASIC example: start at zero');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
 input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
-
-fig_num = 2344;
 
 % Redecimate the traversal at 1-meter increments
 interval = 5;
 new_stations    = (0:interval:5)';
+
+% Call the function
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
-% Make sure function worked!
+% Update title
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
+
+% Check variable values
 assert(isequal(round(new_traversal.X,4),[0; 5]));
 
-%% BASIC example 2 - start at one
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% BASIC example: start at one
+fig_num = 10002;
+titleString = sprintf('BASIC example: start at one');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); 
+
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
 input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
-
-fig_num = 2345;
 
 % Redecimate the traversal at 1-meter increments
 interval = 5;
 new_stations    = (1:interval:6)';
+
+% Call the function
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
-% Make sure function worked!
+% Update title
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
+
+% Check variable values
 assert(isequal(round(new_traversal.X,4),[1; 6]));
 
-%% BASIC example 3 - first point before start
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% BASIC example: first point before start
+fig_num = 10003;
+titleString = sprintf('BASIC example: first point before start');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); 
+
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
 input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
-
-fig_num = 23456;
 
 % Redecimate the traversal
 interval = 5;
 new_stations    = (-5:interval:0)';
+
+% Call the function
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
-% Make sure function worked!
+% Update title
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
+
+% Check variable values
 assert(isequal(round(new_traversal.X,4),new_stations));
 
-%% BASIC example 4 - perfect overlap
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% BASIC example: perfect overlap
+fig_num = 10004;
+titleString = sprintf('BASIC example: perfect overlap');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num);
+
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
 input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
-
-fig_num = 23457;
 
 % Redecimate the traversal at 1-meter increments
 interval = 10;
 new_stations    = (0:interval:20)';
+
+% Call the function
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
-% Make sure function worked!
+% Update title
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
+
+% Check variable values
 assert(isequal(round(new_traversal.X,4),new_stations));
 
-%% BASIC example 5 - none on traversal
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% BASIC example: none on traversal
+fig_num = 10005;
+titleString = sprintf('BASIC example: none on traversal');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num);
+
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
 input_traversal = fcn_Path_convertPathToTraversalStructure(basic_path);
 
-fig_num = 23457;
-
 % Redecimate the traversal at 1-meter increments
 interval = 5;
 new_stations    = (-10:interval:-5)';
+
+% Call the function
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
-% Make sure function worked!
+% Update title
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
+
+% Check variable values
 assert(isequal(round(new_traversal.X,4),new_stations));
 
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
 
-%% Advanced test: show this works with a real traversal
+%% ADVANCED test: using a real traversal
+fig_num = 20001;
+titleString = sprintf('ADVANCED test: using a real traversal');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-fig_num = 2345;
-
 % Redecimate the traversal at 1-meter increments
 interval = 10;
 new_stations    = (0:interval:input_traversal.Station(end))';
+
+% Call the function
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
-URHERE
+% Update title
+title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(diff_angles));
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
 
 % Check variable sizes
-assert(isequal(size(diff_angles),[length(paths_to_check(:,1))-2 1]));
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -134,15 +297,32 @@ figure(fig_num); close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,[]);
+% Redecimate the traversal at 1-meter increments
+interval = 10;
+new_stations    = (0:interval:input_traversal.Station(end))';
+
+% Call the function
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, ([]));
 
 % Check variable types
-assert(isnumeric(diff_angles));
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
 
 % Check variable sizes
-assert(isequal(size(diff_angles),[length(paths_to_check(:,1))-2 1]));
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -154,17 +334,35 @@ fig_num = 80002;
 fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
 figure(fig_num); close(fig_num);
 
+
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,-1);
+% Redecimate the traversal at 1-meter increments
+interval = 10;
+new_stations    = (0:interval:input_traversal.Station(end))';
+
+% Call the function
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, (-1));
 
 % Check variable types
-assert(isnumeric(diff_angles));
+assert(isstruct(new_traversal));
+assert(isfield(new_traversal,'X'))
+assert(isfield(new_traversal,'Y'))
+assert(isfield(new_traversal,'Z'))
+assert(isfield(new_traversal,'Diff'))
+assert(isfield(new_traversal,'Station'))
+assert(isfield(new_traversal,'Yaw'))
 
 % Check variable sizes
-assert(isequal(size(diff_angles),[length(paths_to_check(:,1))-2 1]));
+NreferencePoints = length(new_stations(:,1));
+assert(isequal(size(new_traversal.X),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Y),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Z),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Diff),[NreferencePoints 2]));
+assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
+assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -179,7 +377,11 @@ close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
+
+% Redecimate the traversal at 1-meter increments
+interval = 10;
+new_stations    = (0:interval:input_traversal.Station(end))';
 
 Niterations = 100;
 
@@ -187,7 +389,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,[]);
+    new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, ([]));
 end
 slow_method = toc;
 
@@ -195,7 +397,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,-1);
+    new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, (-1));
 end
 fast_method = toc;
 
