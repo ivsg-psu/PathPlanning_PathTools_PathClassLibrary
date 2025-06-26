@@ -2,7 +2,7 @@ function new_traversal = ...
     fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, varargin)
 % fcn_Path_newTraversalByStationResampling
 % creates a new traversal by resampling a given traversal at given station
-% points. 
+% points.
 %
 % Note: if the stations are intended to align in space between the
 % input_traversal and new_traversal traversals, then the first station
@@ -13,7 +13,7 @@ function new_traversal = ...
 % outward. This can result in bad data if the path is not approximately
 % linear at the endpoints.
 %
-% FORMAT: 
+% FORMAT:
 %
 %      [new_traversal] = ...
 %      fcn_Path_newTraversalByStationResampling(...
@@ -50,13 +50,13 @@ function new_traversal = ...
 %      fcn_Path_convertPathToTraversalStructure
 %
 % EXAMPLES:
-%      
-%     See the script: 
+%
+%     See the script:
 %     script_test_fcn_Path_newTraversalByStationResampling
 %     for a full test suite.
 %
 % This function was written on 2022_01_05 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2022_01_05:
@@ -73,8 +73,9 @@ function new_traversal = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -115,7 +116,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,3);
+        narginchk(2,MAX_NARGIN);
 
         % Check the input_traversal input
         fcn_DebugTools_checkInputsToFunctions(input_traversal, 'traversal');
@@ -127,7 +128,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (3 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -143,10 +144,10 @@ end
 
 %% Main code starts here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
 %
@@ -165,30 +166,30 @@ new_traversal  = fcn_Path_convertPathToTraversalStructure([interp_X, interp_Y], 
 % in the cases where the user explicitly starts the station count at zero.
 % For long station lists, this prevents round-off errors from accumulating.
 if 0==new_stations(1,1)
-    new_traversal.Station = new_stations; 
+    new_traversal.Station = new_stations;
 end
 
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    
-  % Prep the figure for plotting
+
+    % Prep the figure for plotting
     temp_h = figure(fig_num);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
     end
-    
+
     % Is this 2D or 3D?
     dimension_of_points = 2;
 
@@ -242,11 +243,11 @@ if flag_do_plots
     plot(new_traversal.X,new_traversal.Y,'r.-','Linewidth',2,'Markersize',20);
     legend('Input traversal','New traversal');
     title('original traversal and resampled traversal');
-    
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end % End of function
 

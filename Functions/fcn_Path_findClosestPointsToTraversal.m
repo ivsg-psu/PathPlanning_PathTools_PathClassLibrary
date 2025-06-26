@@ -25,7 +25,7 @@ function [closestXs,closestYs,closestZs,closestYaws] = ...
 %      containing a cell array of traversals, each with subfields of X, Y,
 %      etc. in the following form
 %           data.traversal{i_path}.X
-%      Note that i_path denotes an index into a different traversal. 
+%      Note that i_path denotes an index into a different traversal.
 %      This array of traversals specifies the traversals where
 %      intersections from the reference_traversal would hit. Each traversal
 %      will be compared separately.
@@ -84,8 +84,9 @@ function [closestXs,closestYs,closestZs,closestYaws] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 5; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==5 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -126,7 +127,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,5);
+        narginchk(2,MAX_NARGIN);
 
         % Check the reference_traversal input
         fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
@@ -150,7 +151,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (5 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -209,7 +210,7 @@ closestYaws = zeros(length(reference_traversal.X),Ntraversals);
 
 % Loop through each point of the reference traversal
 for index_reference_path = 1:length(reference_traversal.X) % loop through all the point on the reference path
-    
+
     % calculating x, y, and z position of one specific point on
     % each traversal given by index_to_match (a common point). This
     % reference point is what will be used to "match" all the other
@@ -218,49 +219,49 @@ for index_reference_path = 1:length(reference_traversal.X) % loop through all th
     Y_ref = reference_traversal.Y(index_reference_path);
     % Z_ref = reference_traversal.Z(index_reference_path);
     Station_ref = reference_traversal.Station(index_reference_path);
-    
+
     % Define the minimum and maximum stations that we can look for in each
     % of the trajectories. It will be our reference station that we're at,
     % plus and minus the station bound limits. Keep the limits
     station_lower = max(Station_ref - station_bound, 0);
-    
+
     station_upper = min(Station_ref + station_bound, longest_station);
     % station_upper = min(Station_ref + station_bound, max(last_station));
     % % 2020_11_12 - above line seems to be wrong so corrected it!
-    
+
     % Loop through all traversals and for each
     % traversal, find the closest point on the first traversal, and
     % use this to calculate station offset and index offset of the
     % ith traversal relative to the first traversal
     for i_traversal = 1:Ntraversals % loop through all traverasals (already excluded path)
-        
+
         % allowable us to find the indexes within the station range
         index_in_station_range = find(data.traversal{i_traversal}.Station >= station_lower & data.traversal{i_traversal}.Station <= station_upper);
-        
+
         % pull the X,Y,Z data that are within this station range
         X_tra = data.traversal{i_traversal}.X(index_in_station_range);
         Y_tra = data.traversal{i_traversal}.Y(index_in_station_range);
         Z_tra = data.traversal{i_traversal}.Z(index_in_station_range);
-        
+
         % Yaw index cannot be larger than N-1
         length_Yaw = length(data.traversal{i_traversal}.Yaw);
         yaw_index_in_station_range = min(index_in_station_range,length_Yaw);
         Yaw_tra = [data.traversal{i_traversal}.Yaw(yaw_index_in_station_range)];
-        
+
         path = [X_tra, Y_tra];
-                
+
         [closest_path_point,~,first_path_point_index,second_path_point_index,percent_along_length]...
             = fcn_Path_snapPointToPathViaVectors([X_ref,Y_ref], path, [], -1);
-        
+
         closestXs(index_reference_path,i_traversal) = closest_path_point(1);
         closestYs(index_reference_path,i_traversal) = closest_path_point(2);
-        
+
         % interplate Zup
         nearest_Z1 = Z_tra(first_path_point_index);
         nearest_Z2 = Z_tra(second_path_point_index);
         interp_Z = nearest_Z1 + (nearest_Z2-nearest_Z1)*percent_along_length;
         closestZs(index_reference_path,i_traversal) = interp_Z;
-        
+
         if flag_yaw == 1
             % find the closet yaw
             nearest_yaw1 = Yaw_tra(first_path_point_index);
@@ -268,11 +269,11 @@ for index_reference_path = 1:length(reference_traversal.X) % loop through all th
             Proj_yaw_ref_to_tra = nearest_yaw1 + (nearest_yaw2-nearest_yaw1)*percent_along_length;
             closestYaws(index_reference_path,i_traversal) = Proj_yaw_ref_to_tra;
         end
-        
-        
+
+
         if flag_3D
             error('3D methods are not yet implemented');
-            
+
             %             % finding the idx of the that is closet to the current reference point
             %             id = knnsearch([X_tra Y_tra Z_tra],[X_ref Y_ref Z_ref],'k',2);  %Find k-nearest neighbors using object
             %             id = sort(id); % sort in Ascending Order
@@ -332,7 +333,7 @@ for index_reference_path = 1:length(reference_traversal.X) % loop through all th
             %             Proj_yaw_ref_to_tra = nearest_yaw1 + (nearest_yaw2-nearest_yaw1)*(np1_to_pp_length/np1_to_np2_Length);
             %             closestYaws(index_reference_path,i_traversal) = Proj_yaw_ref_to_tra;
         end % Ends flad 3D check
-    end % Ends loop through ith traversal    
+    end % Ends loop through ith traversal
 end % Ends loop through the reference path
 
 %% Plot the results (for debugging)?
@@ -347,16 +348,16 @@ end % Ends loop through the reference path
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-% Prep the figure for plotting
+    % Prep the figure for plotting
     temp_h = figure(fig_num);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
     end
-    
+
     % Is this 2D or 3D?
     dimension_of_points = 2;
-    
+
     % Find size of plotting domain
     allPointsBeingPlotted = [reference_traversal.X reference_traversal.Y; closestXs(:,1),closestYs(:,1)];
     for i_traversal = 1:Ntraversals
@@ -405,25 +406,25 @@ if flag_do_plots
 
     xlabel('X [m]');
     ylabel('Y [m]');
-    
+
     % INPUTS
     % Plot the reference_traversal
-    plot(reference_traversal.X,reference_traversal.Y,'r','Linewidth',2);      
-    
+    plot(reference_traversal.X,reference_traversal.Y,'r','Linewidth',2);
+
     % Plot the path
     for i_traversal = 1:Ntraversals
         plot(data.traversal{i_traversal}.X,data.traversal{i_traversal}.Y,'bo-','Linewidth',2);
     end
-    
+
     axis equal;
-    
+
     % Plot the station points
     plot(reference_traversal.X,reference_traversal.Y,'k.','Markersize',15);
-    
+
     % OUTPUTS
     % Plot hit locations
-    plot(closestXs(:,1),closestYs(:,1),'r.','Markersize',30);     
-    
+    plot(closestXs(:,1),closestYs(:,1),'r.','Markersize',30);
+
     % Show the unit vectors
     quiver(reference_traversal.X,reference_traversal.Y,closestXs(:,1)-reference_traversal.X,closestYs(:,1)-reference_traversal.Y,0,'Linewidth',3);
 
@@ -433,7 +434,7 @@ if flag_do_plots
     % for i_point = 1:length(path(:,1))
     %     text(path(i_point,2),path(i_point,3),sprintf('%.2f',distances_point_to_path(i_point)));
     % end
-      
+
 end
 
 if flag_do_debug

@@ -3,7 +3,7 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
 % finds the traversal index with the most amount of data (determined as the
 % most elements in the X array)
 %
-% FORMAT: 
+% FORMAT:
 %
 %      index_of_longest = fcn_Path_findTraversalWithMostData(data, (fig_num))
 %
@@ -32,12 +32,12 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
 %      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
-%      
+%
 %       See the script: script_test_fcn_Path_findTraversalWithMostData.m
-%       for a full test suite. 
+%       for a full test suite.
 %
 % This function was written on 2020_11_12 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2020_11_12
@@ -55,8 +55,9 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -97,16 +98,16 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(1,2);
+        narginchk(1,MAX_NARGIN);
 
-    % Check the data input
-    fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
+        % Check the data input
+        fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
     end
 end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (2 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -122,16 +123,16 @@ end
 
 %% Solve for the circle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
-% choose the initial reference path, choose the path with most data points 
+
+% choose the initial reference path, choose the path with most data points
 data_length = zeros(1,length(data.traversal));
 for i_path = 1:length(data.traversal)
     data_length(i_path) = length(data.traversal{i_path}.X);
@@ -141,21 +142,21 @@ end
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Nothing in here yet
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
 

@@ -1,9 +1,9 @@
 function XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points, varargin)
 %% fcn_Path_convertSt2XY
 % Given a referencePath (N x 2) and a set of XY_points (N x 2), returns the
-% XY coordinates that represent the St points. 
-% 
-% FORMAT: 
+% XY coordinates that represent the St points.
+%
+% FORMAT:
 %
 %    XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points,
 %    (flag_rounding_type), (fig_num));
@@ -33,17 +33,17 @@ function XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points, vararg
 %          flag_rounding_type = 1;  % This is the default, and indicates
 %          that the orthogonal projection of an endpoint is created by the
 %          PRIOR segment leading up to each station query point.
-% 
+%
 %          flag_rounding_type = 2;  % This indicates that the orthogonal
 %          projection of an endpoint is created by the FOLLOWING segment
 %          after each station query point.
-% 
+%
 %          flag_rounding_type = 3;  % This indicates that the orthogonal
 %          projection, ONLY if the station query falls at the joining point
 %          between two segments (e.g. is on the "joint"), then the
 %          projection is created by averaging the vector projections
 %          created from the PRIOR segment and FOLLOWING segment.
-% 
+%
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
 %          of each segment, and then for each station qeuary, the vector
@@ -64,7 +64,7 @@ function XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points, vararg
 %      coordinates corresponding to each [ S t (h)] input point.
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_Path_convertSt2XY
 % for a full test suite.
 %
@@ -74,7 +74,7 @@ function XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points, vararg
 %     fcn_Path_convertPathToTraversalStructure
 %
 % This function was written on 2023_08_26 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2023_08_26 by S. Brennan
@@ -90,8 +90,9 @@ function XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points, vararg
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -132,7 +133,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,4);
+        narginchk(2,MAX_NARGIN);
 
         % Check the data input
         fcn_DebugTools_checkInputsToFunctions(referencePath, 'path2or3D');
@@ -156,7 +157,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (4 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -172,13 +173,13 @@ end
 
 %% Find the closest point
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 central_traversal = fcn_Path_convertPathToTraversalStructure(referencePath, -1);
@@ -205,14 +206,14 @@ XY_points = unit_normal_vector_start + unit_orthogonal_vectors.*real(St_input_po
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Prep the figure for plotting
@@ -225,22 +226,22 @@ if flag_do_plots
     hold on;
     grid on;
     axis equal;
-    
+
     % Plot the path
     plot(referencePath(:,1),referencePath(:,2),'r.-','Linewidth',5,'Markersize',20);
-    
+
     Npath = length(referencePath(:,1));
     % Label the path points
     for ith_point = 1:Npath
         text(referencePath(ith_point,1),referencePath(ith_point,2),sprintf('%.0d',ith_point),'Color',[1 0 0],'FontSize',12,'VerticalAlignment','bottom');
     end
-    
+
     % Plot the query stations
     plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'k.','MarkerSize',20);
-        
+
     % Plot the solution
     plot(XY_points(:,1),XY_points(:,2),'b.','MarkerSize',20);
-    
+
     % Make axis slightly larger?
     if flag_rescale_axis
         temp = axis;

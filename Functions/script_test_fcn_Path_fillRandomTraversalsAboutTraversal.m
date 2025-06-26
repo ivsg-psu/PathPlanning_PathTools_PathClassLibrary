@@ -48,7 +48,7 @@ assert(isfield(random_traversals.traversal{1},'Yaw'))
 
 % Check variable sizes
 NreferencePoints = length(reference_traversal.X(:,1));
-assert(length(random_traversals.traversal)==1) %#ok<ISCL>
+assert(length(random_traversals.traversal)==1) 
 assert(isequal(size(random_traversals.traversal{1}.X),[NreferencePoints 1]));
 assert(isequal(size(random_traversals.traversal{1}.Y),[NreferencePoints 1]));
 assert(isequal(size(random_traversals.traversal{1}.Z),[NreferencePoints 1]));
@@ -103,7 +103,7 @@ assert(isfield(random_traversals.traversal{1},'Yaw'))
 
 % Check variable sizes
 NreferencePoints = length(reference_traversal.X(:,1));
-assert(length(random_traversals.traversal)==1) %#ok<ISCL>
+assert(length(random_traversals.traversal)==1) 
 assert(isequal(size(random_traversals.traversal{1}.X),[NreferencePoints 1]));
 assert(isequal(size(random_traversals.traversal{1}.Y),[NreferencePoints 1]));
 assert(isequal(size(random_traversals.traversal{1}.Z),[NreferencePoints 1]));
@@ -160,7 +160,7 @@ assert(isfield(random_traversals.traversal{1},'Yaw'))
 
 % Check variable sizes
 NreferencePoints = length(reference_traversal.X(:,1));
-assert(length(random_traversals.traversal)==1) %#ok<ISCL>
+assert(length(random_traversals.traversal)==1) 
 assert(isequal(size(random_traversals.traversal{1}.X),[NreferencePoints 1]));
 assert(isequal(size(random_traversals.traversal{1}.Y),[NreferencePoints 1]));
 assert(isequal(size(random_traversals.traversal{1}.Z),[NreferencePoints 1]));

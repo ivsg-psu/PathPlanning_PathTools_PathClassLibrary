@@ -20,9 +20,9 @@
 
 close all;
 
-%% BASIC example - parallel lines, query is in middle area
+%% BASIC example: Parallel lines, query is in middle area
 fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: Parallel lines, query is in middle area\n',fig_num);
 figure(fig_num); clf;
 
 stations = 1; % Define the station
@@ -46,18 +46,28 @@ search_radius = 5;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[1     4]));
-assert(isequal(round(distances,4),[4])); %#ok<*NBRAK>
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[1     4]));
+assert(isequal(round(distances,4),[4])); %#ok<*NBRAK>
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% BASIC example - parallel lines, negative
+%% BASIC example: parallel lines, negative
 fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: parallel lines, negative\n',fig_num);
 figure(fig_num); clf;
 
 stations = 1; % Define the station
@@ -80,18 +90,29 @@ search_radius = 5;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[1     -4]));
-assert(isequal(round(distances,4),[-4]));
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[1     -4]));
+assert(isequal(round(distances,4),[-4]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% BASIC example - angled line segment adjacent to endpoint query
+
+%% BASIC example: angled line segment adjacent to endpoint query
 fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: angled line segment adjacent to endpoint query\n',fig_num);
 figure(fig_num); clf;
 
 stations = 1;
@@ -111,18 +132,29 @@ search_radius = 10;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[1.0000    5.5000]));
-assert(isequal(round(distances,4),[5.5000]));
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[1.0000    5.5000]));
+assert(isequal(round(distances,4),[5.5000]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% BASIC example - angled line segment adjacent to endpoint query 
+
+%% BASIC example: angled line segment adjacent to endpoint query 
 fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: angled line segment adjacent to endpoint query \n',fig_num);
 figure(fig_num); clf;
 
 stations = 10;
@@ -143,18 +175,29 @@ search_radius = 20;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[10     7]));
-assert(isequal(round(distances,4),[7]));
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[10     7]));
+assert(isequal(round(distances,4),[7]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% BASIC example - angled line segment adjacent to startpoint query
+
+%% BASIC example: Angled line segment adjacent to startpoint query
 fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: Angled line segment adjacent to startpoint query\n',fig_num);
 figure(fig_num); clf;
 
 stations = 0;
@@ -174,19 +217,30 @@ search_radius = 20;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[0    4.2308]));
-assert(isequal(round(distances,4),[4.2308]));
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[0    4.2308]));
+assert(isequal(round(distances,4),[4.2308]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% BASIC example - parallel line segment adjacent to startpoint query
+
+%% BASIC example: parallel line segment adjacent to startpoint query
 % Query point is right at start, so need to check it will not "miss"
 fig_num = 10006;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: parallel line segment adjacent to startpoint query\n',fig_num);
 figure(fig_num); clf;
 
 stations = 0;
@@ -206,19 +260,30 @@ search_radius = 20;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[0     4]));
-assert(isequal(round(distances,4),[4]));
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[0     4]));
+assert(isequal(round(distances,4),[4]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
-%% BASIC example - central path and nearby path are the same
+
+%% BASIC example: central path and nearby path are the same
 % We should get that the very first point is the station point
 fig_num = 10007;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: central path and nearby path are the same\n',fig_num);
 figure(fig_num); clf;
 
 stations = 1;
@@ -237,21 +302,76 @@ nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-% Make sure function worked
-assert(isequal(round(closest_path_point,4),[0.7071    0.7071]));
-assert(isequal(round(distances,4),[0]));
+title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+assert(isequal(round(closest_path_point,4),[0.7071    0.7071]));
+assert(isequal(round(distances,4),[0]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
+
+%% BASIC example: central path and query point do not hit anything
+% We should get NaN values
+
+fig_num = 10008;
+fprintf(1,'Figure %.0f: BASIC example: central path and query point do not hit anything\n',fig_num);
+figure(fig_num); clf;
+
+stations = 1;
+flag_rounding_type = 3;
+search_radius = 10;
+
+central_path = [0 0; 2 0];
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
+nearby_path = [5 5; 8 5];
+nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
+
+% Calculate the closest point and distance on the nearby path
+[closest_path_point,distances] = ...
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
+    central_traversal,nearby_traversal,...
+    flag_rounding_type,search_radius,fig_num);
+
+title(titleString, 'Interpreter','none');
+
+print_results(stations,closest_path_point,distances);
+
+% Check variable types
+assert(all(isnan(closest_path_point)));
+assert(all(isnan(distances)));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
+% assert(isequal(round(closest_path_point,4),[0.7071    0.7071]));
+% assert(isequal(round(distances,4),[0]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+
 %% 
 close all
 
-%% AVERAGING examples
+%% Showing flag_rounding_type
 fig_num = 20001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: Showing flag_rounding_type\n',fig_num);
 figure(fig_num); clf;
 
 % Set up data
@@ -304,7 +424,7 @@ flag_rounding_type = 4;  % use average projection of prior and following segment
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
 print_results(stations,closest_path_point,distances);
-title('Vertex projection via averaging everywhere (flag=4)');
+title('Vertex projection via interpolation (flag=4)');
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -638,11 +758,17 @@ search_radius = 10;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,[]);
 
-% Make sure function worked
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
 assert(isequal(round(closest_path_point,4),[1.0000    5.5000]));
 assert(isequal(round(distances,4),[5.5000]));
-
-print_results(stations,closest_path_point,distances);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -672,11 +798,17 @@ search_radius = 10;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,-1);
 
-% Make sure function worked
+% Check variable types
+assert(isnumeric(closest_path_point));
+assert(isnumeric(distances));
+
+% Check variable sizes
+assert(isequal(size(closest_path_point),[1 2]));
+assert(isequal(size(distances),[1 1]));
+
+% Check variable values
 assert(isequal(round(closest_path_point,4),[1.0000    5.5000]));
 assert(isequal(round(distances,4),[5.5000]));
-
-print_results(stations,closest_path_point,distances);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');

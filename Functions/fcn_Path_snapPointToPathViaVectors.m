@@ -134,7 +134,7 @@ function [closest_path_points,...
 
 % Revision history:
 % 2023_09_28 - S. Brennan
-% --  first write of the code, using fcn_Path_snapPointOntoNearestPath 
+% --  first write of the code, using fcn_Path_snapPointOntoNearestPath
 % 2024_03_14 - S. Brennan
 % -- fixed bug where snap breaks if path is passed in as a 3D vector
 % 2025_06_23 - S. Brennan
@@ -148,8 +148,9 @@ function [closest_path_points,...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -190,7 +191,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,4);
+        narginchk(2,MAX_NARGIN);
 
         % Check the data input
         fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
@@ -213,7 +214,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (4 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -222,7 +223,7 @@ if (0==flag_max_speed) && (4 == nargin)
     end
 else
     if flag_do_debug
-        fig = figure;  
+        fig = figure;
         fig_num = fig.Number;
         flag_do_plots = 1;
     end
@@ -305,7 +306,7 @@ back_orthogonal_flag_rounding_type = 1;
 
 if path_dimension == 2
     unit_tangential_vectors_at_midpoints = unit_orthogonal_vectors_at_midpoints*[0 -1; 1 0];
-elseif  path_dimension == 3 
+elseif  path_dimension == 3
     unit_tangential_vectors_at_midpoints = unit_orthogonal_vectors_at_midpoints*[0 1 0; -1 0 0; 0 0 1];
 else
     error('A 2D or 3D vector is expected');
@@ -438,7 +439,7 @@ for ith_point = 1:Npoints
         %          of each segment, and then for each station qeuary, the vector
         %          projections are interpolated from their prior and subsequent
         %          vectors.
-        
+
         if min_vertex_distance_index == 1
             unit_orthogonal_projection_vector = unit_orthogonal_vectors_at_midpoints(1,:);
         elseif min_vertex_distance_index == Npath
@@ -633,7 +634,7 @@ end % Ends the flag_do_debug if statement
 
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
 
@@ -650,57 +651,57 @@ end
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 %% Calculate cross products
-    function result = crossProduct(v,w)
-        result = v(:,1).*w(:,2)-v(:,2).*w(:,1);
-    end
+function result = crossProduct(v,w)
+result = v(:,1).*w(:,2)-v(:,2).*w(:,1);
+end
 
 %% Calculate dot products
-    function result = dotProduct(v,w)
-        result = sum(v.*w,2);
-    end
+function result = dotProduct(v,w)
+result = sum(v.*w,2);
+end
 
 %% fcn_INTERNAL_convertOffsetCoordinateToImaginaryNumber
-    function     [real_distance, imag_distance] = ...
-            fcn_INTERNAL_convertOffsetCoordinateToImaginaryNumber(...
-            unit_projection_vector_of_real_axis,...
-            origin_point, ...
-            point_to_convert)
+function     [real_distance, imag_distance] = ...
+    fcn_INTERNAL_convertOffsetCoordinateToImaginaryNumber(...
+    unit_projection_vector_of_real_axis,...
+    origin_point, ...
+    point_to_convert)
 
-        % This function is used to convert a point's location into an imaginary
-        % distance, where the real portion of the distance represents the distance in
-        % the direction of a given unit vector, and the imaginary portion of the
-        % distance represents the orthogonal component. The conversion assumes a
-        % coordinate orientation of the Re/Im plane such that the real axis is
-        % aligned with the given unit projection vector representing the real axis.
-        %
-        % The reason for this function is that, when snapping a point onto a
-        % reference traversal, there are situations - particularly before the start
-        % of the traversal, after the end of the traversal, and along sharp corners
-        % of the traversal, where the point cannot be correctly represented solely
-        % by the orthogonal projection distance. For example, in sharp corners, the
-        % orthogonal projection is undefined and must be chosen by the user. The
-        % conversion of orthogonal distance thus allows correct and invertible
-        % converstions from path offsets in XY to Sy representations, and vice
-        % versa.
+% This function is used to convert a point's location into an imaginary
+% distance, where the real portion of the distance represents the distance in
+% the direction of a given unit vector, and the imaginary portion of the
+% distance represents the orthogonal component. The conversion assumes a
+% coordinate orientation of the Re/Im plane such that the real axis is
+% aligned with the given unit projection vector representing the real axis.
+%
+% The reason for this function is that, when snapping a point onto a
+% reference traversal, there are situations - particularly before the start
+% of the traversal, after the end of the traversal, and along sharp corners
+% of the traversal, where the point cannot be correctly represented solely
+% by the orthogonal projection distance. For example, in sharp corners, the
+% orthogonal projection is undefined and must be chosen by the user. The
+% conversion of orthogonal distance thus allows correct and invertible
+% converstions from path offsets in XY to Sy representations, and vice
+% versa.
 
-        point_dimension = length(unit_projection_vector_of_real_axis(1,:));
-        if point_dimension == 3
-            rotation_matrix = [0 1 0; -1 0 0; 0 0 1];
-        else
-            rotation_matrix = [0 1; -1 0];
-        end
+point_dimension = length(unit_projection_vector_of_real_axis(1,:));
+if point_dimension == 3
+    rotation_matrix = [0 1 0; -1 0 0; 0 0 1];
+else
+    rotation_matrix = [0 1; -1 0];
+end
 
-        unit_projection_vector_of_imag_axis = unit_projection_vector_of_real_axis*rotation_matrix; % Rotate by 90 degrees
+unit_projection_vector_of_imag_axis = unit_projection_vector_of_real_axis*rotation_matrix; % Rotate by 90 degrees
 
-        start_to_point_vector = point_to_convert-origin_point;
-        real_distance  = sum(unit_projection_vector_of_real_axis.*start_to_point_vector,2); % Do dot product
-        imag_distance  = sum(unit_projection_vector_of_imag_axis.*start_to_point_vector,2); % Do dot product
+start_to_point_vector = point_to_convert-origin_point;
+real_distance  = sum(unit_projection_vector_of_real_axis.*start_to_point_vector,2); % Do dot product
+imag_distance  = sum(unit_projection_vector_of_imag_axis.*start_to_point_vector,2); % Do dot product
 
-        % % Measure the distance from the closest_path_point station
-        % distance_imaginary = distance_imaginary - path_station(closest_path_point_index,1);
-        %
-        % % Need to flip the sign so that the projection is correctly positioned
-        % % relative to the origin
-        % distance_imaginary = -1.0*distance_imaginary;
-    end % Ends fcn_INTERNAL_convertOffsetCoordinateToImaginaryNumber
+% % Measure the distance from the closest_path_point station
+% distance_imaginary = distance_imaginary - path_station(closest_path_point_index,1);
+%
+% % Need to flip the sign so that the projection is correctly positioned
+% % relative to the origin
+% distance_imaginary = -1.0*distance_imaginary;
+end % Ends fcn_INTERNAL_convertOffsetCoordinateToImaginaryNumber
 

@@ -3,20 +3,20 @@ function [distance,location,path_segment, t, u] = ...
     path, ...
     sensor_vector_start, ...
     sensor_vector_end, ...
-    varargin)   
-%% fcn_Path_findProjectionHitOntoPath 
+    varargin)
+%% fcn_Path_findProjectionHitOntoPath
 % calculates hits between a sensor projection and a path, returning the
 % distance and location of the hit. Also returns as optional outputs which
 % path segment number was hit (e.g. segment 1, 2, 3, etc.) and the distance
 % along both that specific path segment (t) and the distance in the sensor
 % direction (u).
 %
-% FORMAT: 
+% FORMAT:
 %
 %      [distance, location, path_segment, t, u] = ...
 %         fcn_Path_findProjectionHitOntoPath(path,...
 %         sensor_vector_start,sensor_vector_end,...
-%         (flag_search_type),(fig_num))  
+%         (flag_search_type),(fig_num))
 %
 % INPUTS:
 %
@@ -88,20 +88,20 @@ function [distance,location,path_segment, t, u] = ...
 %      first segment, 2 is the second, etc)
 %
 %       t and u: t is distance along the path, and u is distance
-%       along the sensor, as fractions of the input vector lengths.    
+%       along the sensor, as fractions of the input vector lengths.
 %
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
-%      
+%
 %       See the script: script_test_fcn_Path_findProjectionHitOntoPath.m
-%       for a full test suite. 
+%       for a full test suite.
 %
 % Adopted from https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 % This function was written on 2020_11_14 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2020_11_14 - S. Brennan
@@ -138,8 +138,9 @@ function [distance,location,path_segment, t, u] = ...
 
 %% Set up for debugging
 
+MAX_NARGIN = 5; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==5 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -164,10 +165,10 @@ else
     debug_fig_num = []; %#ok<NASGU>
 end
 
-% 
+%
 % flag_do_debug = 0; % Flag to plot the results for debugging
 % flag_check_inputs = 1; % Flag to perform input checking
-% 
+%
 % if flag_do_debug
 %     st = dbstack; %#ok<*UNRCH>
 %     fprintf(1,'Starting function: %s, in file: %s\n',st(1).name,st(1).file);
@@ -175,21 +176,21 @@ end
 
 %% check input arguments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____                   _       
-%  |_   _|                 | |      
-%    | |  _ __  _ __  _   _| |_ ___ 
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
 %    | | | '_ \| '_ \| | | | __/ __|
 %   _| |_| | | | |_) | |_| | |_\__ \
 %  |_____|_| |_| .__/ \__,_|\__|___/
-%              | |                  
-%              |_| 
+%              | |
+%              |_|
 % See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(3,5);
+        narginchk(3,MAX_NARGIN);
 
         % Check path input
         fcn_DebugTools_checkInputsToFunctions(path, 'path');
@@ -206,7 +207,7 @@ end
 % Does user want to specify fig_num?
 fig_num = []; % Default is to have no figure
 flag_do_plots = 0;
-if (0==flag_max_speed) && (5<= nargin)
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
@@ -218,13 +219,13 @@ end
 
 %% Calculations begin here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define each path as a set of walls that can be hit
 wall_start = [path(1:end-1,1) path(1:end-1,2)];
@@ -248,7 +249,7 @@ switch flag_search_type
         flag_search_return_type = 0;
         flag_search_range_type = 1;
 
-    case {2}       
+    case {2}
         % 2: returns distances and locations of ALL the detected
         % intersections of where the given sensor_vector overlaps the
         % path (e.g., this gives ALL the results of the flag=0 case).
@@ -270,8 +271,8 @@ switch flag_search_type
         % given sensor vector is checked.
         flag_search_return_type = 0;
         flag_search_range_type = 2;
-        
-    case {4}        
+
+    case {4}
         % 4: returns distance and location of the FIRST intersection of
         % any projection of the path segment vector, in any direction,
         % hits the sensor or if any projection of the sensor vector, in
@@ -301,50 +302,50 @@ tolerance = [];
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    
+
     % Set up the figure
     figure(fig_num);
     clf;
     hold on;
     axis equal;
     grid on; grid minor;
-    
+
     % Plot the path in black
     plot(path(:,1),path(:,2),'k.-','Linewidth',5);
     handle_text = text(path(1,1),path(1,2),'Path');
     set(handle_text,'Color',[0 0 0]);
-       
+
     % Plot the sensor vector
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),sensor_vector_end(:,1)-sensor_vector_start(:,1),sensor_vector_end(:,2)-sensor_vector_start(:,2),0,'r','Linewidth',3);
     plot(sensor_vector_end(:,1),sensor_vector_end(:,2),'r.','Markersize',10);
-    
+
     handle_text = text(sensor_vector_start(:,1),sensor_vector_start(:,2),'Sensor');
     set(handle_text,'Color',[1 0 0]);
-    
+
     axis_size = axis;
     y_range = axis_size(4)-axis_size(3);
-        
+
     % Plot any hits in blue
     for i_result = 1:length(distance)
         plot(location(i_result,1),location(i_result,2),'bo','Markersize',30);
         handle_text = text(location(i_result,1),location(i_result,2)-0.05*y_range,sprintf('Hit at distance: %.2f',distance(i_result)));
         set(handle_text,'Color',[0 0 1]);
     end
-    
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
 

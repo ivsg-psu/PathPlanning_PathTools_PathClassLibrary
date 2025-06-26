@@ -9,9 +9,9 @@
 
 close all
 
-%% Calculation of the angle between path segements
+%% Calculation of the angle between path segments
 fig_num = 10001;
-titleString = sprintf('Calculation of the angle between path segements');
+titleString = sprintf('Calculation of the angle between path segments');
 fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 

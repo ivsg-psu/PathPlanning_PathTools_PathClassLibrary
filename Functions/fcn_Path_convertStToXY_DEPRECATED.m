@@ -1,5 +1,5 @@
 function [X,Y] = ...
-    fcn_Path_convertStToXY(path,St_points,varargin)
+    fcn_Path_convertStToXY_DEPRECATED(path,point,varargin) 
 % fcn_Path_convertStToXY
 % Given a path used to define Station-transverse (St) coordinates, this
 % function converts St coordinates into XY cartesian coordinates
@@ -154,7 +154,7 @@ Npoints = length(path(:,1));
 
 if flag_check_inputs == 1
     % Are there the right number of inputs?
-    narginchk(2,4);
+    narginchk(2,MAX_NARGIN);
 
     % Check the data input
     fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
@@ -248,14 +248,14 @@ if 1 == closest_path_point_index || Npoints == closest_path_point_index
     end
 
     % Calculate the outputs using vector measures on the segment
-    [closest_path_point,s_coordinate,percent_along_length,unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(point,path(second_path_point_index,:),path(first_path_point_index,:),path_station(first_path_point_index,1));
+    [closest_path_point,~,percent_along_length,unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(point,path(second_path_point_index,:),path(first_path_point_index,:),path_station(first_path_point_index,1));
 
 else % Step 2b:
     % Calculate the outputs using vector measures on the front segment
-    [front_closest_path_point,front_s_coordinate,front_percent_along_length,front_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(point,path(closest_path_point_index+1,:),path(closest_path_point_index,:),path_station(closest_path_point_index,1));
+    [front_closest_path_point,~,front_percent_along_length,front_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(point,path(closest_path_point_index+1,:),path(closest_path_point_index,:),path_station(closest_path_point_index,1));
 
     % Calculate the outputs using vector measures on the back segment
-    [back_closest_path_point,back_s_coordinate,back_percent_along_length,back_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(point,path(closest_path_point_index,:),path(closest_path_point_index-1,:),path_station(closest_path_point_index-1,1));
+    [back_closest_path_point,~,back_percent_along_length,back_unit_orthogonal_projection_vector] = fcn_INTERNAL_calculateVectorMeasures(point,path(closest_path_point_index,:),path(closest_path_point_index-1,:),path_station(closest_path_point_index-1,1));
 
     if 0 > back_percent_along_length
         % Point is located BEHIND the vector that is the rear-most vector -
@@ -285,7 +285,7 @@ else % Step 2b:
             second_path_point_index = closest_path_point_index;
             percent_along_length    = 0;
             closest_path_point = path(closest_path_point_index,:);
-            s_coordinate       = path_station(closest_path_point_index,1);
+            % s_coordinate       = path_station(closest_path_point_index,1);
 
             % The conversion into imaginary distance depends on the snap
             % type
@@ -339,7 +339,7 @@ else % Step 2b:
             second_path_point_index = closest_path_point_index+1;
             percent_along_length    = front_percent_along_length;
             closest_path_point = front_closest_path_point;
-            s_coordinate       = front_s_coordinate;
+            % s_coordinate       = front_s_coordinate;
             unit_orthogonal_projection_vector = front_unit_orthogonal_projection_vector;
         end
     else
@@ -356,7 +356,7 @@ else % Step 2b:
             second_path_point_index = closest_path_point_index;
             percent_along_length    = back_percent_along_length;
             closest_path_point = back_closest_path_point;
-            s_coordinate       = back_s_coordinate;
+            % s_coordinate       = back_s_coordinate;
             unit_orthogonal_projection_vector = back_unit_orthogonal_projection_vector;
 
         else
@@ -375,7 +375,7 @@ else % Step 2b:
                 second_path_point_index = closest_path_point_index+1;
                 percent_along_length    = front_percent_along_length;
                 closest_path_point = front_closest_path_point;
-                s_coordinate       = front_s_coordinate;
+                % s_coordinate       = front_s_coordinate;
                 unit_orthogonal_projection_vector = front_unit_orthogonal_projection_vector;
             else
                 % Back segment is closer
@@ -383,7 +383,7 @@ else % Step 2b:
                 second_path_point_index = closest_path_point_index;
                 percent_along_length    = back_percent_along_length;
                 closest_path_point = back_closest_path_point;
-                s_coordinate       = back_s_coordinate;
+                % s_coordinate       = back_s_coordinate;
                 unit_orthogonal_projection_vector = back_unit_orthogonal_projection_vector;
             end
         end % Ends checks on front percent

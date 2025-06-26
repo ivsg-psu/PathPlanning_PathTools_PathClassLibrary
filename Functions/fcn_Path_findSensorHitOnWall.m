@@ -2,22 +2,21 @@ function [distance,location,wall_segment, t, u] = ...
     fcn_Path_findSensorHitOnWall(...
     wall_start, wall_end, ...
     sensor_vector_start, sensor_vector_end, ...
-    varargin)   
-%% fcn_Path_findSensorHitOnWall 
+    varargin)
+%% fcn_Path_findSensorHitOnWall
 % calculates hits between a sensor projection and a wall, returning the
 % distance and location of the hit. Also returns as optional outputs which
 % wall segment number was hit (e.g. segment 1, 2, 3, etc.) and the distance
 % along both that specific wall segment (t) and the distance in the sensor
 % direction (u).
 %
-% FORMAT: 
-%
+% FORMAT:
 %      [distance, location, wall_segment, t, u] = ...
 %         fcn_Path_findSensorHitOnWall(...
 %         wall_start, wall_end,...
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_return_type), (flag_search_range_type), ...
-%         (tolerance), (fig_num))  
+%         (tolerance), (fig_num))
 %
 % INPUTS:
 %
@@ -75,17 +74,17 @@ function [distance,location,wall_segment, t, u] = ...
 %     then the flag_search_range_type means the following:
 %            0: GIVEN projection of the sensor hits GIVEN wall point (default)
 %            1: ANY   projection of the sensor hits GIVEN wall point
-%            2: GIVEN projection of the sensor hits SENSOR ORTHO PROJECTION of wall onto sensor 
-%            2: ANY   projection of the sensor hits SENSOR ORTHO PROJECTION of wall onto sensor 
+%            2: GIVEN projection of the sensor hits SENSOR ORTHO PROJECTION of wall onto sensor
+%            2: ANY   projection of the sensor hits SENSOR ORTHO PROJECTION of wall onto sensor
 %     and the t vector refers to the ortho projection distance (as
 %     percentage of the sensor), and the u vector has the typical meaning.
 %
 %     If the sensor is entered as a single point (sensor_vector_start = sensor_vector_end),
 %     then the flag_search_range_type means the following:
 %            0: GIVEN point of sensor                     is inside GIVEN projection of walls (default)
-%            1: ORTHO PROJECTION of sensor onto each wall is inside GIVEN projection of walls 
-%            2: GIVEN point of sensor                     is inside ANY   projection of walls 
-%            3: ORTHO PROJECTION of sensor onto each wall is inside ANY   projection of walls 
+%            1: ORTHO PROJECTION of sensor onto each wall is inside GIVEN projection of walls
+%            2: GIVEN point of sensor                     is inside ANY   projection of walls
+%            3: ORTHO PROJECTION of sensor onto each wall is inside ANY   projection of walls
 %     and the t vector has the typical meaning, and the u vector is the
 %     orthogonal projection distance along each wall
 %
@@ -93,7 +92,7 @@ function [distance,location,wall_segment, t, u] = ...
 %      segment to be counted as intersecting. Positive values are
 %      inclusive, negative values are exclusive. For example, consider 3
 %      wall segments:
-%            A: from the origin [0 0] to [1 0], 
+%            A: from the origin [0 0] to [1 0],
 %            B: from [0.5 0] to [0.5 1] (head of B sits on middle of A)
 %            C: from [1 0] to [2 0]  (head of C sits on tail of A)
 %      if the tolerance is 0, whether or not A and B intersect can be
@@ -126,20 +125,20 @@ function [distance,location,wall_segment, t, u] = ...
 %      first segment, 2 is the second, etc)
 %
 %       t and u: t is distance along the wall, and u is distance
-%       along the sensor, as fractions of the input vector lengths.    
+%       along the sensor, as fractions of the input vector lengths.
 %
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
-%      
+%
 %       See the script: script_test_fcn_Path_findSensorHitOnWall.m
-%       for a full test suite. 
+%       for a full test suite.
 %
 % Adopted from https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 % This function was written in original form on 2020_11_14 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2020_11_14 - S. Brennan
@@ -193,8 +192,9 @@ function [distance,location,wall_segment, t, u] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 8; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==8 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -235,7 +235,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(4,8);
+        narginchk(4,MAX_NARGIN);
 
         % Check the wall_start input
         fcn_DebugTools_checkInputsToFunctions(wall_start, '2column_of_numbers');
@@ -281,7 +281,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plot = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (8 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp)
         fig_num = temp;
@@ -289,7 +289,7 @@ if (0==flag_max_speed) && (8 == nargin)
     end
 else
     if flag_do_debug
-        fig = figure; 
+        fig = figure;
         fig_num = fig.Number;
         flag_do_plot = 1;
     end
@@ -298,13 +298,13 @@ end
 
 %% Calculations begin here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Define meaning of near zero
@@ -373,7 +373,7 @@ flag_isParallel = (near_zero>=abs(r_cross_s));
 if any(flag_isParallel)
     % If any walls are parallel to sensor, make dummy length that is
     % removed later, to avoid divide by zero in intermediate calculations.
-    r_cross_s(flag_isParallel) = 1; 
+    r_cross_s(flag_isParallel) = 1;
 end
 
 
@@ -410,14 +410,14 @@ collinear_indices = find(flag_isCollinear);
 if any(collinear_indices)
     [t0_alongwall, t1_alongwall, indices_hit_different_point] = ...
         fcn_INTERNAL_scaleTforCollinear(r(collinear_indices,:), q_minus_p(collinear_indices,:), sensor_vector(1,:), flag_search_range_type);
-         
+
     % Make p and r, t and u longer so that additional hit points are
     % calculated in special case of overlaps
-    tValues(collinear_indices) = t0_alongwall;  
+    tValues(collinear_indices) = t0_alongwall;
     uValues(collinear_indices) = 0.5; % Forces the t values to be accepted in later step
     tValues = [tValues; t1_alongwall(indices_hit_different_point)];
     uValues = [uValues; 0.5*ones(length(indices_hit_different_point),1)];
-    
+
 
     % Check if there are 2 hits at different locations. Sometimes the hit
     % will land at the same location over/over, and we only want the first
@@ -439,14 +439,14 @@ end
 % Fix point wall cases
 if any(pointWall_indices)
     Npointwalls = length(pointWall_indices);
-    
+
     % For point wall cases, the t value will be 0 if there's no "wall"
     % projection, since there is no "distance" along a point. If there is a
     % wall projection, the code returns the orthogonal distance from the
     % sensor to the point as t. The orthogonal distance, as a ratio of the
     % sensor length, is found by projecting from the sensor's start (q) to
     % the point (p). This is (p-q)
-    % 
+    %
     % The u value will the distance from the sensor's start (q) to the
     % point (p). This is given by (p - q), since p is the wall start and q
     % is the sensor_vector_start. Note: we've already calculated q-p
@@ -484,14 +484,14 @@ end
 % 1: ANY projection of the sensor used with the GIVEN wall
 % 2: ANY projection of the wall used with the GIVEN sensor
 % 3: ANY projection of BOTH the wall and sensor
-% 
+%
 % To apply these, we impose restrictions on:
 % t: the scalar denoting the percentage along the wall vector of intersect
 % u: the scalar denoting the percentage along the sensor vector of intersect
 %
 % Note: Since doing many segments at once, need to use vector form (e.g.
 % the .* format of dot products).
-% 
+%
 % Note: Tolerance added as numerical errors can cause points to be missed
 % for some segments that right next to or through points. This biases -
 % very slightly - the data to include intersections along segments that
@@ -510,7 +510,7 @@ if any(flag_isPointSensor)
 end
 
 
-if 0 == flag_search_range_type    
+if 0 == flag_search_range_type
     % 0: (default) the GIVEN sensor and GIVEN wall used.
     % This constrains both t (wall extent) and u (sensor extent)
     good_vector = ((zero_threshold<=tValues).*(one_threshold>=tValues).*(zero_threshold<=uValues).*(one_threshold>=uValues));
@@ -519,7 +519,7 @@ elseif 1 == flag_search_range_type
     good_vector = ((zero_threshold<=tValues).*(one_threshold>=tValues));
 elseif 2 == flag_search_range_type
     % 2: ANY projection of the wall used with the GIVEN sensor
-    % This constrains ONLY u (sensor extent) 
+    % This constrains ONLY u (sensor extent)
     good_vector = ((zero_threshold<=uValues).*(one_threshold>=uValues));
 elseif 3 == flag_search_range_type
     % 3: ANY projection of BOTH the wall and sensor
@@ -538,7 +538,7 @@ within_indices = find(good_vector>0);
 intersections = NaN*ones(length(p(:,1)),2);
 if ~isempty(within_indices)
     % Calculate the intersection point (finally)
-    result = p + tValues.*r; 
+    result = p + tValues.*r;
 
     % Fix values that are infinite
     if any(isinf(tValues))
@@ -551,8 +551,8 @@ if ~isempty(within_indices)
     end
 
     % Save result
-    intersections(within_indices,:) = result(within_indices,:);  
-    
+    intersections(within_indices,:) = result(within_indices,:);
+
 end
 
 %% Apply flag_search_return_type
@@ -576,15 +576,15 @@ else
     r = r(within_indices,:);
     t = tValues(within_indices);
     u = uValues(within_indices);
-    
-    % The following converts t-values into u-values. Only need to do this for colinear indices    
+
+    % The following converts t-values into u-values. Only need to do this for colinear indices
     within_and_colinear = find(flag_isCollinear(within_indices));
     if ~isempty(within_and_colinear)
         temp = fcn_Path_convertPerA2PerB(p, ones(length(p(:,1)),1)*q, r, ones(length(p(:,1)),1)*sensor_vector(1,:), t, -1);
         u(within_and_colinear) = temp(within_and_colinear);
     end
     validDistancesSquared = distances_squared(within_indices);
-    distance = validDistancesSquared.^0.5.*sign(u);    
+    distance = validDistancesSquared.^0.5.*sign(u);
 end
 
 
@@ -592,21 +592,21 @@ end
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
-     % check whether the figure already has data
+    % check whether the figure already has data
     h_fig = figure(fig_num);
-    flag_rescale_axis = 0; 
-    if isempty(get(h_fig,'Children')) 
-        flag_rescale_axis = 1; 
+    flag_rescale_axis = 0;
+    if isempty(get(h_fig,'Children'))
+        flag_rescale_axis = 1;
     else
         child_handle = get(h_fig,'Children');
         if isfield(child_handle,'TileArrangement') && strcmp(get(child_handle,'TileArrangement'),'flow')
@@ -617,7 +617,7 @@ if flag_do_plot
     hold on;
     axis equal;
     grid on; grid minor;
-    
+
     % Find all the walls in one plottable format
     Nwalls = length(wall_start(:,1));
     allWallsX = [wall_start(:,1) wall_end(:,1) nan(Nwalls,1)];
@@ -633,11 +633,11 @@ if flag_do_plot
     max_plotValues = max(allPoints);
     min_plotValues = min(allPoints);
     sizePlot = max(max_plotValues) - min(min_plotValues);
-    nudge = sizePlot*0.006; 
+    nudge = sizePlot*0.006;
 
     % Set size of plotting domain
     if flag_rescale_axis
-        
+
         percent_larger = 0.3;
         axis_range = max_plotValues - min_plotValues;
         if (0==axis_range(1,1))
@@ -646,7 +646,7 @@ if flag_do_plot
         if (0==axis_range(1,2))
             axis_range(1,2) = 2/percent_larger;
         end
-        
+
         % Force the axis to be equal
         min_vertexValuesInPlot = min(min_plotValues);
         max_vertexValuesInPlot = max(max_plotValues);
@@ -672,7 +672,7 @@ if flag_do_plot
 
             % Label the wall
             text(aveWalls(ith_wall,1)+nudge,aveWalls(ith_wall,2),sprintf('%.0f',ith_wall),'Color',0.5*colorsWalls(ith_wall,:));
-            
+
         end
 
     else
@@ -701,12 +701,12 @@ if flag_do_plot
         handle_text = text(location(i_result,1),location(i_result,2)-0.05*y_range,sprintf('D: %.1f',distance(i_result)));
         set(handle_text,'Color',[0 0 1]);
     end
-    
-    
+
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
 
@@ -735,7 +735,7 @@ valueOut = min(1,valueOut);
 end % Ends fcn_INTERNAL_saturateRange
 
 %% fcn_INTERNAL_scaleTforCollinear
-function [t0_alongwall, t1_alongwall, indices_hit_different_point] = fcn_INTERNAL_scaleTforCollinear(r, q_minus_p, s, flag_search_range_type) 
+function [t0_alongwall, t1_alongwall, indices_hit_different_point] = fcn_INTERNAL_scaleTforCollinear(r, q_minus_p, s, flag_search_range_type)
 
 Nwalls = length(r(:,1));
 
@@ -763,7 +763,7 @@ Nwalls = length(r(:,1));
 
 % Calculate raw t's. As a reminder, the t coordinates say where
 % the sensor "hits" in wall coordinates. When calculating the
-% intersections, we ONLY use the t-values. 
+% intersections, we ONLY use the t-values.
 r_dot_r = sum(r.*r,2);
 q_minus_p_dot_r = sum(q_minus_p.*r,2);
 s_dot_r = sum(s.*r,2);
@@ -839,7 +839,7 @@ indices_hit_different_point = find(t0_alongwall~=t1_alongwall);
 end % Ends fcn_INTERNAL_scaleTforCollinear
 
 
-%% fcn_INTERNAL_selectClosestPoint 
+%% fcn_INTERNAL_selectClosestPoint
 function [within_indices, distances_squared] = fcn_INTERNAL_selectClosestPoint(sensor_vector_start, intersections, flag_search_return_type)
 
 % Find the distances via Euclidian distance to the sensor's origin
@@ -851,7 +851,7 @@ if ~isempty(within_indices)
     if 0==flag_search_return_type
         % Keep only the minimum distance result
         [~,within_indices] = min(distances_squared);
- 
+
     elseif 1==flag_search_return_type
         % Return all the results by default
     else

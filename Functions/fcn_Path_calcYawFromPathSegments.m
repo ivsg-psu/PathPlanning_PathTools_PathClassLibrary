@@ -67,8 +67,9 @@ function yaw_angles_in_radians = fcn_Path_calcYawFromPathSegments(Path,varargin)
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==2 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -109,7 +110,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(1,2);
+        narginchk(1,MAX_NARGIN);
 
         % Check the Path variables
         fcn_DebugTools_checkInputsToFunctions(Path, 'path');
@@ -120,7 +121,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (2 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;

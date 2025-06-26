@@ -14,7 +14,8 @@ function [closest_path_points,closest_distances] = ...
 % cross-product between the station direction and sensor
 % projection, have a positive result. If a distance is in the positive
 % direction, it is reported as positive. In the negative direction, it is
-% reported as negative.
+% reported as negative. If the projection does not hit anything, returns
+% NaN values.
 %
 % FORMAT:
 %
@@ -37,10 +38,10 @@ function [closest_path_points,closest_distances] = ...
 %      (OPTIONAL INPUTS)
 %      flag_rounding_type: a flag to indicate which type of projection is
 %      used, especially when stations are located at the end-points of
-%      segments within the nearby_traversal. Note that the very first point
-%      always uses projections from the following segement, and the very
-%      last point always uses the prior. The flag determines behaviors for
-%      endpoints of internal segments. The options include:
+%      segments within the nearby_traversal. Except for flag option 4, the
+%      very first point uses projections from the following segement, and
+%      the very last point always uses the prior. The flag determines
+%      behaviors for endpoints of internal segments. The options include:
 %
 %          flag_rounding_type = 1;  % This is the default, and indicates that
 %          the orthogonal projection of an endpoint is created by the PRIOR
@@ -58,12 +59,15 @@ function [closest_path_points,closest_distances] = ...
 %
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
-%          of each segment, and then for each station qeuary, the vector
+%          of each segment, and then for each station query, the vector
 %          projections are interpolated from their prior and subsequent
-%          vectors.
+%          vectors. For the very first and last points, the projections are
+%          aligned with the segments so that they are collinear, not
+%          orthogonal.
 %
 %      search_radius: how far nearby the search points to look (default is
-%      3 times the length of the station in the central_trajectory)
+%      3 times the length of the total station length in the
+%      central_trajectory)
 %
 %     fig_num: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
@@ -105,7 +109,7 @@ function [closest_path_points,closest_distances] = ...
 % -- fixed a bug where the index was being used, instead of station, to
 % define a search area
 % -- isolated plotting functionality from debugging functionality
-% 2021_01_07 
+% 2021_01_07
 % -- updated the name to fix path notation to traversal or traversals
 % 2021_01_09
 % -- added input argument checking
@@ -115,13 +119,14 @@ function [closest_path_points,closest_distances] = ...
 % -- changed name to singular traversal since code only works with one
 % traversal at a time
 % 2022_01_03
-% -- found a bug in the constrainted search functionality, 
+% -- found a bug in the constrainted search functionality,
 % -- updated plotting function to show both positive and neg vectors
 % -- fixed typo in variable name
 % -- fixed inequality which was cause of bug
 % -- made distance outputs positive and neg, based on directionality
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% -- Fixed bug where empty input arguments do not use defaults
 
 % TO-DO
 % (none)
@@ -131,8 +136,9 @@ function [closest_path_points,closest_distances] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 6; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==6 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -173,8 +179,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(3,6);
-
+        narginchk(3,MAX_NARGIN);
 
         % Check the query_stations input
         fcn_DebugTools_checkInputsToFunctions(query_stations, 'station');
@@ -203,22 +208,27 @@ if 0==flag_max_speed
     end
 end
 
-flag_rounding_type = 1;
 % Does the user want to give a rounding type?
+flag_rounding_type = 1;
 if 4 <= nargin
-    flag_rounding_type = varargin{1};
+    temp = varargin{1};
+    if ~isempty(temp) % Did the user NOT give an empty value?
+        flag_rounding_type = temp;
+    end
 end
 
 % Define search radius?
 search_radius = central_traversal.Station(end)*3;
 if 5 <= nargin
-    search_radius = varargin{2};
+    temp = varargin{2};
+    if ~isempty(temp) % Did the user NOT give an empty value?
+        search_radius = temp;
+    end
 end
-
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (6 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -228,7 +238,7 @@ if (0==flag_max_speed) && (6 == nargin)
 end
 
 if flag_do_debug
-    fig_debug = 2345; 
+    fig_debug = 2345;
 end
 
 %% Start of main code
@@ -267,8 +277,8 @@ locations_of_hits = zeros(Nstations,2);
 distances_of_hits = zeros(Nstations,1);
 
 %% Loop through all the stations, finding the hit points at each station
-for i_station=1:Nstations   
-    
+for i_station=1:Nstations
+
     % Check flag to see if we need to limit the station search range
     if flag_limit_station_range
         % Define the query station
@@ -277,16 +287,16 @@ for i_station=1:Nstations
         % Define the search region by trimming it down?
         s_coord_start = query_station - search_radius;
         s_coord_end = query_station + search_radius;
-        
+
         % Format: [pathSXY_segment,flag_outside_start, flag_outside_end] = ...
         [traversal_segment, ~, ~] = ...
             fcn_Path_findTraversalStationSegment(traversal_to_check, s_coord_start,s_coord_end,-1);
-        
+
         path_segment_to_check = [traversal_segment.X traversal_segment.Y];
     else
         path_segment_to_check = [traversal_to_check.X traversal_to_check.Y];
     end
-    
+
     if flag_do_debug
         % Find results in the search region, plotting results
         [positive_distance,positive_location] = ...
@@ -294,13 +304,13 @@ for i_station=1:Nstations
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
             positive_sensor_vector_end(i_station,:),0,fig_debug);
-        
+
         [negative_distance,negative_location] = ...
             fcn_Path_findProjectionHitOntoPath(...
             path_segment_to_check,...
             sensor_vector_start(i_station,:),...
             negative_sensor_vector_end(i_station,:),0,fig_debug);
-        
+
     else
         % Find results in the search region, no plotting
         [positive_distance,positive_location] = ...
@@ -314,10 +324,10 @@ for i_station=1:Nstations
             sensor_vector_start(i_station,:),...
             negative_sensor_vector_end(i_station,:),0,-1);
     end
-    
+
     % make distance outputs positive and neg, based on directionality
     negative_distance = -1*negative_distance;
-    
+
     % Check that the distances are not NaN values
     if all(isnan(positive_distance))
         positive_location = [nan nan];
@@ -375,25 +385,25 @@ if flag_do_plots
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
-    end    
+    end
 
-    
+
     hold on;
     grid on;
-    
+
     % Plot the central traversal
     plot(central_traversal.X,central_traversal.Y,'k','Linewidth',3);
-    
+
     % Plot the path
     % plot(path_to_check(:,1),path_to_check(:,2),'bo-','Linewidth',2);
     plot(path_to_check(:,1),path_to_check(:,2),'o-','Linewidth',2);
-    
-    
+
+
     axis equal;
-    
+
     % Plot the station points that originate the query
     plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'k.','Markersize',35);
-    
+
     if flag_do_debug
         % Add text to indicate station values
         text_locations = sensor_vector_start;
@@ -401,7 +411,7 @@ if flag_do_plots
             text(text_locations(ith_station,1),text_locations(ith_station,2),sprintf('%.0f',query_stations(ith_station,1)),'Color',[0 0 0]);
         end
     end
-    
+
     %     % Show the unit vectors
     %     normal_unit_vectors_at_stations = ...
     %         unit_normal_vector_end - unit_normal_vector_start;
@@ -411,28 +421,28 @@ if flag_do_plots
     %
     %     legend('Central traversal','Path to check','Station query points','Hit locations','Unit vectors');
 
-    
+
     % Show the sensor vectors
     positive_sensor_vector = positive_sensor_vector_end - sensor_vector_start;
     negative_sensor_vector = negative_sensor_vector_end - sensor_vector_start;
-    
+
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
-        positive_sensor_vector(:,1),positive_sensor_vector(:,2),0,'g','Linewidth',3);  
+        positive_sensor_vector(:,1),positive_sensor_vector(:,2),0,'g','Linewidth',3);
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
         negative_sensor_vector(:,1),negative_sensor_vector(:,2),0,'c','Linewidth',3);
-        
+
     % Plot hit locations
     plot(locations_of_hits(:,1),locations_of_hits(:,2),'r.','Markersize',30);
-       
+
     % Add a legend
     legend('Central traversal','Path to check','Station query points','Sensor vectors (+)','Sensor vectors (-)','Hit locations');
-    
+
     % Add text to indicate distance result
     text_locations = sensor_vector_start + unit_vector_displacement.*closest_distances/2;
     for ith_distance = 1:length(closest_distances)
         text(text_locations(ith_distance,1),text_locations(ith_distance,2),sprintf('%.2f',closest_distances(ith_distance,1)),'Color',[1 0 0]);
     end
-    
+
     % Make axis slightly larger?
     if flag_rescale_axis
         temp = axis;
@@ -441,12 +451,12 @@ if flag_do_plots
         percent_larger = 0.3;
         axis([temp(1)-percent_larger*axis_range_x, temp(2)+percent_larger*axis_range_x,  temp(3)-percent_larger*axis_range_y, temp(4)+percent_larger*axis_range_y]);
     end
-    
-    
+
+
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends the function

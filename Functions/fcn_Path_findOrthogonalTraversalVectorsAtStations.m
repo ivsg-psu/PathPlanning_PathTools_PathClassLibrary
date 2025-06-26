@@ -5,8 +5,8 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 % Given a central traversal and a set of stations along that traversal,
 % finds the unit normal vector on the central traveral at each station
 % point.
-% 
-% FORMAT: 
+%
+% FORMAT:
 %
 %      [unit_normal_vector_start, unit_normal_vector_end] = ...
 %        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
@@ -37,17 +37,17 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %          flag_rounding_type = 1;  % This is the default, and indicates
 %          that the orthogonal projection of an endpoint is created by the
 %          PRIOR segment leading up to each station query point.
-% 
+%
 %          flag_rounding_type = 2;  % This indicates that the orthogonal
 %          projection of an endpoint is created by the FOLLOWING segment
 %          after each station query point.
-% 
+%
 %          flag_rounding_type = 3;  % This indicates that the orthogonal
 %          projection, ONLY if the station query falls at the joining point
 %          between two segments (e.g. is on the "joint"), then the
 %          projection is created by averaging the vector projections
 %          created from the PRIOR segment and FOLLOWING segment.
-% 
+%
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
 %          of each segment, and then for each station qeuary, the vector
@@ -76,12 +76,12 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %      fcn_Path_findPathOrthogonalVectors
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_Path_findOrthogonalTraversalVectorsAtStations
 % for a full test suite.
 %
 % This function was written on 2020_12_31 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2020_12_31:
@@ -111,8 +111,9 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -153,7 +154,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,4);
+        narginchk(2,MAX_NARGIN);
 
         % Check the station_queries input
         fcn_DebugTools_checkInputsToFunctions(station_queries, 'station');
@@ -183,7 +184,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (4 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -198,13 +199,13 @@ end
 
 %% Main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Station_central = central_traversal.Station;
@@ -212,7 +213,7 @@ X_central       = central_traversal.X;
 Y_central       = central_traversal.Y;
 
 
-%% Find the midpoint and joint tangent vectors for all segments 
+%% Find the midpoint and joint tangent vectors for all segments
 % Call the function fcn_Path_findPathOrthogonalVectors
 
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
@@ -221,7 +222,7 @@ Y_central       = central_traversal.Y;
 tangent_unit_vectors_at_midpoints = normal_unit_vectors_at_midpoints*[0 -1; 1 0];
 
 
-%% Find the XY of query station coordinates on the central trajectory 
+%% Find the XY of query station coordinates on the central trajectory
 % Find the points on the central trajectory corresponding to the station
 % query. Format for interp1: Vq = interp1(X,V,Xq). The result are X and Y
 % locations that are ON the central path defined by X_central and
@@ -253,7 +254,7 @@ indices_start = max(1,indices_start);
 indices_end   = min(Indices_central(end),indices_end);
 
 %% Initialize normal vectors
-normal_unit_vectors_at_stations = nan(length(station_queries), 2); 
+normal_unit_vectors_at_stations = nan(length(station_queries), 2);
 
 
 %% Check specifically the start and end locations
@@ -278,7 +279,7 @@ end
 % and not an actual joint
 
 indices_on_joints = find(indices_start==indices_end);
-if ~isempty(indices_on_joints)    
+if ~isempty(indices_on_joints)
     normal_unit_vectors_at_stations(indices_on_joints,:) = normal_unit_vectors_at_joints(indices_start(indices_on_joints),:);
 end
 
@@ -295,7 +296,7 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
     normal_unit_vectors_at_joints(1,:) = -1*normal_unit_vectors_at_midpoints(1,:)*[0 -1; 1 0];
     normal_unit_vectors_at_joints(end,:) =  normal_unit_vectors_at_midpoints(end,:)*[0 -1; 1 0];
 
-   
+
     % Are any at the very end? If so, the floor operation gives the wrong
     % answers.
     segment_numbers = floor(Indices_Central_at_Query_Stations);
@@ -305,9 +306,9 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
         segment_numbers(indices_at_ends) = Indices_central(end-1);
     end
 
-    % Fraction is 0 if at start of segment, if rounding down, 
+    % Fraction is 0 if at start of segment, if rounding down,
     % and 1 if at midpoint
-    round_down_indices = find(remainder<=0.5);    
+    round_down_indices = find(remainder<=0.5);
     if ~isempty(round_down_indices)
         fraction_to_midpoint = 2*remainder(round_down_indices);
         normal_unit_vectors_at_stations(round_down_indices,:)   = ...
@@ -317,7 +318,7 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
         normal_unit_vectors_at_stations(round_down_indices,:) = normal_unit_vectors_at_stations(round_down_indices,:)./mags;
     end
 
-    % Fraction is 0 if at end of segment, if rounding up, 
+    % Fraction is 0 if at end of segment, if rounding up,
     % and 1 if at midpoint
     round_up_indicies = find(remainder>0.5);
     if ~isempty(round_up_indicies)
@@ -331,32 +332,32 @@ if flag_rounding_type == 4 % Always do averaging, but need to calculate ratios
 end
 
 %% Create unit vectors
-unit_normal_vector_start = [X_central_at_stations Y_central_at_stations]; 
+unit_normal_vector_start = [X_central_at_stations Y_central_at_stations];
 unit_normal_vector_end   = [X_central_at_stations Y_central_at_stations] + normal_unit_vectors_at_stations;
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     figure(fig_num);
     hold on;
     grid on;
-    
-    % Plot the central traversal
-    plot(central_traversal.X,central_traversal.Y,'k','Linewidth',3);      
-    
-    % Make the axis normally shaped
-    axis equal;   
 
-    
+    % Plot the central traversal
+    plot(central_traversal.X,central_traversal.Y,'k','Linewidth',3);
+
+    % Make the axis normally shaped
+    axis equal;
+
+
 
     % Plot the query station points
     plot(X_central_at_stations,Y_central_at_stations,'r.','Markersize',30);
@@ -381,7 +382,7 @@ if flag_do_plots
 end % Ends the flag_do_plots if statement
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends the function

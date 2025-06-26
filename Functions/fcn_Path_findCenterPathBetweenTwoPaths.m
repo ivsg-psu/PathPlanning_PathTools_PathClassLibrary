@@ -6,7 +6,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 % Given two paths, finds the path that is geometrically inbetween both.
 % Will also return the centerline projection back onto the first and second
 % paths, as resampled versions of both.
-% 
+%
 % The method is to orthogonally project from the first_path to find
 % the distance to the second_path at each station in the
 % first_path. For situations where the projection does not hit
@@ -27,7 +27,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 % centerline votes, the repeated votes are eliminated when calculating the
 % resampled projections back onto the first and second paths.
 %
-% FORMAT: 
+% FORMAT:
 %
 %    [center_path, first_path_resampled, second_path_resampled] = ...
 %     fcn_Path_findCenterPathBetweenTwoPaths(...
@@ -57,17 +57,17 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %          flag_rounding_type = 1;  % This is the default, and indicates
 %          that the orthogonal projection of an endpoint is created by the
 %          PRIOR segment leading up to each station query point.
-% 
+%
 %          flag_rounding_type = 2;  % This indicates that the orthogonal
 %          projection of an endpoint is created by the FOLLOWING segment
 %          after each station query point.
-% 
+%
 %          flag_rounding_type = 3;  % This indicates that the orthogonal
 %          projection, ONLY if the station query falls at the joining point
 %          between two segments (e.g. is on the "joint"), then the
 %          projection is created by averaging the vector projections
 %          created from the PRIOR segment and FOLLOWING segment.
-% 
+%
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
 %          of each segment, and then for each station qeuary, the vector
@@ -89,7 +89,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %
 %      center_path: a Mx2 or Mx3 vector containing the [X Y (Z)] points
 %      that bisect the two traversals.
-% 
+%
 %      first_path_resampled: a Mx2 or Mx3 vector containing the [X Y (Z)]
 %      points of the first path that correspond to the same stations as the
 %      center_path
@@ -100,7 +100,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %
 
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_Path_findCenterPathBetweenTwoPaths
 % for a full test suite.
 %
@@ -112,7 +112,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %     fcn_Path_findCenterlineVoteFromTraversalToTraversal
 %
 % This function was written on 2023_09_04 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2023_09_04 by S. Brennan
@@ -132,8 +132,9 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 5; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==5 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -174,7 +175,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,5);
+        narginchk(2,MAX_NARGIN);
 
         % Check the first_path input
         fcn_DebugTools_checkInputsToFunctions(first_path, 'path');
@@ -205,7 +206,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (5 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -214,20 +215,20 @@ if (0==flag_max_speed) && (5 == nargin)
     end
 else
     if flag_do_debug
-        fig_debug = 888; 
+        fig_debug = 888;
     end
 end
 
 
 %% Find the closest point
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Check alignment of input paths
@@ -401,14 +402,14 @@ end
 
 % Loop through the points until none are left
 while any(~isnan(points_to_search))
-    
+
     % Plot the situation, for debugging?
-    if flag_do_debug      
+    if flag_do_debug
         figure(fig_debug);
 
         plot(first_path(:,1),first_path(:,2),'.-','Color',[1 1 1]*0.2,'Markersize',30);
         plot(second_path(:,1),second_path(:,2),'.-','Color',[1 1 1]*0.2,'Markersize',30);
-        
+
 
         plot(centerline_points_first_to_second(:,1),centerline_points_first_to_second(:,2),'.-','Color',[0.5 0.5 0.5],'Markersize',30);
         plot(centerline_points_second_to_first(:,1),centerline_points_second_to_first(:,2),'.-','Color',[0.5 0.5 0.5],'Markersize',30);
@@ -420,13 +421,13 @@ while any(~isnan(points_to_search))
     % Create a vector from current point to all remaining points
     vectors_to_search_points =  points_to_search - next_point;
 
-    % Do dot products 
+    % Do dot products
     dot_products = sum((next_orthoginal_vector.*vectors_to_search_points),2);
 
     % Check that we don't have any negatives (this is an error)
     if any(dot_products<-1*previous_distance)
-       % error('A dot product was found further negative than the previous distance - this should never happen!');
-       disp('Weird output here');
+        % error('A dot product was found further negative than the previous distance - this should never happen!');
+        disp('Weird output here');
     end
 
     % Find the smallest distance, and keep the index for that point
@@ -455,12 +456,12 @@ while any(~isnan(points_to_search))
         if secondPath_nextPointIndex>N_secondPath
             secondPath_nextPointIndex = [];
         end
-        
+
 
     else
         error('strange situation encountered where neither path 1 nor path 2 is closest - should not happen!');
     end
-    
+
 
     % Plot the situation, for debugging?
     if flag_do_debug
@@ -489,7 +490,7 @@ while any(~isnan(points_to_search))
         next_secondPathPoint = nan(1,2);
     end
 
-    % Set the points to search as the next ones on the list 
+    % Set the points to search as the next ones on the list
     points_to_search = [next_firstPathPoint; next_secondPathPoint];
 end
 
@@ -536,7 +537,7 @@ if any(isnan(first_path_resampled),'all')
 
     % Find vectors from first path to centerline
     vectors_path2_to_centerline = center_path_no_repeats - second_path_resampled;
-    
+
     % Multiply this by 2 to get the second resampled path
     first_path_resampled = second_path_resampled + 2*vectors_path2_to_centerline;
 end
@@ -549,7 +550,7 @@ if any(isnan(second_path_resampled),'all')
 
     % Find vectors from first path to centerline
     vectors_path1_to_centerline = center_path_no_repeats - first_path_resampled;
-    
+
     % Multiply this by 2 to get the second resampled path
     second_path_resampled = first_path_resampled + 2*vectors_path1_to_centerline;
 end
@@ -557,14 +558,14 @@ end
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Prep the figure for plotting
@@ -572,7 +573,7 @@ if flag_do_plots
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
-    end      
+    end
     % Is this 2D or 3D?
     dimension_of_points = length(first_path(1,:));
 
@@ -624,10 +625,10 @@ if flag_do_plots
 
     xlabel('X [m]')
     ylabel('Y [m]')
-    
+
     % Plot the input traversals
-    plot(first_path(:,1),first_path(:,2),'r.-','Linewidth',3,'MarkerSize',30);      
-    plot(second_path(:,1),second_path(:,2),'b.-','Linewidth',3,'MarkerSize',30);      
+    plot(first_path(:,1),first_path(:,2),'r.-','Linewidth',3,'MarkerSize',30);
+    plot(second_path(:,1),second_path(:,2),'b.-','Linewidth',3,'MarkerSize',30);
 
     % Plot the center_path results
     plot_color = [0 1 0];
@@ -665,11 +666,11 @@ end % Ends the function
 
 %% fcn_INTERNAL_calculateSuccessiveDotProducts
 function successive_dot_products = fcn_INTERNAL_calculateSuccessiveDotProducts(center_path)
-    centerline_final_vectors = center_path(2:end,:)-center_path(1:end-1,:);
-    mag_centerline_final_vectors = sum(centerline_final_vectors.^2,2).^0.5;
-    unit_centerline_final_vectors = centerline_final_vectors./mag_centerline_final_vectors;
+centerline_final_vectors = center_path(2:end,:)-center_path(1:end-1,:);
+mag_centerline_final_vectors = sum(centerline_final_vectors.^2,2).^0.5;
+unit_centerline_final_vectors = centerline_final_vectors./mag_centerline_final_vectors;
 
-    successive_dot_products = sum((unit_centerline_final_vectors(1:end-1,:).*unit_centerline_final_vectors(2:end,:)),2);
+successive_dot_products = sum((unit_centerline_final_vectors(1:end-1,:).*unit_centerline_final_vectors(2:end,:)),2);
 end % ends fcn_INTERNAL_calculateSuccessiveDotProducts
 
 

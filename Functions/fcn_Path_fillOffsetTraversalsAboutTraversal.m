@@ -24,7 +24,7 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 %      offset would be above it, negative would be below.
 %
 %      (OPTIONAL INPUTS)
-% 
+%
 %      flag_rounding_type: determines type of projection, and is passed
 %      into fcn_Path_findOrthogonalTraversalVectorsAtStations. See that
 %      function for more explanation. Default (empty) is used unless
@@ -80,8 +80,9 @@ function offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(referen
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -122,7 +123,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,4);
+        narginchk(2,MAX_NARGIN);
 
         % Check the reference_traversal input
         fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
@@ -143,7 +144,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (4 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -179,7 +180,7 @@ num_trajectories = length(offsets(:,1));
 num_points = Nstations;
 
 
-    
+
 %% Fill in the array of reference station points
 % Each column corresponds to one trajectory.
 
@@ -212,7 +213,7 @@ for ith_trajectory =1:num_trajectories
     offset_path = unit_normal_vector_start + unit_vectors.*offsets_from_reference(:,ith_trajectory);
     offset_traversal = fcn_Path_convertPathToTraversalStructure(offset_path);
     offset_traversals.traversal{ith_trajectory} = offset_traversal;
-    
+
 end
 
 
@@ -229,23 +230,23 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    
+
     % plot the final XY result
     figure(fig_num);
     hold on;
-    
+
     % Plot the reference trajectory first
     plot(reference_traversal.X,reference_traversal.Y,'b.-','Linewidth',4,'Markersize',20);
-    
+
     % Plot the ofset results
     fcn_Path_plotTraversalsXY(offset_traversals,fig_num);
     title('Reference traversal and offset traversals');
     xlabel('X [m]');
-    ylabel('Y [m]'); 
-    
+    ylabel('Y [m]');
+
     % Add a legend
     legend('Reference traversal', 'Offset traversals');
-    
+
 end
 
 if flag_do_debug

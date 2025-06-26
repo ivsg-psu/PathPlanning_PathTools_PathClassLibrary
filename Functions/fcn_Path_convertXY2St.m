@@ -8,8 +8,8 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 % the distance along the flag_rounding_type projection vector, and the
 % imaginary portion is the complex portion. The angle of the point relative
 % to the vertex can be found using the complex vector angle.
-% 
-% FORMAT: 
+%
+% FORMAT:
 %
 %    St_points = fcn_Path_convertXY2St(referencePath,XY_points,
 %    (flag_rounding_type), (fig_num));
@@ -39,17 +39,17 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 %          flag_rounding_type = 1;  % This is the default, and indicates
 %          that the orthogonal projection of an endpoint is created by the
 %          PRIOR segment leading up to each station query point.
-% 
+%
 %          flag_rounding_type = 2;  % This indicates that the orthogonal
 %          projection of an endpoint is created by the FOLLOWING segment
 %          after each station query point.
-% 
+%
 %          flag_rounding_type = 3;  % This indicates that the orthogonal
 %          projection, ONLY if the station query falls at the joining point
 %          between two segments (e.g. is on the "joint"), then the
 %          projection is created by averaging the vector projections
 %          created from the PRIOR segment and FOLLOWING segment.
-% 
+%
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
 %          of each segment, and then for each station qeuary, the vector
@@ -70,7 +70,7 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 %      coordinates corresponding to each [ X Y (Z)] input point.
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_Path_convertXY2St
 % for a full test suite.
 %
@@ -81,7 +81,7 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 %     fcn_Path_convertPathToTraversalStructure
 %
 % This function was written on 2023_08_26 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2023_08_26 by S. Brennan
@@ -97,8 +97,9 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 4; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==4 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -139,7 +140,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,4);
+        narginchk(2,MAX_NARGIN);
 
         % Check the data input
         fcn_DebugTools_checkInputsToFunctions(referencePath, 'path2or3D');
@@ -164,7 +165,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (4 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -180,13 +181,13 @@ end
 
 %% Find the closest point
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -204,14 +205,14 @@ St_points = [s_coordinates distances_real+distances_imaginary*1i];
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Prep the figure for plotting
@@ -224,38 +225,38 @@ if flag_do_plots
     hold on;
     grid on;
     axis equal;
-    
+
     % Plot the path
     plot(referencePath(:,1),referencePath(:,2),'r.-','Linewidth',5,'Markersize',20);
-    
+
     Npath = length(referencePath(:,1));
     % Label the path points
     for ith_point = 1:Npath
         text(referencePath(ith_point,1),referencePath(ith_point,2),sprintf('%.0d',ith_point),'Color',[1 0 0],'FontSize',12,'VerticalAlignment','bottom');
     end
-    
+
     % Plot the query points
     plot(XY_points(:,1),XY_points(:,2),'k.','MarkerSize',20);
-    
+
     Npoints = length(XY_points(:,1));
     % Label the query points
     for ith_point = 1:Npoints
         text(XY_points(ith_point,1),XY_points(ith_point,2),sprintf('%.0d',ith_point),'Color',[0 0 0],'FontSize',12,'VerticalAlignment','bottom');
     end
-    
-    
-    
+
+
+
     % Plot the connecting vectors
     for ith_point = 1:Npoints
         connecting_vectors = XY_points(ith_point,:) - closest_point_on_path(ith_point,:);
         quiver(closest_point_on_path(ith_point,1),closest_point_on_path(ith_point,2),...
             connecting_vectors(1,1),connecting_vectors(1,2),...
             0,'Color',[0.5 0.5 0.5]);
-        
+
         % Label the points with distances
         % labelpoint = (closest_path_points(ith_point,:) + XY_points(ith_point,:))/2;
         labelpoint = XY_points(ith_point,:);
-        
+
         if distances_imaginary(ith_point)==0
             St_string = sprintf('St coordinates: [%.2f %.2f]',...
                 St_points(ith_point,1), St_points(ith_point,2));
@@ -263,10 +264,10 @@ if flag_do_plots
             St_string = sprintf('St coordinates: [%.2f %.2f+%.2fi]',...
                 St_points(ith_point,1), real(St_points(ith_point,2)), imag(St_points(ith_point,2)));
         end
-        
+
         text(labelpoint(1,1),labelpoint(1,2),St_string,'VerticalAlignment','top');
-        
-        
+
+
         %         % Connect closest point on path to query point
         %         closest_point = closest_path_points(ith_point,:);
         %
@@ -278,7 +279,7 @@ if flag_do_plots
         %         plot(closest_point(1,1),closest_point(1,2),'g.','Markersize',20);
         %         text(closest_point(1,1),closest_point(1,2),'Snap Point on Path');
     end
-    
+
     % Make axis slightly larger?
     if flag_rescale_axis
         temp = axis;

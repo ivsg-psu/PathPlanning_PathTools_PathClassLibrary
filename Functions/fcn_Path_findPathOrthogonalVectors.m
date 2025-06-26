@@ -8,8 +8,8 @@ function [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
 % midpoint vectors. If the input path is in 3D, the orthogonal vectors are
 % not clearly defined and the projection is ONLY done in XY space, leaving
 % the z-component of the projection as zero.
-% 
-% FORMAT: 
+%
+% FORMAT:
 %
 %      [normal_unit_vectors_at_midpoints, unit_joint_vectors] = ...
 %        fcn_Path_findPathOrthogonalVectors(path,...
@@ -36,17 +36,17 @@ function [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
 %          flag_rounding_type = 1;  % This is the default, and indicates
 %          that the orthogonal projection of an endpoint is created by the
 %          PRIOR segment leading up to each station query point.
-% 
+%
 %          flag_rounding_type = 2;  % This indicates that the orthogonal
 %          projection of an endpoint is created by the FOLLOWING segment
 %          after each station query point.
-% 
+%
 %          flag_rounding_type = 3;  % This indicates that the orthogonal
 %          projection, ONLY if the station query falls at the joining point
 %          between two segments (e.g. is on the "joint"), then the
 %          projection is created by averaging the vector projections
 %          created from the PRIOR segment and FOLLOWING segment.
-% 
+%
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
 %          of each segment, and then for each station qeuary, the vector
@@ -75,16 +75,16 @@ function [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
 %      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_Path_findPathOrthogonalVectors
 % for a full test suite.
 %
 % This function was written on 2023_08_27 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2023_08_27 - S. Brennan
-% -- first write of the code via modification from 
+% -- first write of the code via modification from
 % fcn_Path_ findOrthogonalTraversalVectorsAtStations
 % 2024_03_14 - S. Brennan
 % -- fixed bug where snap breaks if path is passed in as a 3D vector
@@ -99,8 +99,9 @@ function [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==3 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -141,7 +142,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(1,3);
+        narginchk(1,MAX_NARGIN);
 
         % Check the path input
         fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
@@ -159,7 +160,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (3 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -177,19 +178,19 @@ end
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Find the midpoint tangent vectors for all segments in the central path 
+%% Find the midpoint tangent vectors for all segments in the central path
 % These are used to calculate the midpoint vectors at each segment
 % Convert these into vector form
-tangent_vectors_at_midpoints = diff(path); 
+tangent_vectors_at_midpoints = diff(path);
 magnitudes = sum(tangent_vectors_at_midpoints.^2,2).^0.5;
 tangent_unit_vectors_at_midpoints = tangent_vectors_at_midpoints./magnitudes;
 
@@ -201,15 +202,15 @@ else
     error('A 2D or 3D vector is expected');
 end
 
-%% Find the joint tangent vectors for all joints in the central path 
+%% Find the joint tangent vectors for all joints in the central path
 % The joint projection vector for each joint will depend on the input
 % options. For options where the orthogonal projection only uses the prior
 % or subsequent values, we can use the previously calculated vectors. For
 % options where averaging is occuring, we use averages of vectors.
-% 
+%
 % Note that the start and end points are considered "joints" also, so if
 % there are N segments, then there are N+1 joints.
-% 
+%
 % Here's the rounding options:
 %      flag_rounding_type = 1;  % This is the default, and indicates that
 %      the orthogonal projection at a joint is created by the PRIOR
@@ -249,28 +250,28 @@ end
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     figure(fig_num);
     hold on;
     grid on;
-    
+
     plot_color = [0 0 1];
     line_width = 3;
-    
+
     % Plot the central traversal in blue, with black dots
     sizeOfMarkers = 40;
     plot(path(:,1),path(:,2), '.-','Color',plot_color,'Linewidth',line_width,'Markersize',sizeOfMarkers);
     plot(path(:,1),path(:,2), '.','Color',[0 1 0],'Linewidth',line_width,'Markersize',round(sizeOfMarkers*0.5));
-  
+
 
     % Show the unit vectors at the midpoints in red
     midpoints = (path(1:end-1,:)+path(2:end,:))./2;
@@ -281,7 +282,7 @@ if flag_do_plots
 
     % Add a legend
     legend('Path','Path joints','Midpoint normal unit vectors','Joint normal unit vectors','Location','southwest');
-    
+
     % Make axis slightly larger
     temp = axis;
     axis_range_x = temp(2)-temp(1);
@@ -293,7 +294,7 @@ if flag_do_plots
 end % Ends the flag_do_plots if statement
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends the function

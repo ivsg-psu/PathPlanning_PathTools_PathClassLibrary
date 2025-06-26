@@ -105,8 +105,9 @@ function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(referen
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 7; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==7 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -147,7 +148,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(1,7);
+        narginchk(1,MAX_NARGIN);
 
         % Check the reference_traversal variables
         fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
@@ -215,7 +216,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (7 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -242,7 +243,7 @@ end
 
 % Define useful variables used in several sections below
 maxStation = Station_reference(end);
-    
+
 %% Fill in the array of reference station points
 % Each column corresponds to one trajectory.
 
@@ -279,24 +280,24 @@ if freq_ratio>1
 else
     % Design a filter
     [B,A] = butter(2,freq_ratio);
-    
+
     % Loop through each trajectory's offset column
     for ith_trajectory =1:num_trajectories
         % Grab the raw offsets
         raw_offsets = offsets_from_reference(:,ith_trajectory);
         raw_offsets(1) = 0;
         raw_offsets(end) = 0;
-        
+
         % Smooth the offsets
         filtered_offsets = filtfilt(B,A,raw_offsets);
-        
+
         % Fix the amplitude to match desired standard deviation
         filt_std = std(filtered_offsets);
         filtered_offsets = std_deviation/filt_std * filtered_offsets;
-        
+
         % Save results
         offsets_from_reference(:,ith_trajectory) = filtered_offsets;
-        
+
         % For debugging:
         if 1==0
             figure(33737);
@@ -316,23 +317,23 @@ for ith_trajectory =1:num_trajectories
     if flag_do_debug
         fprintf(1,'Generating random trajectory: %.0d / %.0d \n',ith_trajectory,num_trajectories);
     end
-    
-    
+
+
     %% For each traversal, project from reference orthogonally
     % Set the projection type (see help in function below for details)
     flag_rounding_type = 4; % This averages the projection vectors along segments
-    
+
     % Find the unit normal vectors at each of the station points
     [unit_normal_vector_start, unit_normal_vector_end] = ...
         fcn_Path_findOrthogonalTraversalVectorsAtStations(...
         reference_station_points(:,ith_trajectory),reference_traversal,flag_rounding_type, -1);
     unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
-    
+
     %% Calculate random path and traversal and save into final structure
     random_path = unit_normal_vector_start + unit_vectors.*offsets_from_reference(:,ith_trajectory);
     random_traversal = fcn_Path_convertPathToTraversalStructure(random_path, -1);
     random_traversals.traversal{ith_trajectory} = random_traversal;
-    
+
 end
 
 
@@ -349,21 +350,21 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    
+
     % plot the final XY result
     figure(fig_num);
     hold on;
-    
+
     % Plot the reference trajectory first
     plot(reference_traversal.X,reference_traversal.Y,'b.-','Linewidth',4,'Markersize',20);
-    
+
     % Plot the random results
     fcn_Path_plotTraversalsXY(random_traversals,fig_num);
     title('Reference traversal and random traversals');
     xlabel('X [m]');
-    ylabel('Y [m]'); 
-        
-    
+    ylabel('Y [m]');
+
+
 end
 
 if flag_do_debug

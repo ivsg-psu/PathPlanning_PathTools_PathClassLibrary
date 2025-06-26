@@ -138,8 +138,9 @@ function [closestXs, closestYs, closestDistances] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 6; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==6 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -180,7 +181,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(3,6);
+        narginchk(3,MAX_NARGIN);
 
         % Check the station input
         fcn_DebugTools_checkInputsToFunctions(reference_station_points, 'station');
@@ -214,7 +215,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (6 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -226,7 +227,7 @@ end
 if flag_do_debug
     fig_debug = 35455; %#ok<NASGU>
 end
-    
+
 
 %% Start of main code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -254,7 +255,7 @@ closestDistances = zeros(Nstations,Ntraversals);
 
 for ith_traversal = 1:Ntraversals
     nearby_traversal = all_traversals.traversal{ith_traversal};
-   
+
     [closest_path_points,closest_distances] = ...
         fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
         reference_station_points,...
@@ -262,7 +263,7 @@ for ith_traversal = 1:Ntraversals
         nearby_traversal,...
         flag_rounding_type,...
         search_radius, -1);
-    
+
     % Save final results as closest points
     closestXs(:,ith_traversal) = closest_path_points(:,1);
     closestYs(:,ith_traversal)  = closest_path_points(:,2);
@@ -297,7 +298,7 @@ if flag_do_plots
     % Plot the central traversal
     plot(reference_traversal.X,reference_traversal.Y,'k.-','Linewidth',3,'Markersize',25);
 
-    % Plot the paths 
+    % Plot the paths
     h_plots = fcn_Path_plotTraversalsXY(all_traversals,fig_num);
     colors = zeros(length(h_plots),3);
     for ith_plot = 1:length(h_plots)
@@ -318,7 +319,7 @@ if flag_do_plots
         unit_normal_vector_end - unit_normal_vector_start;
     quiver(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),...
         normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
-    
+
     % Plot the hit results
     for ith_traversal = 1:length(closestXs(1,:))
         plot(closestXs(:,ith_traversal),closestYs(:,ith_traversal),'o','Markersize',5,'Linewidth',3,'Color',colors(ith_traversal,:));
@@ -333,58 +334,58 @@ if flag_do_plots
     xlabel('Station [m]');
     ylabel('y-offset [m]');
     % axis equal;
-    
+
     % Plot the results
-    for ith_traversal = 1:length(closestDistances(1,:))        
+    for ith_traversal = 1:length(closestDistances(1,:))
         plot(reference_station_points, closestDistances(:, ith_traversal),'.-','Markersize',15,'Linewidth',3,'Color',colors(ith_traversal,:));
         for ith_point = 1:length(closestDistances)
             text(reference_station_points(ith_point,1),closestDistances(ith_point,ith_traversal),sprintf('%.0d',ith_point),...
                 'FontSize',12,'VerticalAlignment','bottom','Color',colors(ith_traversal,:));
         end
     end
-    
-    % For debugging    
+
+    % For debugging
     if 1== flag_do_debug  % The following plots the XY results
         figure(fig_num+1);
         clf;
         hold on;
         grid on;
-        
+
         xlabel('X [m]');
         ylabel('Y [m]');
         axis equal;
-        
+
         % Plot the central traversal
         plot(reference_traversal.X,reference_traversal.Y,'k.-','Linewidth',3,'Markersize',25);
-        
+
         % Plot the paths
         fcn_Path_plotTraversalsXY(all_traversals,fig_num);
-        
+
         % Plot the station points
         % Find the unit normal vectors at each of the station points
         [unit_normal_vector_start, unit_normal_vector_end] = ...
             fcn_Path_findOrthogonalTraversalVectorsAtStations(...
             reference_station_points,reference_traversal,flag_rounding_type,-1);
-        
+
         plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'r.','Markersize',35);
-        
-        
+
+
         % Plot the results
         for i_point = 1:length(closestXs(:,1))
             plot(closestXs(i_point,:),closestYs(i_point,:),'bo-','Markersize',15,'Linewidth',3);
         end
-        
+
         % Show the unit vectors
         normal_unit_vectors_at_stations = ...
             unit_normal_vector_end - unit_normal_vector_start;
         quiver(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),...
             normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'g','Linewidth',3);  % The 0 term is to prevent scaling
     end
-    
+
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 
 end % Ends the function

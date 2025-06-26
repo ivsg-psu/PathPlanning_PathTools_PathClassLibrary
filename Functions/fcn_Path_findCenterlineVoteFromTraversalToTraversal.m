@@ -12,8 +12,8 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 % traersal. As well, the orthogonal unit vectors for each projection are
 % returned. The function allows the user to specify the flag_rounding_type
 % and search_radius.
-% 
-% FORMAT: 
+%
+% FORMAT:
 %
 %    [centerline_points_projected,unit_vectors_orthogonal] = ...
 %     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
@@ -44,17 +44,17 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %          flag_rounding_type = 1;  % This is the default, and indicates
 %          that the orthogonal projection of an endpoint is created by the
 %          PRIOR segment leading up to each station query point.
-% 
+%
 %          flag_rounding_type = 2;  % This indicates that the orthogonal
 %          projection of an endpoint is created by the FOLLOWING segment
 %          after each station query point.
-% 
+%
 %          flag_rounding_type = 3;  % This indicates that the orthogonal
 %          projection, ONLY if the station query falls at the joining point
 %          between two segments (e.g. is on the "joint"), then the
 %          projection is created by averaging the vector projections
 %          created from the PRIOR segment and FOLLOWING segment.
-% 
+%
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
 %          of each segment, and then for each station qeuary, the vector
@@ -65,7 +65,7 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %
 %      search_radius: the distance to project "from" to search for
 %      intersections with the "to" traversal (default is 10 meters).
-% 
+%
 %      flag_project_full_distance: this is a flag to determine whether the
 %      projection is to the halfway distance between 1 and 2. For the
 %      following values:
@@ -93,10 +93,10 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %
 %      unit_vectors_orthogonal: vectors at each centerline point that are
 %      unit vectors orthogonal to the projection used in the "from"
-%      traversal. 
+%      traversal.
 %
 % EXAMPLES:
-%      
+%
 % See the script: script_test_fcn_Path_findCenterlineVoteFromTraversalToTraversal
 % for a full test suite.
 %
@@ -107,7 +107,7 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %     fcn_Path_findOrthogonalTraversalVectorsAtStations
 %
 % This function was written on 2023_09_04 by S. Brennan
-% Questions or comments? sbrennan@psu.edu 
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 % 2023_09_04 by S. Brennan
@@ -128,8 +128,9 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 6; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==6 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -170,7 +171,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(2,6);
+        narginchk(2,MAX_NARGIN);
     end
 end
 
@@ -203,7 +204,7 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (6 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -221,13 +222,13 @@ end
 
 %% Find the closest point
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Calculate the closest point and distances from right side to left
@@ -247,17 +248,17 @@ end
 full_distances_between = fillmissing(distances_between, 'nearest');
 
 % Find the centerline points:
-% FORMAT: 
+% FORMAT:
 %
 %      [unit_normal_vector_start, unit_normal_vector_end] = ...
 %        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
 %        station_queries,central_traversal,...
 %        (flag_rounding_type),(fig_num));
 [unit_normal_vector_start, unit_normal_vector_end] = ...
-       fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-       from_traversal.Station,...
-       from_traversal,...
-       flag_rounding_type, -1);
+    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
+    from_traversal.Station,...
+    from_traversal,...
+    flag_rounding_type, -1);
 unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
 
 if 0==flag_project_full_distance
@@ -271,14 +272,14 @@ unit_vectors_orthogonal = unit_vectors*[0 -1; 1 0];
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     figure(fig_num);
@@ -286,13 +287,13 @@ if flag_do_plots
     hold on;
     grid on;
     axis equal;
-    
+
     % Plot the input traversals
-    plot(from_traversal.X,from_traversal.Y,'.-', 'Color',[0 1 0],'Linewidth',5,'MarkerSize',20);      
-    plot(to_traversal.X,to_traversal.Y,'.-', 'Color',[0 0 1],'Linewidth',5,'MarkerSize',20);      
+    plot(from_traversal.X,from_traversal.Y,'.-', 'Color',[0 1 0],'Linewidth',5,'MarkerSize',20);
+    plot(to_traversal.X,to_traversal.Y,'.-', 'Color',[0 0 1],'Linewidth',5,'MarkerSize',20);
 
     % Plot the centerline_points_right_to_left and centerline_points_left_to_right
-    plot(centerline_points_projected(:,1), centerline_points_projected(:,2), '.-','Linewidth',3,'MarkerSize',20,'Color',[1 0 0]*0.7);         
+    plot(centerline_points_projected(:,1), centerline_points_projected(:,2), '.-','Linewidth',3,'MarkerSize',20,'Color',[1 0 0]*0.7);
 
     % Show the unit vectors at the stations
     quiver(centerline_points_projected(:,1),centerline_points_projected(:,2),...
@@ -301,7 +302,7 @@ if flag_do_plots
         0,'Color',[1 0 1],'Linewidth',2);
 
     legend('From path', 'To path','Calculated result','Unit vectors of calculated result');
-    
+
     % Make axis slightly larger
     temp = axis;
     axis_range_x = temp(2)-temp(1);

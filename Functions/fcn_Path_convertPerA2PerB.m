@@ -2,12 +2,12 @@ function B_values = ...
     fcn_Path_convertPerA2PerB(...
     start_A, start_B, ...
     vector_A, vector_B, A_values,...
-    varargin)   
-%% fcn_Path_convertPerA2PerB 
+    varargin)
+%% fcn_Path_convertPerA2PerB
 % give the starting points and vectors for two vectors A and B, and the
 % length(s) along vector A, calculates lengths along vector B
 %
-% FORMAT: 
+% FORMAT:
 %
 %      percentage_B = ...
 %         fcn_Path_convertPerA2PerB(...
@@ -52,11 +52,11 @@ function B_values = ...
 %      fcn_DebugTools_checkInputsToFunctions
 %
 % EXAMPLES:
-%      
-%       See the script: script_test_fcn_Path_convertPerA2PerB.m
-%       for a full test suite. 
 %
-% Questions or comments? sbrennan@psu.edu 
+%       See the script: script_test_fcn_Path_convertPerA2PerB.m
+%       for a full test suite.
+%
+% Questions or comments? sbrennan@psu.edu
 
 % Revision history:
 %      2025_06_19 - S. Brennan
@@ -68,8 +68,9 @@ function B_values = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
+MAX_NARGIN = 6; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
-if (nargin==6 && isequal(varargin{end},-1))
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
@@ -111,7 +112,7 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(5,6);
+        narginchk(5,MAX_NARGIN);
 
         % Check the start_A input
         fcn_DebugTools_checkInputsToFunctions(start_A, '2column_of_numbers');
@@ -138,7 +139,7 @@ Ninputs = length(A_values(:,1));
 
 % Figure out which situation we have
 if NinA==NinB
-    assert(Ninputs==Ninputs);    
+    assert(Ninputs==Ninputs);
     if Ninputs~=NinA
         start_A = ones(Ninputs,1)*start_A;
         vector_A = ones(Ninputs,1)*vector_A;
@@ -162,16 +163,16 @@ end
 
 % Does user want to show the plots?
 flag_do_plot = 0; % Default is to NOT show plots
-if (0==flag_max_speed) && (6 == nargin) 
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp)
-        fig_num = temp; 
+        fig_num = temp;
         flag_do_plot = 1;
     end
 else
     if flag_do_debug
-        fig = figure; 
-        fig_num = fig.Number; 
+        fig = figure;
+        fig_num = fig.Number;
         flag_do_plot = 1;
     end
 end
@@ -179,13 +180,13 @@ end
 
 %% Calculations begin here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   __  __       _       
-%  |  \/  |     (_)      
-%  | \  / | __ _ _ _ __  
-%  | |\/| |/ _` | | '_ \ 
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
 %  | |  | | (_| | | | | |
 %  |_|  |_|\__,_|_|_| |_|
-% 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Check the cross product?
@@ -208,14 +209,14 @@ B_values = A_values.*(A_dot_B)./B_dot_B + As_minus_Bs_dot_B./B_dot_B;
 
 %% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   _____       _                 
-%  |  __ \     | |                
-%  | |  | | ___| |__  _   _  __ _ 
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
 %  | |  | |/ _ \ '_ \| | | |/ _` |
 %  | |__| |  __/ |_) | |_| | (_| |
 %  |_____/ \___|_.__/ \__,_|\__, |
 %                            __/ |
-%                           |___/ 
+%                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
 
@@ -225,9 +226,9 @@ if flag_do_plot
 
     % check whether the figure already has data
     h_fig = figure(fig_num);
-    flag_rescale_axis = 0; 
-    if isempty(get(h_fig,'Children')) 
-        flag_rescale_axis = 1; 
+    flag_rescale_axis = 0;
+    if isempty(get(h_fig,'Children'))
+        flag_rescale_axis = 1;
     else
         child_handle = get(h_fig,'Children');
         if isfield(child_handle,'TileArrangement') && strcmp(get(child_handle,'TileArrangement'),'flow')
@@ -237,7 +238,7 @@ if flag_do_plot
 
     hold on;
     axis equal;
-    grid on; 
+    grid on;
 
     % Find size of plotting domain
     allPoints = [start_A; start_B; start_A+vector_A; start_B+vector_B; predicted_A_points; predicted_B_points];
@@ -296,11 +297,11 @@ if flag_do_plot
         quiver(start_B(ith_input,1),start_B(ith_input,2),vector_B(ith_input,1),vector_B(ith_input,2),0, 'Linewidth',2,'MaxHeadSize',1,'Color',colorsUsed(ith_input,:));
         plot(predicted_B_points(ith_input,1),predicted_B_points(ith_input,2),'.','Linewidth',5,'Markersize',15,'Color',colorsUsed(ith_input,:));
     end
-    
+
 end
 
 if flag_do_debug
-    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file); 
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
 end
 
