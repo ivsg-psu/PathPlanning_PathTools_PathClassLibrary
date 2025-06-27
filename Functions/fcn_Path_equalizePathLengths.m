@@ -1,4 +1,4 @@
-function cellArrayOfEqualizedPaths = ...
+function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = ...
     fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,varargin)
 % fcn_Path_equalizePathLengths
 % given a cell array of paths that are nominally following the same average
@@ -9,7 +9,7 @@ function cellArrayOfEqualizedPaths = ...
 %
 % FORMAT: 
 %
-%      cellArrayOfEqualizedPaths = ...
+%      [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = ...
 %      fcn_Path_equalizePathLengths(...
 %            cellArrayOfUnequalPaths,
 %            (fig_num));
@@ -34,16 +34,24 @@ function cellArrayOfEqualizedPaths = ...
 %     containing Nx2 vectors containing [X, Y] positions. Note, the value
 %     of N may be different for each entry in the cell array.
 %
+%     leastExtensionIndex: the index of the path that had the least amount
+%     of extension. This is useful to identify which path is likely the
+%     best 'reference' to the others.
+%
+%     bestStartIndex: the index of the path that had the least amount
+%     of extension at start. This is useful to identify which path is best
+%     to align start values
+%
+%     bestEndIndex: the index of the path that had the least amount
+%     of extension at end. This is useful to identify which path is best
+%     to align end values
+%
 % DEPENDENCIES:
 %
-%      fcn_DebugTools_checkInputsToFunctions
-%      fcn_Path_findTraversalWithMostData
-%      fcn_Path_findOrthogonalTraversalVectorsAtStations
-%      fcn_Path_findOrthoScatterFromTraversalToTraversals
-%      fcn_Path_cleanPathFromForwardBackwardJogs
-%      fcn_Path_plotTraversalsXY
-%      fcn_Path_newTraversalByStationResampling
-%      fcn_Path_convertPathToTraversalStructure
+%     fcn_DebugTools_checkInputsToFunctions
+%     fcn_Path_convertPathToTraversalStructure
+%     fcn_Path_findOrthogonalHitFromTraversalToTraversal
+%     fcn_Path_findSensorHitOnWall
 %
 % EXAMPLES:
 %      
@@ -86,7 +94,7 @@ else
     end
 end
 
-flag_do_debug = 1;
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
@@ -130,7 +138,7 @@ if (0==flag_max_speed) && (MAX_NARGIN == nargin)
 end
 
 if flag_do_debug
-    fig_debug = 78787; %#ok<NASGU>
+    fig_debug = 78787; 
 end
 
 
@@ -164,59 +172,28 @@ if flag_do_debug
     legend
 end  
 
-%%%%%
+% Project paths to be exactly as long as the longest one
+[cellArrayOfEqualizedEnds, distanceExtendedEnds] = fcn_INTERNAL_extendPaths(cellArrayOfUnequalPaths);
 
+if flag_do_debug
+    for ith_data = 1:Npaths
+        plot(cellArrayOfEqualizedEnds{ith_data}(:,1), cellArrayOfEqualizedEnds{ith_data}(:,2),'.-',...
+            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_data,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_data));
+    end
+end    
 
-%% Find all the endPoints and endVectors of all the traversals
-allEndPositions   = nan(Npaths,2); % Initialize variables
-allEndVectors     = nan(Npaths,2); % Initialize vectors
-
-for ith_path = 1:Npaths
-    allEndPositions(ith_path,:) = cellArrayOfUnequalPaths{ith_path}(end,:);
-    allEndVectors(ith_path,:)   = cellArrayOfUnequalPaths{ith_path}(end,:) - cellArrayOfUnequalPaths{ith_path}(end-1,:);
+% Flip all the data upside down, so starts become ends
+cellArrayOfUnequalStarts = cell(Npaths,1);
+for ith_data = 1:Npaths
+    cellArrayOfUnequalStarts{ith_data} = flipud(cellArrayOfEqualizedEnds{ith_data});
 end
 
-% Find the longest distance from one path's tail to another
-longestDistance = fcn_INTERNAL_findMaxTailDistanceDisparity(allEndPositions);
- 
-% Using the longest distance, see which traversal extends out the
-% furthest from the others. 
-index_of_longest = fcn_INTERNAL_findPathThatSticksOutMost(cellArrayOfUnequalPaths, longestDistance);
+[cellArrayOfEqualizedStarts, distanceExtendedStarts] = fcn_INTERNAL_extendPaths(cellArrayOfUnequalStarts);
 
-%% Project paths to be exactly as long as the longest one
-% To do this, we calculate the vector projection of each end point that
-% would push the end point to align with the longest
-longest_pathPoint = allEndPositions(index_of_longest,:);
-longest_pathVector = allEndVectors(index_of_longest,:);
-orthoToEnd = longest_pathVector*[0 1; -1 0];
-
-% Intersect each path's ending vector with the orthogonal projection of the
-% longest point. We do this with the sensor hit method:
-% FORMAT:
-%      [distance, location, wall_segment, t, u] = ...
-%         fcn_Path_findSensorHitOnWall(...
-%         wall_start, wall_end,...
-%         sensor_vector_start,sensor_vector_end,...
-%         (flag_search_return_type), (flag_search_range_type), ...
-%         (tolerance), (fig_num))
-
-[~, newEndLocations, wall_segment, ~, ~] = ...
-    fcn_Path_findSensorHitOnWall(...
-    allEndPositions-allEndVectors, allEndPositions,...
-    longest_pathPoint,longest_pathPoint+orthoToEnd,...
-    (1), (3), ...
-    ([]), (234));
-
+% Flip all the data upside down, so starts are at start again
 cellArrayOfEqualizedPaths = cell(Npaths,1);
-for ith_wall = 1:Npaths
-    this_wall = wall_segment(ith_wall);
-    if ith_wall~=index_of_longest
-        % Make path longer
-        cellArrayOfEqualizedPaths{this_wall} = [cellArrayOfUnequalPaths{this_wall}; newEndLocations(this_wall,:)];
-    else
-        % Keep original path
-        cellArrayOfEqualizedPaths{this_wall} = cellArrayOfUnequalPaths{this_wall};
-    end
+for ith_data = 1:Npaths
+    cellArrayOfEqualizedPaths{ith_data} = flipud(cellArrayOfEqualizedStarts{ith_data});
 end
 
 if flag_do_debug
@@ -226,6 +203,10 @@ if flag_do_debug
     end
 end    
 
+totalExtensions = distanceExtendedStarts + distanceExtendedEnds;
+[~,leastExtensionIndex] = min(totalExtensions);
+[~,bestStartIndex] = min(distanceExtendedStarts);
+[~,bestEndIndex] = min(distanceExtendedEnds);
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -252,12 +233,14 @@ if flag_do_plots
     dimension_of_points = 2;
 
     % Find size of plotting domain
-    data
-    allPointsBeingPlotted = [(1:length(diff_angles))' diff_angles*180/pi];
+    allPointsBeingPlotted = [];
+    for ith_data = 1:Npaths
+        allPointsBeingPlotted = [allPointsBeingPlotted; cellArrayOfUnequalPaths{ith_data}; cellArrayOfEqualizedPaths{ith_data}]; %#ok<AGROW>
+    end
     max_plotValues = max(allPointsBeingPlotted);
     min_plotValues = min(allPointsBeingPlotted);
     sizePlot = max(max_plotValues) - min(min_plotValues);
-    nudge = sizePlot*0.006; %#ok<NASGU>
+    nudge = sizePlot*0.006; 
 
     % Find size of plotting domain
     if flag_rescale_axis
@@ -297,51 +280,36 @@ if flag_do_plots
     xlabel('X [m]');
     ylabel('Y [m]');
 
-    fcn_Path_plotTraversalsXY(data,fig_num);
-    hold on;
-    plot(traversal_average.X,traversal_average.Y,'b.-','Linewidth',4,'Markersize',20,'DisplayName','Average');
-    
-    legend;
-  
-    
-    if flag_do_debug
-        % Plot the path convergence
-        figure(2255);
-        clf;
-        hold on;
-        xlabel('Index')
-        ylabel('Position change between iterations [m]')
-        for ith_iteration = 1:length(iteration_error_X)
-            title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
-            plot(average_traversals{ith_iteration}.X,average_traversals{ith_iteration}.Y,'-'); 
-            drawnow;
-            pause(0.1);
-        end
-        
-        % Plot the error convergence
-        figure(2233);
-        clf;
-        hold on;
-        xlabel('Index')
-        ylabel('Position change between iterations [m]')
-        for ith_iteration = 1:length(iteration_error_X)
-            title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
-            plot(total_error{ith_iteration});            
-            pause(0.1);
-        end
-        
-        
-        % Plot the error convergence
-        figure(2244);
-        clf;
-        
-        semilogy(1:length(mean_error),mean_error,'.-','Markersize',30);
-        xlabel('Iteration')
-        ylabel('Mean change in distance')
-        grid on
-        
+    % Plot the inputs
+    colorsPerData = zeros(Npaths,3);
+    for ith_data = 1:Npaths
+        h_plot = plot(cellArrayOfUnequalPaths{ith_data}(:,1), cellArrayOfUnequalPaths{ith_data}(:,2),...
+            '.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_data));
+        colorsPerData(ith_data,:) = get(h_plot,'Color');
     end
+
+    % Plot the results
+    for ith_data = 1:Npaths
+        plot(cellArrayOfEqualizedPaths{ith_data}(:,1), cellArrayOfEqualizedPaths{ith_data}(:,2),'.-',...
+            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_data,:)*0.8, 'DisplayName',sprintf('Extended %.0f',ith_data));
+    end
+
+    legend;
+
+    % Label the leastExtensionIndex path
+    textLocationBestStart    = cellArrayOfEqualizedPaths{bestStartIndex}(1,:);
+    textLocationBestEnd    = cellArrayOfEqualizedPaths{bestEndIndex}(end,:);
+    textLocationLeastChanged = cellArrayOfEqualizedPaths{leastExtensionIndex}(end,:);
     
+    text(textLocationBestStart(1,1)+nudge,textLocationBestStart(1,2),'<-- Best start');
+    if bestEndIndex~=leastExtensionIndex
+        text(textLocationLeastChanged(1,1)+nudge,textLocationLeastChanged(1,2),'<-- Least changed');
+        text(textLocationBestEnd(1,1)+nudge,textLocationBestEnd(1,2),'<-- Best end');
+    else
+        text(textLocationLeastChanged(1,1)+nudge,textLocationLeastChanged(1,2),'<-- Best end, least changed');
+    end
+        
+
 end
 
 if flag_do_debug
@@ -361,6 +329,17 @@ end % End of function
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+%% fcn_INTERNAL_getLastPointAndLastVector
+function [allEndPositions, allEndVectors] = fcn_INTERNAL_getLastPointAndLastVector(cellArrayOfPaths)
+Npaths = length(cellArrayOfPaths); % the number of paths we will be checking
+allEndPositions   = nan(Npaths,2); % Initialize variables
+allEndVectors     = nan(Npaths,2); % Initialize vectors
+
+for ith_path = 1:Npaths
+    allEndPositions(ith_path,:) = cellArrayOfPaths{ith_path}(end,:);
+    allEndVectors(ith_path,:)   = cellArrayOfPaths{ith_path}(end,:) - cellArrayOfPaths{ith_path}(end-1,:);
+end
+end % Ends fcn_INTERNAL_getLastPointAndLastVector
 
 %% fcn_INTERNAL_findMaxTailDistanceDisparity
 function longestDistance = fcn_INTERNAL_findMaxTailDistanceDisparity(allEndPositions)
@@ -368,11 +347,11 @@ function longestDistance = fcn_INTERNAL_findMaxTailDistanceDisparity(allEndPosit
 % note: do the square-root calculation only once at end, rather than at
 % every iteration, since this is slow.
 
-Ntraversals = length(allEndPositions(:,1)); % the number of paths we will be checking
+Npaths = length(allEndPositions(:,1)); % the number of paths we will be checking
 
 longestDistance = -inf;
-for ith_traversal = 1:Ntraversals
-    for jth_traversal = 1:Ntraversals
+for ith_traversal = 1:Npaths
+    for jth_traversal = 1:Npaths
         if jth_traversal~=ith_traversal
             testDistance = sum((allEndPositions(jth_traversal,:)-allEndPositions(ith_traversal,:)).^2,2);
             if testDistance>longestDistance
@@ -416,11 +395,11 @@ for ith_testPath = 1:Npaths
             %     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
             %     central_traversal,nearby_traversal,...
             %     flag_rounding_type,search_radius,fig_num);
-
             [~, distance] = ...
                 fcn_Path_findOrthogonalHitFromTraversalToTraversal(endStation,...
                 current_testTraversal,nearby_traversal,...
                 [], longestDistance, -1);
+
             all_orthogonalProjectionHits(jth_adjacentPath,1) = distance;
         end
     end
@@ -444,3 +423,60 @@ end
 % Force only one index to be kept, if there are more than one
 index_of_longest = index_of_longest(1);
 end % Ends fcn_INTERNAL_findPathThatSticksOutMost
+
+%% fcn_INTERNAL_extendPaths
+function [cellArrayOfEqualizedPaths, distanceExtended] = fcn_INTERNAL_extendPaths(cellArrayOfUnequalPaths)
+
+% Find all the endPoints and endVectors of all the traversals
+[allEndPositions, allEndVectors] = fcn_INTERNAL_getLastPointAndLastVector(cellArrayOfUnequalPaths);
+
+% Find the longest distance from one path's tail to another
+longestDistance = fcn_INTERNAL_findMaxTailDistanceDisparity(allEndPositions);
+ 
+% Using the longest distance, see which traversal extends out the
+% furthest from the others. 
+index_of_longest = fcn_INTERNAL_findPathThatSticksOutMost(cellArrayOfUnequalPaths, longestDistance);
+
+% Project paths to be exactly as long as the longest one
+
+Npaths = length(cellArrayOfUnequalPaths); % the number of traversals we will be averaging
+
+% To do this, we calculate the vector projection of each end point that
+% would push the end point to align with the longest
+longest_pathPoint = allEndPositions(index_of_longest,:);
+longest_pathVector = allEndVectors(index_of_longest,:);
+orthoToEnd = longest_pathVector*[0 1; -1 0];
+
+% Intersect each path's ending vector with the orthogonal projection of the
+% longest path. 
+
+% We do this with the sensor hit method:
+% FORMAT:
+%      [distance, location, wall_segment, t, u] = ...
+%         fcn_Path_findSensorHitOnWall(...
+%         wall_start, wall_end,...
+%         sensor_vector_start,sensor_vector_end,...
+%         (flag_search_return_type), (flag_search_range_type), ...
+%         (tolerance), (fig_num))
+
+[~, newEndLocations, wall_segment, ~, ~] = ...
+    fcn_Path_findSensorHitOnWall(...
+    allEndPositions-allEndVectors, allEndPositions,...
+    longest_pathPoint,longest_pathPoint+orthoToEnd,...
+    (1), (3), ...
+    ([]), (-1));
+
+cellArrayOfEqualizedPaths = cell(Npaths,1);
+for ith_wall = 1:Npaths
+    this_wall = wall_segment(ith_wall);
+    if ith_wall~=index_of_longest
+        % Make path longer
+        cellArrayOfEqualizedPaths{this_wall} = [cellArrayOfUnequalPaths{this_wall}; newEndLocations(this_wall,:)];
+    else
+        % Keep original path
+        cellArrayOfEqualizedPaths{this_wall} = cellArrayOfUnequalPaths{this_wall};
+    end
+end
+
+distanceExtended = sum((allEndPositions-newEndLocations).^2,2).^0.5;
+end % Ends fcn_INTERNAL_extendPaths

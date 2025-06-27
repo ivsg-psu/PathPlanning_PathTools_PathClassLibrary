@@ -151,7 +151,7 @@ starting_angle = atan2(Path(2,2)-Path(1,2),Path(2,1)-Path(1,1));
 
 Nangles = length(Path(:,1)) - 1;
 if Nangles>1
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path);
+    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path, -1);
     cumulative_angles = [0; cumsum(diff_angles)];
 else
     cumulative_angles = 0;
