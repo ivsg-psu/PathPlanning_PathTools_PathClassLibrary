@@ -56,7 +56,6 @@ function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEn
 %      
 %     See the script: 
 %     script_test_fcn_Path_equalizePathLengths
-%     script_demo_fcn_Path_findAverageTraversal
 %     for a full test suite and demonstration.
 %
 % This function was written on 2020_11_15 by S. Brennan
@@ -416,7 +415,7 @@ elseif length(index_of_longest)>1
     warning('Multiple paths found that stick out beyond all others.');
     warning('This usually only occurs when paths are severely mis-aligned.');
     warning('This suggests a poor set of paths used for path averaging.');
-    warning('The first "stick out" path found will be used, path number: %.0f ',index_of_longest);   
+    warning('The first "stick out" path found will be used, path number: %.0f ',index_of_longest(1));
     warning('but caution should be used in accepting the results.');
 end
 % Force only one index to be kept, if there are more than one

@@ -2,13 +2,13 @@
 % Tests fcn_Path_plotTraversalsXY
        
 % Revision history:
-%      2020_11_10
-%      -- first write of the code
-%      2021_01_06
-%      -- code clean-up to remove unneeded yaw function
-%     2021_01_07
-%     -- renamed function to show that traversals being used, not path
-%     -- fixed small typo in function name 
+% 2020_11_10
+% -- first write of the code
+% 2021_01_06
+% -- code clean-up to remove unneeded yaw function
+% 2021_01_07
+% -- renamed function to show that traversals being used, not path
+% -- fixed small typo in function name
 
 close all
 

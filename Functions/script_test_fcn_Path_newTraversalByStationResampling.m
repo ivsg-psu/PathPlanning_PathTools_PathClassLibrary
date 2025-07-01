@@ -1,10 +1,9 @@
-% script_test_fcn_fcn_Path_convertPathToTraversalStructure
-% Tests the function: fcn_Path_convertPathToTraversalStructure
+% script_test_fcn_Path_newTraversalByStationResampling
+% Tests the function: fcn_Path_newTraversalByStationResampling
 
 % Revision history
 %     2022_01_05: 
-%     -- wrote the code originally - in support of
-%     fcn_Path_findAverageTraversalViaOrthoProjection
+%     -- wrote the code originally
 
 close all;
 

@@ -1,34 +1,33 @@
-function new_traversal = ...
-    fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, varargin)
-% fcn_Path_newTraversalByStationResampling
-% creates a new traversal by resampling a given traversal at given station
+function new_path = ...
+    fcn_Path_newPathByStationResampling(input_path, new_stations, varargin)
+% fcn_Path_newPathByStationResampling
+% creates a new path by resampling a given path at given station
 % points.
 %
 % Note: if the stations are intended to align in space between the
-% input_traversal and new_traversal traversals, then the first station
+% input_path and new_path paths, then the first station
 % point must be zero.
 %
-% If the stations are outside the station range of the input traversal,
-% then extraploation is used to extend the input_traversal linearly
+% If the stations are outside the station range of the input path,
+% then extraploation is used to extend the input_path linearly
 % outward. This can result in bad data if the path is not approximately
 % linear at the endpoints.
 %
 % FORMAT:
 %
-%      [new_traversal] = ...
-%      fcn_Path_newTraversalByStationResampling(...
-%            input_traversal,
+%      [new_path] = ...
+%      fcn_Path_newPathByStationResampling(...
+%            input_path,
 %            new_stations,
 %            (fig_num));
 %
 % INPUTS:
 %
-%      input_traversal: a traversal type data structure, namely a structure
-%      with subfields of X, Y, Station, etc. in the following form
-%           traversal.X
+%      input_path: a N x 2 or N x 3 set of coordinates representing the 
+%      [X Y] or [X Y Z] coordinates, in sequence, of a path
 %
 %      new_stations: an N x 1 column of stations that contain the locations
-%      where the input traversal is to be estimated, with N>=1.
+%      where the input path is to be estimated, with N>=1.
 %
 %      (OPTIONAL INPUTS)
 %
@@ -40,8 +39,9 @@ function new_traversal = ...
 %
 % OUTPUTS:
 %
-%      new_traversal: the resulting traversal representing the resampled
-%      result
+%      new_path: a N x 2 or N x 3 set of coordinates representing the 
+%      [X Y] or [X Y Z] coordinates, in sequence, of a path created by
+%      resampling the input path at given station points
 %
 % DEPENDENCIES:
 %
@@ -51,23 +51,21 @@ function new_traversal = ...
 % EXAMPLES:
 %
 %     See the script:
-%     script_test_fcn_Path_newTraversalByStationResampling
+%     script_test_fcn_Path_newPathByStationResampling
 %     for a full test suite.
 %
-% This function was written on 2022_01_05 by S. Brennan
+% This function was written on 2025_07_01 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-% 2022_01_05:
-% -- wrote the code originally 
-% 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% 2025_07_01:
+% -- wrote the code originally - modified from
+% fcn_Path_newTraversalByStationResampling
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
-warning('The function fcn_Path_newTraversalByStationResampling is being deprecated. Please use fcn_Path_newPathByStationResampling instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -117,8 +115,8 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(2,MAX_NARGIN);
 
-        % Check the input_traversal input
-        fcn_DebugTools_checkInputsToFunctions(input_traversal, 'traversal');
+        % Check the input_path input
+        fcn_DebugTools_checkInputsToFunctions(input_path, 'path2or3D');
 
         % Check the new_stations input
         fcn_DebugTools_checkInputsToFunctions(new_stations, 'station');
@@ -152,22 +150,14 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-current_X = input_traversal.X;
-current_Y = input_traversal.Y;
-current_Station = input_traversal.Station;
+currentX = input_path(:,1);
+currentY = input_path(:,2);
+[currentStations, ~] = fcn_Path_calcPathStation(input_path,-1);
 
 
-interp_X       = interp1(current_Station,current_X,new_stations,'linear','extrap');
-interp_Y       = interp1(current_Station,current_Y,new_stations,'linear','extrap');
-new_traversal  = fcn_Path_convertPathToTraversalStructure([interp_X, interp_Y], -1);
-
-% The calculation of station is a bit off in the conversion, so fix it here
-% in the cases where the user explicitly starts the station count at zero.
-% For long station lists, this prevents round-off errors from accumulating.
-if 0==new_stations(1,1)
-    new_traversal.Station = new_stations;
-end
-
+interp_X       = interp1(currentStations,currentX,new_stations,'linear','extrap');
+interp_Y       = interp1(currentStations,currentY,new_stations,'linear','extrap');
+new_path  = [interp_X, interp_Y];
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,7 +183,7 @@ if flag_do_plots
     dimension_of_points = 2;
 
     % Find size of plotting domain
-    allPointsBeingPlotted = [input_traversal.X input_traversal.Y; new_traversal.X new_traversal.Y];
+    allPointsBeingPlotted = [input_path; new_path];
     max_plotValues = max(allPointsBeingPlotted);
     min_plotValues = min(allPointsBeingPlotted);
     sizePlot = max(max_plotValues) - min(min_plotValues);
@@ -238,10 +228,10 @@ if flag_do_plots
     xlabel('X [m]');
     ylabel('Y [m]');
 
-    plot(input_traversal.X,input_traversal.Y,'b.-','Linewidth',4,'Markersize',30);
-    plot(new_traversal.X,new_traversal.Y,'r.-','Linewidth',2,'Markersize',20);
-    legend('Input traversal','New traversal');
-    title('original traversal and resampled traversal');
+    plot(input_path(:,1),input_path(:,2),'b.-','Linewidth',4,'Markersize',30,'DisplayName','Input path');
+    plot(new_path(:,1),new_path(:,2),'r.-','Linewidth',2,'Markersize',20,'DisplayName','Resampled path');
+    legend;
+    title('original path and resampled path');
 
 end
 

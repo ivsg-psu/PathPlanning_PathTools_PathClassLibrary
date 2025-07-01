@@ -1,30 +1,30 @@
 function [unit_normal_vector_start, unit_normal_vector_end] = ...
-    fcn_Path_findOrthogonalTraversalVectorsAtStations(station_queries,central_traversal, varargin)
+    fcn_Path_findOrthogonalPathVectorsAtStations(station_queries,central_path, varargin)
 
-% fcn_Path_findOrthogonalTraversalVectorsAtStations
-% Given a central traversal and a set of stations along that traversal,
+% fcn_Path_findOrthogonalPathVectorsAtStations
+% Given a central path and a set of stations along that path,
 % finds the unit normal vector on the central traveral at each station
 % point.
 %
 % FORMAT:
 %
 %      [unit_normal_vector_start, unit_normal_vector_end] = ...
-%        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-%        station_queries,central_traversal,...
+%        fcn_Path_findOrthogonalPathVectorsAtStations(...
+%        station_queries,central_path,...
 %        (flag_rounding_type),(fig_num));
 %
 % INPUTS:
 %
 %      station_queries: an N x 1 vector containing the station on the
-%      central traversal where the projections should take place
+%      central path where the projections should take place
 %
-%      central_traversal: a traversal structure that specifies the path
-%      where projections to other paths are taking place.
+%      central_path: a N x 2 or N x 3 set of coordinates representing the 
+%      [X Y] or [X Y Z] coordinates, in sequence, of a path
 %
 %      (OPTIONAL INPUTS)
 %      flag_rounding_type: a flag to indicate which type of projection is
 %      used, especially when stations are located at the end-points of
-%      segments within the nearby_traversal. When stations are at the
+%      segments within the nearby_path. When stations are at the
 %      end-points of segments, the normal vector is undefined as it depends
 %      on whether to use the prior or subsequent segment, or some
 %      combination of these.
@@ -77,7 +77,7 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_Path_findOrthogonalTraversalVectorsAtStations
+% See the script: script_test_fcn_Path_findOrthogonalPathVectorsAtStations
 % for a full test suite.
 %
 % This function was written on 2020_12_31 by S. Brennan
@@ -161,19 +161,16 @@ if 0==flag_max_speed
         % Check the station_queries input
         fcn_DebugTools_checkInputsToFunctions(station_queries, 'station');
 
-        % Check the central_traversal input
-        fcn_DebugTools_checkInputsToFunctions(central_traversal, 'traversal');
+        % Check the central_path input
+        fcn_DebugTools_checkInputsToFunctions(central_path, 'path2or3D');
 
-        if any(station_queries<central_traversal.Station(1)) || any(station_queries>central_traversal.Station(end))
-            error('The station query locations must be within the range of stations within the central_traversal');
+        reference_station_points = fcn_Path_calcPathStation(central_path,-1);
+        if any(station_queries<reference_station_points(1)) || any(station_queries>reference_station_points(end))
+            error('The station query locations must be within the range of stations within the central_path');
         end
 
-        if ~issorted(central_traversal.Station,'strictascend')
-            error('The station field on the central traversal must be increasing and contain no duplicates');
-        end
     end
 end
-
 
 % Does user want to specify the rounding type?
 flag_rounding_type = 1;
@@ -210,9 +207,9 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Station_central = central_traversal.Station;
-X_central       = central_traversal.X;
-Y_central       = central_traversal.Y;
+Station_central = fcn_Path_calcPathStation(central_path,-1);
+X_central       = central_path(:,1);
+Y_central       = central_path(:,2);
 
 
 %% Find the midpoint and joint tangent vectors for all segments
@@ -353,8 +350,8 @@ if flag_do_plots
     hold on;
     grid on;
 
-    % Plot the central traversal
-    plot(central_traversal.X,central_traversal.Y,'k','Linewidth',3);
+    % Plot the central path
+    plot(central_path(:,1),central_path(:,2),'k','Linewidth',3);
 
     % Make the axis normally shaped
     axis equal;
@@ -368,7 +365,7 @@ if flag_do_plots
     quiver(X_central_at_stations,Y_central_at_stations,normal_unit_vectors_at_stations(:,1),normal_unit_vectors_at_stations(:,2),0,'r','Linewidth',2);
 
     % Add a legend
-    legend('Central traversal','Station query points','Unit vectors','Location','southwest');
+    legend('Central path','Station query points','Unit vectors','Location','southwest');
 
     if 1==0
         % Plot the modpoint tangent and normal vectors

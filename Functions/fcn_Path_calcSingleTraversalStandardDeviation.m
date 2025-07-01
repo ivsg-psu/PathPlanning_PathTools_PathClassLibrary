@@ -59,6 +59,7 @@ function std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference
 % (none)
 
 %% Debugging and Input checks
+warning('The function fcn_Path_calcSingleTraversalStandardDeviation is being deprecated. Please use fcn_Path_calcSinglePathStandardDeviation instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure

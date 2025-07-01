@@ -39,6 +39,8 @@
 % -- Fixed to use the Debug libraray, not Path library, to check inputs on
 %    all functions
 % -- Added environmental variable methods for debugging.
+% -- Redid path averaging method via orthogonal projection. 
+% -- Removed non-working path averaging methods. 
 
 % TO-DO:
 % 2024_03_14 - S. Brennan 
@@ -56,9 +58,7 @@
 % -- pull out the spatial smoothing of offsets within function: 
 %    fcn_Path_fillRandomTraversalsAboutTraversal into another stand-alone
 %    function: fcn_Path_spatialLowPassFilter(path, smoothingDistance)
-% -- clean up fcn_Path_findAverageTraversalViaStationAlignment to match
-%    the inputs/header/style of ortho and closest functions. This should
-%    be a very simple function now that station resampling is done
+
 
 %% Prep the workspace
 close all
@@ -1158,64 +1158,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-clc;
-
-% Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
-% Convert paths to traversal structures
-for i_Path = 1:length(paths)
-    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
-    data.traversal{i_Path} = traversal;
-end
-
-% Plot the results?
-if 1==0
-    fig_num = 12;
-    fcn_Path_plotTraversalsYaw(data,fig_num);
-    fig_num = 13;
-    fcn_Path_plotTraversalsXY(data,fig_num);
-end
-
-% %% Averaging by station, fcn_Path_findAverageTraversalViaStationAlignment
-% % fcn_Path_findAverageTraversalViaStationAlignment
-% % finds the average traversal of several traversals by averaging the
-% % lateral offsets at the same stations.
-% 
-% [aligned_Data_ByStation,mean_Data] = ...
-%     fcn_Path_findAverageTraversalViaStationAlignment(data);
-% 
-% % Plot the final XY result of mean station
-% path_points_fig = 11111;
-% fcn_Path_plotTraversalsXY(data,path_points_fig);
-% hold on
-% plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
-% title('Original paths and final average path via station averaging')
-% xlabel('X [m]')
-% ylabel('Y [m]')
-
-
-%% Averaging by closest point, fcn_Path_findAverageTraversalViaClosestPoint
-% fcn_Path_findAverageTraversalViaClosestPoint
-% finds the average of several traversals by taking a reference traversal
-% (or, if one is not given, using the traversal with longest number of
-% points) and for each point in the traversal finding the nearest point in
-% other traversals. The nearest point is determined by the "snap" of the
-% reference traversal vertices to the closest location of each path. Thus,
-% the resulting projection is orthogonal to each individual nearby path
-% (and not usually orthogonal to the reference path).
-
-path_average_final2 = fcn_Path_findAverageTraversalViaClosestPoint(data);
-
-% Plot the final XY result of closest point
-path_points_fig = 22222;
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final2.X,path_average_final2.Y,'Linewidth',4);
-title('Original paths and final average path via closest point averaging')
-xlabel('X [m]')
-ylabel('Y [m]')
-
 %% Averaging by orthogonal projection, fcn_Path_findAverageTraversalViaOrthoProjection
 % fcn_Path_findAverageTraversalViaOrthoProjection
 % finds the average traversal of several traversals by taking a reference
@@ -1229,6 +1171,18 @@ ylabel('Y [m]')
 % have M columns, one for each traversal, and N rows, one for each station
 % in the reference traversal.
 
+
+clc;
+
+% Fill in sample paths (as a starter)
+paths = fcn_Path_fillSamplePaths;
+
+% Convert paths to traversal structures
+for i_Path = 1:length(paths)
+    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
+    data.traversal{i_Path} = traversal;
+end
+
 path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data);
 
 % Plot the final XY result of orthogonal
@@ -1240,20 +1194,6 @@ title('Original paths and final average path via orthogonal projections')
 xlabel('X [m]')
 ylabel('Y [m]')
 
-
-%% Plot the final XY results of all three
-path_points_fig = 123;
-figure(path_points_fig);
-clf;
-hold on
-% plot(mean_Data.mean_xEast,mean_Data.mean_yNorth,'Linewidth',4);
-plot(path_average_final2.X,path_average_final2.Y,'Linewidth',4);
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-title('Original paths and final average paths');
-legend('Average Station','Closest point','Orthogonal projection','Paths')
-xlabel('X [m]')
-ylabel('Y [m]')
 
 %% The following are sub-functions that are used in the averaging methods
 
@@ -1302,7 +1242,7 @@ fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n
     index_of_longest,...
     length(data.traversal{index_of_longest}.X));
 
-%% Generating a new traversal via station resampling, fcn_Path_newTraversalByStationResampling
+%% DEPRECATED: Generating a new traversal via station resampling, fcn_Path_newTraversalByStationResampling
 % fcn_Path_newTraversalByStationResampling
 % creates a new traversal by resampling a given traversal at given station
 % points. 
@@ -1340,6 +1280,43 @@ interval = 10;
 new_stations    = (0:interval:input_traversal.Station(end))';
 new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
 
+
+%% Generating a new path via station resampling, fcn_Path_newPathByStationResampling
+% fcn_Path_newPathByStationResampling
+% creates a new traversal by resampling a given traversal at given station
+% points. 
+%
+% Note: if the stations are intended to align in space between the
+% input_traversal and new_traversal traversals, then the first station
+% point must be zero.
+%
+% If the stations are outside the station range of the input traversal,
+% then extraploation is used to extend the input_traversal linearly
+% outward. This can result in bad data if the path is not approximately
+% linear at the endpoints.
+
+% Basic example 1 - start at zero
+% Fill in sample paths (as a starter)
+input_path = [0 0; 10 0; 20 0];
+
+fig_num = 23444;
+
+% Redecimate the traversal at 1-meter increments
+interval = 1;
+new_stations    = (0:interval:5)';
+new_traversal = fcn_Path_newPathByStationResampling(input_path, new_stations, fig_num);
+
+% ADVANCED EXAMPLE
+% Fill in sample paths (as a starter)
+paths_array = fcn_Path_fillSamplePaths;
+input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
+
+fig_num = 23445;
+
+% Redecimate the traversal at 1-meter increments
+interval = 10;
+new_stations    = (0:interval:input_traversal.Station(end))';
+new_traversal = fcn_Path_newPathByStationResampling(paths_array{1}, new_stations, fig_num);
 
 %% Remove forward/backward jogs from paths, fcn_Path_cleanPathFromForwardBackwardJogs
 % fcn_Path_cleanPathFromForwardBackwardJogs

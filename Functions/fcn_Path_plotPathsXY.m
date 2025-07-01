@@ -1,26 +1,16 @@
-function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_traversal, lower_traversal, varargin)
-% fcn_Path_plotTraversalXYWithUpperLowerBands
-% Plots a traversal with a band defined by an upper and lower traversal.
-% All traversals must have the same data length.
+function h = fcn_Path_plotPathsXY(cellArrayOfPaths,varargin)
+% fcn_Path_plotPathsXY
+% Plots the XY positions of all paths existing in a data structure
 %
 % FORMAT:
 %
-%      fcn_Path_plotTraversalXYWithUpperLowerBands(...
-%            middle_traversal,...
-%            upper_traversal,...
-%            lower_traversal,...
-%            (fig_num));
+%       h = fcn_Path_plotPathsXY(cellArrayOfPaths,(fig_num))
 %
 % INPUTS:
 %
-%      middle_traversal: the traversal that is being used for the middle
-%      plot
-%
-%      upper_traversal: the traversal that is being used to define the
-%      upper band
-%
-%      lower_traversal: the traversal that is being used to define the
-%      lower band
+%      cellArrayOfPaths: a cell array of paths to plot, with each path being a N x 2
+%      or N x 3 set of coordinates representing the [X Y] or [X Y Z]
+%      coordinates, in sequence, of a path
 %
 %     (OPTIONAL INPUTS)
 %
@@ -32,7 +22,7 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 %
 % OUTPUTS:
 %
-%      (none)
+%      h: a handle to the resulting figure
 %
 % DEPENDENCIES:
 %
@@ -40,17 +30,26 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 %
 % EXAMPLES:
 %
-%     See the script: script_test_fcn_Path_plotTraversalXYWithUpperLowerBands
-%     for a full test suite.
+%       See the script: script_test_fcn_Path_plotPathsXY.m for a full test
+%       suite.
 %
-% This function was written on 2022_01_03 by S. Brennan
+% This function was written on 2020_11_12 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-% 2022_01_03:
-% -- wrote the code originally, using fcn_Path_plotTraversalXYWithVarianceBands
+% 2020_11_12
+% -- wrote the code
+% 2021_01_06
+% -- added functions for input checking
+% 2021_01_07
+% -- renamed function to show that cellArrayOfPaths being used, not paths
+% 2021_12_10
+% -- updated header for clarity
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- removed traversal type to convert function to path type, using
+% fcn_Path_plotTraversalsXY as template
 
 % TO-DO
 % (none)
@@ -60,7 +59,7 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
-MAX_NARGIN = 4; % The largest Number of argument inputs to the function
+MAX_NARGIN = 2; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
@@ -103,42 +102,22 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(3,MAX_NARGIN);
+        narginchk(1,MAX_NARGIN);
 
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(middle_traversal, 'traversal');
-
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(upper_traversal, 'traversal');
-
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(lower_traversal, 'traversal');
-
+        % Check the cellArrayOfPaths input
+        if ~iscell(cellArrayOfPaths)
+            error('cellArrayOfPaths input must be a cell type');
+        end
+        for ith_cell = 1:length(cellArrayOfPaths)
+            fcn_DebugTools_checkInputsToFunctions(cellArrayOfPaths{ith_cell}, 'path2or3D');
+        end
     end
 end
-
-% Grab key variables
-X_middle = middle_traversal.X;
-Y_middle = middle_traversal.Y;
-Nstations = length(X_middle(:,1));
-
-X_upper = upper_traversal.X;
-Y_upper = upper_traversal.Y;
-if Nstations~=length(X_upper(:,1))
-    error('The number of data points in the upper_traversal must match the middle_traversal');
-end
-
-X_lower = lower_traversal.X;
-Y_lower = lower_traversal.Y;
-if Nstations~=length(X_lower(:,1))
-    error('The number of data points in the lower_traversal must match the middle_traversal');
-end
-
 
 % Does user want to show the plots?
 flag_do_plots = 1; % Default is to make a plot
 fig_num = [];
-if (0==flag_max_speed) && (MAX_NARGIN == nargin)
+if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
@@ -168,12 +147,10 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Generate top and bottom paths
-top_path = [X_upper, Y_upper];
-bottom_path = [X_lower, Y_lower];
 
 
-%% Plot the results (for debugging)?
+
+%% Any debugging?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _
 %  |  __ \     | |
@@ -185,49 +162,37 @@ bottom_path = [X_lower, Y_lower];
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-
-    % plot the final XY result
     figure(fig_num);
 
-    % Check to see if the hold was on?
-    flag_hold_was_off = 0;
+    % Check to see if hold is already on. If it is not, set a flag to turn it
+    % off after this function is over so it doesn't affect future plotting
+    flag_shut_hold_off = 0;
     if ~ishold
-        flag_hold_was_off = 1;
-        hold on;
+        flag_shut_hold_off = 1;
+        hold on
     end
 
-    % Plot the reference trajectory first
-    main_plot_handle = plot(X_middle,Y_middle,'.-','Linewidth',4,'Markersize',20);
-    plot_color = get(main_plot_handle,'Color');
-
-    % % Now make the patch as one object (THIS ONLY WORKS IF NO CROSSINGS)
-    % x_vector = [top_path(:,1)', fliplr(bottom_path(:,1)')];
-    % y_vector = [top_path(:,2)', fliplr(bottom_path(:,2)')];
-    % patch = fill(x_vector, y_vector,[128 193 219]./255);
-    % set(patch, 'edgecolor', 'none');
-    % set(patch, 'FaceAlpha', 0.5);
-
-    % Now make the patch segment by segment
-    for i_patch = 2:Nstations
-        x_vector = [top_path((i_patch-1):i_patch,1)', fliplr(bottom_path((i_patch-1):i_patch,1)')];
-        y_vector = [top_path((i_patch-1):i_patch,2)', fliplr(bottom_path((i_patch-1):i_patch,2)')];
-        patch = fill(x_vector, y_vector,plot_color);
-        %patch = fill(x_vector, y_vector,(plot_color*0.8 + 0.2*[1 1 1]));
-        set(patch, 'edgecolor', 'none');
-        set(patch, 'FaceAlpha', 0.2);
+    NumPaths = length(cellArrayOfPaths);
+    h = zeros(NumPaths,1);
+    for i_path= 1:NumPaths
+        h(i_path) = plot(cellArrayOfPaths{i_path}(:,1),cellArrayOfPaths{i_path}(:,2),'-o');
     end
 
-    % Put hold back to the original state
-    if flag_hold_was_off
+    % Shut the hold off?
+    if flag_shut_hold_off
         hold off;
     end
+
+    % Add labels
+    title('X vs Y')
+    xlabel('X [m]')
+    ylabel('Y [m]')
 end
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
-
-end % Ends main function
+end
 
 
 %% Functions follow

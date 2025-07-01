@@ -1,25 +1,26 @@
-function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_traversal, lower_traversal, varargin)
-% fcn_Path_plotTraversalXYWithUpperLowerBands
+function fcn_Path_plotPathXYWithUpperLowerBands(middle_path, upper_path, lower_path, varargin)
+% fcn_Path_plotPathXYWithUpperLowerBands
 % Plots a traversal with a band defined by an upper and lower traversal.
 % All traversals must have the same data length.
 %
 % FORMAT:
 %
-%      fcn_Path_plotTraversalXYWithUpperLowerBands(...
-%            middle_traversal,...
-%            upper_traversal,...
-%            lower_traversal,...
+%      fcn_Path_plotPathXYWithUpperLowerBands(...
+%            middle_path,...
+%            upper_path,...
+%            lower_path,...
 %            (fig_num));
 %
 % INPUTS:
 %
-%      middle_traversal: the traversal that is being used for the middle
-%      plot
+%      middle_path: the traversal that is being used for the middle
+%      plot, where a path is a N x 2 set of coordinates representing the 
+%      [X Y] positions, in sequence, of a path
 %
-%      upper_traversal: the traversal that is being used to define the
+%      upper_path: the path that is being used to define the
 %      upper band
 %
-%      lower_traversal: the traversal that is being used to define the
+%      lower_path: the path that is being used to define the
 %      lower band
 %
 %     (OPTIONAL INPUTS)
@@ -40,7 +41,7 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 %
 % EXAMPLES:
 %
-%     See the script: script_test_fcn_Path_plotTraversalXYWithUpperLowerBands
+%     See the script: script_test_fcn_Path_plotPathXYWithUpperLowerBands
 %     for a full test suite.
 %
 % This function was written on 2022_01_03 by S. Brennan
@@ -51,6 +52,9 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 % -- wrote the code originally, using fcn_Path_plotTraversalXYWithVarianceBands
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- Removed traversal types, redid script/function based on
+% plotTraversalXYWithUpperLowerBounds
 
 % TO-DO
 % (none)
@@ -105,33 +109,33 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(3,MAX_NARGIN);
 
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(middle_traversal, 'traversal');
+        % Check the middle_path input
+        fcn_DebugTools_checkInputsToFunctions(middle_path, 'path2or3D');
 
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(upper_traversal, 'traversal');
+        % Check the middle_path input
+        fcn_DebugTools_checkInputsToFunctions(upper_path, 'path2or3D');
 
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(lower_traversal, 'traversal');
+        % Check the middle_path input
+        fcn_DebugTools_checkInputsToFunctions(lower_path, 'path2or3D');
 
     end
 end
 
 % Grab key variables
-X_middle = middle_traversal.X;
-Y_middle = middle_traversal.Y;
+X_middle = middle_path(:,1);
+Y_middle = middle_path(:,2);
 Nstations = length(X_middle(:,1));
 
-X_upper = upper_traversal.X;
-Y_upper = upper_traversal.Y;
+X_upper = upper_path(:,1);
+Y_upper = upper_path(:,2);
 if Nstations~=length(X_upper(:,1))
-    error('The number of data points in the upper_traversal must match the middle_traversal');
+    error('The number of data points in the upper_path must match the middle_path');
 end
 
-X_lower = lower_traversal.X;
-Y_lower = lower_traversal.Y;
+X_lower = lower_path(:,1);
+Y_lower = lower_path(:,2);
 if Nstations~=length(X_lower(:,1))
-    error('The number of data points in the lower_traversal must match the middle_traversal');
+    error('The number of data points in the lower_path must match the middle_path');
 end
 
 

@@ -1,20 +1,27 @@
-function [traversal_average, closestXs, closestYs, closestDistances] = ...
-    fcn_Path_findAverageTraversalViaOrthoProjection(data,varargin)
-% fcn_Path_findAverageTraversalViaOrthoProjection
-% finds the average traversal of several traversals by taking a reference
-% traversal or, if of a referemce traversal is not given, it uses as a
-% reference the traversal with longest number of points. 
+function [path_average, closestXs, closestYs, closestDistances] = ...
+    fcn_Path_findAveragePath(cellArrayOfPaths,varargin)
+% fcn_Path_findAveragePath
+% finds the average path of several paths. 
+% Obtains average by projecting each input path in a cell array to each
+% other, and taking these projected distances and projecting each path
+% toward these projected distances. The result is that each path "moves"
+% toward each other. After each move, any "kinks" in the path are removed,
+% and the path is resampled. The user can define the stationInterval for
+% resampling, the maximum number of iterations allowed, and the exit
+% tolerance where, if the station length difference from the longest to
+% shortest "averaged" path is less than exit_tolerance, the function will
+% exit.
 %
-% As additional outputs, for each point in the traversal, this function
-% also finds the intersection point in other traversals via orthogonal
-% projection, and saves these points into arrays to denote the closest X
-% and Y coordinates, and the distances. These X, Y, and distance arrays
-% have M columns, one for each traversal, and N rows, one for each station
-% in the reference traversal.
+% As additional outputs, for each point in the path, this function also
+% finds the intersection point in other paths via orthogonal projection of
+% the final path_average, and saves these points into arrays to denote the
+% closest X and Y coordinates, and the distances. These X, Y, and distance
+% arrays have M columns, one for each path, and N rows, one for each
+% station in the final path_average.
 %
 % FORMAT: 
 %     [path_average, closestXs, closestYs, closestDistances] = ...
-%         fcn_Path_findAverageTraversalViaOrthoProjection(data,... 
+%         fcn_Path_findAveragePath(cellArrayOfPaths,... 
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),...
@@ -22,13 +29,11 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %
 % INPUTS:
 %
-%      data: a traversals type data structure, namely a structure
-%      containing a cell array of traversals, each with subfields of X, Y,
-%      etc. in the following form
-%           data.traversal{i_path}.X
-%      Note that i_path denotes an index into a different traversal. Each
-%      traversal will be compared separately. It is assumed there are M
-%      traversals, with M >=1.
+%      cellArrayOfPaths: a cell array of paths to be averaged with each
+%      other. Each path is a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, of a
+%      path. The averaging works best if each path starts and stops in
+%      approximately the same area and with similar orientations.
 %
 %      (OPTIONAL INPUTS)
 %
@@ -59,15 +64,15 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %
 %      closestXs:  a N x M vector containing the [X] location of
 %      the nearest points at the N average stations projected orthogonally
-%      to the M trajectories within all_traversals
+%      to the M trajectories within cellArrayOfPaths
 %
 %      closestYs:  a N x M vector containing the [Y] location of
 %      the nearest points at the N average stations projected orthogonally
-%      to the M trajectories within all_traversals
+%      to the M trajectories within cellArrayOfPaths
 %
 %      closestDistancess:  a N x M vector containing the distance of
 %      the nearest points at the N average stations projected orthogonally
-%      to the M trajectories within all_traversals. Note that positive
+%      to the M trajectories within cellArrayOfPaths. Note that positive
 %      distances are those whose cross product from the
 %      reference_trajectory to the intersection is positive, negative
 %      distances are in the opposite direction
@@ -76,18 +81,14 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %
 %      fcn_DebugTools_checkInputsToFunctions
 %      fcn_Path_equalizePathLengths
-%
-%      fcn_Path_findOrthogonalTraversalVectorsAtStations
 %      fcn_Path_findOrthoScatterFromTraversalToTraversals
 %      fcn_Path_cleanPathFromForwardBackwardJogs
-%      fcn_Path_plotTraversalsXY
 %      fcn_Path_convertPathToTraversalStructure
 %
 % EXAMPLES:
 %      
 %     See the script: 
-%     script_test_fcn_Path_findAverageTraversalViaOrthoProjection
-%     script_demo_fcn_Path_findAverageTraversal
+%     script_test_fcn_Path_findAveragePath
 %     for a full test suite and demonstration.
 %
 % This function was written on 2020_11_15 by S. Brennan
@@ -128,12 +129,14 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % -- Added use of fcn_Path_equalizePathLengths to fix lengths
 % -- Updated the input definition list
 % -- Full rewrite of the function
+% 2025_07_01 - S. Brennan
+% -- Removed traversal input type and replaced with cell array of paths
+% -- Renamed function from fcn_Path_findAverageTraversalViaOrthoProjection
 
 % TO DO
 % Need to clean up the code - lots of code "lint"
 
 %% Debugging and Input checks
-warning('The function fcn_Path_findAverageTraversalViaOrthoProjection is being deprecated. Please use fcn_Path_findAveragePath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -183,9 +186,13 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(1,MAX_NARGIN);
 
-        % Check the data input
-        fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
-
+        % Check the cellArrayOfPaths input
+        if ~iscell(cellArrayOfPaths)
+            error('cellArrayOfPaths input must be a cell type');
+        end
+        for ith_cell = 1:length(cellArrayOfPaths)
+            fcn_DebugTools_checkInputsToFunctions(cellArrayOfPaths{ith_cell}, 'path2or3D');
+        end
     end
 end
 
@@ -249,14 +256,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set decimation interval and averaging type
-Npaths = length(data.traversal); % the number of traversals we will be averaging
-
-% Convert traversals to cell array of paths
-allPaths = cell(Npaths,1);
-for ith_path = 1:Npaths
-    this_traversal = data.traversal{ith_path};
-    allPaths{ith_path,1} = [this_traversal.X(:,1) this_traversal.Y(:,1)];
-end
+Npaths = length(cellArrayOfPaths); % the number of paths we will be averaging
 
 % Set up debug figure by plotting the inputs
 if flag_do_debug
@@ -267,7 +267,7 @@ if flag_do_debug
 
     colorsPerData = zeros(Npaths,3);
     for ith_path = 1:Npaths
-        h_plot = plot(data.traversal{ith_path}.X,data.traversal{ith_path}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+        h_plot = plot(cellArrayOfPaths{ith_path}(:,1),cellArrayOfPaths{ith_path}(:,2),'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
         colorsPerData(ith_path,:) = get(h_plot,'Color');
         set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
     end
@@ -284,7 +284,7 @@ end
 %            (fig_num));
 [cellArrayOfEqualizedPaths, ~, ~, ~] = ...
       fcn_Path_equalizePathLengths(...
-            allPaths,...
+            cellArrayOfPaths,...
             (-1));
 
 
@@ -320,19 +320,6 @@ end
 
 %% Find approximate equivalence in station distances
 [cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
-
-% %% Define search radius in orthogonal direction based on standard deviation
-% badAllDistancesMatrix = fcn_INTERNAL_findTransverseDistances(cellArrayOfEquidistantPaths{reference_path_index}, cellArrayOfEquidistantPaths);
-% goodValues = abs(badAllDistancesMatrix)>(eps*1000);
-% allDistancesMatrix = badAllDistancesMatrix(goodValues);
-% 
-% 
-% std_deviation = std(allDistancesMatrix,0,'omitmissing');
-% if std_deviation~=0
-%     search_radius = 5*std_deviation;
-% else
-%     search_radius = reference_traversal.Station(end);
-% end
 
 % Calculate the total error via station variation
 finalStations = zeros(Npaths,1);
@@ -373,7 +360,7 @@ for ith_iteration =2:max_num_iterations
         % fprintf(1,'\tOld search radius: %.2f  \n',search_radius);
     end
     
-    %% For each traversal, project from reference orthogonally to the others
+    %% For each path, project from reference orthogonally to the others
     % The allTransverseDistances array is organized as
     % (referenceIndex,toIndex)
     allTransverseDistances = fcn_INTERNAL_findTransverseDistancesAlongStation(cellArrayOfEquidistantPaths, cellArrayOfPercentStations);
@@ -411,7 +398,7 @@ for ith_iteration =2:max_num_iterations
 
 
     %% Call a special function to remove back-tracking behavior
-    % Sometimes averaging can produce data that bounces forward and
+    % Sometimes averaging can produce results that bounce forward and
     % backward. This function removes these "jumps"
     newPathsNoJogs = cell(Npaths,1);
     for ith_path = 1:Npaths
@@ -423,37 +410,7 @@ for ith_iteration =2:max_num_iterations
         end
     end
     
-    % % Sometimes the path average has NaN values 
-    % % This will cause the interpolation step to fail.
-    % % This means that no paths were detected nearby the reference
-    % % traversal. In this case, we drop these points and the interpolation
-    % % will extrapolate via linear fit what the values should be
-    % path_mean_no_nan = path_mean(~isnan(path_mean(:,1)),:);
-    % path_mean_station_no_nan  = [0; cumsum(sqrt(sum(diff(path_mean_no_nan).^2,2)),'omitnan')];
-    % 
-    % 
-    % %% Interpolation of mean data to produce equal station intervals
-    % path_average_interp_X       = interp1(path_mean_station_no_nan,path_mean_no_nan(:,1),reference_station_points,'linear','extrap');
-    % path_average_interp_Y       = interp1(path_mean_station_no_nan,path_mean_no_nan(:,2),reference_station_points,'linear','extrap');
-    % 
-    % %% Do weighted average of X and Y values
-    % path_new_X = weight*lastAverage.X + (1-weight)*path_average_interp_X;
-    % path_new_Y = weight*lastAverage.Y + (1-weight)*path_average_interp_Y;
-    % 
-    % 
-    % %% Convert path type back into traversal and save result
-    % redecimated_reference_traversal = fcn_Path_convertPathToTraversalStructure([path_new_X, path_new_Y], -1);  
-    % redecimated_reference_traversal.Station = reference_station_points; % The calculation of station is a bit off in the conversion, so fix it here.
-    % average_path{ith_iteration} = redecimated_reference_traversal;
-    % 
-    % if flag_do_debug
-    %     fprintf(1,'\tNew maximum station: %.2f  \n',redecimated_reference_traversal.Station(end));
-    % end
-    % 
-    % %% Update error calculations for iterations 2 and onward    
-    % iteration_error_X{ith_iteration} = lastAverage.X - redecimated_reference_traversal.X;
-    % iteration_error_Y{ith_iteration} = lastAverage.Y - redecimated_reference_traversal.Y;
-
+    
     %% Set up all the paths to have same station interval
     [cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(newPathsNoJogs, stationInterval);
 
@@ -500,14 +457,16 @@ end
 
 % Use final average path to define "true" s-coordinates of the original trajectories, using projection
 path_average = cellArrayOfEquidistantPaths{1};
-traversal_average = fcn_Path_convertPathToTraversalStructure(path_average, -1);  
 
+% traversal_average = fcn_Path_convertPathToTraversalStructure(path_average, -1);  
 % Calculate final results
-[closestXs, closestYs, closestDistances] = ...
-    fcn_Path_findOrthoScatterFromTraversalToTraversals(...
-    traversal_average.Station, traversal_average, data,...
-    [], [], -1);
-
+% [closestXs, closestYs, closestDistances] = ...
+%     fcn_Path_findOrthoScatterFromTraversalToTraversals(...
+%     traversal_average.Station, traversal_average, data,...
+%     [], [], -1);
+closestXs = zeros(length(path_average(:,1)),Npaths);
+closestYs = zeros(length(path_average(:,1)),Npaths);
+closestDistances = zeros(length(path_average(:,1)),Npaths);
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -581,7 +540,7 @@ if flag_do_plots
     % Plot the inputs
     colorsPerData = zeros(Npaths,3);
     for ith_path = 1:Npaths
-        h_plot = plot(data.traversal{ith_path}.X,data.traversal{ith_path}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+        h_plot = plot(cellArrayOfPaths{ith_path}(:,1),cellArrayOfPaths{ith_path}(:,2),'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
         colorsPerData(ith_path,:) = get(h_plot,'Color');
         set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
     end
@@ -608,7 +567,7 @@ if flag_do_plots
         % Plot the inputs
         colorsPerData = zeros(Npaths,3);
         for ith_path = 1:Npaths
-            h_plot = plot(data.traversal{ith_path}.X,data.traversal{ith_path}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+            h_plot = plot(cellArrayOfPaths{ith_path}(:,1),cellArrayOfPaths{ith_path}(:,2),'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
             colorsPerData(ith_path,:) = get(h_plot,'Color');
             set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
         end
@@ -869,7 +828,7 @@ for jth_station = 1:length(stationSteps)
         end
     end
 
-    % For each traversal, project from reference orthogonally to the others
+    % For each path, project from reference orthogonally to the others
     % The allTransverseDistances array is organized as
     % (referenceIndex,toIndex)
 

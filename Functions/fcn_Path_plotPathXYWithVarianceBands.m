@@ -1,28 +1,25 @@
-function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_traversal, lower_traversal, varargin)
-% fcn_Path_plotTraversalXYWithUpperLowerBands
-% Plots a traversal with a band defined by an upper and lower traversal.
-% All traversals must have the same data length.
+function fcn_Path_plotPathXYWithVarianceBands(path, varargin)
+% fcn_Path_plotPathXYWithVarianceBands
+% Plots a traversal with a variance band around the path
 %
 % FORMAT:
 %
-%      fcn_Path_plotTraversalXYWithUpperLowerBands(...
-%            middle_traversal,...
-%            upper_traversal,...
-%            lower_traversal,...
+%      fcn_Path_plotPathXYWithVarianceBands(...
+%            path,...
+%            (std_deviation),...
 %            (fig_num));
 %
 % INPUTS:
 %
-%      middle_traversal: the traversal that is being used for the middle
-%      plot
+%      path: a N x 2 or N x 3 set of coordinates representing the 
+%      [X Y] or [X Y Z] coordinates, in sequence, of a path
 %
-%      upper_traversal: the traversal that is being used to define the
-%      upper band
+%      (OPTIONAL INPUTS)
 %
-%      lower_traversal: the traversal that is being used to define the
-%      lower band
-%
-%     (OPTIONAL INPUTS)
+%      std_deviation: a positive value representing the standard deviation
+%      to use in calculating the deviation distance. Note: the default is
+%      to use the variance in angles along the path
+%      multiplied by the average segment length in the reference traversal.
 %
 %     fig_num: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
@@ -37,20 +34,32 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
+%      fcn_Path_calcSinglePathStandardDeviation
+%      fcn_Path_findOrthogonalTraversalVectorsAtStations
+%      fcn_Path_plotPathXYWithUpperLowerBands
 %
 % EXAMPLES:
 %
-%     See the script: script_test_fcn_Path_plotTraversalXYWithUpperLowerBands
+%     See the script: script_test_fcn_Path_plotPathXYWithVarianceBands
 %     for a full test suite.
 %
-% This function was written on 2022_01_03 by S. Brennan
+% This function was written on 2021_01_05 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
+% 2021_01_05:
+% -- wrote the code originally
+% 2021_01_08:
+% -- added input checking
 % 2022_01_03:
-% -- wrote the code originally, using fcn_Path_plotTraversalXYWithVarianceBands
+% -- corrected dependency list of functions
+% -- broke out fcn_Path_plotTraversalXYWithUpperLowerBands into
+% separate functionality (it is very useful for other functions!)
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- Removed traversal types, redid script/function based on
+% plotTraversalXYWithVarianceBounds
 
 % TO-DO
 % (none)
@@ -60,7 +69,7 @@ function fcn_Path_plotTraversalXYWithUpperLowerBands(middle_traversal, upper_tra
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
-MAX_NARGIN = 4; % The largest Number of argument inputs to the function
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
@@ -103,40 +112,27 @@ end
 if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
-        narginchk(3,MAX_NARGIN);
+        narginchk(1,MAX_NARGIN);
 
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(middle_traversal, 'traversal');
-
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(upper_traversal, 'traversal');
-
-        % Check the middle_traversal input
-        fcn_DebugTools_checkInputsToFunctions(lower_traversal, 'traversal');
+        % Check the path input
+        fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
 
     end
 end
 
-% Grab key variables
-X_middle = middle_traversal.X;
-Y_middle = middle_traversal.Y;
-Nstations = length(X_middle(:,1));
-
-X_upper = upper_traversal.X;
-Y_upper = upper_traversal.Y;
-if Nstations~=length(X_upper(:,1))
-    error('The number of data points in the upper_traversal must match the middle_traversal');
+% Does the user want to specify standard deviation?
+std_deviation = fcn_Path_calcSinglePathStandardDeviation(path,-1); % Default
+if 2 <= nargin
+    temp = varargin{1};
+    if ~isempty(temp)
+        std_deviation = temp;
+    end
 end
 
-X_lower = lower_traversal.X;
-Y_lower = lower_traversal.Y;
-if Nstations~=length(X_lower(:,1))
-    error('The number of data points in the lower_traversal must match the middle_traversal');
-end
 
 
 % Does user want to show the plots?
-flag_do_plots = 1; % Default is to make a plot
+flag_do_plots = 0; % Default is to NOT make a plot
 fig_num = [];
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
@@ -147,17 +143,12 @@ if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     end
 else
     if flag_do_debug
-        fig = figure;
-        fig_num = fig.Number;
-        flag_do_plots = 1;
+        fig_debug = 8838; %#ok<NASGU>
     end
 end
-if isempty(fig_num)
-    temp = figure;
-    fig_num = temp.Number;
-end
 
-%% Main code
+
+%% Main code starts here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
 %  |  \/  |     (_)
@@ -167,10 +158,32 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Fill in the array of stations.
+reference_station_points = fcn_Path_calcPathStation(path,-1);
+Nstations = length(reference_station_points(:,1));
 
-% Generate top and bottom paths
-top_path = [X_upper, Y_upper];
-bottom_path = [X_lower, Y_lower];
+% the default number of points to use
+num_points = Nstations;
+
+
+%% Fill in the array of offset distances.
+% Each column corresponds to one trajectory.
+offsets_from_reference = std_deviation*ones(num_points,1);
+
+%% Find offsets from trajectory
+% Set the projection type (see help in function below for details)
+flag_rounding_type = 4; % This averages the projection vectors along segments
+
+% Find the unit normal vectors at each of the station points
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalPathVectorsAtStations(...
+    reference_station_points(:,1),path,flag_rounding_type, (-1));
+unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
+
+%% Calculate random path and traversal and save into final structure
+upper_path = unit_normal_vector_start + unit_vectors.*offsets_from_reference(:,1);
+lower_path = unit_normal_vector_start - unit_vectors.*offsets_from_reference(:,1);
+
 
 
 %% Plot the results (for debugging)?
@@ -185,42 +198,7 @@ bottom_path = [X_lower, Y_lower];
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-
-    % plot the final XY result
-    figure(fig_num);
-
-    % Check to see if the hold was on?
-    flag_hold_was_off = 0;
-    if ~ishold
-        flag_hold_was_off = 1;
-        hold on;
-    end
-
-    % Plot the reference trajectory first
-    main_plot_handle = plot(X_middle,Y_middle,'.-','Linewidth',4,'Markersize',20);
-    plot_color = get(main_plot_handle,'Color');
-
-    % % Now make the patch as one object (THIS ONLY WORKS IF NO CROSSINGS)
-    % x_vector = [top_path(:,1)', fliplr(bottom_path(:,1)')];
-    % y_vector = [top_path(:,2)', fliplr(bottom_path(:,2)')];
-    % patch = fill(x_vector, y_vector,[128 193 219]./255);
-    % set(patch, 'edgecolor', 'none');
-    % set(patch, 'FaceAlpha', 0.5);
-
-    % Now make the patch segment by segment
-    for i_patch = 2:Nstations
-        x_vector = [top_path((i_patch-1):i_patch,1)', fliplr(bottom_path((i_patch-1):i_patch,1)')];
-        y_vector = [top_path((i_patch-1):i_patch,2)', fliplr(bottom_path((i_patch-1):i_patch,2)')];
-        patch = fill(x_vector, y_vector,plot_color);
-        %patch = fill(x_vector, y_vector,(plot_color*0.8 + 0.2*[1 1 1]));
-        set(patch, 'edgecolor', 'none');
-        set(patch, 'FaceAlpha', 0.2);
-    end
-
-    % Put hold back to the original state
-    if flag_hold_was_off
-        hold off;
-    end
+    fcn_Path_plotPathXYWithUpperLowerBands( path, upper_path, lower_path, fig_num);
 end
 
 if flag_do_debug
@@ -228,6 +206,7 @@ if flag_do_debug
 end
 
 end % Ends main function
+
 
 
 %% Functions follow
@@ -241,3 +220,5 @@ end % Ends main function
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+

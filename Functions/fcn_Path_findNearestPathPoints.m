@@ -35,7 +35,7 @@ function closest_path_point_indicies = ...
 % OUTPUTS:
 %
 %      closest_path_point_indicies: a Mx1 vector containing the indices of
-%      the path that is nearest to each of the query_points.
+%      the path that are nearest to each of the query_points.
 %
 % EXAMPLES:
 %      
@@ -216,22 +216,29 @@ if flag_do_plots
     % Is this a 2-D query
     if length(path(1,:))==2
         % Plot the path
-        plot(path(:,1),path(:,2),'r-','Linewidth',3);
-        plot(path(:,1),path(:,2),'r.','Markersize',20);
+        plot(path(:,1),path(:,2),'r.-','Linewidth',5, 'Markersize',20, 'DisplayName','Input path');
         
         axis equal;
         
         % Plot the query points
-        plot(query_points(:,1),query_points(:,2),'k.','Markersize',20);
+        plot(query_points(:,1),query_points(:,2),'k.','Markersize',20, 'DisplayName','Query points');
         % text(query_points(:,1),query_points(:,2),'Query point');
         
         % Show vectors from the query points to closest path points
-        for ith_query = 1:length(query_points(:,1))
-            closest_point_vector = path(closest_path_point_indicies(ith_query,1),:) - query_points(ith_query,:);
-            quiver(query_points(ith_query,1),query_points(ith_query,2),...
-                closest_point_vector(1,1),closest_point_vector(1,2),...
-                0,'-','Linewidth',3);
-        end
+        closest_point_vectors = path(closest_path_point_indicies,:) - query_points;
+        quiver(query_points(:,1),query_points(:,2),...
+            closest_point_vectors(:,1),closest_point_vectors(:,2),...
+            0,'-','Linewidth',3,'MaxHeadSize',0.1,'DisplayName','Direction of nearest vertex');
+        
+        legend
+
+
+        % Plots each arrow as different colors
+        % for ith_query = 1:length(query_points(:,1))
+        %     quiver(query_points(ith_query,1),query_points(ith_query,2),...
+        %         closest_point_vectors(ith_query,1),closest_point_vectors(ith_query,2),...
+        %         0,'-','Linewidth',3,'MaxHeadSize',5);
+        % end
 
         
     elseif length(path(1,:))==3
