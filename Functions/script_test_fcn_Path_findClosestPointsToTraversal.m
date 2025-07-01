@@ -67,6 +67,9 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 % Create a dummy central path and convert it to a traversal
+central_path = [0 0; 2 0];  
+central_traversal = fcn_Path_convertPathToTraversalStructure(central_path);
+
 nearby_path = [0 4; 2 7];
 nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 clear data

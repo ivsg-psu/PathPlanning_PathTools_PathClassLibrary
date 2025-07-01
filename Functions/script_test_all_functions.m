@@ -16,7 +16,7 @@ testing_times = nan(N_files,1);
 
 diary 'script_test_fcn_path_all_stdout.txt';
 
-for i_script = 31:31 % 1:N_files
+for i_script = 1:N_files
     file_name_extended = all_scripts(i_script).name;
     file_name = erase(file_name_extended,'.m');
     if ~strcmp(mfilename,file_name)

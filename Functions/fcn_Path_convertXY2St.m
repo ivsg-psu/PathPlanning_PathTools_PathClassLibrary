@@ -10,8 +10,7 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 % to the vertex can be found using the complex vector angle.
 %
 % FORMAT:
-%
-%    St_points = fcn_Path_convertXY2St(referencePath,XY_points,
+%    St_points = fcn_Path_convertXY2St(referencePath,XY_points,...
 %    (flag_rounding_type), (fig_num));
 %
 % INPUTS:

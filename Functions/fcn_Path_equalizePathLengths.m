@@ -8,10 +8,9 @@ function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEn
 % beginning and end - is smallest before corrections are added.
 %
 % FORMAT: 
-%
 %      [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = ...
 %      fcn_Path_equalizePathLengths(...
-%            cellArrayOfUnequalPaths,
+%            cellArrayOfUnequalPaths,...
 %            (fig_num));
 %
 % INPUTS:

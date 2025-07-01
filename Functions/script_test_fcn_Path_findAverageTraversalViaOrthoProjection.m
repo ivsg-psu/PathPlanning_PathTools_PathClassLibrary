@@ -32,184 +32,288 @@
 close all;
 
 
-%% Example 1: Basic call
+%% BASIC call: showing path averaging via ortho projection
+fig_num = 10001;
+titleString = sprintf('BASIC call: showing path averaging via ortho projection');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
 
+% Load data
 data = fcn_INTERNAL_loadData;
+stationInterval = 5;
+max_num_iterations = 10;
+exit_tolerance = [];
 
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data);
+% Find path average
+% FORMAT:
+%     [path_average, closestXs, closestYs, closestDistances] = ...
+%         fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+%                 (stationInterval),...
+%                 (max_num_iterations),...
+%                 (exit_tolerance),...
+%                 (fig_num));
+[traversal_average, closestXs, closestYs, closestDistances] = ...
+    fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+    (stationInterval),...
+    (max_num_iterations),...
+    (exit_tolerance),...
+    (fig_num));
 
+title(titleString, 'Interpreter','none');
 
-%% BASIC CALL - Show some extra features of the orthogonal projection averaging function
+% Check variable types
+assert(isstruct(traversal_average));
+assert(isfield(traversal_average,'X'))
+assert(isfield(traversal_average,'Y'))
+assert(isfield(traversal_average,'Z'))
+assert(isfield(traversal_average,'Diff'))
+assert(isfield(traversal_average,'Station'))
+assert(isfield(traversal_average,'Yaw'))
+assert(isnumeric(closestXs));
+assert(isnumeric(closestYs));
+assert(isnumeric(closestDistances));
 
+% Check variable sizes
+NreferencePoints = 66;
+assert(isequal(size(traversal_average.X),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Y),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Z),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Diff),[NreferencePoints 2]));
+assert(isequal(size(traversal_average.Station),[NreferencePoints 1]));
+assert(isequal(size(closestXs),[NreferencePoints length(data.traversal)]));
+assert(isequal(size(closestYs),[NreferencePoints length(data.traversal)]));
+assert(isequal(size(closestDistances),[NreferencePoints length(data.traversal)]));
+
+% Check  variable values
+% Not possible - too many variables
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+%% Fast Mode Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  ______        _     __  __           _        _______        _
+% |  ____|      | |   |  \/  |         | |      |__   __|      | |
+% | |__ __ _ ___| |_  | \  / | ___   __| | ___     | | ___  ___| |_ ___
+% |  __/ _` / __| __| | |\/| |/ _ \ / _` |/ _ \    | |/ _ \/ __| __/ __|
+% | | | (_| \__ \ |_  | |  | | (_) | (_| |  __/    | |  __/\__ \ |_\__ \
+% |_|  \__,_|___/\__| |_|  |_|\___/ \__,_|\___|    |_|\___||___/\__|___/
+%
+%
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Fast%20Mode%20Tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figures start with 8
+
+close all;
+fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
+
+%% Basic example - NO FIGURE
+fig_num = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
+figure(fig_num); close(fig_num);
+
+% Load data
 data = fcn_INTERNAL_loadData;
+stationInterval = 5;
+max_num_iterations = 10;
+exit_tolerance = [];
 
-[path_average_final4, closestXs, closestYs, closestDistances]  = ...
-    fcn_Path_findAverageTraversalViaOrthoProjection(data);
+% Find path average
+% FORMAT:
+%     [path_average, closestXs, closestYs, closestDistances] = ...
+%         fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+%                 (stationInterval),...
+%                 (max_num_iterations),...
+%                 (exit_tolerance),...
+%                 (fig_num));
+[traversal_average, closestXs, closestYs, closestDistances] = ...
+    fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+    (stationInterval),...
+    (max_num_iterations),...
+    (exit_tolerance),...
+    ([]));
+
+% Check variable types
+assert(isstruct(traversal_average));
+assert(isfield(traversal_average,'X'))
+assert(isfield(traversal_average,'Y'))
+assert(isfield(traversal_average,'Z'))
+assert(isfield(traversal_average,'Diff'))
+assert(isfield(traversal_average,'Station'))
+assert(isfield(traversal_average,'Yaw'))
+assert(isnumeric(closestXs));
+assert(isnumeric(closestYs));
+assert(isnumeric(closestDistances));
+
+% Check variable sizes
+NreferencePoints = 66;
+assert(isequal(size(traversal_average.X),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Y),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Z),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Diff),[NreferencePoints 2]));
+assert(isequal(size(traversal_average.Station),[NreferencePoints 1]));
+assert(isequal(size(closestXs),[NreferencePoints length(data.traversal)]));
+assert(isequal(size(closestYs),[NreferencePoints length(data.traversal)]));
+assert(isequal(size(closestDistances),[NreferencePoints length(data.traversal)]));
+
+% Check  variable values
+% Not possible - too many variables
+
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
 
 
-if 1==0
-    % Show the "hit" points
-    for i_path = 1:length(closestXs(1,:))
-        plot(closestXs(:,i_path),closestYs(:,i_path),'o-');
-    end
+%% Basic fast mode - NO FIGURE, FAST MODE
+fig_num = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
+figure(fig_num); close(fig_num);
 
-    % Convert closestDistances into a single column
-    closestDistancesColumn = reshape(closestDistances,[length(closestDistances(:,1))*length(closestDistances(1,:)) 1]);
+% Load data
+data = fcn_INTERNAL_loadData;
+stationInterval = 5;
+max_num_iterations = 10;
+exit_tolerance = [];
 
-    % Calculate the standard deviation
-    std_deviation = std(closestDistancesColumn,'omitnan');
+% Find path average
+% FORMAT:
+%     [path_average, closestXs, closestYs, closestDistances] = ...
+%         fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+%                 (stationInterval),...
+%                 (max_num_iterations),...
+%                 (exit_tolerance),...
+%                 (fig_num));
+[traversal_average, closestXs, closestYs, closestDistances] = ...
+    fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+    (stationInterval),...
+    (max_num_iterations),...
+    (exit_tolerance),...
+    (-1));
 
-    % Overlay the average with 3 times the standard deviations
-    fcn_Path_plotTraversalXYWithVarianceBands(path_average_final4,...
-        3*std_deviation,path_points_fig);
+% Check variable types
+assert(isstruct(traversal_average));
+assert(isfield(traversal_average,'X'))
+assert(isfield(traversal_average,'Y'))
+assert(isfield(traversal_average,'Z'))
+assert(isfield(traversal_average,'Diff'))
+assert(isfield(traversal_average,'Station'))
+assert(isfield(traversal_average,'Yaw'))
+assert(isnumeric(closestXs));
+assert(isnumeric(closestYs));
+assert(isnumeric(closestDistances));
 
-    num_outliers = length(find(abs(closestDistancesColumn)>3*std_deviation));
-    num_points = length(closestXs(:,1))*length(closestXs(1,:));
+% Check variable sizes
+NreferencePoints = 66;
+assert(isequal(size(traversal_average.X),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Y),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Z),[NreferencePoints 1]));
+assert(isequal(size(traversal_average.Diff),[NreferencePoints 2]));
+assert(isequal(size(traversal_average.Station),[NreferencePoints 1]));
+assert(isequal(size(closestXs),[NreferencePoints length(data.traversal)]));
+assert(isequal(size(closestYs),[NreferencePoints length(data.traversal)]));
+assert(isequal(size(closestDistances),[NreferencePoints length(data.traversal)]));
 
-    title(sprintf('There were %.0d points out of %.0d points that were more than 3 standard deviations from the average path, or %.2f percent',num_outliers,num_points,num_outliers/num_points));
-    xlabel('X [m]')
-    ylabel('Y [m]')
+% Check  variable values
+% Not possible - too many variables
 
-    figure(44);
-    histogram(closestDistancesColumn,50);
-    title('Histogram of distances of paths from the final average path');
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
+
+
+%% Compare speeds of pre-calculation versus post-calculation versus a fast variant
+fig_num = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
+figure(fig_num);
+close(fig_num);
+
+% Load data
+data = fcn_INTERNAL_loadData;
+stationInterval = 5;
+max_num_iterations = 10;
+exit_tolerance = [];
+
+Niterations = 10;
+
+% Do calculation without pre-calculation
+tic;
+for ith_test = 1:Niterations
+    % Call the function
+    [traversal_average, closestXs, closestYs, closestDistances] = ...
+        fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+        (stationInterval),...
+        (max_num_iterations),...
+        (exit_tolerance),...
+        ([]));
 end
+slow_method = toc;
 
-%% Example 2: Basic call showing effect of reference traversal
+% Do calculation with pre-calculation, FAST_MODE on
+tic;
+for ith_test = 1:Niterations
+    % Call the function
+    [traversal_average, closestXs, closestYs, closestDistances] = ...
+        fcn_Path_findAverageTraversalViaOrthoProjection(data,...
+        (stationInterval),...
+        (max_num_iterations),...
+        (exit_tolerance),...
+        (-1));
+end
+fast_method = toc;
 
-data = fcn_INTERNAL_loadData;
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
 
-% choose first one for traversal
-reference_traversal = data.traversal{1};
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal);
+% Plot results as bar chart
+figure(373737);
+clf;
+hold on;
 
-subplot(2,2,1);
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average using first trajectory for reference')
-xlabel('X [m]')
-ylabel('Y [m]')
-
-% choose second one for traversal
-reference_traversal = data.traversal{2};
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal);
-
-subplot(2,2,2);
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average using second trajectory for reference')
-xlabel('X [m]')
-ylabel('Y [m]')
-
-% choose second one for traversal
-reference_traversal = data.traversal{3};
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal);
-
-subplot(2,2,3);
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average using third trajectory for reference')
-xlabel('X [m]')
-ylabel('Y [m]')
+X = categorical({'Normal mode','Fast mode'});
+X = reordercats(X,{'Normal mode','Fast mode'}); % Forces bars to appear in this exact order, not alphabetized
+Y = [slow_method fast_method ]*1000/Niterations;
+bar(X,Y)
+ylabel('Execution time (Milliseconds)')
 
 
-% choose a "dumb" one for traversal
-%dumb_traversal = fcn_Path_convertPathToTraversalStructure([10 10; 15 65; 10 90]);
-dumb_traversal = fcn_Path_convertPathToTraversalStructure([0 0; 40 40; 80 80]);
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,dumb_traversal);
-
-subplot(2,2,4);
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(dumb_traversal.X,dumb_traversal.Y,'Linewidth',4);
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average using dumb trajectory for reference')
-legend('trajectory 1','trajectory 2','trajectory 3','dumb traversal','average')
-xlabel('X [m]')
-ylabel('Y [m]')
+% Make sure plot did NOT open up
+figHandles = get(groot, 'Children');
+assert(~any(figHandles==fig_num));
 
 
-%% Example 2: Basic call showing effect of num_iterations
+%% BUG cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  ____  _    _  _____
+% |  _ \| |  | |/ ____|
+% | |_) | |  | | |  __    ___ __ _ ___  ___  ___
+% |  _ <| |  | | | |_ |  / __/ _` / __|/ _ \/ __|
+% | |_) | |__| | |__| | | (_| (_| \__ \  __/\__ \
+% |____/ \____/ \_____|  \___\__,_|___/\___||___/
+%
+% See: http://patorjk.com/software/taag/#p=display&v=0&f=Big&t=BUG%20cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All bug case figures start with the number 9
 
-data = fcn_INTERNAL_loadData;
+% close all;
 
-reference_traversal = data.traversal{3};
+%% BUG
 
-% Show the effect of one iteration
-num_iterations = 1;
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations);
-path_points_fig = 3331;
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average path via orthogonal projections, N = 1')
-xlabel('X [m]')
-ylabel('Y [m]')
 
-% Show the effect of 3 iterations
-num_iterations = 3;
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations);
-path_points_fig = 3332;
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average path via orthogonal projections, N = 3')
-xlabel('X [m]')
-ylabel('Y [m]')
 
-% Show the effect of 10 iterations
-num_iterations = 10;
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations);
-path_points_fig = 3333;
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average path via orthogonal projections, N = 10')
-xlabel('X [m]')
-ylabel('Y [m]')
-
-% Show the effect of 40 iterations
-num_iterations = 40;
-path_average_final3 = fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations);
-path_points_fig = 3334;
-fcn_Path_plotTraversalsXY(data,path_points_fig);
-hold on
-plot(path_average_final3.X,path_average_final3.Y,'Linewidth',4);
-title('Final average path via orthogonal projections, N = 40')
-xlabel('X [m]')
-ylabel('Y [m]')
-
-%% Example 3: Basic call showing effect of weight_for_averaging
-
-data = fcn_INTERNAL_loadData;
-
-reference_traversal = data.traversal{3};
-num_iterations = 40;
-
-% Show the effect of no averaging
-path_points_fig = 3331;
-weight_for_averaging = 0;
-fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations,weight_for_averaging,path_points_fig);
-
-% Show the effect of small averaging
-path_points_fig = 3332;
-weight_for_averaging = 0.5;
-fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations,weight_for_averaging,path_points_fig);
-
-% Show the effect of medium averaging
-path_points_fig = 3333;
-weight_for_averaging = 0.8;
-fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations,weight_for_averaging,path_points_fig);
-
-num_iterations = 80;
-% Show the effect of heavy averaging
-path_points_fig = 3334;
-weight_for_averaging = 0.90;
-fcn_Path_findAverageTraversalViaOrthoProjection(data,reference_traversal, num_iterations,weight_for_averaging,path_points_fig);
-
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
 
 %% fcn_INTERNAL_loadData
@@ -221,7 +325,7 @@ paths_array = fcn_Path_fillSamplePaths;
 % Convert paths to traversal structures
 clear data
 for i_Path = 1:3
-    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
+    traversal = fcn_Path_convertPathToTraversalStructure(paths_array{i_Path}, -1);
     data.traversal{i_Path} = traversal;
 end
 end % Ends fcn_INTERNAL_loadData

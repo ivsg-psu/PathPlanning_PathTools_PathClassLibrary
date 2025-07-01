@@ -13,14 +13,12 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % in the reference traversal.
 %
 % FORMAT: 
-%
-%      [traversal_average, closestXs, closestYs, closestDistances] = ...
-%      fcn_Path_findAverageTraversalViaOrthoProjection(...
-%            data,
-%            (reference_traversal),...
-%            (num_iterations),
-%            (weight_for_averaging),
-%            (fig_num));
+%     [path_average, closestXs, closestYs, closestDistances] = ...
+%         fcn_Path_findAverageTraversalViaOrthoProjection(data,... 
+%                 (stationInterval),...
+%                 (max_num_iterations),...
+%                 (exit_tolerance),...
+%                 (fig_num));
 %
 % INPUTS:
 %
@@ -34,23 +32,18 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %
 %      (OPTIONAL INPUTS)
 %
-%      reference_traversal: the traversal that is being used for comparison
-%      for all the other traversals. If empty, it uses the longest
-%      traversal (in number of stations) from the trajectories in the data
-%      structure. 
+%      stationInterval: the station distance interval of the resulting
+%      average path, in meters. Default is: stationInterval = 1; % units are meters 
 %
-%      num_iterations: an integer to specify how many iterations to perform
-%      in the path averaging, where the solution of the first reference
-%      traversal serves as the reference traversal for the second
-%      iteration's average, etc. Usually, convergence occurs within 3 to 10
-%      iterations (the default is 40). Note that, within the function, a debug
-%      flag can be set to plot and analyze convergence.
+%      max_num_iterations: an integer to specify the maximum number of
+%      iterations to perform in the path averaging, where the solution of
+%      the first processing step serves as the starting paths for
+%      the second iteration, etc. Usually, convergence occurs
+%      within 3 to 10 iterations (the default is 40). Note that, within the
+%      function, a debug flag can be set to plot and analyze convergence.
 %
-%      weight_for_averaging: a value between 0 and 1 that keeps the prior
-%      solution when a new solution is found, e.g. a value of 0.8 keeps 80%
-%      of the prior average and 20% of the new average, during each
-%      iteration. The effect is to low-pass filter the averaging process to
-%      prevent numerical bouncing that often occurs (default is 0.8).
+%      exit_tolerance: the allowable tolerance to make the looping exit
+%      before the max_num_iterations is reached. Default is 0.1 meters.
 %
 %     fig_num: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
@@ -60,7 +53,7 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 %
 % OUTPUTS:
 %
-%      traversal_average: the resulting traversal representing the average
+%      path_average: the resulting path representing the average
 %      path. Usually, it is decimated at an even spacing which is currently
 %      set to 1 meter.
 %
@@ -82,7 +75,8 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_Path_findTraversalWithMostData
+%      fcn_Path_equalizePathLengths
+%
 %      fcn_Path_findOrthogonalTraversalVectorsAtStations
 %      fcn_Path_findOrthoScatterFromTraversalToTraversals
 %      fcn_Path_cleanPathFromForwardBackwardJogs
@@ -132,6 +126,9 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % length
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% -- Added use of fcn_Path_equalizePathLengths to fix lengths
+% -- Updated the input definition list
+% -- Full rewrite of the function
 
 % TO DO
 % Need to clean up the code - lots of code "lint"
@@ -141,15 +138,15 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
-MAX_NARGIN = 6; % The largest Number of argument inputs to the function
+MAX_NARGIN = 5; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; % Flag to plot the results for debugging
     flag_check_inputs = 0; % Flag to perform input checking
     flag_max_speed = 1;
 else
     % Check to see if we are externally setting debug mode to be "on"
-    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_do_debug = 0; % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
     MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
     MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
@@ -159,14 +156,14 @@ else
     end
 end
 
-flag_do_debug = 1;
+% flag_do_debug = 1;
 
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_fig_num = 999978; 
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_fig_num = []; 
 end
 
 %% check input arguments?
@@ -192,41 +189,42 @@ if 0==flag_max_speed
     end
 end
 
-% Check to see if the reference_traversal was specified?
-flag_calculate_reference_traversal = 1;
-if nargin>=2
-    temp = varargin{1};    
+% Check to see if user wants to specify stationInterval?
+stationInterval = 1; % units are meters
+if nargin >= 2
+    temp = varargin{1};
     if ~isempty(temp)
-        reference_traversal = temp;
-        if flag_check_inputs == 1           
-            % Check the reference_traversal input
-            fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
+        stationInterval = temp;
+        if  1==flag_check_inputs && stationInterval<=0
+            error('stationInterval must be greater than zero');
         end
-        flag_calculate_reference_traversal = 0;
     end
 end
 
 % Check to see if the number of iterations was specified?
-num_iterations = 40;  % the default number of iteration to find the average path 
+max_num_iterations = 40;  % the default number of iteration to find the average path 
 if nargin >= 3
     temp = varargin{2};
     if ~isempty(temp)
-        num_iterations = temp+1;
-        if num_iterations<1
+        max_num_iterations = temp+1;
+        if 1==flag_check_inputs && max_num_iterations<1
             error('Number of iterations must be at least 1');
         end
     end
 end
 
-% Check to see if the number of iterations was specified?
-weight = 0.8;  % Default weight
-if nargin >= 4
+% Check to see if user wants to specify exit_tolerance?
+exit_tolerance = 0.1;
+if nargin>=4
     temp = varargin{3};
     if ~isempty(temp)
-        weight = temp;
+        exit_tolerance = temp;
+        if 1==flag_check_inputs && exit_tolerance <= 0
+            error('exit_tolerance must be greater than zero');
+        end
     end
 end
-  
+
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
@@ -235,10 +233,6 @@ if (0==flag_max_speed) && (MAX_NARGIN == nargin)
         fig_num = temp;
         figure(fig_num);
         flag_do_plots = 1;
-    end
-else
-    if flag_do_debug
-        fig_debug = 78787; %#ok<NASGU>
     end
 end
 
@@ -255,160 +249,95 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set decimation interval and averaging type
-interval = 1; % meters
-flag_rounding_type = 4; % Use smooth segment-to-segment rounding. See the help on fcn_Path_FindOrthogonalHitFromPathToPath for details
-Ntraversals = length(data.traversal); % the number of traversals we will be averaging
+Npaths = length(data.traversal); % the number of traversals we will be averaging
 
+% Convert traversals to cell array of paths
+allPaths = cell(Npaths,1);
+for ith_path = 1:Npaths
+    this_traversal = data.traversal{ith_path};
+    allPaths{ith_path,1} = [this_traversal.X(:,1) this_traversal.Y(:,1)];
+end
+
+% Set up debug figure by plotting the inputs
 if flag_do_debug
-    figure(fig_debug)
+    figure(debug_fig_num)
     clf;
     hold on;
     axis equal
 
-    colorsPerData = zeros(Ntraversals,3);
-    for ith_data = 1:Ntraversals
-        h_plot = plot(data.traversal{ith_data}.X,data.traversal{ith_data}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Traversal %.0f',ith_data));
-        colorsPerData(ith_data,:) = get(h_plot,'Color');
+    colorsPerData = zeros(Npaths,3);
+    for ith_path = 1:Npaths
+        h_plot = plot(data.traversal{ith_path}.X,data.traversal{ith_path}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+        colorsPerData(ith_path,:) = get(h_plot,'Color');
+        set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
     end
     legend
 end  
 
-%% Find all the endpoints of all the traversals
-allEndPositions = nan(flag_rounding_type,2); % Initialize variable
-for ith_reference_traversal = 1:Ntraversals
-    this_traversal = data.traversal{ith_reference_traversal};
-    allEndPositions(ith_reference_traversal,:) = [this_traversal.X(end) this_traversal.Y(end)];
-end
+%% Make sure all paths start/stop alongside each other
+% As well, grab index of the one that requires least modification
 
-%% Find longest distance from one traversal's end to another
-% note: do the square-root calculation only once at end, rather than at
-% every iteration, since this is slow.
-longestDistance = -inf;
-for ith_traversal = 1:Ntraversals
-    for jth_traversal = 1:Ntraversals
-        if jth_traversal~=ith_traversal
-            testDistance = sum((allEndPositions(jth_traversal,:)-allEndPositions(ith_traversal,:)).^2,2);
-            if testDistance>longestDistance
-                longestDistance = testDistance;
-            end
-        end
-    end
-end
-longestDistance = longestDistance^0.5;
-
-%% Check to see if we need to calculate a reference traversal 
-% or if it was given. If not given, use the first traversal whose
-% projection, at the last station, does not hit any others
-
-if flag_calculate_reference_traversal
-    
-    % Using the longest distance, see which traversal extends out the
-    % furthest from the others. This is done by projecting, orthogonally,
-    % from each traversal's end point and checking if anything was hit,
-    % using a projection of the longest distance. NOTE: this may not work
-    % if the trajectories loop back onto each otehr.
-    for ith_reference_traversal = 1:Ntraversals
-        central_traversal = data.traversal{ith_reference_traversal};
-        endStation = central_traversal.Station(end);
-        all_hits = nan(Ntraversals,1);
-        for jth_traversal = 1:Ntraversals
-            if jth_traversal~=ith_reference_traversal
-                nearby_traversal =  data.traversal{jth_traversal};
-
-                % Calculate the closest point and distance on the nearby path
-                % FORMAT: 
-                % [closest_path_point,distances] = ...
-                %     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
-                %     central_traversal,nearby_traversal,...
-                %     flag_rounding_type,search_radius,fig_num);
-
-                [~, distance] = ...
-                    fcn_Path_findOrthogonalHitFromTraversalToTraversal(endStation,...
-                    central_traversal,nearby_traversal,...
-                    [], longestDistance, -1);
-                all_hits(jth_traversal,1) = distance;
-            end
-        end
-        if all(isnan(all_hits))
-            index_of_longest = ith_reference_traversal;
-            break
-        end
-    end
-    reference_traversal = data.traversal{index_of_longest}; %initial reference path
-end
-
-% Redecimate the reference traversal at stations corresponding to
-% user-chosen intervals within the chosen reference traversal
-reference_station_points    = (0:interval:reference_traversal.Station(end))';
-redecimated_reference_traversal = ...
-    fcn_Path_newTraversalByStationResampling(reference_traversal, reference_station_points, -1);
-
-%% Indicate the starting reference stations
-% Do this by finding the length of each traversal, then finding the
-% standard deviation in length. Add this to the longest traversal just as a
-% safety amount, as the averaging process sometimes moves around a LOT
-
-% OLD method: use standard deviations to estimate longest distance
-% last_stations = zeros(Ntraversals,1);
-% for ith_traversal = 1:Ntraversals
-%     last_stations(ith_traversal,1) = data.traversal{ith_traversal}.Station(end);
-% end
-% longestDistance = std(last_stations);
+% FORMAT: 
+%      [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = ...
+%      fcn_Path_equalizePathLengths(...
+%            cellArrayOfUnequalPaths,...
+%            (fig_num));
+[cellArrayOfEqualizedPaths, ~, ~, ~] = ...
+      fcn_Path_equalizePathLengths(...
+            allPaths,...
+            (-1));
 
 
-%% Set up all the traversals to be as long as these reference station points, plus a bit just in case
-for ith_traversal = 1:Ntraversals
-    current_X = data.traversal{ith_traversal}.X;
-    current_Y = data.traversal{ith_traversal}.Y;
-    current_Station = data.traversal{ith_traversal}.Station;
-    current_StationEnd = current_Station(end);
-
-    extra_long_station = current_StationEnd + longestDistance;
-    longer_reference_station_points    = (0:interval:extra_long_station)';
-
-    interp_X       = interp1(current_Station,current_X,longer_reference_station_points,'linear','extrap');
-    interp_Y       = interp1(current_Station,current_Y,longer_reference_station_points,'linear','extrap');
-    resampled_traversal = fcn_Path_convertPathToTraversalStructure([interp_X, interp_Y], -1);   
-    resampled_data.traversal{ith_traversal} = resampled_traversal;
-end
+%% Set up all the paths to have same station interval
+[cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(cellArrayOfEqualizedPaths, stationInterval); 
 
 if flag_do_debug
-    for ith_data = 1:Ntraversals
-        plot(resampled_data.traversal{ith_data}.X,resampled_data.traversal{ith_data}.Y,'.-',...
-            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_data,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_data));
+    figure(debug_fig_num)
+    h_updatedPlots = zeros(Npaths,1);
+    for ith_path = 1:Npaths
+        h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
+            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
     end
 end    
 
-data_to_average = resampled_data;
-
-%% Define search radius in orthogonal direction based on standard deviation
-stationsToTest = reference_traversal.Station;
-allDistances = nan(length(stationsToTest(:,1)),Ntraversals);
-for jth_traversal = 1:Ntraversals
-    if jth_traversal~=index_of_longest
-        nearby_traversal =  resampled_data.traversal{jth_traversal};
-
-        % Calculate the closest point and distance on the nearby path
-        % FORMAT:
-        % [closest_path_point,distances] = ...
-        %     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
-        %     central_traversal,nearby_traversal,...
-        %     flag_rounding_type,search_radius,fig_num);
-
-        [~, distances] = ...
-            fcn_Path_findOrthogonalHitFromTraversalToTraversal(stationsToTest,...
-            reference_traversal,nearby_traversal,...
-            [], [], -1);
-        allDistances(:,jth_traversal) = distances;
-    end
+%% Find locked start/end points
+allStarts = nan(Npaths,2);
+allEnds   = nan(Npaths,2);
+for ith_path = 1:Npaths
+    allStarts(ith_path,:) = cellArrayOfEquidistantPaths{ith_path}(1,:);
+    allEnds(ith_path,:)   = cellArrayOfEquidistantPaths{ith_path}(end,:);
 end
 
+lockedStart = mean(allStarts,1);
+lockedEnd = mean(allEnds,1);
 
-std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(redecimated_reference_traversal, -1);
-if std_deviation~=0
-    search_radius = 5*std_deviation;
-else
-    search_radius = reference_traversal.Station(end);
+if flag_do_debug
+    plot(lockedStart(1,1), lockedStart(1,2),'.',...
+        'LineWidth',2,'MarkerSize',30,'Color',[0 1 0], 'DisplayName',sprintf('Locked Start'));
+    plot(lockedEnd(1,1), lockedEnd(1,2),'.',...
+        'LineWidth',2,'MarkerSize',30,'Color',[1 0 0], 'DisplayName',sprintf('Locked End'));
+end  
+
+%% Find approximate equivalence in station distances
+[cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
+
+% %% Define search radius in orthogonal direction based on standard deviation
+% badAllDistancesMatrix = fcn_INTERNAL_findTransverseDistances(cellArrayOfEquidistantPaths{reference_path_index}, cellArrayOfEquidistantPaths);
+% goodValues = abs(badAllDistancesMatrix)>(eps*1000);
+% allDistancesMatrix = badAllDistancesMatrix(goodValues);
+% 
+% 
+% std_deviation = std(allDistancesMatrix,0,'omitmissing');
+% if std_deviation~=0
+%     search_radius = 5*std_deviation;
+% else
+%     search_radius = reference_traversal.Station(end);
+% end
+
+% Calculate the total error via station variation
+finalStations = zeros(Npaths,1);
+for ith_path = 1:Npaths
+    finalStations(ith_path,1) = cellArrayOfEquidistantStations{ith_path}(end,1);
 end
 
 
@@ -418,117 +347,166 @@ end
 % * Clean up average and store results for next iteration or exit
 
 % Initialize variables to hold results
-average_traversals{num_iterations} = [];
-total_error{num_iterations} = [];
-mean_error = nan(num_iterations, 1);
-iteration_error_X{num_iterations}  = 0;
-iteration_error_Y{num_iterations}  = 0;
+average_path = cell(max_num_iterations,Npaths);
+% total_error{max_num_iterations} = [];
 
-% Set iteration 1 values
-average_traversals{1} = redecimated_reference_traversal;
-total_error{1} = inf*redecimated_reference_traversal.X;
+stationError = nan(max_num_iterations, 1);
+stationError(1) = max(finalStations) - min(finalStations);
+previousMaxStation =  max(finalStations);
+
+% % Set iteration 1 values
+for ith_path = 1:Npaths
+    average_path{1,ith_path} = cellArrayOfEquidistantPaths{ith_path};
+end
+% total_error{1}  = allDistancesMatrix;
 
 % Start iterations - at each iteration, find orthogonal projections,
 % average results, then recalculate the reference traversal
-for ith_iteration =2:num_iterations 
+for ith_iteration =2:max_num_iterations 
 
     % Show user what we are doing?        
     if flag_do_debug
-        fprintf(1,'Averaging paths via iteration: %.0d / %.0d \n',ith_iteration,num_iterations);
-        fprintf(1,'\tInitial maximum station: %.2f  \n',redecimated_reference_traversal.Station(end));    
-        fprintf(1,'\tOld search radius: %.2f  \n',search_radius);
+        figure(debug_fig_num)
+        title(sprintf('Iteration: %.0f',ith_iteration))
+        fprintf(1,'Averaging paths via iteration: %.0d / %.0d \n',ith_iteration,max_num_iterations);
+        fprintf(1,'\tInitial maximum station: %.2f  \n',previousMaxStation);    
+        % fprintf(1,'\tOld search radius: %.2f  \n',search_radius);
     end
     
-    path_last  = redecimated_reference_traversal;   % Saves the prior path - used for error calculations later     
-    
-    %% For each traversal, project from reference orthogonally
-    % For debugging: [closestXs, closestYs, closestDistances] = ...
-    % fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, data, flag_rounding_type,search_radius, 33304);
-    [closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(...
-        reference_station_points, redecimated_reference_traversal, data_to_average, flag_rounding_type,search_radius, -1);
-    
-    %% Find and remove outliers due to distance jumps
-    % Find the standard deviation in the distances
-    sigma_distances = std(closestDistances,0,'all','omitmissing');    
-    search_radius = 5*sigma_distances;
-    outliers = find(abs(closestDistances)>(5*sigma_distances));
-    if ~isempty(outliers)
-        closestXs(outliers) = NaN;
-        closestYs(outliers) = NaN;
-        closestDistances(outliers) = NaN;         %#ok<NASGU>
-    end
-    
-    if flag_do_debug
-        fprintf(1,'\tStandard deviation in distances: %.2f  \n',sigma_distances);
-        fprintf(1,'\tNumber of outliers: %d  \n',length(outliers));
-        fprintf(1,'\tNew search radius: %.2f  \n',search_radius);
+    %% For each traversal, project from reference orthogonally to the others
+    % The allTransverseDistances array is organized as
+    % (referenceIndex,toIndex)
+    allTransverseDistances = fcn_INTERNAL_findTransverseDistancesAlongStation(cellArrayOfEquidistantPaths, cellArrayOfPercentStations);
+
+
+    %% Sum the corrections
+    pathCorrections = cell(Npaths,1);
+    for ith_referencePath = 1:Npaths
+        for jth_targetPath = 1:Npaths
+            if jth_targetPath == 1
+                pathCorrections{ith_referencePath,1} = -1/Npaths .* allTransverseDistances{ith_referencePath}(:,jth_targetPath);
+            else
+                pathCorrections{ith_referencePath,1} = pathCorrections{ith_referencePath,1} - 1/Npaths .* allTransverseDistances{ith_referencePath}(:,jth_targetPath);
+             end
+        end
     end
 
-    
-    
-    %% Average distances at the projection points to generate a mean path    
-    raw_path_mean = [mean(closestXs,2,'omitmissing') mean(closestYs,2,'omitmissing')];
-    
-    
+    %% Update each path
+    newPaths = cell(Npaths,1);
+    for ith_path = 1:Npaths
+        thisPath = cellArrayOfEquidistantPaths{ith_path};
+        thisCorrection = pathCorrections{ith_path,1};
+        orthoProjectionVectors = diff(thisPath,1,1)*[0 1; -1 0];
+        mag_orthoProjectionVectors = sum(orthoProjectionVectors.^2,2).^0.5;
+        unit_orthoProjectionVectors = orthoProjectionVectors./mag_orthoProjectionVectors;
+
+        updatedPath = [lockedStart; thisPath(2:end-1,:)+thisCorrection(2:end-1,:).*unit_orthoProjectionVectors(1:end-1,:); lockedEnd];
+        newPaths{ith_path,1} = updatedPath;
+
+        if flag_do_debug
+            set(h_updatedPlots(ith_path,1),'Xdata',updatedPath(:,1),'Ydata',updatedPath(:,2));
+            pause(0.02);
+        end
+    end
+
+
     %% Call a special function to remove back-tracking behavior
     % Sometimes averaging can produce data that bounces forward and
-    % backward. This function removes these
-    path_mean = fcn_Path_cleanPathFromForwardBackwardJogs(raw_path_mean, -1);        
-    
-    % Sometimes the path average has NaN values 
-    % This will cause the interpolation step to fail.
-    % This means that no paths were detected nearby the reference
-    % traversal. In this case, we drop these points and the interpolation
-    % will extrapolate via linear fit what the values should be
-    path_mean_no_nan = path_mean(~isnan(path_mean(:,1)),:);
-    path_mean_station_no_nan  = [0; cumsum(sqrt(sum(diff(path_mean_no_nan).^2,2)),'omitnan')];
-
-    
-    %% Interpolation of mean data to produce equal station intervals
-    path_average_interp_X       = interp1(path_mean_station_no_nan,path_mean_no_nan(:,1),reference_station_points,'linear','extrap');
-    path_average_interp_Y       = interp1(path_mean_station_no_nan,path_mean_no_nan(:,2),reference_station_points,'linear','extrap');
-        
-    %% Do weighted average of X and Y values
-    path_new_X = weight*path_last.X + (1-weight)*path_average_interp_X;
-    path_new_Y = weight*path_last.Y + (1-weight)*path_average_interp_Y;
-    
-    
-    %% Convert path type back into traversal and save result
-    redecimated_reference_traversal = fcn_Path_convertPathToTraversalStructure([path_new_X, path_new_Y], -1);  
-    redecimated_reference_traversal.Station = reference_station_points; % The calculation of station is a bit off in the conversion, so fix it here.
-    average_traversals{ith_iteration} = redecimated_reference_traversal;
-
-    if flag_do_debug
-        fprintf(1,'\tNew maximum station: %.2f  \n',redecimated_reference_traversal.Station(end));
+    % backward. This function removes these "jumps"
+    newPathsNoJogs = cell(Npaths,1);
+    for ith_path = 1:Npaths
+        rawPath = newPaths{ith_path,1};
+        rawPathNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs(rawPath, -1);
+        newPathsNoJogs{ith_path,1} = rawPathNoJogs;
+        if flag_do_debug
+            set(h_updatedPlots(ith_path,1),'Xdata',rawPathNoJogs(:,1),'Ydata',rawPathNoJogs(:,2));
+        end
     end
     
-    %% Update error calculations for iterations 2 and onward    
-    iteration_error_X{ith_iteration} = path_last.X - redecimated_reference_traversal.X;
-    iteration_error_Y{ith_iteration} = path_last.Y - redecimated_reference_traversal.Y;
+    % % Sometimes the path average has NaN values 
+    % % This will cause the interpolation step to fail.
+    % % This means that no paths were detected nearby the reference
+    % % traversal. In this case, we drop these points and the interpolation
+    % % will extrapolate via linear fit what the values should be
+    % path_mean_no_nan = path_mean(~isnan(path_mean(:,1)),:);
+    % path_mean_station_no_nan  = [0; cumsum(sqrt(sum(diff(path_mean_no_nan).^2,2)),'omitnan')];
+    % 
+    % 
+    % %% Interpolation of mean data to produce equal station intervals
+    % path_average_interp_X       = interp1(path_mean_station_no_nan,path_mean_no_nan(:,1),reference_station_points,'linear','extrap');
+    % path_average_interp_Y       = interp1(path_mean_station_no_nan,path_mean_no_nan(:,2),reference_station_points,'linear','extrap');
+    % 
+    % %% Do weighted average of X and Y values
+    % path_new_X = weight*lastAverage.X + (1-weight)*path_average_interp_X;
+    % path_new_Y = weight*lastAverage.Y + (1-weight)*path_average_interp_Y;
+    % 
+    % 
+    % %% Convert path type back into traversal and save result
+    % redecimated_reference_traversal = fcn_Path_convertPathToTraversalStructure([path_new_X, path_new_Y], -1);  
+    % redecimated_reference_traversal.Station = reference_station_points; % The calculation of station is a bit off in the conversion, so fix it here.
+    % average_path{ith_iteration} = redecimated_reference_traversal;
+    % 
+    % if flag_do_debug
+    %     fprintf(1,'\tNew maximum station: %.2f  \n',redecimated_reference_traversal.Station(end));
+    % end
+    % 
+    % %% Update error calculations for iterations 2 and onward    
+    % iteration_error_X{ith_iteration} = lastAverage.X - redecimated_reference_traversal.X;
+    % iteration_error_Y{ith_iteration} = lastAverage.Y - redecimated_reference_traversal.Y;
 
-    % Calculate the total error
-    X_error = iteration_error_X{ith_iteration};
-    Y_error = iteration_error_Y{ith_iteration};
-    total_error{ith_iteration} = (X_error.^2 + Y_error.^2).^0.5;
-    mean_error(ith_iteration,1) = mean(total_error{ith_iteration});
+    %% Set up all the paths to have same station interval
+    [cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(newPathsNoJogs, stationInterval);
+
+    % Find approximate equivalence in station distances
+    [cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
+
+    % Save results (for later plotting)
+    for ith_path = 1:Npaths
+        average_path{ith_iteration,ith_path} = cellArrayOfEquidistantPaths{ith_path};
+    end
+
+    if flag_do_debug
+        for ith_path = 1:Npaths
+            finalPath = cellArrayOfEquidistantPaths{ith_path};
+            set(h_updatedPlots(ith_path,1),'Xdata',finalPath(:,1),'Ydata',finalPath(:,2));
+        end
+    end
+
+    % Calculate the total error via station variation
+    finalStations = zeros(Npaths,1);
+    for ith_path = 1:Npaths
+        finalStations(ith_path,1) = cellArrayOfEquidistantStations{ith_path}(end,1);
+    end
+    
+    % Calculate the change in station between the paths
+    stationError(ith_iteration,1) = max(finalStations) - min(finalStations);    
     
     % Show results?
     if flag_do_debug
-        fprintf(1,'\t Mean change from iteration %.0d to %.0d: %.3f \n',ith_iteration-1, ith_iteration,mean_error(ith_iteration,1));
+        fprintf(1,'\t Station differences from iteration %.0d to %.0d: %.3f \n',ith_iteration-1, ith_iteration,stationError(ith_iteration,1));
     end
 
+    if exit_tolerance>stationError(ith_iteration,1)
+        % Exit the for loop        
+        break;
+    end
     
 end
 
+lastIteration = find(isnan(stationError),1)-1;
+if isempty(lastIteration)
+    lastIteration = max_num_iterations;
+end
+
 % Use final average path to define "true" s-coordinates of the original trajectories, using projection
-traversal_average = fcn_Path_convertPathToTraversalStructure([path_mean_no_nan(:,1), path_mean_no_nan(:,2)], -1);  
-% traversal_average.Station = reference_station_points; % The calculation of station is a bit off in the conversion, so fix it here.
- 
+path_average = cellArrayOfEquidistantPaths{1};
+traversal_average = fcn_Path_convertPathToTraversalStructure(path_average, -1);  
+
 % Calculate final results
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_findOrthoScatterFromTraversalToTraversals(...
-    traversal_average.Station, redecimated_reference_traversal, data,...
-    flag_rounding_type,search_radius, -1);
+    traversal_average.Station, traversal_average, data,...
+    [], [], -1);
 
 
 %% Plot the results (for debugging)?
@@ -556,8 +534,7 @@ if flag_do_plots
     dimension_of_points = 2;
 
     % Find size of plotting domain
-    data
-    allPointsBeingPlotted = [(1:length(diff_angles))' diff_angles*180/pi];
+    allPointsBeingPlotted = cellArrayOfEquidistantPaths{1};
     max_plotValues = max(allPointsBeingPlotted);
     min_plotValues = min(allPointsBeingPlotted);
     sizePlot = max(max_plotValues) - min(min_plotValues);
@@ -594,54 +571,87 @@ if flag_do_plots
         axis(newAxis);
 
     end
-    % goodAxis = axis;
+    goodAxis = axis;
 
     hold on;
     grid on;
     xlabel('X [m]');
     ylabel('Y [m]');
 
-    fcn_Path_plotTraversalsXY(data,fig_num);
-    hold on;
-    plot(traversal_average.X,traversal_average.Y,'b.-','Linewidth',4,'Markersize',20,'DisplayName','Average');
-    
-    legend;
-  
-    
+    % Plot the inputs
+    colorsPerData = zeros(Npaths,3);
+    for ith_path = 1:Npaths
+        h_plot = plot(data.traversal{ith_path}.X,data.traversal{ith_path}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+        colorsPerData(ith_path,:) = get(h_plot,'Color');
+        set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
+    end
+
+    % Plot the results
+    h_updatedPlots = zeros(Npaths,1);
+    for ith_path = 1:Npaths
+        h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
+            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
+    end
+
+    legend
+
+
     if flag_do_debug
         % Plot the path convergence
         figure(2255);
         clf;
         hold on;
-        xlabel('Index')
-        ylabel('Position change between iterations [m]')
-        for ith_iteration = 1:length(iteration_error_X)
-            title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
-            plot(average_traversals{ith_iteration}.X,average_traversals{ith_iteration}.Y,'-'); 
+        axis(goodAxis);
+        xlabel('X [m]')
+        ylabel('Y [m]')
+       
+        % Plot the inputs
+        colorsPerData = zeros(Npaths,3);
+        for ith_path = 1:Npaths
+            h_plot = plot(data.traversal{ith_path}.X,data.traversal{ith_path}.Y,'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+            colorsPerData(ith_path,:) = get(h_plot,'Color');
+            set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
+        end
+
+        % Plot the results to create handles
+        h_updatedPlots = zeros(Npaths,1);
+        for ith_path = 1:Npaths
+            h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
+                'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
+        end
+
+        % Animate the results
+        for ith_iteration = 1:lastIteration
+            title(sprintf('Iteration %.0d of %.0d',ith_iteration,ith_iteration));
+            
+            for ith_path = 1:Npaths
+                finalPath = average_path{ith_iteration,ith_path};
+                set(h_updatedPlots(ith_path,1),'Xdata',finalPath(:,1),'Ydata',finalPath(:,2));
+            end
             drawnow;
             pause(0.1);
         end
         
-        % Plot the error convergence
-        figure(2233);
-        clf;
-        hold on;
-        xlabel('Index')
-        ylabel('Position change between iterations [m]')
-        for ith_iteration = 1:length(iteration_error_X)
-            title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
-            plot(total_error{ith_iteration});            
-            pause(0.1);
-        end
-        
+        % % Plot the error convergence
+        % figure(2233);
+        % clf;
+        % hold on;
+        % xlabel('Index')
+        % ylabel('Position change between iterations [m]')
+        % for ith_iteration = 1:length(iteration_error_X)
+        %     title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
+        %     plot(total_error{ith_iteration});            
+        %     pause(0.1);
+        % end
+        % 
         
         % Plot the error convergence
         figure(2244);
         clf;
         
-        semilogy(1:length(mean_error),mean_error,'.-','Markersize',30);
+        semilogy(1:length(stationError),stationError,'.-','Markersize',30);
         xlabel('Iteration')
-        ylabel('Mean change in distance')
+        ylabel('Change in total station')
         grid on
         
     end
@@ -665,3 +675,222 @@ end % End of function
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+%% fcn_INTERNAL_findTransverseDistances
+function [distanceMatrix, allDistances] = fcn_INTERNAL_findTransverseDistances(reference_path, cellArrayOfPaths)
+Npaths = length(cellArrayOfPaths);
+allDistances = cell(Npaths,1);
+for jth_path = 1:Npaths
+    % FORMAT:
+    %    St_points = fcn_Path_convertXY2St(referencePath,XY_points,...
+    %    (flag_rounding_type), (fig_num));
+    St_points = fcn_Path_convertXY2St(reference_path,cellArrayOfPaths{jth_path},...
+        ([]), (-1));
+    allDistances{jth_path} = real(St_points(:,2));
+end
+distanceMatrix = cell2mat(allDistances);
+end % Ends fcn_INTERNAL_findTransverseDistances  cellArrayOfPaths
+
+%% fcn_INTERNAL_resamplePaths
+function [cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(cellArrayOfEqualizedPaths, interval)
+
+% Find the station values for each path
+cellArrayOfEqualizedStations = fcn_Path_calcPathStation(cellArrayOfEqualizedPaths,-1);
+
+% cellArrayOfEquidistantStations = cellArrayOfEqualizedStations;
+% cellArrayOfEquidistantPaths    = cellArrayOfEqualizedPaths;
+
+Npaths = length(cellArrayOfEqualizedPaths);
+
+% Sets up all the paths to have user-defined station interval
+cellArrayOfEquidistantPaths = cell(Npaths,1);
+cellArrayOfEquidistantStations = cell(Npaths,1);
+for ith_path = 1:Npaths
+    % What X, Y, and Station values do we have?
+    current_X = cellArrayOfEqualizedPaths{ith_path}(:,1);
+    current_Y = cellArrayOfEqualizedPaths{ith_path}(:,2);
+    current_Station = cellArrayOfEqualizedStations{ith_path};
+    current_StationEnd = current_Station(end);
+
+    % Define the stations we want
+    reference_station_points    = (0:interval:current_StationEnd)';
+    if ~isequal(reference_station_points(end),current_StationEnd)
+        longer_reference_station_points    = [reference_station_points; current_StationEnd];
+    else
+        longer_reference_station_points = reference_station_points;
+    end
+
+    % Find X and Y points at wanted stations
+    interp_X       = interp1(current_Station,current_X,longer_reference_station_points,'linear','extrap');
+    interp_Y       = interp1(current_Station,current_Y,longer_reference_station_points,'linear','extrap');
+
+    % Save results
+    cellArrayOfEquidistantPaths{ith_path} = [interp_X, interp_Y];
+    cellArrayOfEquidistantStations{ith_path} = longer_reference_station_points;
+
+
+end
+end % fcn_INTERNAL_resamplePaths
+
+%% fcn_INTERNAL_calculateApproximateStationEquivalence
+function [cellArrayOfPercentStations, longestStation] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfStations)
+% Produces a station cell array such that all the input stations have the
+% same total path length (unit length)
+flag_doDebug = 0;
+if 1==flag_doDebug
+    figure(48484);
+    clf;
+    hold on;
+end
+
+Npaths = length(cellArrayOfStations);
+cellArrayOfPercentStations = cell(Npaths,1);
+longestStation = -inf; % Initialize longest path value
+for ith_path = 1:Npaths
+
+    % Normalize the path
+    cellArrayOfPercentStations{ith_path,1} = cellArrayOfStations{ith_path}./cellArrayOfStations{ith_path}(end,1);
+
+    % Save longest path
+    if cellArrayOfStations{ith_path}(end,1)>longestStation
+        longestStation = cellArrayOfStations{ith_path}(end,1);
+    end
+    if 1==flag_doDebug
+        figure(48484);
+        subplot(2,1,1);
+        hold on;
+        plot(cellArrayOfStations{ith_path},'-');
+        subplot(2,1,2);
+        hold on;
+        plot(cellArrayOfPercentStations{ith_path},'-');
+
+    end
+end
+
+end % Ends fcn_INTERNAL_calculateApproximateStationEquivalence
+
+%% fcn_INTERNAL_findTransverseDistancesAlongStation
+function allTransverseDistances = fcn_INTERNAL_findTransverseDistancesAlongStation(cellArrayOfInputPaths, cellArrayOfPercentStations)
+Npaths = length(cellArrayOfInputPaths);
+
+% allTransverseDistances is a cell array organized by the "measured" path
+% index. Each cell contains NstationsxNpath vectors, where Nstation is the
+% number of stations in the "measured" path, and the columns represent each of
+% the "from" reference locations. For example, if path 2 is measured as
+% distances relative to each of the paths 1, 2, 3, then the results appear
+% in cell{2,1} in columns 1, 2, and 3 respectively.
+
+flag_doDebug = 0;
+if 1==flag_doDebug
+    figure(23457);
+    clf;
+    hold on;
+    axis equal;
+
+    colorsPerData = zeros(Npaths,3);
+    h_plotsLocalSearch = zeros(Npaths,1);
+    h_plotsLocalReference = zeros(Npaths,1);
+
+    for ith_path = 1:Npaths
+        h_plot = plot(cellArrayOfInputPaths{ith_path}(:,1),cellArrayOfInputPaths{ith_path}(:,2),'.-',...
+            'LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+        colorsPerData(ith_path,:) = get(h_plot,'Color');
+        set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
+        
+        h_plot = plot(cellArrayOfInputPaths{ith_path}(:,1),cellArrayOfInputPaths{ith_path}(:,2),'.-',...
+            'LineWidth',2,'MarkerSize',20, 'DisplayName',sprintf('Focused %.0f',ith_path),'Color',colorsPerData(ith_path,:));
+        h_plotsLocalSearch(ith_path,1) = h_plot;
+
+        h_plot = plot(cellArrayOfInputPaths{ith_path}(:,1),cellArrayOfInputPaths{ith_path}(:,2),'-',...
+            'LineWidth',1,'MarkerSize',20, 'DisplayName',sprintf('Reference %.0f',ith_path),'Color',colorsPerData(ith_path,:)*0.8);
+        h_plotsLocalReference(ith_path,1) = h_plot;
+    end
+
+    legend
+
+end
+
+% Find the variation in station distances
+allStations = cell2mat(cellArrayOfPercentStations);
+stationDifference = diff(allStations);
+stationDifference = stationDifference(stationDifference>0);
+maxDifference = max(stationDifference);
+percentStationRange = 2*maxDifference;
+
+% Initialize distances
+allTransverseDistances = cell(Npaths,1);
+for ith_path = 1:Npaths
+    allTransverseDistances{ith_path,1} = cellArrayOfPercentStations{ith_path}*nan(1,Npaths);
+end
+
+stationSteps = (0:percentStationRange:1)';
+
+for jth_station = 1:length(stationSteps)
+    thisStation = stationSteps(jth_station);
+    startSearch = max(0,thisStation);
+    endSearch   = min(1,thisStation+percentStationRange);
+
+    % Fill in search areas for all paths, relative to this start and end
+    % station. NOTE: the local reference paths must be larger than this
+    % start/end cycle, otherwise it's possible for the hit to be "missed"
+    cellArrayOfSearchableAreas = cell(Npaths,1);
+    cellArrayOfSearchableIndices = cell(Npaths,1);
+    cellArrayOfLocalReferencePath = cell(Npaths,1);
+
+    extendedStartSearch = max(0,thisStation-5*percentStationRange);
+    extendedEndSearch = min(1,thisStation+5*percentStationRange);
+
+    for ith_path = 1:Npaths
+        thisPath = cellArrayOfInputPaths{ith_path};
+
+        searchStations = cellArrayOfPercentStations{ith_path,1};
+        indicesGood = find((searchStations>=startSearch) .* (searchStations<=endSearch));
+        cellArrayOfSearchableIndices{ith_path,1} = indicesGood;
+        goodPath = thisPath(indicesGood,:); 
+        cellArrayOfSearchableAreas{ith_path,1} = goodPath;
+
+        % Find the extended references
+        indicesGood = find((searchStations>=extendedStartSearch) .* (searchStations<=extendedEndSearch));
+        try
+        goodPath = thisPath(indicesGood,:); %#ok<FNDSB>
+        catch
+            disp('Stop here');
+        end
+        cellArrayOfLocalReferencePath{ith_path,1} = goodPath;
+    
+    end
+
+    if 1==flag_doDebug
+        figure(23457);
+        for ith_path = 1:Npaths
+            set(h_plotsLocalSearch(ith_path,1),'XData',cellArrayOfSearchableAreas{ith_path,1}(:,1),'YData',cellArrayOfSearchableAreas{ith_path,1}(:,2));
+            set(h_plotsLocalReference(ith_path,1),'XData',cellArrayOfLocalReferencePath{ith_path,1}(:,1),'YData',cellArrayOfLocalReferencePath{ith_path,1}(:,2));
+            pause(0.01);
+        end
+    end
+
+    % For each traversal, project from reference orthogonally to the others
+    % The allTransverseDistances array is organized as
+    % (referenceIndex,toIndex)
+
+    % Loop through each reference path, saving the distances of each of the
+    % OTHER paths relative to this reference.
+    for ith_pathReference = 1:Npaths
+        % Find distance from this path to the others
+        [~, tDistance] = fcn_INTERNAL_findTransverseDistances(cellArrayOfLocalReferencePath{ith_pathReference}, cellArrayOfSearchableAreas);
+
+        % Save results of each of the others
+        % allTransverseDistances is a cell array organized by the "measured" path
+        % index. Each cell contains NstationsxNpath vectors, where Nstation is the
+        % number of stations in the "measured" path, and the columns represent each of
+        % the "from" reference locations. For example, if path 2 is measured as
+        % distances relative to each of the paths 1, 2, 3, then the results appear
+        % in cell{2,1} in columns 1, 2, and 3 respectively.
+        for jth_targetPath = 1:Npaths
+            indicesSearched = cellArrayOfSearchableIndices{jth_targetPath};
+            allTransverseDistances{jth_targetPath}(indicesSearched, ith_pathReference) = tDistance{jth_targetPath};
+        end
+    end
+end
+
+end % Ends fcn_INTERNAL_findTransverseDistancesAlongStation

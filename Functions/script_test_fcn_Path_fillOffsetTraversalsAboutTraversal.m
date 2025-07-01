@@ -24,6 +24,27 @@ reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 offsets = 2; 
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, [], fig_num);
 
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
+
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
@@ -41,6 +62,27 @@ reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 offsets = 2; 
 flag_rounding_type = [];
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type, fig_num); %#ok<*NASGU>
+
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -60,6 +102,27 @@ reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 offsets = [2; -2]; 
 flag_rounding_type = [];
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,  flag_rounding_type, fig_num);
+
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -83,6 +146,27 @@ offsets = (-10:1:10)';
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type,  fig_num);
 axis equal;
 
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
+
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
@@ -104,17 +188,17 @@ path2 = [30 10; 25 44];
 second_traversal = fcn_Path_convertPathToTraversalStructure(path2);
 
 offsets = 2; 
-offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type,  fig_num);
+offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets, flag_rounding_type,  fig_num);
 
-offsets = [2; -2]; 
-offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(second_traversal, offsets, flag_rounding_type,  fig_num);
+offsets_2 = [2; -2]; 
+offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(second_traversal, offsets_2, flag_rounding_type,  fig_num);
 
 % Find intersections
 [right_intersection_points,...
     ~,...
     ~] = ...
     fcn_Path_findIntersectionsBetweenTraversals(...
-    offset_traversal_1.traversal{1},...
+    offset_traversals.traversal{1},...
     offset_traversal_2.traversal{1});
 plot(right_intersection_points(:,1),right_intersection_points(:,2),'ro','Markersize',10);
 
@@ -122,10 +206,31 @@ plot(right_intersection_points(:,1),right_intersection_points(:,2),'ro','Markers
     ~,...
     ~] = ...
     fcn_Path_findIntersectionsBetweenTraversals(...
-    offset_traversal_1.traversal{1},...
+    offset_traversals.traversal{1},...
     offset_traversal_2.traversal{2});
 plot(left_intersection_points(:,1),left_intersection_points(:,2),'bo','Markersize',10);
 title('Illustration of how to use offsets to link lane edge designations');
+
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -153,6 +258,27 @@ for flag_rounding_type = 1:4
 end
 sgtitle('Effect of flag_rounding_type','Interpreter','none');
 
+
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -190,7 +316,28 @@ offsets = [2; -2];
 flag_rounding_type = [];
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,  flag_rounding_type, []);
 
-% Make sure plot did NOT open up
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
+
+% Make sure plot opened up
 figHandles = get(groot, 'Children');
 assert(~any(figHandles==fig_num));
 
@@ -210,7 +357,28 @@ offsets = [2; -2];
 flag_rounding_type = [];
 offset_traversals = fcn_Path_fillOffsetTraversalsAboutTraversal(reference_traversal, offsets,  flag_rounding_type, -1);
 
-% Make sure plot did NOT open up
+% Check variable types
+assert(isstruct(offset_traversals));
+assert(isfield(offset_traversals,'traversal'));
+assert(isfield(offset_traversals.traversal{1},'X'))
+assert(isfield(offset_traversals.traversal{1},'Y'))
+assert(isfield(offset_traversals.traversal{1},'Z'))
+assert(isfield(offset_traversals.traversal{1},'Diff'))
+assert(isfield(offset_traversals.traversal{1},'Station'))
+assert(isfield(offset_traversals.traversal{1},'Yaw'))
+
+% Check variable sizes
+NreferencePoints = length(reference_traversal.X);
+Noffsets = length(offsets);
+assert(isequal(length(offset_traversals.traversal),Noffsets));
+assert(isequal(size(offset_traversals.traversal{1}.X),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Y),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Z),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Diff),[NreferencePoints 2]));
+assert(isequal(size(offset_traversals.traversal{1}.Station),[NreferencePoints 1]));
+assert(isequal(size(offset_traversals.traversal{1}.Yaw),[NreferencePoints-1 1]));
+
+% Make sure plot opened up
 figHandles = get(groot, 'Children');
 assert(~any(figHandles==fig_num));
 

@@ -133,8 +133,10 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Npath = length(path_with_jogs(:,1));
 iteration_count = 1;
 flag_average_is_good = 0;
+
 
 % For debugging
 if flag_do_debug
@@ -150,7 +152,7 @@ working_path_with_jogs = path_with_jogs;
 points_removed = [];
 while (0==flag_average_is_good)  && (iteration_count<=3)
     % Calculate angle changes between points
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(working_path_with_jogs);
+    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(working_path_with_jogs, -1);
     diff_angles_fullLength = [diff_angles(1); diff_angles];
     
     % Find outliers
@@ -158,7 +160,7 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
 
     if flag_do_debug
         figure(fig_debug);
-        plot(working_path_with_jogs(outliers,1),working_path_with_jogs(outliers,2),'r.','MarkerSize',20);
+        plot(working_path_with_jogs(outliers,1),working_path_with_jogs(outliers,2),'ro','MarkerSize',10);
     end
 
     % For debugging
@@ -167,7 +169,7 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
         clf;
 
         x_indices = 1:length(diff_angles_fullLength);
-        plot(x_indices,diff_angles_fullLength*180/pi,'k-');
+        plot(x_indices,diff_angles_fullLength*180/pi,'k.-','MarkerSize',10);
         hold on;
         plot(x_indices(outliers), diff_angles_fullLength(outliers)*180/pi,'ro');
         xlabel('Indices');
@@ -176,6 +178,51 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
 
     % Are there any back/forth jogs?
     if ~isempty(outliers)
+
+        % If there are, find pairs, e.g. outliers in sequence. These occur
+        % where the differences in outliers is 1
+        outlierIndexDifferences = diff(outliers);
+        pairStarts = outliers(outlierIndexDifferences==1);
+        realOutliers = nan(length(pairStarts),1);
+        if ~isempty(realOutliers)
+            for ith_pair = 1:length(pairStarts)
+                startingIndex = pairStarts(ith_pair);
+                if startingIndex==1 || startingIndex>=Npath-1
+                    error('jogs found at start/end - this will likely cause errors.');
+                end
+
+                % Find the segment that the jogs occur "within". We will use
+                % this segment to find which one is outlier is most away from the
+                % segment, and just eliminate that one. To do this, we convert
+                % the segment into a vector, rotate the vector by 90 degrees,
+                % take the dot product of the ortho vector with the vector to
+                % each point, and find the largest magnitude value.
+                segmentStartIndex = startingIndex-1;
+                segmentEndIndex   = startingIndex+2;
+                segmentStart = path_with_jogs(segmentStartIndex,:);
+                segmentEnd   = path_with_jogs(segmentEndIndex,:);
+                segmentVector = segmentEnd-segmentStart;
+                segmentOrthoVector = segmentVector*[0 1; -1 0];
+                outlier1Vector = path_with_jogs(startingIndex,:) - segmentStart;
+                outlier2Vector = path_with_jogs(startingIndex+1,:) - segmentStart;
+                % Take dot products
+                orthoDistance1 = abs(sum(outlier1Vector.*segmentOrthoVector,2));
+                orthoDistance2 = abs(sum(outlier2Vector.*segmentOrthoVector,2));
+                if orthoDistance1>orthoDistance2
+                    realOutliers(ith_pair) = startingIndex;
+                else
+                    realOutliers(ith_pair) = startingIndex+1;
+                end
+            end % Ends loop through pairs
+
+
+            if flag_do_debug
+                figure(fig_debug);
+                plot(working_path_with_jogs(realOutliers,1),working_path_with_jogs(realOutliers,2),'rx','MarkerSize',10);
+            end
+        else % No back/forth jogs left!
+            flag_average_is_good = 1;
+        end
         % % ID adjacent points
         % outliers = unique([outliers;outliers+1;outliers-1]);
         % outliers = min(outliers,length(working_path_with_jogs)-1);
@@ -183,7 +230,7 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
         
         % Create a set of indices we will save
         indices = (1:length(working_path_with_jogs(:,1)))';
-        indices(outliers) = 0;
+        indices(realOutliers) = 0;
         
         % Save the clean path
         clean_path = working_path_with_jogs(indices~=0,:);        

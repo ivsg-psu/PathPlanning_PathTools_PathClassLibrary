@@ -46,7 +46,7 @@ search_radius = 5;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -90,7 +90,7 @@ search_radius = 5;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -132,7 +132,7 @@ search_radius = 10;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -175,7 +175,7 @@ search_radius = 20;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -217,7 +217,7 @@ search_radius = 20;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -260,7 +260,7 @@ search_radius = 20;
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -302,7 +302,7 @@ nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
@@ -345,7 +345,7 @@ nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
     central_traversal,nearby_traversal,...
     flag_rounding_type,search_radius,fig_num);
 
-title(titleString, 'Interpreter','none');
+% title(titleString, 'Interpreter','none');
 
 print_results(stations,closest_path_point,distances);
 
