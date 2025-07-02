@@ -71,7 +71,7 @@ function XY_points = fcn_Path_convertSt2XY(referencePath,St_input_points, vararg
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_Path_convertPathToTraversalStructure
+%     fcn_Path_calcPathStation
 %
 % This function was written on 2023_08_26 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
@@ -182,13 +182,14 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-central_traversal = fcn_Path_convertPathToTraversalStructure(referencePath, -1);
+central_path = referencePath;
+central_path_Station = fcn_Path_calcPathStation(central_path,-1);
 
-modified_stations = min(St_input_points(:,1),central_traversal.Station(end));
+modified_stations = min(St_input_points(:,1),central_path_Station(end));
 modified_stations = max(modified_stations,0);
 
 [unit_normal_vector_start, unit_normal_vector_end] = ...
-    fcn_Path_findOrthogonalTraversalVectorsAtStations(modified_stations,central_traversal, flag_rounding_type, -1);
+    fcn_Path_findOrthogonalPathVectorsAtStations(modified_stations,central_path, flag_rounding_type, -1);
 
 unit_orthogonal_vectors = unit_normal_vector_end - unit_normal_vector_start;
 

@@ -181,24 +181,24 @@ else
     end
 
     % Prep path for cutting
-    traversalToCut = fcn_Path_convertPathToTraversalStructure(pathToCut, -1);
-    trimmed_after_indicies  = traversalToCut.Station >=s_coordinate_of_cut;
-    trimmed_before_indicies = traversalToCut.Station <=s_coordinate_of_cut;
+    pathToCut_Station = fcn_Path_calcPathStation(pathToCut,-1);
+    trimmed_after_indicies  = pathToCut_Station >=s_coordinate_of_cut;
+    trimmed_before_indicies = pathToCut_Station <=s_coordinate_of_cut;
     
     cut_path_before = pathToCut(trimmed_before_indicies,:);
     cut_path_after  = pathToCut(trimmed_after_indicies,:);
 
     % Do we need to insert a point?
-    if ~any(traversalToCut.Station == s_coordinate_of_cut)
+    if ~any(pathToCut_Station == s_coordinate_of_cut)
         if length(pathToCut(1,:))==3
             % Must find height at cut. Use interpolation to do this.
 
-            index_before_cut = find(traversalToCut.Station<s_coordinate_of_cut,1,'last');
-            station_before_cut = traversalToCut.Station(index_before_cut,1);
+            index_before_cut = find(pathToCut_Station<s_coordinate_of_cut,1,'last');
+            station_before_cut = pathToCut_Station(index_before_cut,1);
             height_before_cut  = pathToCut(index_before_cut,3);
             
-            index_after_cut = find(traversalToCut.Station>s_coordinate_of_cut,1,'first');
-            station_after_cut = traversalToCut.Station(index_after_cut,1);
+            index_after_cut = find(pathToCut_Station>s_coordinate_of_cut,1,'first');
+            station_after_cut = pathToCut_Station(index_after_cut,1);
             height_after_cut  = pathToCut(index_after_cut,3);
 
             stations = [station_before_cut; station_after_cut];

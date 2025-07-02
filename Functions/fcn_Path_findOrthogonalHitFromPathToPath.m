@@ -1,15 +1,15 @@
 function [closest_path_points,closest_distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
+    fcn_Path_findOrthogonalHitFromPathToPath(...
     query_stations,...
-    central_traversal,...
-    nearby_traversal, ...
+    central_path,...
+    nearby_path, ...
     varargin)
-% fcn_Path_findOrthogonalHitFromTraversalToTraversal
-% Given a central traversal and a set of stations along that traversal,
-% finds the location on nearby traversals that are closest to the central
-% traveral at each station point. Closest is defined via an orthogonal
+% fcn_Path_findOrthogonalHitFromPathToPath
+% Given a central path and a set of stations along that path,
+% finds the location on nearby paths that are closest to the central
+% path at each station point. Closest is defined via an orthogonal
 % projection (or modifications of orthogonal projections) from the central
-% traversal outward toward nearby traversals. Both positive and negative
+% path outward toward nearby paths. Both positive and negative
 % projections are included. Positive projections are those that, in the
 % cross-product between the station direction and sensor
 % projection, have a positive result. If a distance is in the positive
@@ -20,25 +20,27 @@ function [closest_path_points,closest_distances] = ...
 % FORMAT:
 %
 %      [closest_path_points,s_coordinate] = ...
-%        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
-%        query_stations,central_traversal,nearby_traversal,...
+%        fcn_Path_findOrthogonalHitFromPathToPath(...
+%        query_stations,central_path,nearby_path,...
 %        (flag_rounding_type),(search_radius),(fig_num));
 %
 % INPUTS:
 %
 %      query_stations: an N x 1 vector, with N>=1, containing the station
-%      on the central traversal where the projections should take place
+%      on the central path where the projections should take place
 %
-%      central_traversal: a traversal structure that specifies the path
-%      where projections to other paths are taking place.
+%      central_path: a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, of a
+%      path.
 %
-%      nearby_traversal: a traversal structure that specifies the path
-%      where intersections from the central_traversal would hit.
+%      nearby_path: a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, of a
+%      path where intersections from the central_path would hit.
 %
 %      (OPTIONAL INPUTS)
 %      flag_rounding_type: a flag to indicate which type of projection is
 %      used, especially when stations are located at the end-points of
-%      segments within the nearby_traversal. Except for flag option 4, the
+%      segments within the nearby_path. Except for flag option 4, the
 %      very first point uses projections from the following segement, and
 %      the very last point always uses the prior. The flag determines
 %      behaviors for endpoints of internal segments. The options include:
@@ -87,14 +89,13 @@ function [closest_path_points,closest_distances] = ...
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_Path_findOrthogonalTraversalVectorsAtStations
-%      fcn_Path_convertPathToTraversalStructure
-%      fcn_Path_findTraversalStationSegment
+%      fcn_Path_findOrthogonalPathVectorsAtStations
+%      fcn_Path_findPathStationSegment
 %      fcn_Path_findProjectionHitOntoPath
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_Path_findOrthogonalHitFromTraversalToTraversal
+% See the script: script_test_fcn_Path_findOrthogonalHitFromPathToPath
 % for a full test suite.
 %
 % This function was written on 2020_11_14 by S. Brennan
@@ -127,12 +128,15 @@ function [closest_path_points,closest_distances] = ...
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
 % -- Fixed bug where empty input arguments do not use defaults
+% 2025_07_01 - S. Brennan
+% -- Removed traversal input type and replaced with cell array of paths
+% -- Renamed function from
+% fcn_Path_findOrthogonalHitFromTraversalToTraversal
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
-warning('The function fcn_Path_findOrthogonalHitFromTraversalToTraversal is being deprecated. Please use fcn_Path_findOrthogonalHitFromPathToPath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -185,24 +189,27 @@ if 0==flag_max_speed
         % Check the query_stations input
         fcn_DebugTools_checkInputsToFunctions(query_stations, 'station');
 
-        % Check the central_traversal input
-        fcn_DebugTools_checkInputsToFunctions(central_traversal, 'traversal');
+        % Check the central_path input
+        fcn_DebugTools_checkInputsToFunctions(central_path, 'path2or3D');
 
+        % Check the nearby_path input
+        fcn_DebugTools_checkInputsToFunctions(nearby_path, 'path2or3D');
 
-        % Check the nearby_traversal input
-        fcn_DebugTools_checkInputsToFunctions(nearby_traversal, 'traversal');
+        % Check the query_stations input
+        fcn_DebugTools_checkInputsToFunctions(query_stations, 'station');
 
-        % Check cases specific to this function
-        if any(query_stations<central_traversal.Station(1,1)) || any(query_stations>central_traversal.Station(end,1))
-            fprintf(1,'Min of central_traversal stations: %.2f\n',central_traversal.Station(1));
+        [central_path_Station, ~] = fcn_Path_calcPathStation(central_path,-1);
+
+        if any(query_stations<central_path_Station(1,1)) || any(query_stations>central_path_Station(end,1))
+            fprintf(1,'Min of central_path stations: %.2f\n',central_path_Station(1));
             fprintf(1,'Min of query stations: %.2f\n',min(query_stations));
-            fprintf(1,'Max of central_traversal stations: %.2f\n',central_traversal.Station(end,1));
+            fprintf(1,'Max of central_path stations: %.2f\n',central_path_Station(end,1));
             fprintf(1,'Max of query stations: %.2f\n',max(query_stations));
-            warning('The station query locations should be within the full range of stations within the central_traversal. Rounding to closest station.');
-            bad_queries = (query_stations<central_traversal.Station(1,1));
-            query_stations(bad_queries) = central_traversal.Station(1,1);
-            bad_queries = (query_stations>central_traversal.Station(end,1));
-            query_stations(bad_queries) = central_traversal.Station(end,1);
+            warning('The station query locations should be within the full range of stations within the central_path. Rounding to closest station.');
+            bad_queries = (query_stations<central_path_Station(1,1));
+            query_stations(bad_queries) = central_path_Station(1,1);
+            bad_queries = (query_stations>central_path_Station(end,1));
+            query_stations(bad_queries) = central_path_Station(end,1);
 
 
         end
@@ -219,7 +226,8 @@ if 4 <= nargin
 end
 
 % Define search radius?
-search_radius = central_traversal.Station(end)*3;
+[central_path_Station, ~] = fcn_Path_calcPathStation(central_path,-1);
+search_radius = central_path_Station(end)*3;
 if 5 <= nargin
     temp = varargin{2};
     if ~isempty(temp) % Did the user NOT give an empty value?
@@ -258,8 +266,8 @@ Nstations = length(query_stations(:,1));
 
 %% Find the unit normal vectors at each of the station points
 [unit_normal_vector_start, unit_normal_vector_end] = ...
-    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    query_stations,central_traversal,flag_rounding_type,-1);
+    fcn_Path_findOrthogonalPathVectorsAtStations(...
+    query_stations,central_path,flag_rounding_type,-1);
 unit_vector_displacement = unit_normal_vector_end - unit_normal_vector_start;
 
 %% Define the sensor vector from the unit vector
@@ -270,8 +278,7 @@ negative_sensor_vector_end = unit_normal_vector_start - unit_vector_displacement
 
 %% Define the path we are searching from the nearby traversal
 % Need to constrain this to be only within a small range of the s-distance?
-path_to_check = [nearby_traversal.X nearby_traversal.Y];
-traversal_to_check = fcn_Path_convertPathToTraversalStructure(path_to_check, -1);
+path_to_check = nearby_path;
 
 % Initialize the location of the hits to zeros
 locations_of_hits = zeros(Nstations,2);
@@ -290,12 +297,12 @@ for i_station=1:Nstations
         s_coord_end = query_station + search_radius;
 
         % Format: [pathSXY_segment,flag_outside_start, flag_outside_end] = ...
-        [traversal_segment, ~, ~] = ...
-            fcn_Path_findTraversalStationSegment(traversal_to_check, s_coord_start,s_coord_end,-1);
+        [path_segment, ~, ~] = ...
+            fcn_Path_findPathStationSegment(path_to_check, s_coord_start,s_coord_end,-1);
 
-        path_segment_to_check = [traversal_segment.X traversal_segment.Y];
+        path_segment_to_check = path_segment;
     else
-        path_segment_to_check = [traversal_to_check.X traversal_to_check.Y];
+        path_segment_to_check = path_to_check;
     end
 
     if flag_do_debug
@@ -393,17 +400,17 @@ if flag_do_plots
     grid on;
 
     % Plot the central traversal
-    plot(central_traversal.X,central_traversal.Y,'k','Linewidth',3);
+    plot(central_path(:,1),central_path(:,2),'k','Linewidth',3,'DisplayName','Central Path');
 
     % Plot the path
     % plot(path_to_check(:,1),path_to_check(:,2),'bo-','Linewidth',2);
-    plot(path_to_check(:,1),path_to_check(:,2),'o-','Linewidth',2);
+    plot(path_to_check(:,1),path_to_check(:,2),'o-','Linewidth',2,'DisplayName','Path to Check');
 
 
     axis equal;
 
     % Plot the station points that originate the query
-    plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'k.','Markersize',35);
+    plot(unit_normal_vector_start(:,1),unit_normal_vector_start(:,2),'k.','Markersize',35,'DisplayName','Station Points');
 
     if flag_do_debug
         % Add text to indicate station values
@@ -428,15 +435,15 @@ if flag_do_plots
     negative_sensor_vector = negative_sensor_vector_end - sensor_vector_start;
 
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
-        positive_sensor_vector(:,1),positive_sensor_vector(:,2),0,'g','Linewidth',3);
+        positive_sensor_vector(:,1),positive_sensor_vector(:,2),0,'g','Linewidth',3,'DisplayName','Sensor vectors (+)');
     quiver(sensor_vector_start(:,1),sensor_vector_start(:,2),...
-        negative_sensor_vector(:,1),negative_sensor_vector(:,2),0,'c','Linewidth',3);
+        negative_sensor_vector(:,1),negative_sensor_vector(:,2),0,'c','Linewidth',3,'DisplayName','Sensor vectors (-)');
 
     % Plot hit locations
-    plot(locations_of_hits(:,1),locations_of_hits(:,2),'r.','Markersize',30);
+    plot(locations_of_hits(:,1),locations_of_hits(:,2),'r.','Markersize',30,'DisplayName','Hit locations');
 
     % Add a legend
-    legend('Central traversal','Path to check','Station query points','Sensor vectors (+)','Sensor vectors (-)','Hit locations');
+    legend
 
     % Add text to indicate distance result
     text_locations = sensor_vector_start + unit_vector_displacement.*closest_distances/2;

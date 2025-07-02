@@ -19,7 +19,7 @@ diary 'script_test_fcn_path_all_stdout.txt';
 for i_script = 1:N_files
     file_name_extended = all_scripts(i_script).name;
     file_name = erase(file_name_extended,'.m');
-    if ~strcmp(mfilename,file_name)
+    if ~strcmp(mfilename,file_name) && ~contains(file_name,'traversal','IgnoreCase',true)
         %file_name_trunc = erase(file_name,'script_');
         fcn_DebugTools_cprintf('*blue',' ');
         fcn_DebugTools_cprintf('*blue','Testing script: %.0d of %.0d, %s\n\n',i_script,length(all_scripts),file_name);
@@ -29,6 +29,9 @@ for i_script = 1:N_files
         results = run(suite);
         telapsed = toc(tstart);
         testing_times(i_script) = telapsed;
+    else
+        fcn_DebugTools_cprintf('*red',' ');
+        fcn_DebugTools_cprintf('*red','Skipping script: %.0d of %.0d, %s\n\n',i_script,length(all_scripts),file_name);
     end
 end
 diary off

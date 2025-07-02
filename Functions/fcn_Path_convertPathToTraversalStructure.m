@@ -75,6 +75,8 @@ function traversal = fcn_Path_convertPathToTraversalStructure(path,varargin)
 % (none)
 
 %% Debugging and Input checks
+warning('on','backtrace');
+warning('The function fcn_Path_convertPathToTraversalStructure is being deprecated. Please path definitions in codes hereafter, instead of traversals.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure

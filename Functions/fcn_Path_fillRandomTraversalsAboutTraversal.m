@@ -101,6 +101,7 @@ function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(referen
 % (none)
 
 %% Debugging and Input checks
+warning('The function fcn_Path_fillRandomTraversalsAboutTraversal is being deprecated. Please use fcn_Path_fillRandomPathsAboutPath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure

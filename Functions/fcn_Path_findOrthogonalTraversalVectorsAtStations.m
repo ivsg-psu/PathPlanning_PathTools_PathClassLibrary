@@ -109,6 +109,8 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 
 
 %% Debugging and Input checks
+warning('on','backtrace');
+warning('The function fcn_Path_findOrthogonalTraversalVectorsAtStations is being deprecated. Please use fcn_Path_findOrthogonalPathVectorsAtStations instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure

@@ -1,0 +1,350 @@
+function [closest_path_point,s_coordinate,path_point_yaw,....
+    first_path_point_index,...
+    second_path_point_index,...
+    percent_along_length] = ...
+    fcn_Path_snapPointOntoNearestPath(point, path, varargin)
+% fcn_Path_snapPointOntoNearestPath
+% Finds location on a path that is closest to a given point,
+% e.g. snapping the point onto the path.
+% This function usually finds the orthogonal point on the path.
+% At times, the orthogonal point lies off the path at corners. In such
+% cases, the nearest neigbour is taken as the corner.
+% 'path_point_yaw' gives orientation of the path at
+% 'first_path_point_index'.
+%
+% FORMAT:
+%
+%      [closest_path_point,s_coordinate,path_point_yaw,....
+%      first_path_point_index,...
+%      second_path_point_index,...
+%      percent_along_length] = ...
+%      fcn_Path_snapPointOntoNearestPath(point, path, (fig_num))
+%
+% INPUTS:
+%
+%      point: a 1x2 vector containing the [X Y] location of the point
+%
+%      path: a N x 2 or N x 3 set of coordinates representing the [X Y] or
+%      [X Y Z] coordinates, in sequence, of a path
+%
+%     (OPTIONAL INPUTS)
+%
+%     fig_num: a figure number to plot results. If set to -1, skips any
+%     input checking or debugging, no figures will be generated, and sets
+%     up code to maximize speed. As well, if given, this forces the
+%     variable types to be displayed as output and as well makes the input
+%     check process verbose.
+%
+% OUTPUTS:
+%
+%      closest_path_point: a 1x2 vector containing the [X Y] location of
+%      the nearest point on the path
+%
+%      s_coordinate: a scalar (1x1) representing the s-coordinate distance
+%      along the path
+%
+%      path_point_yaw: a scalar (1x1) representing the yaw angle (rad) of
+%      the path segment in the path to which the point snapped.
+%
+%      first_path_point_index: (1x1) scalar integer which is the index of
+%      starting the path segment to which the point snapped
+%
+%      second_path_point_index: (1x1) scalar integer which is the index of
+%      the ending point of the path segment to which the point snapped.
+%
+%      percent_along_length: (1x1) scalar representing the fraction (from 0
+%      to 1) along the path segment to which the point snapped
+%
+% DEPENDENCIES:
+%
+%     fcn_DebugTools_checkInputsToFunctions
+%
+% EXAMPLES:
+%
+% See the script: script_test_fcn_Path_snapPointOntoNearestPath
+% for a full test suite.
+%
+% This function was written on 2021_01_29 by Satya Prasad based on
+% fcn_snapPointOntoNearestPath written by S. Brennan
+% Questions or comments? szm888@psu.edu
+
+% Revision history:
+% 2020_01_29 - first write of the code
+% 2021_12_27 - improved the comments, fixed input argument comments
+% 2023_04_24 - sbrennan@psu.edu
+% - converted code to a nested call to fcn_Path_snapPointOntoNearestPath
+% - fixed debug plotting to match fcn_Path_snapPointOntoNearestPath
+% 2023_09_29 - sbrennan@psu.edu
+% - updated code to use fcn_Path_snapPointToPathViaVectors
+% - fixed bug where it can call a yaw value larger than the array
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
+
+% TO-DO
+% Allow multiple points, e.g.
+%      point: a Nx2 vector where N is the number of points, but at least 1.
+
+
+%% Debugging and Input checks
+
+% Check if flag_max_speed set. This occurs if the fig_num variable input
+% argument (varargin) is given a number of -1, which is not a valid figure
+% number.
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
+flag_max_speed = 0;
+if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 0; % Flag to perform input checking
+    flag_max_speed = 1;
+else
+    % Check to see if we are externally setting debug mode to be "on"
+    flag_do_debug = 0; % % % % Flag to plot the results for debugging
+    flag_check_inputs = 1; % Flag to perform input checking
+    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    end
+end
+
+% flag_do_debug = 1;
+
+if flag_do_debug
+    st = dbstack; %#ok<*UNRCH>
+    fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
+    debug_fig_num = 999978; %#ok<NASGU>
+else
+    debug_fig_num = []; %#ok<NASGU>
+end
+
+%% check input arguments?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____                   _
+%  |_   _|                 | |
+%    | |  _ __  _ __  _   _| |_ ___
+%    | | | '_ \| '_ \| | | | __/ __|
+%   _| |_| | | | |_) | |_| | |_\__ \
+%  |_____|_| |_| .__/ \__,_|\__|___/
+%              | |
+%              |_|
+% See: http://patorjk.com/software/taag/#p=display&f=Big&t=Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if 0==flag_max_speed
+    if flag_check_inputs
+        % Are there the right number of inputs?
+        narginchk(2,MAX_NARGIN);
+
+        % Check the Path variables
+        fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
+    end
+end
+
+% Does user want to show the plots?
+flag_do_plots = 0; % Default is to NOT show plots
+if (0==flag_max_speed) && (MAX_NARGIN == nargin)
+    temp = varargin{end};
+    if ~isempty(temp) % Did the user NOT give an empty figure number?
+        fig_num = temp;
+        figure(fig_num);
+        flag_do_plots = 1;
+    end
+else
+    if flag_do_debug
+        fig_debug = 38383; %#ok<NASGU>
+    end
+end
+
+
+
+%% Main code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   __  __       _
+%  |  \/  |     (_)
+%  | \  / | __ _ _ _ __
+%  | |\/| |/ _` | | '_ \
+%  | |  | | (_| | | | | |
+%  |_|  |_|\__,_|_|_| |_|
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The solution method is as follows:
+%  1. Find the closest point on the path to the query point
+%   -> Check for end cases
+%  2. Find path points behind and ahead of the closest point from 1
+%  3. Find percentage of travel on both the segments using dot products
+%  4. Find projected point on the segment that has percentage of travel
+%  between 0 and 1
+%  5. If percentage of travel is not between 0 and 1 for both the segments,
+%  then choose the projected point as closest point from 1
+
+path_yaw = fcn_Path_calcYawFromPathSegments(path,-1);
+
+[closest_path_point,s_coordinate,...
+    first_path_point_index,...
+    second_path_point_index,...
+    percent_along_length] = ...
+    fcn_Path_snapPointToPathViaVectors(point, path);
+
+path_point_yaw     = path_yaw(min(first_path_point_index,length(path_yaw)));
+
+%
+% % Find square of the distance from a point to every point on the path
+% squared_distances_point_to_path = sum((path - point).^2,2); % Calculate square of distances
+% [~,closest_path_point_index] = min(squared_distances_point_to_path);  % Grab index of the closest point
+%
+% % First check if we are in one of the end cases
+% if 1 == closest_path_point_index || Npoints == closest_path_point_index
+%     if 1 == closest_path_point_index
+%         first_path_point_index  = 1;
+%         second_path_point_index = 2;
+%     else
+%         first_path_point_index  = Npoints-1;
+%         second_path_point_index = Npoints;
+%     end
+%
+%     % Do the dot products - define the vectors first
+%     % See: https://mathinsight.org/dot_product for explanation
+%     % Basically, we are seeing what amount the point_vector points in the
+%     % direction of the path_vector
+%     path_vector  = path(second_path_point_index,:)-path(first_path_point_index,:);
+%     path_segment_length  = sum(path_vector.^2,2).^0.5;
+%     point_vector = point-path(first_path_point_index,:);
+%     projection_distance  = dot(path_vector,point_vector)/path_segment_length; % Do dot product
+%     percent_along_length = projection_distance/path_segment_length;
+%
+%     % Calculate the outputs
+%     closest_path_point = path(first_path_point_index,:) + path_vector*percent_along_length;
+%     s_coordinate       = path_station(first_path_point_index,1) + path_segment_length*percent_along_length;
+%     path_point_yaw     = path_yaw(first_path_point_index);
+% else
+%     % Do the dot products - define the vectors first
+%     % See: https://mathinsight.org/dot_product for explanation
+%     % Basically, we are seeing what amount the front_point_vector points in
+%     % the direction of the front_path_vector
+%     front_path_vector  = path(closest_path_point_index+1,:)-path(closest_path_point_index,:);
+%     front_path_segment_length  = sum(front_path_vector.^2,2).^0.5;
+%     front_point_vector = point-path(closest_path_point_index,:);
+%     front_projection_distance  = dot(front_path_vector,front_point_vector)/front_path_segment_length; % Do dot product
+%     front_percent_along_length = front_projection_distance/front_path_segment_length;
+%
+%     % Do the dot products - define the vectors first
+%     % See: https://mathinsight.org/dot_product for explanation
+%     % Basically, we are seeing what amount the back_point_vector points in
+%     % the direction of the back_path_vector
+%     back_path_vector  = path(closest_path_point_index,:)-path(closest_path_point_index-1,:);
+%     back_path_segment_length  = sum(back_path_vector.^2,2).^0.5;
+%     back_point_vector = point-path(closest_path_point_index-1,:);
+%     back_projection_distance  = dot(back_path_vector,back_point_vector)/back_path_segment_length;    % Do dot product
+%     back_percent_along_length = back_projection_distance/back_path_segment_length;
+%
+%     if 0 > back_percent_along_length % Point is located BEHIND the vector that is the rear-most vector
+%         error('ERROR: Point is lying BEHIND the BACK segment on path');
+%     elseif 1 < back_percent_along_length  % Point is in front of vector that is the rear-most vector
+%         if 1 < front_percent_along_length % Point is ahead of the vector that is in front
+%             error('ERROR: Point is lying AHEAD of the FRONT segment on path');
+%         elseif 0 > front_percent_along_length  % point is BEFORE start of front and AHEAD start of back - this is normal
+%             first_path_point_index  = closest_path_point_index;
+%             second_path_point_index = closest_path_point_index;
+%             percent_along_length    = 0;
+%
+%             % Calculate the outputs
+%             closest_path_point = path(closest_path_point_index,:);
+%             s_coordinate       = path_station(closest_path_point_index,1);
+%             path_point_yaw     = path_yaw(first_path_point_index);
+%
+%         else  % Only way to enter here is if point is ahead of back, and ON the front vector
+%             first_path_point_index  = closest_path_point_index;
+%             second_path_point_index = closest_path_point_index+1;
+%             percent_along_length    = front_percent_along_length;
+%
+%             % Calculate the outputs
+%             closest_path_point = path(first_path_point_index,:) + ...
+%                 front_path_vector*front_percent_along_length;
+%             s_coordinate       = path_station(first_path_point_index,1) + ...
+%                 front_path_segment_length*front_percent_along_length;
+%             path_point_yaw     = path_yaw(first_path_point_index);
+%         end
+%     else % Only way to enter here is if point is on the back vector
+%
+%         first_path_point_index  = closest_path_point_index-1;
+%         second_path_point_index = closest_path_point_index;
+%         percent_along_length    = back_percent_along_length;
+%
+%         % Calculate the outputs
+%         closest_path_point = path(first_path_point_index,:) + ...
+%             back_path_vector*back_percent_along_length;
+%         s_coordinate       = path_station(first_path_point_index,1) + ...
+%             back_path_segment_length*back_percent_along_length;
+%         path_point_yaw     = path_yaw(first_path_point_index);
+%     end
+% end
+
+%% Plot the results (for debugging)?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   _____       _
+%  |  __ \     | |
+%  | |  | | ___| |__  _   _  __ _
+%  | |  | |/ _ \ '_ \| | | |/ _` |
+%  | |__| |  __/ |_) | |_| | (_| |
+%  |_____/ \___|_.__/ \__,_|\__, |
+%                            __/ |
+%                           |___/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if flag_do_plots
+    figure(fig_num);
+    hold on;
+    grid on;
+
+    % Plot the path
+    plot(path(:,1),path(:,2),'r.-','Linewidth',3,'Markersize',20,'DisplayName','Path');
+
+    axis equal;
+
+    % Plot the query point
+    plot(point(:,1),point(:,2),'k.','MarkerSize',20,'DisplayName','Query point');
+
+    % Plot the closest path points;
+    plot(...
+        path(first_path_point_index:second_path_point_index,1),...
+        path(first_path_point_index:second_path_point_index,2),'m.','MarkerSize',30,'DisplayName','Closest Endpoints');
+
+    % % Label the points with distances?
+    % for i_point = 1:length(path(:,1))
+    %     text(path(i_point,2),path(i_point,3),sprintf('%.2f',distances_point_to_path(i_point)));
+    % end
+
+    %     % Plot the closest point on path
+    %     plot(closest_path_point(:,1),closest_path_point(:,2),'go','Markersize',20);
+    %     quiver(closest_path_point(1), closest_path_point(2), ...
+    %            cos(path_point_yaw), sin(path_point_yaw), 0.3, 'g', 'Linewidth', 3);
+    %     text(closest_path_point(:,1),closest_path_point(:,2),'Snap Point on Path');
+
+    % Connect closest point on path to query point
+    plot(...
+        [point(:,1) closest_path_point(:,1)],...
+        [point(:,2) closest_path_point(:,2)],'g-','Linewidth',2,'DisplayName','Connection');
+    
+    legend
+
+
+end % Ends the flag_do_plots if statement
+
+if flag_do_debug
+    fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
+end
+
+end % Ends the function
+
+%% Functions follow
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ______                _   _
+%  |  ____|              | | (_)
+%  | |__ _   _ _ __   ___| |_ _  ___  _ __  ___
+%  |  __| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+%  | |  | |_| | | | | (__| |_| | (_) | | | \__ \
+%  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+%
+% See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+

@@ -1,23 +1,24 @@
-function [traversal_no_pinch_point] = ...
-    fcn_Path_removePinchPointInTraversal(...
-    traversal_with_pinch_point,...
+function [path_no_pinch_point] = ...
+    fcn_Path_removePinchPointInPath(...
+    path_with_pinch_point,...
     varargin)
-% fcn_Path_removePinchPointInTraversal
-% Given a traversal with a pinch point - an area where the traversal
+% fcn_Path_removePinchPointInPath
+% Given a path with a pinch point - an area where the path
 % suddenly bends back on itself before continuing - this function removes
 % the pinch point
 %
 % FORMAT:
 %
-%     [traversal_no_pinch_point] = ...
-%         fcn_Path_removePinchPointInTraversal(...
-%         traversal_with_pinch_point
+%     [path_no_pinch_point] = ...
+%         fcn_Path_removePinchPointInPath(...
+%         path_with_pinch_point
 %        (fig_num));
 %
 % INPUTS:
 %
-%      traversal_with_pinch_point: a traversal structure that specifies the
-%      path, s-coordinates, etc of a traveral with a pinch point
+%      path_with_pinch_point: a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, that
+%      specifies the path with a pinch point
 %
 %     (OPTIONAL INPUTS)
 %
@@ -29,19 +30,18 @@ function [traversal_no_pinch_point] = ...
 %
 % OUTPUTS:
 %
-%      traversal_no_pinch_point: a traversal structure that specifies the
+%      path_no_pinch_point: a path structure that specifies the
 %      path, s-coordinates, etc of a traveral with the pinch points
 %      removed.
 %
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
-%      fcn_Path_convertPathToTraversalStructure
 %      fcn_Path_plotTraversalsXY
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_Path_removePinchPointInTraversal
+% See the script: script_test_fcn_Path_removePinchPointInPath
 % for a full test suite.
 %
 % This function was written on 2021_01_23 by S. Brennan
@@ -52,12 +52,14 @@ function [traversal_no_pinch_point] = ...
 % -- first write of the code
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- Removed traversal input type and replaced with cell array of paths
+% -- Renamed function from fcn_Path_removePinchPointInTraversal
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
-warning('The function fcn_Path_removePinchPointInTraversal is being deprecated. Please use fcn_Path_removePinchPointInPath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -107,8 +109,8 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(1,MAX_NARGIN);
 
-        % Check the traversal_with_pinch_point input
-        fcn_DebugTools_checkInputsToFunctions(traversal_with_pinch_point, 'traversal');
+        % Check the path_with_pinch_point input
+        fcn_DebugTools_checkInputsToFunctions(path_with_pinch_point, 'path2or3D');
 
     end
 end
@@ -140,24 +142,24 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Nsegments = length(traversal_with_pinch_point.X) - 1;
+Nsegments = length(path_with_pinch_point(:,1)) - 1;
 
 if Nsegments<2
     % There needs to be at least 2 segments to self-intersect
-    traversal_no_pinch_point = traversal_with_pinch_point;
+    path_no_pinch_point = path_with_pinch_point;
 else
 
-    % Loop through all the segments in traversal 1, checking each for
-    % intersections with traversal 2
-    original_path_of_traversal = [traversal_with_pinch_point.X traversal_with_pinch_point.Y];
+    % Loop through all the segments in path 1, checking each for
+    % intersections with path 2
+    original_path = path_with_pinch_point;
 
     % Set the flag to indicate that we are ONLY searching if the exact segment
     % crosses or not
     flag_search_type = 0;
 
     % Initialize values
-    no_pinch_path = original_path_of_traversal(1,:);
-    remaining_path = original_path_of_traversal(2:end,:);
+    no_pinch_path = original_path(1,:);
+    remaining_path = original_path(2:end,:);
 
     % Are there at least 3 points in the remaining path?
     while length(remaining_path(:,1))>=2
@@ -171,7 +173,7 @@ else
             fcn_Path_findProjectionHitOntoPath(...
             remaining_path,...
             sensor_vector_start,sensor_vector_end,...
-            flag_search_type);
+            flag_search_type, -1);
 
         % Did we hit anything? If so, save it and set a flag that a pinch
         % point was hit!
@@ -188,17 +190,19 @@ else
             % First, interpolate the s-coordinate after the 1st hit
             travel = sum((sensor_vector_end - hit_location).^2,2).^0.5;
 
-            % Second: find the s-coordinate for traversal after this hit
+            % Second: find the s-coordinate for path after this hit
             [~,s_coordinate_after_hit,~,~,~] = ...
                 fcn_Path_snapPointToPathViaVectors(...
-                hit_location, remaining_path);
+                hit_location, remaining_path, [], -1);
 
             % Third: add these values
             s_coordinates_trimmed = (travel + s_coordinate_after_hit);
 
             % Do we need to warn the user?
-            if s_coordinates_trimmed > 10
-                warning('10 meters or more were trimmed. This is a large amount!');
+            if 1==0
+                if s_coordinates_trimmed > 10
+                    warning('10 meters or more were trimmed. This is a large amount!');
+                end
             end
 
             % Update the path
@@ -223,9 +227,8 @@ else
             cleaned_path = [cleaned_path; no_pinch_path(ith_row,:)]; %#ok<AGROW>
         end
     end % Ends the for loop over rows, to clean repeats
-    no_pinch_path = cleaned_path;
 
-    traversal_no_pinch_point = fcn_Path_convertPathToTraversalStructure(no_pinch_path);
+    path_no_pinch_point = cleaned_path;
 end % Ends check to see if there are at least 3 segments
 
 
@@ -247,13 +250,13 @@ if flag_do_plots
     hold on;
     grid on;
 
-    % Plot the two traversals
+    % Plot the two paths
     clear data
-    data.traversal{1} = traversal_with_pinch_point;
-    data.traversal{2} = traversal_no_pinch_point;
-    fcn_Path_plotTraversalsXY(data,fig_num);
+    data{1} = path_with_pinch_point;
+    data{2} = path_no_pinch_point;
+    fcn_Path_plotPathsXY(data,fig_num);
 
-    legend('Original traversal with pinch point', 'Traversal with no pinch');
+    legend('Original path with pinch point', 'Traversal with no pinch');
 end % Ends the flag_do_plot if statement
 
 if flag_do_debug

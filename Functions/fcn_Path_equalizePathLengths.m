@@ -48,8 +48,7 @@ function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEn
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_Path_convertPathToTraversalStructure
-%     fcn_Path_findOrthogonalHitFromTraversalToTraversal
+%     fcn_Path_findOrthogonalHitFromPathToPath
 %     fcn_Path_findSensorHitOnWall
 %
 % EXAMPLES:
@@ -377,25 +376,24 @@ pathIndicesNoHits = zeros(Npaths,1);
 
 for ith_testPath = 1:Npaths
     current_testPath = cellArrayOfUnequalPaths{ith_testPath};    
-    current_testTraversal = fcn_Path_convertPathToTraversalStructure(current_testPath, -1);
-    endStation = current_testTraversal.Station(end);
+    current_testPath_Station = fcn_Path_calcPathStation(current_testPath,-1);
+    endStation = current_testPath_Station(end);
 
     all_orthogonalProjectionHits = nan(Npaths,1);
     for jth_adjacentPath = 1:Npaths
         if jth_adjacentPath~=ith_testPath
 
             nearby_path = cellArrayOfUnequalPaths{jth_adjacentPath};            
-            nearby_traversal = fcn_Path_convertPathToTraversalStructure(nearby_path, -1);
 
             % Calculate the closest point and distance on the nearby path
             % FORMAT:
             % [closest_path_point,distances] = ...
-            %     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
-            %     central_traversal,nearby_traversal,...
+            %     fcn_Path_findOrthogonalHitFromPathToPath(stations,...
+            %     central_path,nearby_path,...
             %     flag_rounding_type,search_radius,fig_num);
             [~, distance] = ...
-                fcn_Path_findOrthogonalHitFromTraversalToTraversal(endStation,...
-                current_testTraversal,nearby_traversal,...
+                fcn_Path_findOrthogonalHitFromPathToPath(endStation,...
+                current_testPath,nearby_path,...
                 [], longestDistance, -1);
 
             all_orthogonalProjectionHits(jth_adjacentPath,1) = distance;

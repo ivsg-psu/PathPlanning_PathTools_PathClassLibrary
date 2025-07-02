@@ -182,11 +182,12 @@ figure(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}, -1);
+input_path = paths_array{1};
 
 % Redecimate the path at 1-meter increments
+input_path_Station = fcn_Path_calcPathStation(input_path,-1);
 interval = 10;
-new_stations    = (0:interval:input_traversal.Station(end))';
+new_stations    = (0:interval:input_path_Station(end))';
 
 % Call the function
 new_path = fcn_Path_newPathByStationResampling(input_path, new_stations, fig_num);
@@ -229,11 +230,12 @@ figure(fig_num); close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}, -1);
+input_path = paths_array{1};
 
-% Redecimate the path at 10-meter increments
+% Redecimate the path at 1-meter increments
+input_path_Station = fcn_Path_calcPathStation(input_path,-1);
 interval = 10;
-new_stations    = (0:interval:input_traversal.Station(end))';
+new_stations    = (0:interval:input_path_Station(end))';
 
 % Call the function
 new_path = fcn_Path_newPathByStationResampling(input_path, new_stations, ([]));
@@ -258,11 +260,12 @@ figure(fig_num); close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}, -1);
+input_path = paths_array{1};
 
-% Redecimate the path at 10-meter increments
+% Redecimate the path at 1-meter increments
+input_path_Station = fcn_Path_calcPathStation(input_path,-1);
 interval = 10;
-new_stations    = (0:interval:input_traversal.Station(end))';
+new_stations    = (0:interval:input_path_Station(end))';
 
 % Call the function
 new_path = fcn_Path_newPathByStationResampling(input_path, new_stations, (-1));
@@ -287,11 +290,12 @@ close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-input_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1}, -1);
+input_path = paths_array{1};
 
-% Redecimate the path at 10-meter increments
+% Redecimate the path at 1-meter increments
+input_path_Station = fcn_Path_calcPathStation(input_path,-1);
 interval = 10;
-new_stations    = (0:interval:input_traversal.Station(end))';
+new_stations    = (0:interval:input_path_Station(end))';
 
 Niterations = 100;
 

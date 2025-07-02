@@ -35,16 +35,16 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %
 % INPUTS:
 %
-%      first_path: the first traversal defining one edge of the
+%      first_path: the first path defining one edge of the
 %      boundary.
 %
-%      second_path: the second traversal defining the other edge of
+%      second_path: the second path defining the other edge of
 %      the boundary.
 %
 %      (OPTIONAL INPUTS)
 %      flag_rounding_type: a flag to indicate which type of projection is
 %      used, especially when stations are located at the end-points of
-%      segments within the nearby_traversal. When stations are at the
+%      segments within the nearby_path. When stations are at the
 %      end-points of segments, the normal vector is undefined as it depends
 %      on whether to use the prior or subsequent segment, or some
 %      combination of these.
@@ -77,7 +77,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %          directions, respectively.
 %
 %      search_radius: the distance to project "from" to search for
-%      intersections with the "to" traversal (default is 10 meters).
+%      intersections with the "to" path (default is 10 meters).
 %
 %     fig_num: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
@@ -88,7 +88,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 % OUTPUTS:
 %
 %      center_path: a Mx2 or Mx3 vector containing the [X Y (Z)] points
-%      that bisect the two traversals.
+%      that bisect the two paths.
 %
 %      first_path_resampled: a Mx2 or Mx3 vector containing the [X Y (Z)]
 %      points of the first path that correspond to the same stations as the
@@ -98,7 +98,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %      points of the second path that correspond to the same stations as
 %      the center_path
 %
-
+%
 % EXAMPLES:
 %
 % See the script: script_test_fcn_Path_findCenterPathBetweenTwoPaths
@@ -107,9 +107,9 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_Path_findOrthogonalHitFromTraversalToTraversal
-%     fcn_Path_findOrthogonalTraversalVectorsAtStations
-%     fcn_Path_findCenterlineVoteFromTraversalToTraversal
+%     fcn_Path_findCenterlineVoteFromPathToPath
+%     fcn_Path_convertXY2St
+%     fcn_Path_convertSt2XY
 %
 % This function was written on 2023_09_04 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
@@ -267,21 +267,16 @@ if any(successive_dot_products<0)
     warning('Misaligned vectors found in second_path - this indicates a path that points back toward itself at successive points. This can produce errors in calculation of centerlines.');
 end
 
-
-%% Convert the paths into traversal types
-first_traversal   = fcn_Path_convertPathToTraversalStructure(first_path, -1);
-second_traversal  = fcn_Path_convertPathToTraversalStructure(second_path, -1);
-
-%% Obtain the projections from the traversals toward each other
+%% Obtain the projections from the paths toward each other
 flag_project_full_distance = 0;
 [centerline_points_first_to_second,centerline_points_first_to_second_unit_vectors_orthogonal] = ...
-    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-    first_traversal,second_traversal,...
+    fcn_Path_findCenterlineVoteFromPathToPath(...
+    first_path,second_path,...
     (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 
 [centerline_points_second_to_first,centerline_points_second_to_first_unit_vectors_orthogonal] = ...
-    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-    second_traversal,first_traversal,...
+    fcn_Path_findCenterlineVoteFromPathToPath(...
+    second_path,first_path,...
     (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 
 %% Check for non-intersecting situations
@@ -512,17 +507,17 @@ if flag_do_debug
     fprintf('Max misalignment angle is: %.3f degrees.\n',max(angles));
 end
 
-%% Obtain the projections from the central traversal back toward 1st and 2nd traversals
+%% Obtain the projections from the central path back toward 1st and 2nd paths
 center_path_no_repeats =  unique(round(center_path,8),'rows','stable');
-center_traversal_no_repeats   = fcn_Path_convertPathToTraversalStructure(center_path_no_repeats, -1);
+
 flag_project_full_distance = 1;
 [first_path_resampled,~] = ...
-    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-    center_traversal_no_repeats,first_traversal,...
+    fcn_Path_findCenterlineVoteFromPathToPath(...
+    center_path_no_repeats,first_path,...
     (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 [second_path_resampled,~] = ...
-    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-    center_traversal_no_repeats,second_traversal,...
+    fcn_Path_findCenterlineVoteFromPathToPath(...
+    center_path_no_repeats,second_path,...
     (flag_rounding_type),(search_radius),(flag_project_full_distance), -1);
 
 
@@ -626,7 +621,7 @@ if flag_do_plots
     xlabel('X [m]')
     ylabel('Y [m]')
 
-    % Plot the input traversals
+    % Plot the input paths
     plot(first_path(:,1),first_path(:,2),'r.-','Linewidth',3,'MarkerSize',30);
     plot(second_path(:,1),second_path(:,2),'b.-','Linewidth',3,'MarkerSize',30);
 

@@ -465,13 +465,6 @@ figure(fig_num); clf;
 % Fill in some dummy data
 paths = fcn_Path_fillSamplePaths;
 
-% Convert paths to traversal structures
-clear data
-for i_Path = 1:3
-    traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
-    data.traversal{i_Path} = traversal;
-end
-
 
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 
@@ -482,9 +475,6 @@ stations = (0:step_size:central_path_stations(end))';
 stations = unique(stations);
 
 for i_Path = 1:3
-    nearby_traversal  = data.traversal{i_Path};
-
-
     temp_fig_num = fig_num - 1 +i_Path;  % Define the figure
     
     % Calculate the unit normal vectors at given stations and put results into

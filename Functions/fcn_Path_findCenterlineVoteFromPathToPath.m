@@ -1,37 +1,40 @@
 function [centerline_points_projected,unit_vectors_orthogonal] = ...
-    fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-    from_traversal,to_traversal,varargin)
+    fcn_Path_findCenterlineVoteFromPathToPath(...
+    from_path,to_path,varargin)
 
-%% fcn_Path_findCenterlineVoteFromTraversalToTraversal
-% Given a "from" traversal and a "to" traversal, the method is to
-% orthogonally project from the "from" traversal to find the distance to
-% the "to" traversal at each station in the "from" traversal. For
+%% fcn_Path_findCenterlineVoteFromPathToPath
+% Given a "from" path and a "to" path, the method is to
+% orthogonally project from the "from" path to find the distance to
+% the "to" path at each station in the "from" path. For
 % situations where the projection does not hit anything, the nearest
 % neighbor is used that has a hit. Thes projection distances are then
 % divided in half to find the apparent centerline measured via the "from"
-% traversal. As well, the orthogonal unit vectors for each projection are
+% path. As well, the orthogonal unit vectors for each projection are
 % returned. The function allows the user to specify the flag_rounding_type
 % and search_radius.
 %
 % FORMAT:
 %
 %    [centerline_points_projected,unit_vectors_orthogonal] = ...
-%     fcn_Path_findCenterlineVoteFromTraversalToTraversal(...
-%     from_traversal,to_traversal, ...
+%     fcn_Path_findCenterlineVoteFromPathToPath(...
+%     from_path,to_path, ...
 %     (flag_rounding_type),(search_radius), (flag_project_full_distance), (fig_num))
 %
 % INPUTS:
 %
-%      from_traversal: a traversal type wherein the projections are
-%      calculated "from".
+%      from_path: a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, of a
+%      path wherein the projections are calculated "from".
 %
-%      to_traversal: a traversal type wherein the projections are
-%      calculated "to", to determine the distances "from".
+%      to_path: a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, of a
+%      path wherein the projections are calculated "to", to determine the
+%      distances "from".
 %
 %      (OPTIONAL INPUTS)
 %      flag_rounding_type: a flag to indicate which type of projection is
 %      used, especially when stations are located at the end-points of
-%      segments within the nearby_traversal. When stations are at the
+%      segments within the nearby_path. When stations are at the
 %      end-points of segments, the normal vector is undefined as it depends
 %      on whether to use the prior or subsequent segment, or some
 %      combination of these.
@@ -64,7 +67,7 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %          directions, respectively.
 %
 %      search_radius: the distance to project "from" to search for
-%      intersections with the "to" traversal (default is 10 meters).
+%      intersections with the "to" path (default is 10 meters).
 %
 %      flag_project_full_distance: this is a flag to determine whether the
 %      projection is to the halfway distance between 1 and 2. For the
@@ -89,22 +92,22 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 %
 %      centerline_points_projected: a Mx2 or Mx3 vector containing the [X
 %      Y (Z)] locations of the projected centerline, one for each station
-%      point in the "from" traversal.
+%      point in the "from" path.
 %
 %      unit_vectors_orthogonal: vectors at each centerline point that are
 %      unit vectors orthogonal to the projection used in the "from"
-%      traversal.
+%      path.
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_Path_findCenterlineVoteFromTraversalToTraversal
+% See the script: script_test_fcn_Path_findCenterlineVoteFromPathToPath
 % for a full test suite.
 %
 % DEPENDENCIES:
 %
 %     fcn_DebugTools_checkInputsToFunctions
-%     fcn_Path_findOrthogonalHitFromTraversalToTraversal
-%     fcn_Path_findOrthogonalTraversalVectorsAtStations
+%     fcn_Path_findOrthogonalHitFromPathToPath
+%     fcn_Path_findOrthogonalPathVectorsAtStations
 %
 % This function was written on 2023_09_04 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
@@ -119,12 +122,15 @@ function [centerline_points_projected,unit_vectors_orthogonal] = ...
 % -- added flag_project_full_distance to allow full distance projections
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- Removed traversal input type and replaced with cell array of paths
+% -- Renamed function from
+% fcn_Path_findCenterlineVoteFromTraversalToTraversal
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
-warning('The function fcn_Path_findCenterlineVoteFromTraversalToTraversal is being deprecated. Please use fcn_Path_findCenterlineVoteFromPathToPath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -173,7 +179,15 @@ if 0==flag_max_speed
     if flag_check_inputs
         % Are there the right number of inputs?
         narginchk(2,MAX_NARGIN);
+
+        % Check from_path input
+        fcn_DebugTools_checkInputsToFunctions(from_path, 'path2or3D');
+
+        % Check to_path input
+        fcn_DebugTools_checkInputsToFunctions(to_path, 'path2or3D');
+
     end
+
 end
 
 % Does user want to specify the rounding type?
@@ -236,14 +250,16 @@ end
 % FORMAT:
 %
 %      [closest_path_points,s_coordinate] = ...
-%        fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
-%        query_stations,central_traversal,nearby_traversal,...
+%        fcn_Path_findOrthogonalHitFromPathToPath(...
+%        query_stations,central_path,nearby_path,...
 %        (flag_rounding_type),(search_radius),(fig_num));
 
+from_Stations = fcn_Path_calcPathStation(from_path,-1);
+
 [~,distances_between] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(...
-    from_traversal.Station,...
-    from_traversal,to_traversal,...
+    fcn_Path_findOrthogonalHitFromPathToPath(...
+    from_Stations,...
+    from_path,to_path,...
     flag_rounding_type,search_radius, -1);
 
 full_distances_between = fillmissing(distances_between, 'nearest');
@@ -252,20 +268,20 @@ full_distances_between = fillmissing(distances_between, 'nearest');
 % FORMAT:
 %
 %      [unit_normal_vector_start, unit_normal_vector_end] = ...
-%        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-%        station_queries,central_traversal,...
+%        fcn_Path_findOrthogonalPathVectorsAtStations(...
+%        station_queries,central_path,...
 %        (flag_rounding_type),(fig_num));
 [unit_normal_vector_start, unit_normal_vector_end] = ...
-    fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-    from_traversal.Station,...
-    from_traversal,...
+    fcn_Path_findOrthogonalPathVectorsAtStations(...
+    from_Stations,...
+    from_path,...
     flag_rounding_type, -1);
 unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
 
 if 0==flag_project_full_distance
-    centerline_points_projected = [from_traversal.X from_traversal.Y]  + (unit_vectors/2).*full_distances_between;
+    centerline_points_projected = from_path  + (unit_vectors/2).*full_distances_between;
 else
-    centerline_points_projected = [from_traversal.X from_traversal.Y]  + (unit_vectors).*full_distances_between;
+    centerline_points_projected = from_path  + (unit_vectors).*full_distances_between;
 end
 
 unit_vectors_orthogonal = unit_vectors*[0 -1; 1 0];
@@ -289,9 +305,9 @@ if flag_do_plots
     grid on;
     axis equal;
 
-    % Plot the input traversals
-    plot(from_traversal.X,from_traversal.Y,'.-', 'Color',[0 1 0],'Linewidth',5,'MarkerSize',20);
-    plot(to_traversal.X,to_traversal.Y,'.-', 'Color',[0 0 1],'Linewidth',5,'MarkerSize',20);
+    % Plot the input paths
+    plot(from_path(:,1),from_path(:,2),'.-', 'Color',[0 1 0],'Linewidth',5,'MarkerSize',20);
+    plot(to_path(:,1),to_path(:,2),'.-', 'Color',[0 0 1],'Linewidth',5,'MarkerSize',20);
 
     % Plot the centerline_points_right_to_left and centerline_points_left_to_right
     plot(centerline_points_projected(:,1), centerline_points_projected(:,2), '.-','Linewidth',3,'MarkerSize',20,'Color',[1 0 0]*0.7);

@@ -140,6 +140,8 @@ function [TransitionCurves, ...
 % -- Converted this function over to Path library from LoadWZ library
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_02 - S. Brennan
+% -- Removed dependency on traversal types
 
 % TO-DO
 % (none)
@@ -333,14 +335,6 @@ if flag_do_debug == 1
     title('Original Line Segments and their Extentions','fontsize',24)
 end
 
-%% convert the extended paths to traversals
-% This is so that we can use them in the PathClass Library function to find
-% intersectinos and offsets to the path
-
-% Convert the extended versions
-path_1_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_1_extended,-1);
-path_2_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_2_extended,-1);
-
 
 %% 1. calculate if and how the extended paths intersect
 % 1a. use function from PathClass to find the intersection
@@ -351,9 +345,9 @@ path_2_extended_traversal = fcn_Path_convertPathToTraversalStructure(path_2_exte
 [extended_paths_intersections,...
     s_coordinates_in_traversal_1,...
     s_coordinates_in_traversal_2] = ...
-    fcn_Path_findIntersectionsBetweenTraversals(...
-    path_1_extended_traversal,...
-    path_2_extended_traversal, -1);
+    fcn_Path_findIntersectionsBetweenPaths(...
+    path_1_extended,...
+    path_2_extended, -1);
 
 % Show the results?
 if flag_do_debug == 1
@@ -396,8 +390,8 @@ end
 
 %% 1c. find the segments that are intersecting
 % Then use these to find the vectors in/out
-prior_segment_path_1 = fcn_INTERNAL_findPriorIntersectingSegment(path_1_extended_traversal,s_coordinate_in_traversal_1);
-post_segment_path_2  = fcn_INTERNAL_findPostIntersectingSegment(path_2_extended_traversal,s_coordinate_in_traversal_2);
+prior_segment_path_1 = fcn_INTERNAL_findPriorIntersectingSegment(path_1_extended,s_coordinate_in_traversal_1);
+post_segment_path_2  = fcn_INTERNAL_findPostIntersectingSegment(path_2_extended,s_coordinate_in_traversal_2);
 
 % Show the results?
 if flag_do_debug == 1
@@ -447,15 +441,15 @@ offset_amount = offset_direction_relative_to_1*radius_of_curve;
 % offset the path segments in the in the direction of their travel (where
 % direction of travel is in the order of the points in the matrix of the
 % path segments)
-[offset_traversal_1_start, offset_traversal_1_end] = fcn_INTERNAL_findOrthogonalOffsetTraversal(path_1_extended_traversal, offset_amount); % offset for traversal 1
-[offset_traversal_2_start, offset_traversal_2_end] = fcn_INTERNAL_findOrthogonalOffsetTraversal(path_2_extended_traversal, offset_amount); % offset for traversal 2
+[offset_traversal_1_start, offset_traversal_1_end] = fcn_INTERNAL_findOrthogonalOffsetPath(path_1_extended, offset_amount); % offset for traversal 1
+[offset_traversal_2_start, offset_traversal_2_end] = fcn_INTERNAL_findOrthogonalOffsetPath(path_2_extended, offset_amount); % offset for traversal 2
 
 % BELOW uses Path Library function, which is not actually a perfect offset
 % - See Example 6 - because it is averaging the end points. These examples
 % will fail because of this imperfection!
 %
-% offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_1_extended_traversal, offset_amount,-1); % offset for traversal 1
-% offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_2_extended_traversal, offset_amount,-1); % offset for traversal 2
+% offset_traversal_1 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_1_extended, offset_amount,-1); % offset for traversal 1
+% offset_traversal_2 = fcn_Path_fillOffsetTraversalsAboutTraversal(path_2_extended, offset_amount,-1); % offset for traversal 2
 
 % Show the results?
 if flag_do_debug == 1
@@ -513,19 +507,19 @@ path_2_segment_hit = nan;
 
 % Convert all segment_2's into traversals
 % Initialize with an empty struct
-segment_1_traversals{length(offset_traversal_1_start(:,1))} = struct;
-segment_2_traversals{length(offset_traversal_2_start(:,1))} = struct;
+segment_1_paths = cell(length(offset_traversal_1_start(:,1)),1);
+segment_2_paths = cell(length(offset_traversal_2_start(:,1)),1);
 
 % Fill in all the traversals possible for path_1
 for ith_segment_in_path1 = 1:length(offset_traversal_1_start(:,1))
-    segment_1_traversals{ith_segment_in_path1} = ...
-        fcn_Path_convertPathToTraversalStructure([offset_traversal_1_start(ith_segment_in_path1,:); offset_traversal_1_end(ith_segment_in_path1,:)],-1);
+    segment_1_paths{ith_segment_in_path1} = ...
+        [offset_traversal_1_start(ith_segment_in_path1,:); offset_traversal_1_end(ith_segment_in_path1,:)];
 end
 
 % Fill in all the traversals possible for path_2
 for jth_segment_in_path2 = 1:length(offset_traversal_2_start(:,1))
-    segment_2_traversals{jth_segment_in_path2} = ...
-        fcn_Path_convertPathToTraversalStructure([offset_traversal_2_start(jth_segment_in_path2,:); offset_traversal_2_end(jth_segment_in_path2,:)],-1);
+    segment_2_paths{jth_segment_in_path2} = ...
+        [offset_traversal_2_start(jth_segment_in_path2,:); offset_traversal_2_end(jth_segment_in_path2,:)];
 end
 
 % Now loop through all the path 1 segments, checking each segment from path
@@ -533,17 +527,17 @@ end
 % 1.
 for ith_segment_in_path1 = 1:length(offset_traversal_1_start(:,1))
     if flag_an_intersection_was_found==0
-        segment_1_traversal_to_check = segment_1_traversals{ith_segment_in_path1};
+        segment_1_path_to_check = segment_1_paths{ith_segment_in_path1};
 
         for jth_segment_in_path2 = 1:length(offset_traversal_2_start(:,1))
-            segment_2_traversal_to_check = segment_2_traversals{jth_segment_in_path2};
+            segment_2_path_to_check = segment_2_paths{jth_segment_in_path2};
 
             [intersection_point,...
                 s_coordinates_in_traversal_1,...
                 ~] = ...
-                fcn_Path_findIntersectionsBetweenTraversals(...
-                segment_1_traversal_to_check,...
-                segment_2_traversal_to_check, -1);
+                fcn_Path_findIntersectionsBetweenPaths(...
+                segment_1_path_to_check,...
+                segment_2_path_to_check, -1);
 
             if ~isempty(intersection_point)
                 flag_an_intersection_was_found = 1;
@@ -579,38 +573,40 @@ end
 % when the curve is tangent to the paths respectively
 
 % Convert all segments in path 1 and 2 into traversals
-% Initialize with an empty struct
-path_1_traversals{length(offset_traversal_1_start(:,1))} = struct;
-path_2_traversals{length(offset_traversal_2_start(:,1))} = struct;
 
 % Fill in all the traversals possible for path_1
-N_segments_path_1 = length(path_1_extended_traversal.X(:,1))-1;
-N_segments_path_2 = length(path_2_extended_traversal.X(:,1))-1;
+N_segments_path_1 = length(path_1_extended(:,1))-1;
+N_segments_path_2 = length(path_2_extended(:,1))-1;
+
+% Initialize with an empty cell array
+path_1_segments = cell(length(offset_traversal_1_start(:,1)),1);
+path_2_segments = cell(length(offset_traversal_2_start(:,1)),1);
+
 
 % Fill in all the traversals possible for path_1
 for ith_segment_in_path1 = 1:N_segments_path_1
-    path_1_traversals{ith_segment_in_path1} = fcn_Path_convertPathToTraversalStructure(...
-        [path_1_extended_traversal.X(ith_segment_in_path1,1) path_1_extended_traversal.Y(ith_segment_in_path1,1); ...
-        path_1_extended_traversal.X(ith_segment_in_path1+1,1) path_1_extended_traversal.Y(ith_segment_in_path1+1,1)],-1);
+    path_1_segments{ith_segment_in_path1,1} = ...
+        [path_1_extended(ith_segment_in_path1,:); ...
+        path_1_extended(ith_segment_in_path1+1,:)];
 end
 
 % Fill in all the traversals possible for path_2
 for jth_segment_in_path2 = 1:N_segments_path_2
-    path_2_traversals{jth_segment_in_path2} = fcn_Path_convertPathToTraversalStructure(...
-        [path_2_extended_traversal.X(jth_segment_in_path2,1) path_2_extended_traversal.Y(jth_segment_in_path2,1); ...
-        path_2_extended_traversal.X(jth_segment_in_path2+1,1) path_2_extended_traversal.Y(jth_segment_in_path2+1,1)],-1);
+    path_2_segments{jth_segment_in_path2,1} = ...
+        [path_2_extended(jth_segment_in_path2,:); ...
+        path_2_extended(jth_segment_in_path2+1,:)];
 end
 
 
 % snap point onto path_1
 [closest_path_point1,~,~,~,...
     ~,~] = ...
-    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_1_traversals{path_1_segment_hit},-1);
+    fcn_Path_snapPointOntoNearestPath(center_transition_curve, path_1_segments{path_1_segment_hit},-1);
 
 % snap point onto path_2
 [closest_path_point2,~,~,~,...
     ~,~] = ...
-    fcn_Path_snapPointOntoNearestTraversal(center_transition_curve, path_2_traversals{path_2_segment_hit},-1);
+    fcn_Path_snapPointOntoNearestPath(center_transition_curve, path_2_segments{path_2_segment_hit},-1);
 
 % Check results
 distance_1 = sum((center_transition_curve - closest_path_point1).^2,2).^0.5;
@@ -742,10 +738,12 @@ unit_vector = vector_to_calculate./magnitude_vector_to_calculate;
 end % Ends fcn_INTERNAL_calcUnitVector
 
 %% fcn_INTERNAL_findPriorIntersectingSegment
-function prior_intersecting_segment_number = fcn_INTERNAL_findPriorIntersectingSegment(traversal_to_check,s_coordinate)
-path_1_segment_intersecting_start = find(traversal_to_check.Station<s_coordinate,1,'last');
-path_1_segment_intersecting_end   = find(traversal_to_check.Station>s_coordinate,1,'first');
-path_1_segment_intersecing_on     = interp1(traversal_to_check.Station,(1:length(traversal_to_check.Station))',s_coordinate);
+function prior_intersecting_segment_number = fcn_INTERNAL_findPriorIntersectingSegment(path_to_check,s_coordinate)
+path_to_check_Station = fcn_Path_calcPathStation(path_to_check,-1);
+
+path_1_segment_intersecting_start = find(path_to_check_Station<s_coordinate,1,'last');
+path_1_segment_intersecting_end   = find(path_to_check_Station>s_coordinate,1,'first');
+path_1_segment_intersecing_on     = interp1(path_to_check_Station,(1:length(path_to_check_Station))',s_coordinate);
 prior_intersecting_segment_number       = floor(path_1_segment_intersecing_on);
 
 % If the intersection is on a vertex, then the current intersecting segment
@@ -756,15 +754,17 @@ end
 
 % Check if the intersection is exactly at the end of the traversal - if so,
 % then need to use the prior segment number
-if isempty(path_1_segment_intersecting_end) || (prior_intersecting_segment_number == length(traversal_to_check.Station))
-    prior_intersecting_segment_number = length(traversal_to_check.Station) - 1;
+if isempty(path_1_segment_intersecting_end) || (prior_intersecting_segment_number == length(path_to_check_Station))
+    prior_intersecting_segment_number = length(path_to_check_Station) - 1;
 end
 end % Ends fcn_INTERNAL_findPriorIntersectingSegment
 
 %% fcn_INTERNAL_findPostIntersectingSegment
-function post_intersecting_segment_number = fcn_INTERNAL_findPostIntersectingSegment(traversal_to_check,s_coordinate)
-path_1_segment_intersecting_end   = find(traversal_to_check.Station>s_coordinate,1,'first');
-path_1_segment_intersecing_on     = interp1(traversal_to_check.Station,(1:length(traversal_to_check.Station))',s_coordinate);
+function post_intersecting_segment_number = fcn_INTERNAL_findPostIntersectingSegment(path_to_check,s_coordinate)
+path_to_check_Station = fcn_Path_calcPathStation(path_to_check,-1);
+
+path_1_segment_intersecting_end   = find(path_to_check_Station>s_coordinate,1,'first');
+path_1_segment_intersecing_on     = interp1(path_to_check_Station,(1:length(path_to_check_Station))',s_coordinate);
 post_intersecting_segment_number       = floor(path_1_segment_intersecing_on);
 
 % If the intersection is on a vertex, then the rounding down will match the
@@ -775,15 +775,15 @@ end
 
 % Check if the intersection is exactly at the end of the traversal - if so,
 % then need to use the prior segment number
-if isempty(path_1_segment_intersecting_end) || (post_intersecting_segment_number >= length(traversal_to_check.Station))
-    post_intersecting_segment_number = length(traversal_to_check.Station) - 1;
+if isempty(path_1_segment_intersecting_end) || (post_intersecting_segment_number >= length(path_to_check_Station))
+    post_intersecting_segment_number = length(path_to_check_Station) - 1;
 end
 end % Ends fcn_INTERNAL_findPostIntersectingSegment
 
 %% fcn_INTERNAL_findOrthogonalOffsetTraversal
-function [offset_segments_start, offset_segments_end] = fcn_INTERNAL_findOrthogonalOffsetTraversal(reference_traversal,offset)
+function [offset_segments_start, offset_segments_end] = fcn_INTERNAL_findOrthogonalOffsetPath(reference_path,offset)
 
-N_segments = length(reference_traversal.Station) - 1;
+N_segments = length(reference_path(:,1)) - 1;
 offset_segments_start = zeros(N_segments,2);
 offset_segments_end   = zeros(N_segments,2);
 
@@ -791,16 +791,15 @@ offset_segments_end   = zeros(N_segments,2);
 
 % For each segment, project an offset, and find its coordinates
 for ith_segment = 1:N_segments
-    segment_coordinates = [reference_traversal.X(ith_segment:ith_segment+1) reference_traversal.Y(ith_segment:ith_segment+1)];
-    segment_traversal = fcn_Path_convertPathToTraversalStructure(segment_coordinates,-1);
-    segment_stations = segment_traversal.Station;
+    segment_path = reference_path(ith_segment:ith_segment+1,:);   
+    segment_stations = fcn_Path_calcPathStation(segment_path,-1);
 
     % Set the projection type to use. 1 indicates using the prior segment
     % to project a vertex
     projection_type = 1;
     [unit_normal_vector_start, unit_normal_vector_end] = ...
-        fcn_Path_findOrthogonalTraversalVectorsAtStations(...
-        segment_stations(:,1),segment_traversal,projection_type,-1);
+        fcn_Path_findOrthogonalPathVectorsAtStations(...
+        segment_stations(:,1),segment_path,projection_type,-1);
 
     % Use the unit vectors to find the offsets
     unit_vectors = unit_normal_vector_end - unit_normal_vector_start;
@@ -819,7 +818,7 @@ if 1==0
     hold on;
     grid on;
     axis equal;
-    plot(reference_traversal.X,reference_traversal.Y,'b.-','MarkerSize',10);
+    plot(reference_path(:,1),reference_path(:,2),'b.-','MarkerSize',10);
     for ith_segment = 1:N_segments
         plot(...
             [offset_segments_start(ith_segment,1) offset_segments_end(ith_segment,1)],...

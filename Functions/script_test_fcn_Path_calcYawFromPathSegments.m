@@ -41,16 +41,11 @@ figure(fig_num*10); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-clear all_traversals
+clear all_paths
 for ith_path = 1:3
     % Pick first path as reference_traversal structure
     path_to_check = paths_array{ith_path};
     
-    % Pick first path as reference_traversal structure
-    traversal_to_check = fcn_Path_convertPathToTraversalStructure(path_to_check);
-    all_traversals.traversal{1} = traversal_to_check;
-    fcn_Path_plotTraversalsXY(all_traversals,fig_num*10);
-
     yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num);
 
     % Check the variable type

@@ -1,19 +1,19 @@
-function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
-% fcn_Path_findTraversalWithMostData.m
-% finds the traversal index with the most amount of data (determined as the
+function  index_of_longest = fcn_Path_findPathWithMostData(cellArrayOfPaths, varargin)
+% fcn_Path_findPathWithMostData.m
+% finds the path index with the most amount of cellArrayOfPaths (determined as the
 % most elements in the X array)
 %
 % FORMAT:
 %
-%      index_of_longest = fcn_Path_findTraversalWithMostData(data, (fig_num))
+%      index_of_longest = fcn_Path_findPathWithMostData(cellArrayOfPaths, (fig_num))
 %
 % INPUTS:
 %
-%      data: a structure containing subfields of X in the
-%      following form
-%           data.traversal{i_path}.X
-%      Note that i_path denotes an array of paths. Each path will be
-%      compared separately
+%      cellArrayOfPaths: a cell array of paths to be averaged with each
+%      other. Each path is a N x 2 or N x 3 set of coordinates
+%      representing the [X Y] or [X Y Z] coordinates, in sequence, of a
+%      path. The averaging works best if each path starts and stops in
+%      approximately the same area and with similar orientations.
 %
 %     (OPTIONAL INPUTS)
 %
@@ -25,7 +25,7 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
 %
 % OUTPUTS:
 %
-%      index: the index of the traversal with the most data
+%      index: the index of the path with the most cellArrayOfPaths
 %
 % DEPENDENCIES:
 %
@@ -33,7 +33,7 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
 %
 % EXAMPLES:
 %
-%       See the script: script_test_fcn_Path_findTraversalWithMostData.m
+%       See the script: script_test_fcn_Path_findPathWithMostData.m
 %       for a full test suite.
 %
 % This function was written on 2020_11_12 by S. Brennan
@@ -46,12 +46,14 @@ function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
 % - added more checks to traversal type
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- Removed traversal input type and replaced with cell array of paths
+% -- Renamed function from fcn_Path_findTraversalWithMostData
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
-warning('The function fcn_Path_findTraversalWithMostData is being deprecated. Please use fcn_Path_findPathWithMostData instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -101,8 +103,13 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(1,MAX_NARGIN);
 
-        % Check the data input
-        fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
+        % Check the cellArrayOfPaths input
+        if ~iscell(cellArrayOfPaths)
+            error('cellArrayOfPaths input must be a cell type');
+        end
+        for ith_cell = 1:length(cellArrayOfPaths)
+            fcn_DebugTools_checkInputsToFunctions(cellArrayOfPaths{ith_cell}, 'path2or3D');
+        end
     end
 end
 
@@ -133,12 +140,14 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% choose the initial reference path, choose the path with most data points
-data_length = zeros(1,length(data.traversal));
-for i_path = 1:length(data.traversal)
-    data_length(i_path) = length(data.traversal{i_path}.X);
+Npaths = length(cellArrayOfPaths);
+
+% choose the initial reference path, choose the path with most cellArrayOfPaths points
+cellArrayOfPaths_length = zeros(1,Npaths);
+for i_path = 1:Npaths
+    cellArrayOfPaths_length(i_path) = length(cellArrayOfPaths{i_path}(:,1));
 end
-[~,index_of_longest] = max(data_length);
+[~,index_of_longest] = max(cellArrayOfPaths_length);
 
 
 %% Any debugging?

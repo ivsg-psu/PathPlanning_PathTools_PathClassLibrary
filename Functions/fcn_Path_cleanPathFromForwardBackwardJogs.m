@@ -153,7 +153,7 @@ points_removed = [];
 while (0==flag_average_is_good)  && (iteration_count<=3)
     % Calculate angle changes between points
     diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(working_path_with_jogs, -1);
-    diff_angles_fullLength = [diff_angles(1); diff_angles];
+    diff_angles_fullLength = [0; diff_angles];
     
     % Find outliers
     outliers = find(abs(diff_angles_fullLength)>pi/4);
