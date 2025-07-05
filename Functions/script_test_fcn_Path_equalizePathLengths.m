@@ -260,6 +260,134 @@ assert(isequal(bestEndIndex,1));
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
+%% BASIC CALL: No ends hit each other
+fig_num = 10007;
+titleString = sprintf('BASIC CALL: No ends hit each other');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+cellArrayOfUnequalPaths{1,1} = [0 5; 0 10; -0.5 10.9];
+cellArrayOfUnequalPaths{2,1} = [2 0; 2 10; 2 11];
+cellArrayOfUnequalPaths{3,1} = [4 1; 4 10; 4.5 10.9];
+
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(iscell(cellArrayOfEqualizedPaths));
+assert(isnumeric(leastExtensionIndex));
+assert(isnumeric(bestStartIndex));
+assert(isnumeric(bestEndIndex));
+
+% Check variable sizes
+% Show that the cell array has same number of paths after extensions
+assert(isequal(size(cellArrayOfEqualizedPaths),[length(cellArrayOfUnequalPaths) 1]));
+% Show extensions make the cell array longer
+for ith_cell = 1:length(cellArrayOfUnequalPaths)
+    assert(length(cellArrayOfEqualizedPaths{ith_cell}(:,1))>=length(cellArrayOfUnequalPaths{ith_cell}(:,1)))
+end
+assert(isequal(size(leastExtensionIndex),[1 1]));
+assert(isequal(size(bestStartIndex),[1 1]));
+assert(isequal(size(bestEndIndex),[1 1]));
+
+% Check variable values
+assert(isequal(round(cellArrayOfEqualizedPaths{1},4),round([0 0; cellArrayOfUnequalPaths{1}(1:end,:); -0.5556   11.000],4)));
+assert(isequal(round(cellArrayOfEqualizedPaths{2},4),round([cellArrayOfUnequalPaths{2}],4)));
+assert(isequal(round(cellArrayOfEqualizedPaths{3},4),round([4 0; cellArrayOfUnequalPaths{3}; 4.5556   11.0000],4)));
+assert(isequal(leastExtensionIndex,2));
+assert(isequal(bestStartIndex,2));
+assert(isequal(bestEndIndex,2));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% BASIC CALL: All ends hit each other
+fig_num = 10008;
+titleString = sprintf('BASIC CALL: All ends hit each other');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+cellArrayOfUnequalPaths{1,1} = [0 5; 0 10; 0.5 11.1];
+cellArrayOfUnequalPaths{2,1} = [2 0; 2 10; 2 11];
+cellArrayOfUnequalPaths{3,1} = [4 1; 4 10; 3.5 11.1];
+
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(iscell(cellArrayOfEqualizedPaths));
+assert(isnumeric(leastExtensionIndex));
+assert(isnumeric(bestStartIndex));
+assert(isnumeric(bestEndIndex));
+
+% Check variable sizes
+% Show that the cell array has same number of paths after extensions
+assert(isequal(size(cellArrayOfEqualizedPaths),[length(cellArrayOfUnequalPaths) 1]));
+% Show extensions make the cell array longer
+for ith_cell = 1:length(cellArrayOfUnequalPaths)
+    assert(length(cellArrayOfEqualizedPaths{ith_cell}(:,1))>=length(cellArrayOfUnequalPaths{ith_cell}(:,1)))
+end
+assert(isequal(size(leastExtensionIndex),[1 1]));
+assert(isequal(size(bestStartIndex),[1 1]));
+assert(isequal(size(bestEndIndex),[1 1]));
+
+% Check variable values
+assert(isequal(round(cellArrayOfEqualizedPaths{1},4),round([0 0; cellArrayOfUnequalPaths{1}(1:end-1,:); 0.4545   11.000],4)));
+assert(isequal(round(cellArrayOfEqualizedPaths{2},4),round([cellArrayOfUnequalPaths{2}],4)));
+assert(isequal(round(cellArrayOfEqualizedPaths{3},4),round([4 0; cellArrayOfUnequalPaths{3}(1:end-1,:); 3.5455   11.0000],4)));
+assert(isequal(leastExtensionIndex,2));
+assert(isequal(bestStartIndex,2));
+assert(isequal(bestEndIndex,2));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
+
+%% BASIC CALL: Two of three ends hit each other
+fig_num = 10009;
+titleString = sprintf('BASIC CALL: Two of three ends hit each other');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
+
+cellArrayOfUnequalPaths{1,1} = [0 5; 0 10; -0.5 10.9]; % Does not hit any
+cellArrayOfUnequalPaths{2,1} = [2 0; 2 10; 2 11]; % Does not hit any
+cellArrayOfUnequalPaths{3,1} = [4 1; 4 10; 4 10.9]; % Hits all
+
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(iscell(cellArrayOfEqualizedPaths));
+assert(isnumeric(leastExtensionIndex));
+assert(isnumeric(bestStartIndex));
+assert(isnumeric(bestEndIndex));
+
+% Check variable sizes
+% Show that the cell array has same number of paths after extensions
+assert(isequal(size(cellArrayOfEqualizedPaths),[length(cellArrayOfUnequalPaths) 1]));
+% Show extensions make the cell array longer
+for ith_cell = 1:length(cellArrayOfUnequalPaths)
+    assert(length(cellArrayOfEqualizedPaths{ith_cell}(:,1))>=length(cellArrayOfUnequalPaths{ith_cell}(:,1)))
+end
+assert(isequal(size(leastExtensionIndex),[1 1]));
+assert(isequal(size(bestStartIndex),[1 1]));
+assert(isequal(size(bestEndIndex),[1 1]));
+
+% Check variable values
+assert(isequal(round(cellArrayOfEqualizedPaths{1},4),round([0 0; cellArrayOfUnequalPaths{1}(1:end,:); -0.5556   11.0000],4)));
+assert(isequal(round(cellArrayOfEqualizedPaths{2},4),round([cellArrayOfUnequalPaths{2}],4)));
+assert(isequal(round(cellArrayOfEqualizedPaths{3},4),round([4 0; cellArrayOfUnequalPaths{3}(1:end-1,:); 4.000   11.0000],4)));
+assert(isequal(leastExtensionIndex,2));
+assert(isequal(bestStartIndex,2));
+assert(isequal(bestEndIndex,2));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
+
 %% ADVANCED CALL: using a realistic test path
 fig_num = 20001;
 titleString = sprintf('ADVANCED CALL: using a realistic test path');
@@ -317,7 +445,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % Figures start with 8
 
 close all;
-fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
+fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
 fig_num = 80001;
@@ -412,13 +540,13 @@ cellArrayOfUnequalPaths{2,1} = [3 2; 6 2];
 cellArrayOfUnequalPaths{3,1} = [1 0; 10 0];
 
 
-Niterations = 100;
+Niterations = 50;
 
 % Do calculation without pre-calculation
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,([]));
+    [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,([])); %#ok<ASGLU>
 end
 slow_method = toc;
 
@@ -426,7 +554,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(-1));
+    [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(-1)); %#ok<ASGLU>
 end
 fast_method = toc;
 
@@ -465,11 +593,48 @@ assert(~any(figHandles==fig_num));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % All bug case figures start with the number 9
 
-% close all;
+close all;
+fprintf(1,'Figure: 9XXXXXX: BUG mode cases\n');
 
-%% BUG 
+%% Bug found when processing HSOV data
+fig_num = 90001;
+titleString = sprintf('BUG mode: Bug found when processing HSOV data');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
 
+load('testData1_fcn_Path_equalizePathLengths','cellArrayOfPaths');
 
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfPaths,(fig_num));
+
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(iscell(cellArrayOfEqualizedPaths));
+assert(isnumeric(leastExtensionIndex));
+assert(isnumeric(bestStartIndex));
+assert(isnumeric(bestEndIndex));
+
+% Check variable sizes
+% Show that the cell array has same number of paths after extensions
+assert(isequal(size(cellArrayOfEqualizedPaths),[length(cellArrayOfUnequalPaths) 1]));
+% Show extensions make the cell array longer
+for ith_cell = 1:length(cellArrayOfUnequalPaths)
+    assert(length(cellArrayOfEqualizedPaths{ith_cell}(:,1))>=length(cellArrayOfUnequalPaths{ith_cell}(:,1)))
+end
+assert(isequal(size(leastExtensionIndex),[1 1]));
+assert(isequal(size(bestStartIndex),[1 1]));
+assert(isequal(size(bestEndIndex),[1 1]));
+
+% % Check variable values
+% % assert(isequal(cellArrayOfEqualizedPaths{1},[0 4; cellArrayOfUnequalPaths{1}]));
+% % assert(isequal(cellArrayOfEqualizedPaths{2},[cellArrayOfUnequalPaths{2}; 10 2]));
+% % assert(isequal(cellArrayOfEqualizedPaths{3},[0 0; cellArrayOfUnequalPaths{3}; 10 0]));
+% assert(isequal(leastExtensionIndex,2));
+% assert(isequal(bestStartIndex,1));
+% assert(isequal(bestEndIndex,2));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

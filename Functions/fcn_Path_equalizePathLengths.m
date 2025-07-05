@@ -362,7 +362,7 @@ longestDistance = longestDistance^0.5;
 end % Ends fcn_INTERNAL_findMaxTailDistanceDisparity
 
 %% fcn_INTERNAL_findPathThatSticksOutMost
-function index_of_longest = fcn_INTERNAL_findPathThatSticksOutMost(cellArrayOfUnequalPaths, longestDistance)
+function [index_of_longest, flag_ExtendPaths] = fcn_INTERNAL_findPathThatSticksOutMost(cellArrayOfUnequalPaths, longestDistance)
 
 Npaths = length(cellArrayOfUnequalPaths); % the number of paths
 
@@ -374,10 +374,14 @@ Npaths = length(cellArrayOfUnequalPaths); % the number of paths
 
 pathIndicesNoHits = zeros(Npaths,1);
 
+allEndPoints = nan(Npaths,2);
 for ith_testPath = 1:Npaths
     current_testPath = cellArrayOfUnequalPaths{ith_testPath};    
     current_testPath_Station = fcn_Path_calcPathStation(current_testPath,-1);
     endStation = current_testPath_Station(end);
+
+    % Save endStation in case we need it in future
+    allEndPoints(ith_testPath,:) = current_testPath(end,:);
 
     all_orthogonalProjectionHits = nan(Npaths,1);
     for jth_adjacentPath = 1:Npaths
@@ -403,21 +407,47 @@ for ith_testPath = 1:Npaths
         pathIndicesNoHits(ith_testPath) = 1;
     end
 end
+flag_ExtendPaths = pathIndicesNoHits;
+
 index_of_longest = find(pathIndicesNoHits);
+flag_calculate_middlemost = 0;
 if isempty(index_of_longest)
-    warning('on','backtrace');
-    warning('No path found that does not intersect the others. This should not happen');
-    error('Unable to continue');
+    flag_calculate_middlemost = 1;
+    % warning('on','backtrace');
+    % warning('No path found that does not intersect the others. This should not happen');
 elseif length(index_of_longest)>1
-    warning('on','backtrace');
-    warning('Multiple paths found that stick out beyond all others.');
-    warning('This usually only occurs when paths are severely mis-aligned.');
-    warning('This suggests a poor set of paths used for path averaging.');
-    warning('The first "stick out" path found will be used, path number: %.0f ',index_of_longest(1));
-    warning('but caution should be used in accepting the results.');
+    flag_calculate_middlemost = 1;
+    % warning('on','backtrace');
+    % warning('Multiple paths found that stick out beyond all others.');
+    % warning('This usually only occurs when paths are severely mis-aligned.');
+    % warning('This suggests a poor set of paths used for path averaging.');
+    % warning('The first "stick out" path found will be used, path number: %.0f ',index_of_longest(1));
+    % warning('but caution should be used in accepting the results.');
 end
-% Force only one index to be kept, if there are more than one
-index_of_longest = index_of_longest(1);
+
+% Calculate middle-most?
+if 1==flag_calculate_middlemost
+    meanEndPoint = mean(allEndPoints,1);
+    if isempty(index_of_longest)
+        % All hit each other
+        contenders = (1:Npaths)';
+    elseif length(index_of_longest)==Npaths
+        % None of them hit each other
+        contenders = index_of_longest;
+    else
+        % Some of them hit, some did not
+        contenders = index_of_longest;
+    end
+    Ncontenders = length(contenders);
+    distancesSquaredToMean = sum((allEndPoints(contenders,:)-ones(Ncontenders,1)*meanEndPoint).^2,2);
+    [~, closest] = min(distancesSquaredToMean);
+    index_of_longest = contenders(closest);
+else
+    % Force only one index to be kept. This is the typical operation, e.g.
+    % one of the segments is longer than all others
+    index_of_longest = index_of_longest(1);
+    flag_ExtendPaths = ones(Npaths,1); % Force all paths to be extended
+end
 end % Ends fcn_INTERNAL_findPathThatSticksOutMost
 
 %% fcn_INTERNAL_extendPaths
@@ -431,9 +461,9 @@ longestDistance = fcn_INTERNAL_findMaxTailDistanceDisparity(allEndPositions);
  
 % Using the longest distance, see which traversal extends out the
 % furthest from the others. 
-index_of_longest = fcn_INTERNAL_findPathThatSticksOutMost(cellArrayOfUnequalPaths, longestDistance);
+[index_of_longest, flag_ExtendPaths] = fcn_INTERNAL_findPathThatSticksOutMost(cellArrayOfUnequalPaths, longestDistance);
 
-% Project paths to be exactly as long as the longest one
+% Project paths to be exactly as long as the longest one?
 
 Npaths = length(cellArrayOfUnequalPaths); % the number of traversals we will be averaging
 
@@ -465,12 +495,26 @@ orthoToEnd = longest_pathVector*[0 1; -1 0];
 cellArrayOfEqualizedPaths = cell(Npaths,1);
 for ith_wall = 1:Npaths
     this_wall = wall_segment(ith_wall);
-    if ith_wall~=index_of_longest
+    % Make path longer? or replace end?
+    % If flag_ExtendPaths is equal to 1, then we need to make the path
+    % longer. If it is equal to 0, we're cutting the path down.
+    if 1==flag_ExtendPaths(ith_wall,1)
         % Make path longer
-        cellArrayOfEqualizedPaths{this_wall} = [cellArrayOfUnequalPaths{this_wall}; newEndLocations(this_wall,:)];
+        if ith_wall~=index_of_longest
+            cellArrayOfEqualizedPaths{this_wall} = [cellArrayOfUnequalPaths{this_wall}; newEndLocations(this_wall,:)];
+        else
+            % Keep original path
+            cellArrayOfEqualizedPaths{this_wall} = cellArrayOfUnequalPaths{this_wall};
+        end
     else
-        % Keep original path
-        cellArrayOfEqualizedPaths{this_wall} = cellArrayOfUnequalPaths{this_wall};
+        % Replace end
+        if ith_wall~=index_of_longest
+            cellArrayOfEqualizedPaths{this_wall} = cellArrayOfUnequalPaths{this_wall};
+            cellArrayOfEqualizedPaths{this_wall}(end,:) = newEndLocations(this_wall,:);
+        else
+            % Keep original path
+            cellArrayOfEqualizedPaths{this_wall} = cellArrayOfUnequalPaths{this_wall};
+        end
     end
 end
 
