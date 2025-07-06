@@ -169,8 +169,14 @@ if flag_do_debug
     legend
 end  
 
+% Make sure each cell array is unique
+goodCellArrayOfUnequalPaths = cell(Npaths,1);
+for ith_path = 1:Npaths
+    goodCellArrayOfUnequalPaths{ith_path,1} = unique(cellArrayOfUnequalPaths{ith_path},'rows','stable');
+end
+
 % Project paths to be exactly as long as the longest one
-[cellArrayOfEqualizedEnds, distanceExtendedEnds] = fcn_INTERNAL_extendPaths(cellArrayOfUnequalPaths);
+[cellArrayOfEqualizedEnds, distanceExtendedEnds] = fcn_INTERNAL_extendPaths(goodCellArrayOfUnequalPaths);
 
 if flag_do_debug
     for ith_data = 1:Npaths
@@ -395,6 +401,7 @@ for ith_testPath = 1:Npaths
             %     fcn_Path_findOrthogonalHitFromPathToPath(stations,...
             %     central_path,nearby_path,...
             %     flag_rounding_type,search_radius,fig_num);
+
             [~, distance] = ...
                 fcn_Path_findOrthogonalHitFromPathToPath(endStation,...
                 current_testPath,nearby_path,...

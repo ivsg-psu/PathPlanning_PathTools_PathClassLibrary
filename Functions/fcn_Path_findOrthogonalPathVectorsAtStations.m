@@ -103,6 +103,9 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 % -- Updated debugging and input checks
 % 2025_07_01 - S. Brennan
 % -- Typo fixes in docstrings
+% 2025_07_06 - S. Brennan
+% -- Added test to see if station is strictly increasing. Otherwise,
+% interpolation will fail.
 
 % TO-DO
 % Define search radius - need to let user define this as an input!
@@ -206,10 +209,22 @@ end
 %  |_|  |_|\__,_|_|_| |_|
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Make sure stations are unique. If not, use first one and warn
 
 Station_central = fcn_Path_calcPathStation(central_path,-1);
-X_central       = central_path(:,1);
-Y_central       = central_path(:,2);
+[uniqueStation,IA,~] = unique(Station_central,'rows','stable');
+if length(central_path(:,1))~=length(uniqueStation(:,1))
+    warning('on','backtrace');
+    warning('Orthogonal projection encountered non-unique stations during interpolation, so the same station may have more than one y value. The path will be modified to remove repeated values which result in repeated stations, but this may result in errors.');
+    Station_central = uniqueStation;    
+    central_path = central_path(IA,:);
+    X_central = central_path(:,1);
+    Y_central = central_path(:,2);
+else
+    X_central       = central_path(:,1);
+    Y_central       = central_path(:,2);
+end
+
 
 
 %% Find the midpoint and joint tangent vectors for all segments

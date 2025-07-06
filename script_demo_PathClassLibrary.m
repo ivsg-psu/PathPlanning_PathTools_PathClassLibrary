@@ -41,6 +41,9 @@
 % -- Added environmental variable methods for debugging.
 % -- Redid path averaging method via orthogonal projection. 
 % -- Removed non-working path averaging methods. 
+% 2025_07_06 - S. Brennan
+% -- Added weighted averaging option to fcn_Path_findAveragePath
+% -- Added more test cases to script_test_fcn_Path_cleanPathFromForwardBackwardJogs
 
 % TO-DO:
 % 2024_03_14 - S. Brennan 
@@ -48,8 +51,6 @@
 % 2025_06_14 by S. Brennan
 % -- look at script_main_laneChange.m. Can clean this up by taking Guangwei's
 %    functions and adding them into these functions too
-% -- add more test cases to script_test_fcn_Path_cleanPathFromForwardBackwardJogs
-% -- allow weighted averaging of paths (so we can add paths collected later)
 % -- add a function to find where paths diverage, based on user-defined 
 %    metric (e.g. a lane width)
 % -- add a function that finds where intersections and lange changes occur

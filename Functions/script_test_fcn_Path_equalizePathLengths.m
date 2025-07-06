@@ -603,8 +603,9 @@ fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
 figure(fig_num); clf;
 
 load('testData1_fcn_Path_equalizePathLengths','cellArrayOfPaths');
+cellArrayOfUnequalPaths = cellArrayOfPaths;
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
 
 title(titleString, 'Interpreter','none');
 

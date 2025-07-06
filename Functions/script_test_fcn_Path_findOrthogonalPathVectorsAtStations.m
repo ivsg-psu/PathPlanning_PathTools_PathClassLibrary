@@ -11,12 +11,19 @@
 % -- added more comments during clean-up
 % 2022_01_03
 % -- added assertion tests
+% 2025_06_23 - S. Brennan
+% -- Updated debugging and input checks
+% 2025_07_01 - S. Brennan
+% -- Typo fixes in docstrings
+% 2025_07_06 - S. Brennan
+% -- Added test to see if station is strictly increasing. Otherwise,
+% interpolation will fail
 
 close all;
 
 %% BASIC example - simple horizontal line
 fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example - simple horizontal line\n',fig_num);
 figure(fig_num); clf;
 
 stations = 1; % Define the station
@@ -40,7 +47,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 
 %% BASIC example - simple horizontal line with flag type 4
 fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example - simple horizontal line with flag type 4\n',fig_num);
 figure(fig_num); clf;
 
 stations = linspace(0,4,10)'; % Define the stations
@@ -64,9 +71,9 @@ central_path = [0 0; 4 0];
 assert(isequal(get(gcf,'Number'),fig_num));
 
 
-%% BASIC example - angled line segment - flag 1
+%% BASIC example: angled line segment - flag 1
 fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 1\n',fig_num);
 figure(fig_num); clf;
 
 stations = 2;
@@ -89,9 +96,9 @@ assert(isequal(round(unit_normal_vector_end,4),[ 2 1]));
 assert(isequal(get(gcf,'Number'),fig_num));
 
 
-%% BASIC example 2 - angled line segment - flag 2
+%% BASIC example: angled line segment - flag 2
 fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 2\n',fig_num);
 figure(fig_num); clf;
 
 stations = 2;
@@ -113,9 +120,9 @@ assert(isequal(round(unit_normal_vector_end,4),[ 3 0]));
 assert(isequal(get(gcf,'Number'),fig_num));
 
 
-%% BASIC example 2 - angled line segment - flag 3
+%% BASIC example: angled line segment - flag 3
 fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 3\n',fig_num);
 figure(fig_num); clf;
 
 stations = 2;
@@ -137,9 +144,9 @@ assert(isequal(round(unit_normal_vector_end,4),[2.7071 .7071]));
 assert(isequal(get(gcf,'Number'),fig_num));
 
 
-%% BASIC example 2 - angled line segment - flag 4
+%% BASIC example: angled line segment - flag 4
 fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 4\n',fig_num);
 figure(fig_num); clf;
 
 stations = 2;
@@ -164,7 +171,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 
 %% BASIC example - angled line segment adjacent to endpoint 
 fig_num = 10006;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: BASIC example - angled line segment adjacent to endpoint \n',fig_num);
 figure(fig_num); clf;
 
 stations = 2*2^0.5;
@@ -212,7 +219,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 
 %% AVERAGING examples
 fig_num = 10008;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: AVERAGING examples\n',fig_num);
 figure(fig_num); clf;
 
 % Set up data
@@ -309,7 +316,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 
 %% NEGATIVE examples
 fig_num = 10009;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: NEGATIVE examples\n',fig_num);
 figure(fig_num); clf;
 
 % Prep the example and workspace
@@ -381,7 +388,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 
 %% MULTICROSS examples
 fig_num = 10010;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
+fprintf(1,'Figure %.0f: MULTICROSS examples\n',fig_num);
 figure(fig_num); clf;
 
 % Setup
@@ -452,6 +459,34 @@ title('Multicross example using projection via averaging of prior and following 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
 
+%% BASIC example - poorly formed path
+fig_num = 10011;
+fprintf(1,'Figure %.0f: BASIC example - poorly formed path\n',fig_num);
+figure(fig_num); clf;
+
+stations = [1.5; 1.6; 1.7];
+flag_rounding_type = 1; % Define the rounding type
+central_path = [0 0; 1 1; 1 1; 2 2];
+
+
+% Calculate the unit normal vectors at given stations and put results into
+% the figure.
+[unit_normal_vector_start, unit_normal_vector_end] = ...
+    fcn_Path_findOrthogonalPathVectorsAtStations(...
+    stations,central_path,flag_rounding_type,fig_num);
+
+% Make sure function worked
+assert(isequal(round(unit_normal_vector_start,4),[...
+    1.0607    1.0607
+    1.1314    1.1314
+    1.2021    1.2021]));
+assert(isequal(round(unit_normal_vector_end,4),  [...
+    0.3536    1.7678
+    0.4243    1.8385
+    0.4950    1.9092]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
 
 %%
 

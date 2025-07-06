@@ -25,6 +25,7 @@ function [path_average, closestXs, closestYs, closestDistances] = ...
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),...
+%                 (averaging_weights),...
 %                 (fig_num));
 %
 % INPUTS:
@@ -49,6 +50,14 @@ function [path_average, closestXs, closestYs, closestDistances] = ...
 %
 %      exit_tolerance: the allowable tolerance to make the looping exit
 %      before the max_num_iterations is reached. Default is 0.1 meters.
+%
+%      averaging_weights: a set of weighted averages to apply to weight
+%      the path averaging process. Default is that all paths get weight of
+%      1/Npaths where Npaths is the length of cellArrayOfPaths.
+%      NOTE: if averaging_weights set to -1, forces code to enter special
+%      case where groups of paths are iteratively averaged, rather than all
+%      at once. This process takes only 20% of the time as normal averaging
+%      for large data sets. However, the results will have more error.
 %
 %     fig_num: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
@@ -132,6 +141,10 @@ function [path_average, closestXs, closestYs, closestDistances] = ...
 % 2025_07_01 - S. Brennan
 % -- Removed traversal input type and replaced with cell array of paths
 % -- Renamed function from fcn_Path_findAverageTraversalViaOrthoProjection
+% 2025_07_05 - S. Brennan
+% -- Forced path to have unique values
+% -- Added averaging weights input and iteration
+% -- Improved functionalization of code (slightly)
 
 % TO DO
 % Need to clean up the code - lots of code "lint"
@@ -141,7 +154,7 @@ function [path_average, closestXs, closestYs, closestDistances] = ...
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
-MAX_NARGIN = 5; % The largest Number of argument inputs to the function
+MAX_NARGIN = 6; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % Flag to plot the results for debugging
@@ -232,6 +245,26 @@ if nargin>=4
     end
 end
 
+% Check to see if user wants to specify averaging_weights?
+averaging_weights = [];
+flag_solveIteratively = 0;
+if nargin>=5
+    temp = varargin{4};
+    if ~isempty(temp)
+        averaging_weights = temp;
+        if averaging_weights == -1
+            flag_solveIteratively = 1;
+        else
+            if 1==flag_check_inputs && (length(averaging_weights)~=length(cellArrayOfPaths))
+                error('averaging_weights must have same length as paths');
+            end
+        end
+    end
+end
+if isempty(averaging_weights)
+    averaging_weights = ones(length(cellArrayOfPaths),1)*(1/length(cellArrayOfPaths));
+end
+
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
@@ -271,7 +304,22 @@ if flag_do_debug
         colorsPerData(ith_path,:) = get(h_plot,'Color');
         set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
     end
+
+    h_StartStop(1) = plot(nan, nan,'.',...
+            'LineWidth',2,'MarkerSize',30,'Color',[0 1 0], 'DisplayName',sprintf('Locked Start'));
+    h_StartStop(2) = plot(nan, nan,'.',...
+            'LineWidth',2,'MarkerSize',30,'Color',[1 0 0], 'DisplayName',sprintf('Locked End'));
+
+    h_updatedPlots = zeros(Npaths,1);
+    for ith_path = 1:Npaths
+        h_updatedPlots(ith_path,1) = plot(nan, nan,'.-',...
+            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
+    end
+
     legend
+else
+    h_StartStop = [];
+    h_updatedPlots = [];
 end  
 
 %% Make sure all paths start/stop alongside each other
@@ -282,181 +330,46 @@ end
 %      fcn_Path_equalizePathLengths(...
 %            cellArrayOfUnequalPaths,...
 %            (fig_num));
-[cellArrayOfEqualizedPaths, ~, ~, ~] = ...
-      fcn_Path_equalizePathLengths(...
-            cellArrayOfPaths,...
-            (-1));
-
-
-%% Set up all the paths to have same station interval
-[cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(cellArrayOfEqualizedPaths, stationInterval); 
-
-if flag_do_debug
-    figure(debug_fig_num)
-    h_updatedPlots = zeros(Npaths,1);
-    for ith_path = 1:Npaths
-        h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
-            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
-    end
-end    
-
-%% Find locked start/end points
-allStarts = nan(Npaths,2);
-allEnds   = nan(Npaths,2);
-for ith_path = 1:Npaths
-    allStarts(ith_path,:) = cellArrayOfEquidistantPaths{ith_path}(1,:);
-    allEnds(ith_path,:)   = cellArrayOfEquidistantPaths{ith_path}(end,:);
-end
-
-lockedStart = mean(allStarts,1);
-lockedEnd = mean(allEnds,1);
-
-if flag_do_debug
-    plot(lockedStart(1,1), lockedStart(1,2),'.',...
-        'LineWidth',2,'MarkerSize',30,'Color',[0 1 0], 'DisplayName',sprintf('Locked Start'));
-    plot(lockedEnd(1,1), lockedEnd(1,2),'.',...
-        'LineWidth',2,'MarkerSize',30,'Color',[1 0 0], 'DisplayName',sprintf('Locked End'));
-end  
-
-%% Find approximate equivalence in station distances
-[cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
-
-% Calculate the total error via station variation
-finalStations = zeros(Npaths,1);
-for ith_path = 1:Npaths
-    finalStations(ith_path,1) = cellArrayOfEquidistantStations{ith_path}(end,1);
-end
+[cellArrayOfEqualizedPaths, ~, ~, ~] = fcn_Path_equalizePathLengths(cellArrayOfPaths,(-1));
 
 
 %% Perform iterations to seek an average path
-% * Project from the reference path to nearby trajectories to find projections
-% * Average projections to find new average path. 
-% * Clean up average and store results for next iteration or exit
-
-% Initialize variables to hold results
-average_path = cell(max_num_iterations,Npaths);
-% total_error{max_num_iterations} = [];
-
-stationError = nan(max_num_iterations, 1);
-stationError(1) = max(finalStations) - min(finalStations);
-previousMaxStation =  max(finalStations);
-
-% % Set iteration 1 values
-for ith_path = 1:Npaths
-    average_path{1,ith_path} = cellArrayOfEquidistantPaths{ith_path};
-end
-% total_error{1}  = allDistancesMatrix;
-
-% Start iterations - at each iteration, find orthogonal projections,
-% average results, then recalculate the reference traversal
-for ith_iteration =2:max_num_iterations 
-
-    % Show user what we are doing?        
-    if flag_do_debug
-        figure(debug_fig_num)
-        title(sprintf('Iteration: %.0f',ith_iteration))
-        fprintf(1,'Averaging paths via iteration: %.0d / %.0d \n',ith_iteration,max_num_iterations);
-        fprintf(1,'\tInitial maximum station: %.2f  \n',previousMaxStation);    
-        % fprintf(1,'\tOld search radius: %.2f  \n',search_radius);
-    end
-    
-    %% For each path, project from reference orthogonally to the others
-    % The allTransverseDistances array is organized as
-    % (referenceIndex,toIndex)
-    allTransverseDistances = fcn_INTERNAL_findTransverseDistancesAlongStation(cellArrayOfEquidistantPaths, cellArrayOfPercentStations);
-
-
-    %% Sum the corrections
-    pathCorrections = cell(Npaths,1);
-    for ith_referencePath = 1:Npaths
-        for jth_targetPath = 1:Npaths
-            if jth_targetPath == 1
-                pathCorrections{ith_referencePath,1} = -1/Npaths .* allTransverseDistances{ith_referencePath}(:,jth_targetPath);
-            else
-                pathCorrections{ith_referencePath,1} = pathCorrections{ith_referencePath,1} - 1/Npaths .* allTransverseDistances{ith_referencePath}(:,jth_targetPath);
-             end
-        end
-    end
-
-    %% Update each path
-    newPaths = cell(Npaths,1);
-    for ith_path = 1:Npaths
-        thisPath = cellArrayOfEquidistantPaths{ith_path};
-        thisCorrection = pathCorrections{ith_path,1};
-        orthoProjectionVectors = diff(thisPath,1,1)*[0 1; -1 0];
-        mag_orthoProjectionVectors = sum(orthoProjectionVectors.^2,2).^0.5;
-        unit_orthoProjectionVectors = orthoProjectionVectors./mag_orthoProjectionVectors;
-
-        updatedPath = [lockedStart; thisPath(2:end-1,:)+thisCorrection(2:end-1,:).*unit_orthoProjectionVectors(1:end-1,:); lockedEnd];
-        newPaths{ith_path,1} = updatedPath;
-
-        if flag_do_debug
-            set(h_updatedPlots(ith_path,1),'Xdata',updatedPath(:,1),'Ydata',updatedPath(:,2));
-            pause(0.02);
-        end
-    end
-
-
-    %% Call a special function to remove back-tracking behavior
-    % Sometimes averaging can produce results that bounce forward and
-    % backward. This function removes these "jumps"
-    newPathsNoJogs = cell(Npaths,1);
-    for ith_path = 1:Npaths
-        rawPath = newPaths{ith_path,1};
-        rawPathNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs(rawPath, -1);
-        newPathsNoJogs{ith_path,1} = rawPathNoJogs;
-        if flag_do_debug
-            set(h_updatedPlots(ith_path,1),'Xdata',rawPathNoJogs(:,1),'Ydata',rawPathNoJogs(:,2));
-        end
-    end
-    
-    
-    %% Set up all the paths to have same station interval
-    [cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(newPathsNoJogs, stationInterval);
-
-    % Find approximate equivalence in station distances
-    [cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
-
-    % Save results (for later plotting)
-    for ith_path = 1:Npaths
-        average_path{ith_iteration,ith_path} = cellArrayOfEquidistantPaths{ith_path};
-    end
-
+if 0==flag_solveIteratively
+    % This does not iterate, but does all path options at once. This is
+    % very slow as it is an N^3 operation
+    path_average = fcn_INTERNAL_iterateTowardAverage( ...
+        cellArrayOfEqualizedPaths, ...
+        stationInterval, ...
+        max_num_iterations, exit_tolerance, ...
+        averaging_weights, flag_do_plots, flag_do_debug, debug_fig_num, h_StartStop, h_updatedPlots);
+else
+    % This averages the paths iteratively. It's about 4 times faster than
+    % the above method, but not very accurate in situations where path
+    % changes (curves, jogs, etc.). This is a good first method to try, and
+    % future work may figure out ways to integrate both.
     if flag_do_debug
         for ith_path = 1:Npaths
-            finalPath = cellArrayOfEquidistantPaths{ith_path};
-            set(h_updatedPlots(ith_path,1),'Xdata',finalPath(:,1),'Ydata',finalPath(:,2));
+            set(h_updatedPlots(ith_path,1),'Xdata',nan,'Ydata',nan);
         end
     end
+    path_average = cellArrayOfEqualizedPaths{1};
+    for ith_dataSet = 2:length(cellArrayOfEqualizedPaths)
+        if flag_do_plots
+            fprintf(1,'\n ITERATING on path: %.0d\n', ith_dataSet);
+            title(sprintf('ITERATING on path: %.0d\n', ith_dataSet));
+        end
+        weightedPaths = cell(2,1);
+        weightedPaths{1,1} = path_average;
+        weightedPaths{2,1} = cellArrayOfEqualizedPaths{ith_dataSet};
+        weights = [(ith_dataSet-1)/ith_dataSet;  1/ith_dataSet];
+        path_average = fcn_INTERNAL_iterateTowardAverage( ...
+            weightedPaths, ...
+            stationInterval, ...
+            max_num_iterations, exit_tolerance, ...
+            weights, flag_do_plots, flag_do_debug, debug_fig_num,h_StartStop, h_updatedPlots);
 
-    % Calculate the total error via station variation
-    finalStations = zeros(Npaths,1);
-    for ith_path = 1:Npaths
-        finalStations(ith_path,1) = cellArrayOfEquidistantStations{ith_path}(end,1);
     end
-    
-    % Calculate the change in station between the paths
-    stationError(ith_iteration,1) = max(finalStations) - min(finalStations);    
-    
-    % Show results?
-    if flag_do_debug
-        fprintf(1,'\t Station differences from iteration %.0d to %.0d: %.3f \n',ith_iteration-1, ith_iteration,stationError(ith_iteration,1));
-    end
-
-    if exit_tolerance>stationError(ith_iteration,1)
-        % Exit the for loop        
-        break;
-    end
-    
 end
-
-lastIteration = find(isnan(stationError),1)-1;
-if isempty(lastIteration)
-    lastIteration = max_num_iterations;
-end
-
-% Use final average path to define "true" s-coordinates of the original trajectories, using projection
-path_average = cellArrayOfEquidistantPaths{1};
 
 % traversal_average = fcn_Path_convertPathToTraversalStructure(path_average, -1);  
 % Calculate final results
@@ -493,7 +406,7 @@ if flag_do_plots
     dimension_of_points = 2;
 
     % Find size of plotting domain
-    allPointsBeingPlotted = cellArrayOfEquidistantPaths{1};
+    allPointsBeingPlotted = cellArrayOfEqualizedPaths{1};
     max_plotValues = max(allPointsBeingPlotted);
     min_plotValues = min(allPointsBeingPlotted);
     sizePlot = max(max_plotValues) - min(min_plotValues);
@@ -530,7 +443,7 @@ if flag_do_plots
         axis(newAxis);
 
     end
-    goodAxis = axis;
+    % goodAxis = axis;
 
     hold on;
     grid on;
@@ -545,76 +458,18 @@ if flag_do_plots
         set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
     end
 
-    % Plot the results
-    h_updatedPlots = zeros(Npaths,1);
-    for ith_path = 1:Npaths
-        h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
-            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
-    end
+    % Plot the average
+    plot(path_average(:,1), path_average(:,2),'.-',...
+             'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(1,:)*0.8, 'DisplayName',sprintf('Average from path %.0f',1));
+
+    % h_updatedPlots = zeros(Npaths,1);
+    % for ith_path = 1:Npaths
+    %     h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
+    %         'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
+    % end
 
     legend
-
-
-    if flag_do_debug
-        % Plot the path convergence
-        figure(2255);
-        clf;
-        hold on;
-        axis(goodAxis);
-        xlabel('X [m]')
-        ylabel('Y [m]')
-       
-        % Plot the inputs
-        colorsPerData = zeros(Npaths,3);
-        for ith_path = 1:Npaths
-            h_plot = plot(cellArrayOfPaths{ith_path}(:,1),cellArrayOfPaths{ith_path}(:,2),'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
-            colorsPerData(ith_path,:) = get(h_plot,'Color');
-            set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
-        end
-
-        % Plot the results to create handles
-        h_updatedPlots = zeros(Npaths,1);
-        for ith_path = 1:Npaths
-            h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
-                'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
-        end
-
-        % Animate the results
-        for ith_iteration = 1:lastIteration
-            title(sprintf('Iteration %.0d of %.0d',ith_iteration,ith_iteration));
-            
-            for ith_path = 1:Npaths
-                finalPath = average_path{ith_iteration,ith_path};
-                set(h_updatedPlots(ith_path,1),'Xdata',finalPath(:,1),'Ydata',finalPath(:,2));
-            end
-            drawnow;
-            pause(0.1);
-        end
-        
-        % % Plot the error convergence
-        % figure(2233);
-        % clf;
-        % hold on;
-        % xlabel('Index')
-        % ylabel('Position change between iterations [m]')
-        % for ith_iteration = 1:length(iteration_error_X)
-        %     title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
-        %     plot(total_error{ith_iteration});            
-        %     pause(0.1);
-        % end
-        % 
-        
-        % Plot the error convergence
-        figure(2244);
-        clf;
-        
-        semilogy(1:length(stationError),stationError,'.-','Markersize',30);
-        xlabel('Iteration')
-        ylabel('Change in total station')
-        grid on
-        
-    end
-    
+   
 end
 
 if flag_do_debug
@@ -634,6 +489,19 @@ end % End of function
 %
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
+
+%% fcn_INTERNAL_calcStationError
+function stationError = fcn_INTERNAL_calcStationError(cellArrayOfEquidistantStations)
+Npaths = length(cellArrayOfEquidistantStations);
+
+% Calculate the total error via station variation at end of each array
+finalStations = zeros(Npaths,1);
+for ith_path = 1:Npaths
+    finalStations(ith_path,1) = cellArrayOfEquidistantStations{ith_path}(end,1);
+end
+stationError = max(finalStations) - min(finalStations);
+
+end % Ends fcn_INTERNAL_calcStationError
 
 %% fcn_INTERNAL_findTransverseDistances
 function [distanceMatrix, allDistances] = fcn_INTERNAL_findTransverseDistances(reference_path, cellArrayOfPaths)
@@ -810,11 +678,7 @@ for jth_station = 1:length(stationSteps)
 
         % Find the extended references
         indicesGood = find((searchStations>=extendedStartSearch) .* (searchStations<=extendedEndSearch));
-        try
         goodPath = thisPath(indicesGood,:); %#ok<FNDSB>
-        catch
-            disp('Stop here');
-        end
         cellArrayOfLocalReferencePath{ith_path,1} = goodPath;
     
     end
@@ -853,3 +717,236 @@ for jth_station = 1:length(stationSteps)
 end
 
 end % Ends fcn_INTERNAL_findTransverseDistancesAlongStation
+
+%% 
+function path_average = fcn_INTERNAL_iterateTowardAverage( ...
+    cellArrayOfEqualizedPaths, ...
+    stationInterval, ...
+    max_num_iterations, exit_tolerance, ...
+    averaging_weights, flag_do_plots, flag_do_debug, debug_fig_num, h_StartStop, h_updatedPlots)
+
+
+% Perform iterations to seek an average path
+% * Project from the reference path to nearby trajectories to find projections
+% * Average projections to find new average path. 
+% * Clean up average and store results for next iteration or exit
+
+Npaths = length(cellArrayOfEqualizedPaths);
+
+%%%%
+% Find locked start/end points
+allStarts = nan(Npaths,2);
+allEnds   = nan(Npaths,2);
+for ith_path = 1:Npaths
+    allStarts(ith_path,:) = cellArrayOfEqualizedPaths{ith_path}(1,:);
+    allEnds(ith_path,:)   = cellArrayOfEqualizedPaths{ith_path}(end,:);
+end
+
+lockedStart = sum(averaging_weights.*allStarts,1);
+lockedEnd   = sum(averaging_weights.*allEnds,1);
+
+if flag_do_debug
+   set(h_StartStop(1),'Xdata',lockedStart(1,1), 'Ydata', lockedStart(1,2));
+   set(h_StartStop(2),'Xdata',lockedEnd(1,1), 'Ydata', lockedEnd(1,2));
+end  
+
+
+%%%%% 
+% Set up all the paths to have same station interval
+[cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(cellArrayOfEqualizedPaths, stationInterval); 
+
+if flag_do_debug
+    figure(debug_fig_num)
+    for ith_path = 1:Npaths
+        set(h_updatedPlots(ith_path,1),'Xdata',cellArrayOfEquidistantPaths{ith_path}(:,1),'Ydata',cellArrayOfEquidistantPaths{ith_path}(:,2));
+    end
+end    
+
+
+%%%%% 
+% Find approximate equivalence in station distances
+[cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
+
+
+stationError = nan(max_num_iterations, 1);
+stationError(1,1) = fcn_INTERNAL_calcStationError(cellArrayOfEquidistantStations);
+
+% Initialize variables to hold results
+averagePathForPlotting = cell(max_num_iterations,Npaths);
+% Set iteration 1 values
+for ith_path = 1:Npaths
+    averagePathForPlotting{1,ith_path} = cellArrayOfEquidistantPaths{ith_path};
+end
+
+% Start iterations - at each iteration, find orthogonal projections,
+% average results, then recalculate the reference traversal
+for ith_iteration =2:max_num_iterations 
+
+    % Show user what we are doing?        
+    if flag_do_plots
+        fprintf(1,'Averaging paths via iteration: %.0d / %.0d \n',ith_iteration,max_num_iterations);
+        fprintf(1,'\t Previous station error: %.4f  \n',stationError(ith_iteration-1,1));    
+        % fprintf(1,'\tOld search radius: %.2f  \n',search_radius);
+    end
+    
+    %% For each path, project from reference orthogonally to the others
+    % The allTransverseDistances array is organized as
+    % (referenceIndex,toIndex)
+    allTransverseDistances = fcn_INTERNAL_findTransverseDistancesAlongStation(cellArrayOfEquidistantPaths, cellArrayOfPercentStations);
+
+
+    %% Sum the corrections
+    pathCorrections = cell(Npaths,1);
+    for ith_referencePath = 1:Npaths
+        for jth_targetPath = 1:Npaths
+            if jth_targetPath == 1
+                pathCorrections{ith_referencePath,1} = -averaging_weights(jth_targetPath) .* allTransverseDistances{ith_referencePath}(:,jth_targetPath);
+            else
+                pathCorrections{ith_referencePath,1} = pathCorrections{ith_referencePath,1} - averaging_weights(jth_targetPath) .* allTransverseDistances{ith_referencePath}(:,jth_targetPath);
+             end
+        end
+    end
+
+    %% Update each path
+    newPaths = cell(Npaths,1);
+    for ith_path = 1:Npaths
+        thisPath = cellArrayOfEquidistantPaths{ith_path};
+        thisCorrection = pathCorrections{ith_path,1};
+        orthoProjectionVectors = diff(thisPath,1,1)*[0 1; -1 0];
+        mag_orthoProjectionVectors = sum(orthoProjectionVectors.^2,2).^0.5;
+        unit_orthoProjectionVectors = orthoProjectionVectors./mag_orthoProjectionVectors;
+
+        updatedPath = [lockedStart; thisPath(2:end-1,:)+thisCorrection(2:end-1,:).*unit_orthoProjectionVectors(1:end-1,:); lockedEnd];
+        newPaths{ith_path,1} = updatedPath;
+
+        if flag_do_debug
+            set(h_updatedPlots(ith_path,1),'Xdata',updatedPath(:,1),'Ydata',updatedPath(:,2));
+            pause(0.02);
+        end
+    end
+
+
+    %% Call a special function to remove back-tracking behavior
+    % Sometimes averaging can produce results that bounce forward and
+    % backward. This function removes these "jumps"
+    newPathsNoJogs = cell(Npaths,1);
+    for ith_path = 1:Npaths
+        rawPath = newPaths{ith_path,1};
+        rawPathNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs(rawPath, -1);
+        newPathsNoJogs{ith_path,1} = rawPathNoJogs;
+        if flag_do_debug
+            set(h_updatedPlots(ith_path,1),'Xdata',rawPathNoJogs(:,1),'Ydata',rawPathNoJogs(:,2));
+        end
+    end
+    
+    
+    %% Set up all the paths to have same station interval
+    [cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(newPathsNoJogs, stationInterval);
+
+    % Find approximate equivalence in station distances
+    [cellArrayOfPercentStations, ~] = fcn_INTERNAL_calculateApproximateStationEquivalence(cellArrayOfEquidistantStations);
+
+    % Save results (for later plotting)
+    for ith_path = 1:Npaths
+        averagePathForPlotting{ith_iteration,ith_path} = cellArrayOfEquidistantPaths{ith_path};
+    end
+
+    if flag_do_debug
+        for ith_path = 1:Npaths
+            finalPath = cellArrayOfEquidistantPaths{ith_path};
+            set(h_updatedPlots(ith_path,1),'Xdata',finalPath(:,1),'Ydata',finalPath(:,2));
+        end
+    end
+    
+    % Calculate the station error between the paths
+    stationError(ith_iteration,1) = fcn_INTERNAL_calcStationError(cellArrayOfEquidistantStations);
+    
+    % Show results?
+    if flag_do_plots
+        fprintf(1,'\t Station differences from iteration %.0d to %.0d: %.3f \n',ith_iteration-1, ith_iteration,stationError(ith_iteration,1));
+    end
+
+    if exit_tolerance>stationError(ith_iteration,1)
+        if flag_do_plots
+            fprintf(1,'\t Station differences from iteration %.0d to %.0d: %.3f, this meets tolerance of: %.4f \n',ith_iteration-1, ith_iteration,stationError(ith_iteration,1), exit_tolerance);
+        end
+        break;
+    end
+
+end
+
+lastIteration = find(isnan(stationError),1)-1;
+if isempty(lastIteration)
+    lastIteration = max_num_iterations;
+end
+
+% Use final average path to define "true" s-coordinates of the original trajectories, using projection
+path_average = cellArrayOfEquidistantPaths{1};
+
+
+if 1==0 % flag_do_debug
+    % Plot the path convergence
+    figure(debug_fig_num);
+    goodAxis = axis;
+
+    figure(2255);
+    clf;
+    hold on;
+    axis(goodAxis);
+    xlabel('X [m]')
+    ylabel('Y [m]')
+
+    % Plot the inputs
+    colorsPerData = zeros(Npaths,3);
+    for ith_path = 1:Npaths
+        h_plot = plot(cellArrayOfEqualizedPaths{ith_path}(:,1),cellArrayOfEqualizedPaths{ith_path}(:,2),'.-','LineWidth',5,'MarkerSize',20, 'DisplayName',sprintf('Path %.0f',ith_path));
+        colorsPerData(ith_path,:) = get(h_plot,'Color');
+        set(h_plot,'Color',(colorsPerData(ith_path,:)*0.4 + 0.6*[1 1 1]))
+    end
+
+    % Plot the results to create handles
+    h_updatedPlots = zeros(Npaths,1);
+    for ith_path = 1:Npaths
+        h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
+            'LineWidth',2,'MarkerSize',10,'Color',colorsPerData(ith_path,:)*0.8, 'DisplayName',sprintf('Resampled %.0f',ith_path));
+    end
+
+    % Animate the results
+    for ith_iteration = 1:lastIteration
+        title(sprintf('Iteration %.0d of %.0d',ith_iteration,ith_iteration));
+
+        for ith_path = 1:Npaths
+            finalPath = averagePathForPlotting{ith_iteration,ith_path};
+            set(h_updatedPlots(ith_path,1),'Xdata',finalPath(:,1),'Ydata',finalPath(:,2));
+        end
+        drawnow;
+        pause(0.1);
+    end
+
+    % % Plot the error convergence
+    % figure(2233);
+    % clf;
+    % hold on;
+    % xlabel('Index')
+    % ylabel('Position change between iterations [m]')
+    % for ith_iteration = 1:length(iteration_error_X)
+    %     title(sprintf('Iteration %.0d of %.0d',ith_iteration,length(iteration_error_X)));
+    %     plot(total_error{ith_iteration});
+    %     pause(0.1);
+    % end
+    %
+
+    % Plot the error convergence
+    figure(2244);
+    clf;
+
+    semilogy(1:length(stationError),stationError,'.-','Markersize',30);
+    xlabel('Iteration')
+    ylabel('Change in total station')
+    grid on
+
+end
+
+end
+
+

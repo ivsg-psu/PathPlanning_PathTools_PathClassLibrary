@@ -51,7 +51,7 @@ function St_points = fcn_Path_convertXY2St(referencePath,XY_points, varargin)
 %
 %          flag_rounding_type = 4;  % This indicates that the orthogonal
 %          projections along segments should be calculated at the midpoints
-%          of each segment, and then for each station qeuary, the vector
+%          of each segment, and then for each station query, the vector
 %          projections are interpolated from their prior and subsequent
 %          vectors. For the endpoints - the start and end - the vectors are
 %          aligned with the endpoints in the negative and positive
