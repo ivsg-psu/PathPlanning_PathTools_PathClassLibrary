@@ -2,10 +2,15 @@
 % Tests fcn_Path_calcDiffAnglesBetweenPathSegments
        
 % Revision history:
-%      2021_01_03
-%      -- first write of the code
-%      2021_01_07
-%      -- fixed typos in the comments, minor header clean-ups
+% 2021_01_03
+% - first write of the code
+% 2021_01_07
+% - fixed typos in the comments, minor header clean-ups
+% 2025_08_02 by S. Brennan
+% - In script_test_fcn_Path_calcDiffAnglesBetweenPathSegments
+%   % * added edgeLengths to variable testing
+%   % * renamed other variables to match inputs
+%   % * added a trival but problem test case from real-world data
 
 close all
 
@@ -18,17 +23,19 @@ figure(fig_num); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+pathVerticesXY = paths_array{1}; % Pick first path as reference_traversal structure
 
-diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,fig_num);
+[changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,fig_num);
 
 title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(diff_angles));
+assert(isnumeric(changeInAngles));
+assert(isnumeric(edgeLengths));
 
 % Check variable sizes
-assert(isequal(size(diff_angles),[length(paths_to_check(:,1))-2 1]));
+assert(isequal(size(changeInAngles),[length(pathVerticesXY(:,1))-2 1]));
+assert(isequal(size(edgeLengths),[length(pathVerticesXY(:,1))-1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),fig_num));
@@ -58,15 +65,17 @@ figure(fig_num); close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+pathVerticesXY = paths_array{1}; % Pick first path as reference_traversal structure
 
-diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,[]);
+[changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,[]);
 
 % Check variable types
-assert(isnumeric(diff_angles));
+assert(isnumeric(changeInAngles));
+assert(isnumeric(edgeLengths));
 
 % Check variable sizes
-assert(isequal(size(diff_angles),[length(paths_to_check(:,1))-2 1]));
+assert(isequal(size(changeInAngles),[length(pathVerticesXY(:,1))-2 1]));
+assert(isequal(size(edgeLengths),[length(pathVerticesXY(:,1))-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -80,15 +89,17 @@ figure(fig_num); close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+pathVerticesXY = paths_array{1}; % Pick first path as reference_traversal structure
 
-diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,-1);
+[changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,-1);
 
 % Check variable types
-assert(isnumeric(diff_angles));
+assert(isnumeric(changeInAngles));
+assert(isnumeric(edgeLengths));
 
 % Check variable sizes
-assert(isequal(size(diff_angles),[length(paths_to_check(:,1))-2 1]));
+assert(isequal(size(changeInAngles),[length(pathVerticesXY(:,1))-2 1]));
+assert(isequal(size(edgeLengths),[length(pathVerticesXY(:,1))-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -103,7 +114,7 @@ close(fig_num);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-paths_to_check = paths_array{1}; % Pick first path as reference_traversal structure
+pathVerticesXY = paths_array{1}; % Pick first path as reference_traversal structure
 
 Niterations = 100;
 
@@ -111,17 +122,33 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,[]);
+    [changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,[]);
 end
 slow_method = toc;
+
+% Check variable types
+assert(isnumeric(changeInAngles));
+assert(isnumeric(edgeLengths));
+
+% Check variable sizes
+assert(isequal(size(changeInAngles),[length(pathVerticesXY(:,1))-2 1]));
+assert(isequal(size(edgeLengths),[length(pathVerticesXY(:,1))-1 1]));
 
 % Do calculation with pre-calculation, FAST_MODE on
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(paths_to_check,-1);
+    [changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,-1);
 end
 fast_method = toc;
+
+% Check variable types
+assert(isnumeric(changeInAngles));
+assert(isnumeric(edgeLengths));
+
+% Check variable sizes
+assert(isequal(size(changeInAngles),[length(pathVerticesXY(:,1))-2 1]));
+assert(isequal(size(edgeLengths),[length(pathVerticesXY(:,1))-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -137,7 +164,6 @@ X = reordercats(X,{'Normal mode','Fast mode'}); % Forces bars to appear in this 
 Y = [slow_method fast_method ]*1000/Niterations;
 bar(X,Y)
 ylabel('Execution time (Milliseconds)')
-
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -160,8 +186,29 @@ assert(~any(figHandles==fig_num));
 
 % close all;
 
-%% BUG 
+%% BUG Point that goes back on itself
+fig_num = 90001;
+titleString = sprintf('Calculation of the angle between path segments');
+fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
+figure(fig_num); clf;
 
+
+pathVerticesXY = [0 0; 1 0; 0.5 0];
+
+[changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,fig_num);
+
+title(titleString, 'Interpreter','none');
+
+% Check variable types
+assert(isnumeric(changeInAngles));
+assert(isnumeric(edgeLengths));
+
+% Check variable sizes
+assert(isequal(size(changeInAngles),[length(pathVerticesXY(:,1))-2 1]));
+assert(isequal(size(edgeLengths),[length(pathVerticesXY(:,1))-1 1]));
+
+% Make sure plot opened up
+assert(isequal(get(gcf,'Number'),fig_num));
 
 
 %% Functions follow

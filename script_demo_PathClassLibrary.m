@@ -44,6 +44,35 @@
 % 2025_07_06 - S. Brennan
 % -- Added weighted averaging option to fcn_Path_findAveragePath
 % -- Added more test cases to script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+%
+% 2025_08_02 - S. Brennan
+% - In fcn_Path_calcDiffAnglesBetweenSegments
+%   % * Minor reordering of code steps to pass out edge lengths
+%   % * Allows speed up other codes using same values
+%   % * renamed variables for clarity
+%   % * updated docstrings
+%   % * Removed fill of debug_fig_num, as this is in the new header
+% - In script_test_fcn_Path_calcDiffAnglesBetweenPathSegments
+%   % * added edgeLengths to variable testing
+%   % * renamed other variables to match inputs
+%   % * added a trival but problem test case from real-world data
+% - In fcn_Path_cleanPathFromForwardBackwardJogs
+%   % * Found a huge number of bugs from a real world test 
+%   % * (see bug test added to script)
+%   % * Added removal of singleton outliers
+%   % * Fixed errors where paired outliers were not being used correctly
+%   % * Added more debug plotting
+%   % * Improved final plot layout to make the outliers more clear
+% - In script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+%   * added Bug Test Case 90005
+%   * BUG - real-world example that was not previously working
+% - In script_test_fcn_Path_findAveragePath
+%   % * Removed some of the assertion testing
+%   % * Some were broken from prior edits
+% - In script_test_all_functions
+%   % * Updated library name in output file
+%   % * Updated docstrings accordingly
+%   % * Edited start/end values for file numbering, to cover entire range
 
 % TO-DO:
 % 2024_03_14 - S. Brennan 

@@ -46,6 +46,14 @@ function clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
 % -- wrote the code originally
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_08_02 - S. Brennan
+% - In fcn_Path_cleanPathFromForwardBackwardJogs
+%   % * Found a huge number of bugs from a real world test 
+%   % * (see bug test added to script)
+%   % * Added removal of singleton outliers
+%   % * Fixed errors where paired outliers were not being used correctly
+%   % * Added more debug plotting
+%   % * Improved final plot layout to make the outliers more clear
 
 % TO-DO
 % (none)
@@ -137,34 +145,34 @@ Npath = length(path_with_jogs(:,1));
 iteration_count = 1;
 flag_average_is_good = 0;
 
-
-% For debugging
-if flag_do_debug
-    figure(fig_debug);
-    clf;
-
-    plot(path_with_jogs(:,1),path_with_jogs(:,2),'k.-');
-    hold on;
-end
-
-
-working_path_with_jogs = path_with_jogs;
+working_path_removing_jogs = path_with_jogs;
 points_removed = [];
-while (0==flag_average_is_good)  && (iteration_count<=3)
+while (0==flag_average_is_good)  && (iteration_count<=50)
     % Calculate angle changes between points
-    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(working_path_with_jogs, -1);
+    diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(working_path_removing_jogs, -1);
     diff_angles_fullLength = [0; diff_angles];
     
     % Find outliers
     outliers = find(abs(diff_angles_fullLength)>pi/4);
 
+    % For debugging
     if flag_do_debug
+        outlierAnglesDegrees = round(diff_angles_fullLength(outliers)*180/pi);
         figure(fig_debug);
-        plot(working_path_with_jogs(outliers,1),working_path_with_jogs(outliers,2),'ro','MarkerSize',10);
+        clf;
+        plot(working_path_removing_jogs(:,1),working_path_removing_jogs(:,2),'k.-');
+        hold on;
+        axis equal
+        title(sprintf('Iteration: %.0f',iteration_count))
+        plot(working_path_removing_jogs(outliers,1),working_path_removing_jogs(outliers,2),'ro','MarkerSize',10);
+        for ith_outlier = 1:length(outliers)
+            thisOutlier = outliers(ith_outlier);
+            text(working_path_removing_jogs(thisOutlier,1),working_path_removing_jogs(thisOutlier,2),sprintf('%.0f',outlierAnglesDegrees(ith_outlier)))
+        end
     end
 
     % For debugging
-    if flag_do_debug
+    if flag_do_debug && 1==0
         figure(888);
         clf;
 
@@ -172,6 +180,8 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
         plot(x_indices,diff_angles_fullLength*180/pi,'k.-','MarkerSize',10);
         hold on;
         plot(x_indices(outliers), diff_angles_fullLength(outliers)*180/pi,'ro');
+        yline(pi/4*180/pi);
+        yline(-pi/4*180/pi);
         xlabel('Indices');
         ylabel('Angle change (deg)');
     end
@@ -179,12 +189,16 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
     % Are there any back/forth jogs?
     if ~isempty(outliers)
 
-        % If there are, find pairs, e.g. outliers in sequence. These occur
-        % where the differences in outliers is 1
+        % Create a set of indices we will save
+        indices = (1:length(working_path_removing_jogs(:,1)))';
+
+        % Find outlier pairs, e.g. outliers in sequence. These occur
+        % where the differences in outliers is 1. These should be removed
+        % first, before doing singleton outliers, as they remove 2 at once.
         outlierIndexDifferences = diff(outliers);
         pairStarts = outliers(outlierIndexDifferences==1);
-        realOutliers = nan(length(pairStarts),1);
-        if ~isempty(realOutliers)
+        pairedOutliers = nan(length(pairStarts),1);
+        if ~isempty(pairedOutliers)
             for ith_pair = 1:length(pairStarts)
                 startingIndex = pairStarts(ith_pair);
                 if startingIndex==1 || startingIndex>=Npath-1
@@ -199,51 +213,74 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
                 % each point, and find the largest magnitude value.
                 segmentStartIndex = startingIndex-1;
                 segmentEndIndex   = startingIndex+2;
+                
                 segmentStart = path_with_jogs(segmentStartIndex,:);
                 segmentEnd   = path_with_jogs(segmentEndIndex,:);
                 segmentVector = segmentEnd-segmentStart;
                 segmentOrthoVector = segmentVector*[0 1; -1 0];
+                             
                 outlier1Vector = path_with_jogs(startingIndex,:) - segmentStart;
                 outlier2Vector = path_with_jogs(startingIndex+1,:) - segmentStart;
-                % Take dot products
+
+
+                % Take dot products with the ortho vector to see magnitude
+                % of distance "away" from straight-line segment
                 orthoDistance1 = abs(sum(outlier1Vector.*segmentOrthoVector,2));
                 orthoDistance2 = abs(sum(outlier2Vector.*segmentOrthoVector,2));
                 if orthoDistance1>orthoDistance2
-                    realOutliers(ith_pair) = startingIndex;
+                    pairedOutlierToRemove = startingIndex;
                 else
-                    realOutliers(ith_pair) = startingIndex+1;
+                    pairedOutlierToRemove = startingIndex+1;
                 end
+
+                % Remove this outlier pair choice from the index list
+                indices(pairedOutlierToRemove) = 0;
+
+                if flag_do_debug
+                    figure(fig_debug);
+                    plot(working_path_removing_jogs(pairedOutlierToRemove,1),working_path_removing_jogs(pairedOutlierToRemove,2),'rx','MarkerSize',10);
+                end
+
             end % Ends loop through pairs
 
 
-            if flag_do_debug
-                figure(fig_debug);
-                plot(working_path_with_jogs(realOutliers,1),working_path_with_jogs(realOutliers,2),'rx','MarkerSize',10);
+        else 
+            % If enter here, there are no back/forth jogs. The only
+            % outliers are singletons. Need to remove these specific points
+            for ith_outlier = 1:length(outliers)
+                thisOutlier = outliers(ith_outlier);
+
+                % Remove this outlier pair choice from the index list
+                indices(thisOutlier) = 0;
+
+                if flag_do_debug
+                    figure(fig_debug);
+                    plot(working_path_removing_jogs(thisOutlier,1),working_path_removing_jogs(thisOutlier,2),'rx','MarkerSize',10);
+                end
+                
             end
-        else % No back/forth jogs left!
-            flag_average_is_good = 1;
-        end
-        % % ID adjacent points
-        % outliers = unique([outliers;outliers+1;outliers-1]);
-        % outliers = min(outliers,length(working_path_with_jogs)-1);
-        % outliers = max(1,outliers);
-        
-        % Create a set of indices we will save
-        indices = (1:length(working_path_with_jogs(:,1)))';
-        indices(realOutliers) = 0;
-        
+
+        end % Ends if statement for paired outliers
+                     
         % Save the clean path
-        clean_path = working_path_with_jogs(indices~=0,:);        
+        clean_path = working_path_removing_jogs(indices~=0,:);        
         
         % Save the points that were removed
-        points_removed = [points_removed; working_path_with_jogs(indices==0,:)]; %#ok<AGROW>
+        points_removed = [points_removed; working_path_removing_jogs(indices==0,:)]; %#ok<AGROW>
 
         
     else % No back/forth jogs left!
         flag_average_is_good = 1;
-        clean_path = working_path_with_jogs;
-    end
+        clean_path = working_path_removing_jogs;
+    end % Ends if statement to see if there are any outliers
     
+    % Remove any repeats
+    [clean_path_unique,IA] = unique(clean_path,'rows','stable'); %#ok<ASGLU>
+    % if length(clean_path_unique(:,1))~=length(clean_path(:,1))
+    %     disp('Working');
+    % end
+    clean_path = clean_path_unique;
+
     % Show results for debugging?
     if flag_do_debug
         figure(fig_debug);
@@ -254,7 +291,7 @@ while (0==flag_average_is_good)  && (iteration_count<=3)
     iteration_count = iteration_count + 1;
     
     % Reset the path average for the next round
-    working_path_with_jogs = clean_path;
+    working_path_removing_jogs = clean_path;
 end
 
 
@@ -322,9 +359,9 @@ if flag_do_plots
     grid minor;
     axis equal;
     
-    plot(path_with_jogs(:,1),path_with_jogs(:,2),'k.-','Linewidth',5,'Markersize',40,'DisplayName','Path with jogs');
-    plot(points_removed(:,1),points_removed(:,2),'ro','DisplayName','Outliers','MarkerSize',10,'LineWidth',3);
-    plot(clean_path(:,1),clean_path(:,2),'c.-','Linewidth',2,'Markersize',25,'DisplayName','Fixed path, no jogs');
+    plot(path_with_jogs(:,1),path_with_jogs(:,2),'k.-','Linewidth',5,'Markersize',20,'DisplayName','Path with jogs');
+    plot(clean_path(:,1),clean_path(:,2),'c.-','Linewidth',2,'Markersize',10,'DisplayName','Fixed path, no jogs');
+    plot(points_removed(:,1),points_removed(:,2),'rx','MarkerSize',10,'LineWidth',2,'DisplayName','Outliers');
     legend;
 
     xlabel('X [m]')

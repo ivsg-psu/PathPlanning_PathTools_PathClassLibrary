@@ -1,4 +1,4 @@
-function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
+function [changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,varargin)
 % fcn_Path_calcDiffAnglesBetweenSegments
 % Calculates the change in angles between path segments. If there are N
 % points in the path, there are N-1 segments and thus N-2 angles between
@@ -11,11 +11,11 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 %
 % FORMAT: 
 %
-%       diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,(fig_num))
+%       [changeInAngles, edgeLengths] = fcn_Path_calcDiffAnglesBetweenPathSegments(pathVerticesXY,(fig_num))
 %
 % INPUTS:
 %
-%      Path: an N x 2 vector with [X Y] data in each row. N must be >= 3.
+%      pathVerticesXY: an N x 2 vector with [X Y] data in each row. N must be >= 3.
 %
 %     (OPTIONAL INPUTS)
 %
@@ -27,7 +27,9 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 %
 % OUTPUTS:
 %
-%      diff_angles: tan (N-2) x 1 vector of the change in angles in radians
+%      changeInAngles: an (N-2) x 1 vector of the change in angles in radians
+%
+%      edgeLengths: an (N-1) x 1 vector of the lengths of the edges
 %
 % DEPENDENCIES
 %
@@ -51,6 +53,13 @@ function diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(Path,varargin)
 % -- fixed typos in the comments, minor header clean-ups
 % 2025_06_23 - S. Brennan
 % -- Updated debugging and input checks
+% 2025_08_02 - S. Brennan
+% - In fcn_Path_calcDiffAnglesBetweenSegments
+%   % * Minor reordering of code steps to pass out edge lengths
+%   % * Allows speed up other codes using same values
+%   % * renamed variables for clarity
+%   % * updated docstrings
+%   % * Removed fill of debug_fig_num, as this is in the new header
 
 % TO-DO
 % (none)
@@ -105,8 +114,8 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(1,MAX_NARGIN);
 
-        % Check the Path variables
-        fcn_DebugTools_checkInputsToFunctions(Path, 'paths');
+        % Check the pathVerticesXY variables
+        fcn_DebugTools_checkInputsToFunctions(pathVerticesXY, 'paths');
     end
 end
 
@@ -116,12 +125,7 @@ if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
         fig_num = temp;
-        figure(fig_num);
         flag_do_plots = 1;
-    end
-else
-    if flag_do_debug
-        fig_debug = 4848; %#ok<NASGU>
     end
 end
 
@@ -144,19 +148,33 @@ end
 %
 %     % angles = atan2(path_average(2:end,2)-path_average(1:end-1,2),path_average(2:end,1)-path_average(1:end-1,1));
 %     % angles = [angles; angles(end)];  % Pad the last point twice
-%     % diff_angles2 = abs(diff(angles));
+%     % changeInAngles2 = abs(diff(angles));
 
-a_vector = Path(2:end-1,:)-Path(1:end-2,:);
-b_vector = Path(3:end,:)-Path(2:end-1,:);
-a_dot_b = sum(a_vector.*b_vector,2); % Do the dot product
-a_cross_b = crossProduct(a_vector,b_vector);
+edgeVectors = pathVerticesXY(2:end,:)-pathVerticesXY(1:end-1,:);
+edgeLengths = sum(edgeVectors.^2,2).^0.5;
 
-a_mag = sum(a_vector.^2,2).^0.5;
-b_mag = sum(b_vector.^2,2).^0.5;
+incoming_vector = edgeVectors(1:end-1,:);
+outgoing_vector = edgeVectors(2:end,:);
+% OLD VERSION:
+% incoming_vector = pathVerticesXY(2:end-1,:)-pathVerticesXY(1:end-2,:);
+% outgoing_vector = pathVerticesXY(3:end,:)-pathVerticesXY(2:end-1,:);
+incoming_dot_outgoing = sum(incoming_vector.*outgoing_vector,2); % Do the dot product
+incoming_cross_outgoing = crossProduct(incoming_vector,outgoing_vector);
+
+zeroCross = find(0==incoming_cross_outgoing);
+if incoming_dot_outgoing(zeroCross)~=0
+    incoming_cross_outgoing(zeroCross) = 1*sign(incoming_dot_outgoing(zeroCross));
+end
+
+incoming_mag = edgeLengths(1:end-1,:);
+outgoing_mag = edgeLengths(2:end,:);
+% OLD VERSION:
+% incoming_mag = sum(incoming_vector.^2,2).^0.5;
+% outgoing_mag = sum(outgoing_vector.^2,2).^0.5;
 
 % Calculate the change in angle using the dot product
-%diff_angles = [acos(a_dot_b./(a_mag.*b_mag)); 0];
-diff_angles = sign(a_cross_b).*(acos(a_dot_b./(a_mag.*b_mag)));
+%changeInAngles = [acos(incoming_dot_outgoing./(incoming_mag.*outgoing_mag)); 0];
+changeInAngles = sign(incoming_cross_outgoing).*(acos(incoming_dot_outgoing./(incoming_mag.*outgoing_mag)));
 
 
 %% Any debugging?
@@ -172,53 +190,53 @@ diff_angles = sign(a_cross_b).*(acos(a_dot_b./(a_mag.*b_mag)));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Prep the figure for plotting
-    temp_h = figure(fig_num);
-    flag_rescale_axis = 0;
-    if isempty(get(temp_h,'Children'))
-        flag_rescale_axis = 1;
-    end
+    temp_h = figure(fig_num); %#ok<NASGU>
+    % flag_rescale_axis = 0;
+    % if isempty(get(temp_h,'Children'))
+    %     flag_rescale_axis = 1;
+    % end
     
     % Is this 2D or 3D?
-    dimension_of_points = length(diff_angles(1,:));
+    % dimension_of_points = length(changeInAngles(1,:));
 
     % Find size of plotting domain
-    allPointsBeingPlotted = [(1:length(diff_angles))' diff_angles*180/pi];
+    allPointsBeingPlotted = [(1:length(changeInAngles))' changeInAngles*180/pi];
     max_plotValues = max(allPointsBeingPlotted);
     min_plotValues = min(allPointsBeingPlotted);
     sizePlot = max(max_plotValues) - min(min_plotValues);
     nudge = sizePlot*0.006; %#ok<NASGU>
 
     % Find size of plotting domain
-    if flag_rescale_axis
-        percent_larger = 0.3;
-        axis_range = max_plotValues - min_plotValues;
-        if (0==axis_range(1,1))
-            axis_range(1,1) = 2/percent_larger;
-        end
-        if (0==axis_range(1,2))
-            axis_range(1,2) = 2/percent_larger;
-        end
-        if dimension_of_points==3 && (0==axis_range(1,3))
-            axis_range(1,3) = 2/percent_larger;
-        end
-
-        % Force the axis to be equal?
-        if 1==0
-            min_valuesInPlot = min(min_plotValues);
-            max_valuesInPlot = max(max_plotValues);
-        else
-            min_valuesInPlot = min_plotValues;
-            max_valuesInPlot = max_plotValues;
-        end
-
-        % Stretch the axes
-        stretched_min_vertexValues = min_valuesInPlot - percent_larger.*axis_range;
-        stretched_max_vertexValues = max_valuesInPlot + percent_larger.*axis_range;
-        axesTogether = [stretched_min_vertexValues; stretched_max_vertexValues];
-        newAxis = reshape(axesTogether, 1, []);
-        axis(newAxis);
-
-    end
+    % if flag_rescale_axis
+    %     percent_larger = 0.3;
+    %     axis_range = max_plotValues - min_plotValues;
+    %     if (0==axis_range(1,1))
+    %         axis_range(1,1) = 2/percent_larger;
+    %     end
+    %     if (0==axis_range(1,2))
+    %         axis_range(1,2) = 2/percent_larger;
+    %     end
+    %     if dimension_of_points==3 && (0==axis_range(1,3))
+    %         axis_range(1,3) = 2/percent_larger;
+    %     end
+    % 
+    %     % Force the axis to be equal?
+    %     if 1==0
+    %         min_valuesInPlot = min(min_plotValues);
+    %         max_valuesInPlot = max(max_plotValues);
+    %     else
+    %         min_valuesInPlot = min_plotValues;
+    %         max_valuesInPlot = max_plotValues;
+    %     end
+    % 
+    %     % Stretch the axes
+    %     stretched_min_vertexValues = min_valuesInPlot - percent_larger.*axis_range;
+    %     stretched_max_vertexValues = max_valuesInPlot + percent_larger.*axis_range;
+    %     axesTogether = [stretched_min_vertexValues; stretched_max_vertexValues];
+    %     newAxis = reshape(axesTogether, 1, []);
+    %     axis(newAxis);
+    % 
+    % end
     % goodAxis = axis;
 
     hold on;
@@ -228,7 +246,7 @@ if flag_do_plots
     ylabel('Angle [deg]');
 
     % Plot the angle differences
-    plot(diff_angles*180/pi,'k.-','Linewidth',3,'Markersize',25);
+    plot(changeInAngles*180/pi,'k.-','Linewidth',3,'Markersize',25);
 
 end
 
