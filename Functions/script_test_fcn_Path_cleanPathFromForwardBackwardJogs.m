@@ -8,8 +8,17 @@
 % 2025_06_30
 % -- testing more with real-world cases
 % 2025_08_02
-% - Added Bug Test Case 90005
+% - Added Bug Test Case 90004
 %   * BUG - real-world example that was not previously working
+% 2025_08_05
+% - In script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+%   % * Cleaned up variable names
+%   % * Added jogAngleThreshold input option
+%   % * Added Bug Test Case 90005 that shows need for this input
+%   % * Fixed Bug shown in case 90002, which needed jogAnglethreshold to
+%   %   % work
+
+
 
 close all;
 
@@ -26,50 +35,52 @@ close all;
 % All demonstration case figures start with the number 1
 
 %% Basic call example
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('Basic call example, eliminating first point');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
-path_with_jogs = [0 0; 1 1; 2 2; 3.3 3.36; 2.5 2.9; 3.5 3.6; 5 5];
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,(fig_num));
+pathWithJogs = [0 0; 1 1; 2 2; 3.3 3.36; 2.5 2.9; 3.5 3.6; 5 5];
+jogAngleThreshold = [];
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % Check variable values
-assert(isequal(clean_path,[0 0; 1 1; 2 2; 3.3 3.36; 3.5 3.6; 5 5]));
+assert(isequal(pathWithNoJogs,[0 0; 1 1; 2 2; 3.3 3.36; 3.5 3.6; 5 5]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% DEMO: showing jog that overlaps in forward/back
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('DEMO: showing jog that overlaps in forward/back');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
-path_with_jogs = [0 0; 1 0; 1.5 0; 0.8 0; 2 2; 3 3];
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,(fig_num));
+pathWithJogs = [0 0; 1 0; 1.5 0; 0.8 0; 2 2; 3 3];
+jogAngleThreshold = [];
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % % Check variable values
-% assert(isequal(clean_path,[0 0; 1 1; 2 2; 3.3 3.36; 3.5 3.6; 5 5]));
+% assert(isequal(pathWithNoJogs,[0 0; 1 1; 2 2; 3.3 3.36; 3.5 3.6; 5 5]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,52 +101,55 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
-path_with_jogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,([]));
+pathWithJogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
+jogAngleThreshold = [];
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), ([]));
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
-path_with_jogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,(-1));
+pathWithJogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
+jogAngleThreshold = [];
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), (-1));
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
-path_with_jogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
+pathWithJogs = [0 0; 1 1; 2 2.2; 3.3 3; 2.5 2.9; 3.5 3.6; 5 5];
+jogAngleThreshold = [];
 
 Niterations = 20;
 
@@ -143,8 +157,8 @@ Niterations = 20;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-        (path_with_jogs,([])); %#ok<NASGU>
+    pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+        (pathWithJogs, (jogAngleThreshold), ([])); %#ok<NASGU>
 end
 slow_method = toc;
 
@@ -152,14 +166,14 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-        (path_with_jogs,(-1)); %#ok<NASGU>
+    pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+        (pathWithJogs, (jogAngleThreshold), (-1)); %#ok<NASGU>
 end
 fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -175,7 +189,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 
@@ -195,75 +209,78 @@ assert(~any(figHandles==fig_num));
 
 close all;
 
-%% BUG - cuts off path when should not (FIXED)
-fig_num = 90001;
-titleString = sprintf('BUG - cuts off path when should not (FIXED)');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+%% BUG - cuts off path when should not (SHOWS BUG)
+figNum = 90001;
+titleString = sprintf('BUG - cuts off path when should not (SHOWS BUG)');
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 load('testData1_fcn_Path_cleanPathFromForwardBackwardJogs.mat','rawPath');
-path_with_jogs = rawPath;
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,(fig_num));
+pathWithJogs = rawPath;
+jogAngleThreshold = [];
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BUG - cuts off path when should not (FIXED)
-fig_num = 90002;
+figNum = 90002;
 titleString = sprintf('BUG - cuts off path when should not (FIXED)');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 load('testData2_fcn_Path_cleanPathFromForwardBackwardJogs.mat','rawPath');
-path_with_jogs = rawPath;
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,(fig_num));
+pathWithJogs = rawPath;
+jogAngleThreshold = 120*pi/180;
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
-%% BUG - cuts off path weirdly
-fig_num = 90003;
-titleString = sprintf('Real world example where path cuts wierdly');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+%% BUG - Real world example where path jogs wierdly
+figNum = 90003;
+titleString = sprintf('BUG - Real world example where path jogs wierdly');
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 load('testData3_fcn_Path_cleanPathFromForwardBackwardJogs.mat','rawPath');
-path_with_jogs = rawPath;
-clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,(fig_num));
+pathWithJogs = rawPath;
+jogAngleThreshold = [];
+pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, (jogAngleThreshold), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
-assert(isnumeric(clean_path));
+assert(isnumeric(pathWithNoJogs));
 
 % Check variable sizes
-assert(length(clean_path(:,1))<=length(path_with_jogs(:,1)));
+assert(length(pathWithNoJogs(:,1))<=length(pathWithJogs(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BUG - real-world example that was not previously working
-fig_num = 90004;
+figNum = 90004;
 titleString = sprintf('BUG - real-world example that was not previously working');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 startPoints = [...
    2.382127025781378  -1.581756646038485
@@ -555,8 +572,288 @@ startPoints = [...
    2.382127025781378  -1.581756646038485];
 
 % startPoints = fcn_Path_removePinchPointInPath
-figure(987); clf;
-startPoints = fcn_Path_cleanPathFromForwardBackwardJogs(startPoints,987);
+jogAngleThreshold = [];
+startPoints = fcn_Path_cleanPathFromForwardBackwardJogs(startPoints, (jogAngleThreshold), (figNum));
+
+%% BUG - real-world example that depends on jog angle threshold
+figNum = 90005;
+titleString = sprintf('BUG - real-world example that was not previously working');
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
+
+startPoints = [...
+   -5.670060550265426  -0.679111508181282
+  -5.518463840597115  -1.049436494815645
+  -5.371179526462447  -1.455035608045367
+  -5.338018198472700  -1.561933914195701
+  -5.270602573609158  -1.984440095087457
+  -5.211688875246534  -2.360996271621747
+  -5.175359403935678  -2.786878292584544
+  -5.169433917837815  -2.906287265368882
+  -5.195858537577371  -3.331390739464461
+  -5.200653729613303  -3.382430322198700
+  -5.261855552426627  -3.773725492084143
+  -5.356944874099582  -4.136999237415955
+  -5.523177336245906  -4.520121214515676
+  -5.527650872133988  -4.529151156328628
+  -5.704002356859609  -4.895466762677103
+  -5.902935961723009  -5.238873352176144
+  -6.136982023268684  -5.597785527979401
+  -6.151143912633588  -5.619998464664369
+  -6.366672819090874  -5.992589232455512
+  -6.372597659321795  -6.002570723724753
+  -6.630254394732694  -6.350697179770572
+  -6.691167136819036  -6.439246829202554
+  -6.938295682894532  -6.801609897928943
+  -7.118179156909490  -7.025416766754680
+  -7.325399628557233  -7.388301117622599
+  -7.512690582561837  -7.628139444212342
+  -7.739384561370168  -8.016954720851535
+  -7.975126003945246  -8.384877903118678
+  -8.003536089062470  -8.440980208611165
+  -8.123792363898863  -8.846646683761728
+  -8.241039665925113  -9.220724746893481
+  -8.267130202915288  -9.629867503874266
+  -8.264736850359633 -10.038023752152913
+  -8.263057015123730 -10.324498574256197
+  -7.856747200435803 -10.332433801879809
+  -7.450651957743422 -10.345749866472595
+  -7.345137837876744 -10.352191929556621
+  -6.938495909311523 -10.346677694959480
+  -6.865203428494447 -10.346677694959480
+  -6.458770165243847 -10.347728699384042
+  -6.067793600485672 -10.355716474447778
+  -5.661765146123380 -10.370856784049352
+  -5.641751822633559 -10.370856784049352
+  -5.235918043842927 -10.393208236742167
+  -5.106973257559132 -10.393208236742167
+  -4.701327984320066 -10.422674770718642
+  -4.553323714606211 -10.459011680644272
+  -4.148033894128816 -10.501834749047212
+  -4.024313649311754 -10.501834749047212
+  -3.619189315923467 -10.550631966977896
+  -3.223666873780303 -10.604777281597221
+  -2.822187876454850 -10.663545792720106
+  -2.417503333036063 -10.726129834663844
+  -2.148512543678803 -10.791655420867027
+  -1.744068859546394 -10.859198592024930
+  -1.367807264001566 -10.927801288246417
+  -0.963559026464820 -10.996486455596557
+  -0.885510308079108 -10.996486455596557
+  -0.485337055810188 -11.064272190742619
+  -0.081236593619220 -11.130184817943604
+   0.008378440850432 -11.130184817943604
+   0.408305444665825 -11.193270874504176
+   0.812308053933586 -11.252608049286417
+   0.846970397690154 -11.252608049286417
+   1.250943685533549 -11.307315170354773
+   1.581166880529819 -11.356561370120323
+   1.985123182960457 -11.399574568729063
+   2.156510171450484 -11.399574568729063
+   2.560480079655430 -11.435649409597165
+   2.636982138522030 -11.464154756930586
+   3.041027349785514 -11.484540826910578
+   3.361716602000262 -11.484540826910578
+   3.765825296116662 -11.496345975922395
+   3.771575207381613 -11.496345975922395
+   4.175765858886349 -11.499203115268870
+   4.191687861589863 -11.499203115268870
+   4.595979874305979 -11.492845667000127
+   4.671148872334445 -11.477112924426722
+   4.844608753339863 -11.477112924426722
+   4.918034710414364 -11.075608403937787
+   4.991460667488866 -10.674103883448852
+   5.003933052638692 -10.473434621108407
+   5.070898239351632 -10.495020063160611
+   4.873658211104531 -10.135515012462973
+   4.873353441891225 -10.134777863050186
+   4.728653646521724  -9.753124590608587
+   4.545193322722085  -9.378717690455648
+   4.398783751121989  -8.988261334005474
+   4.269763827191063  -8.673734636397155
+   4.147957606588974  -8.253079937610046
+   4.047799029171732  -7.921375945019144
+   3.978282108006729  -7.494051440549510
+   3.937119114177428  -7.240703489207994
+   3.852519091422601  -6.806322935253956
+   3.777176524947278  -6.418660215205429
+   3.719556689817236  -5.977961425460892
+   3.680269977977688  -5.720929456576727
+   3.636167678392270  -5.277257858786444
+   3.596340031205567  -4.859303544024611
+   3.575375386166540  -4.414058634677433
+   3.571126253278112  -4.205002298536272
+   3.571924755187835  -3.759981149697591
+   3.569250298626679  -3.536576446753509
+   3.604011996550222  -3.094761075876292
+   3.621563798740828  -2.916778718571539
+   3.688411839550148  -2.480185167600204
+   3.688939263539937  -2.477147320180495
+   3.775380760436919  -2.045415719066256
+   3.782783771768690  -2.011551699049197
+   3.829700537085783  -1.594591795075534
+   3.851138020009842  -1.479797910089653
+   3.991724929825502  -1.082316359533970
+   4.154566396114118  -0.679409240701912
+   4.208773276603698  -0.511533884780426
+   4.414513462969607  -0.132457180909222
+   4.415337772996013  -0.130909215817015
+   4.611909680390930   0.194230181953274
+   4.857473774489518   0.547548505300574
+   4.924275495838919   0.647021748331021
+   5.171697824183156   0.983972585168699
+   5.213219306842260   1.041852942573260
+   5.473920241092986   1.375883455165269
+   5.522505199208224   1.441148606905960
+   5.776707878656662   1.783871244416117
+   5.843506648796805   1.882972863578361
+   6.100062676557019   2.225197660335751
+   6.115981669621736   2.248439116845328
+   6.377549295944188   2.593997589034219
+   6.459190403436597   2.712919682719590
+   6.701551093585119   3.058360764669187
+   6.908258767312069   3.352996025619834
+   7.145721295556624   3.698476894921221
+   7.363817951367993   4.025165505419258
+   7.549631863505766   4.394450820097234
+   7.672520637528460   4.686045381972955
+   7.847877396317852   5.093891131147485
+   7.983049729288870   5.385136186374361
+   8.111659572947810   5.772423064381094
+   8.142934145968857   5.888139426329753
+   8.203742788597715   6.287700616291950
+   8.251391001662022   6.573880676115778
+   8.258904984822376   6.976045336496607
+   8.256501522407993   7.082509817615654
+   8.216381728534076   7.481526986217172
+   8.201237861166581   7.592351943568922
+   8.146977160555450   7.990026508623065
+   8.123477790465408   8.198839420910710
+   7.942045463078549   8.555205734353153
+   7.815541211151716   8.748055738721714
+   7.606999976420290   9.089037677458981
+   7.489112132836658   9.258545734690042
+   7.205137408727659   9.551727601817895
+   6.925936549833219   9.827353679284132
+   6.784341005392774   9.973540091565321
+   6.381516057982516  10.040397256435783
+   6.157152503000098  10.086978573219167
+   5.748027115788340  10.105115053261223
+   5.706650467415368  10.105115053261223
+   5.297612028795085  10.134352732312536
+   5.123552498038716  10.134352732312536
+   4.714626946903102  10.173988104819761
+   4.678009491298862  10.173988104819761
+   4.269218553949504  10.223066069059863
+   3.966903560154714  10.280412322450816
+   3.558426967158802  10.344671448704101
+   3.369692735419013  10.414349329442294
+   2.961553482516874  10.487858387460514
+   2.803988325960024  10.487858387460514
+   2.396012113982732  10.563564100065729
+   2.290328646254145  10.563564100065729
+   1.882504524162786  10.639831211547303
+   1.873662959802933  10.639831211547303
+   1.465975162676891  10.715068123957250
+   1.152370297226294  10.787768052586365
+   0.745577080605969  10.856545691868174
+   0.338166264828641  10.920168341621780
+   0.273902052675144  10.920168341621780
+  -0.133468549301385  10.977580683283259
+  -0.509385917972957  11.027922660243894
+  -0.915968300888412  11.070540193768908
+  -1.323381652446524  11.104988743991695
+  -1.448168038967389  11.131029992209687
+  -1.855729934120391  11.148622165018933
+  -1.940888521148449  11.148622165018933
+  -2.348551699404126  11.157904733057801
+  -2.403412957200795  11.157904733057801
+  -2.811190030849413  11.159178389554159
+  -2.925804406491638  11.159178389554159
+  -3.333703495045675  11.152881340934908
+  -3.735214148136576  11.139563020468659
+  -4.143363029452349  11.119856365711838
+  -4.150293905666899  11.119856365711838
+  -4.558561451711405  11.094449783253550
+  -4.886440595270809  11.064059863903118
+  -5.294912402806141  11.029405813772568
+  -5.377984644260925  11.029405813772568
+  -5.786535246300117  10.991186438672511
+  -5.858381512130387  10.991186438672511
+  -6.266991870643279  10.950060368656162
+  -6.417583284231225  10.906630044492051
+  -6.826250012339488  10.861429816066090
+  -7.111488099856013  10.861429816066090
+  -7.520150400075284  10.814918331375912
+  -7.718868476367442  10.767475230026497
+  -8.127460000315935  10.719402001914096
+  -8.358026469374312  10.719402001914096
+  -8.766555181637242  10.670926733757142
+  -8.942646228886476  10.622212345735322
+  -9.351008012996497  10.573367819024050
+  -9.534582928285557  10.573367819024050
+  -9.942847479035297  10.548923665789395
+ -10.008503549235948  10.548923665789395
+ -10.171536388956032  10.174734483265151
+ -10.341806144155786   9.800646586184527
+ -10.519090471977876   9.426658322631788
+ -10.536182711563391   9.387428611801788
+ -10.549873877973797   8.979562615140990
+ -10.549873877973797   8.962145992362970
+ -10.562768642537424   8.554371469156720
+ -10.562768642537424   8.546668822399955
+ -10.574620589318716   8.138979362489058
+ -10.585172222454201   7.802649993789002
+ -10.594155710155270   7.395105692117403
+ -10.594155710155270   7.320308286241728
+ -10.601295270174978   6.912821457985828
+ -10.606311257030756   6.537467737497943
+ -10.608925912729504   6.130059984179743
+ -10.608925912729504   6.023315248235563
+ -10.608870643565954   5.615927243122387
+ -10.605894590688635   5.413989289639376
+ -10.599774176426441   5.006597731613203
+ -10.599774176426441   4.852007262495562
+ -10.590323236301757   4.444591523185546
+ -10.577403292158067   4.202153550166894
+ -10.560933487999128   3.794643825563220
+ -10.560933487999128   3.560030073103484
+ -10.540899699077952   3.152450813704901
+ -10.517362337541810   3.029238503107788
+ -10.490462414297134   2.621477355114031
+ -10.490462414297134   2.462323824709995
+ -10.460425475336718   2.054451897888698
+ -10.427563108968910   1.649706489393855
+ -10.392271814559583   1.241579006629645
+ -10.392271814559583   1.223834297247913
+ -10.355029129039934   0.815565003451610
+ -10.355029129039934   0.736948897736205
+ -10.213637868150080   0.341675244809068
+ -10.089490995358156   0.015551164942926
+  -9.704724596121697  -0.120654815703907
+  -9.281065929615638  -0.228479214121386
+  -9.278439964594538  -0.229408796698121
+  -8.873132515378925  -0.137028878275182
+  -8.634642768956184  -0.116278405929170
+  -8.295274480477209   0.089614941996576
+  -8.038288771853445   0.243757646801920
+  -7.676847562028088   0.476210784398809
+  -7.569033663279210   0.552409653012698
+  -7.235061480332152   0.827873643270843
+  -7.225203218334294   0.834599003712932
+  -7.077466314911805   0.862072364791307
+  -6.726736285760372   0.701122972941219
+  -6.714902903060861   0.694404169326397
+  -6.406398502547093   0.425607741036854
+  -6.239055095090206   0.247683660757942
+  -6.028244451705162  -0.037025226886358
+  -5.820661178381673  -0.416358855073975
+  -5.670060550265426  -0.679111508181282];
+
+% jogAngleThreshold = []; % Gives WRONG answer
+jogAngleThreshold = 120*pi/180;
+startPoints = fcn_Path_cleanPathFromForwardBackwardJogs(startPoints, (jogAngleThreshold), (figNum));
+
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   ______                _   _

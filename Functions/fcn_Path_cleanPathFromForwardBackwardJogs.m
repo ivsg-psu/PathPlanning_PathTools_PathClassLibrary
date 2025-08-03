@@ -1,5 +1,5 @@
-function clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-    (path_with_jogs,varargin)
+function pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+    (pathWithJogs, varargin)
 % Finds and removes situations where the path is jumping forward and
 % backward. This is detected by finding situations where the angle between
 % segments is more than a threshold (currently pi/4), and then taking these
@@ -8,16 +8,20 @@ function clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
 %
 % FORMAT: 
 %
-%     clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
-%     (path_with_jogs, (fig_num));
+%     pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
+%     (pathWithJogs, (jogAngleThreshold), (figNum));
 %
 % INPUTS:
 %
-%      path_with_jogs: a paths type consisting of (N x 2) array with N>=3
+%     pathWithJogs: a paths type consisting of (N x 2) array with N>=3
 %
-%      (OPTIONAL INPUTS)
+%     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     jogAngleThreshold: the value, in radians, above which the absolute
+%     value of the angle deviation is considered a "jog". The default is
+%     pi/4 (45 degrees).
+%
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -25,7 +29,7 @@ function clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
 %
 % OUTPUTS:
 %
-%      clean_path: the resulting path
+%      pathWithNoJogs: the resulting path
 %
 % DEPENDENCIES:
 %
@@ -49,21 +53,28 @@ function clean_path = fcn_Path_cleanPathFromForwardBackwardJogs...
 % 2025_08_02 - S. Brennan
 % - In fcn_Path_cleanPathFromForwardBackwardJogs
 %   % * Found a huge number of bugs from a real world test 
-%   % * (see bug test added to script)
+%   % * see bug test 90004 added to script for testing
 %   % * Added removal of singleton outliers
 %   % * Fixed errors where paired outliers were not being used correctly
 %   % * Added more debug plotting
 %   % * Improved final plot layout to make the outliers more clear
+% 2025_08_03 - S. Brennan
+% - In fcn_Path_cleanPathFromForwardBackwardJogs
+%   % * Added jog angle threshold as variable input. 
+%   % * Need this for Bounded AStar library
+%   % * See bug test 90005
+%   % * Fixed bug in plotting, where error happens if there's no jogs
+
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
-MAX_NARGIN = 2; % The largest Number of argument inputs to the function
+MAX_NARGIN = 3; % The largest Number of argument inputs to the function
 flag_max_speed = 0;
 if (nargin==MAX_NARGIN && isequal(varargin{end},-1))
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
@@ -86,9 +97,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -109,8 +120,20 @@ if 0==flag_max_speed
         narginchk(1,MAX_NARGIN);
 
         % Check the Path variables
-        fcn_DebugTools_checkInputsToFunctions(path_with_jogs, 'paths');
+        fcn_DebugTools_checkInputsToFunctions(pathWithJogs, 'paths');
 
+    end
+end
+
+% Does user want to specify the jogAngleThreshold?
+jogAngleThreshold = 45*pi/180;
+if nargin >= 2
+    temp = varargin{1};
+    if ~isempty(temp)
+        jogAngleThreshold = temp;
+        if  1==flag_check_inputs && jogAngleThreshold<=0
+            error('jogAngleThreshold must be greater than zero');
+        end
     end
 end
 
@@ -119,8 +142,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -141,11 +164,11 @@ end
 % 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Npath = length(path_with_jogs(:,1));
+Npath = length(pathWithJogs(:,1));
 iteration_count = 1;
 flag_average_is_good = 0;
 
-working_path_removing_jogs = path_with_jogs;
+working_path_removing_jogs = pathWithJogs;
 points_removed = [];
 while (0==flag_average_is_good)  && (iteration_count<=50)
     % Calculate angle changes between points
@@ -153,7 +176,7 @@ while (0==flag_average_is_good)  && (iteration_count<=50)
     diff_angles_fullLength = [0; diff_angles];
     
     % Find outliers
-    outliers = find(abs(diff_angles_fullLength)>pi/4);
+    outliers = find(abs(diff_angles_fullLength)>jogAngleThreshold);
 
     % For debugging
     if flag_do_debug
@@ -214,13 +237,13 @@ while (0==flag_average_is_good)  && (iteration_count<=50)
                 segmentStartIndex = startingIndex-1;
                 segmentEndIndex   = startingIndex+2;
                 
-                segmentStart = path_with_jogs(segmentStartIndex,:);
-                segmentEnd   = path_with_jogs(segmentEndIndex,:);
+                segmentStart = pathWithJogs(segmentStartIndex,:);
+                segmentEnd   = pathWithJogs(segmentEndIndex,:);
                 segmentVector = segmentEnd-segmentStart;
                 segmentOrthoVector = segmentVector*[0 1; -1 0];
                              
-                outlier1Vector = path_with_jogs(startingIndex,:) - segmentStart;
-                outlier2Vector = path_with_jogs(startingIndex+1,:) - segmentStart;
+                outlier1Vector = pathWithJogs(startingIndex,:) - segmentStart;
+                outlier2Vector = pathWithJogs(startingIndex+1,:) - segmentStart;
 
 
                 % Take dot products with the ortho vector to see magnitude
@@ -263,7 +286,7 @@ while (0==flag_average_is_good)  && (iteration_count<=50)
         end % Ends if statement for paired outliers
                      
         % Save the clean path
-        clean_path = working_path_removing_jogs(indices~=0,:);        
+        pathWithNoJogs = working_path_removing_jogs(indices~=0,:);        
         
         % Save the points that were removed
         points_removed = [points_removed; working_path_removing_jogs(indices==0,:)]; %#ok<AGROW>
@@ -271,27 +294,27 @@ while (0==flag_average_is_good)  && (iteration_count<=50)
         
     else % No back/forth jogs left!
         flag_average_is_good = 1;
-        clean_path = working_path_removing_jogs;
+        pathWithNoJogs = working_path_removing_jogs;
     end % Ends if statement to see if there are any outliers
     
     % Remove any repeats
-    [clean_path_unique,IA] = unique(clean_path,'rows','stable'); %#ok<ASGLU>
-    % if length(clean_path_unique(:,1))~=length(clean_path(:,1))
+    [pathWithNoJogs_unique,IA] = unique(pathWithNoJogs,'rows','stable'); %#ok<ASGLU>
+    % if length(pathWithNoJogs_unique(:,1))~=length(pathWithNoJogs(:,1))
     %     disp('Working');
     % end
-    clean_path = clean_path_unique;
+    pathWithNoJogs = pathWithNoJogs_unique;
 
     % Show results for debugging?
     if flag_do_debug
         figure(fig_debug);
-        plot(clean_path(:,1),clean_path(:,2),'b-');
+        plot(pathWithNoJogs(:,1),pathWithNoJogs(:,2),'b-');
     end
     
     % Increment the iteration count
     iteration_count = iteration_count + 1;
     
     % Reset the path average for the next round
-    working_path_removing_jogs = clean_path;
+    working_path_removing_jogs = pathWithNoJogs;
 end
 
 
@@ -309,18 +332,18 @@ end
 if flag_do_plots
     
     % Prep the figure for plotting
-    temp_h = figure(fig_num);
+    temp_h = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
     end      
     
     % Is this 2D or 3D?
-    dimension_of_points = length(path_with_jogs(1,:));
+    dimension_of_points = length(pathWithJogs(1,:));
 
     % Find size of plotting domain
-    max_plotValues = max(path_with_jogs);
-    min_plotValues = min(path_with_jogs);
+    max_plotValues = max(pathWithJogs);
+    min_plotValues = min(pathWithJogs);
     sizePlot = max(max_plotValues) - min(min_plotValues);
     nudge = sizePlot*0.006; %#ok<NASGU>
 
@@ -359,9 +382,14 @@ if flag_do_plots
     grid minor;
     axis equal;
     
-    plot(path_with_jogs(:,1),path_with_jogs(:,2),'k.-','Linewidth',5,'Markersize',20,'DisplayName','Path with jogs');
-    plot(clean_path(:,1),clean_path(:,2),'c.-','Linewidth',2,'Markersize',10,'DisplayName','Fixed path, no jogs');
-    plot(points_removed(:,1),points_removed(:,2),'rx','MarkerSize',10,'LineWidth',2,'DisplayName','Outliers');
+    plot(pathWithJogs(:,1),pathWithJogs(:,2),'k.-','Linewidth',5,'Markersize',20,'DisplayName','Path with jogs');
+
+    if ~isempty(pathWithNoJogs)
+        plot(pathWithNoJogs(:,1),pathWithNoJogs(:,2),'c.-','Linewidth',2,'Markersize',10,'DisplayName','Fixed path, no jogs');
+    end
+    if ~isempty(points_removed)
+        plot(points_removed(:,1),points_removed(:,2),'rx','MarkerSize',10,'LineWidth',2,'DisplayName','Outliers');
+    end
     legend;
 
     xlabel('X [m]')

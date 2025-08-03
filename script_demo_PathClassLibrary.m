@@ -73,6 +73,20 @@
 %   % * Updated library name in output file
 %   % * Updated docstrings accordingly
 %   % * Edited start/end values for file numbering, to cover entire range
+%
+% 2025_08_03 - S. Brennan
+% - In fcn_Path_cleanPathFromForwardBackwardJogs
+%   % * Added jog angle threshold as variable input. 
+%   % * Need this for Bounded AStar library
+%   % * See bug test 90005
+%   % * Fixed bug in plotting, where error happens if there's no jogs
+% - In script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+%   % * Cleaned up variable names
+%   % * Added jogAngleThreshold input option
+%   % * Added Bug Test Case 90005 that shows need for this input
+%   % * Fixed Bug shown in case 90002, which needed jogAnglethreshold to
+%   %   % work
+
 
 % TO-DO:
 % 2024_03_14 - S. Brennan 
