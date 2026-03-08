@@ -541,8 +541,6 @@ s_coord_end   = 100;
     fcn_Path_findTraversalStationSegment(...
     traversal, s_coord_start,s_coord_end, ([]));
 
-title(titleString, 'Interpreter','none');
-
 % Check variable types
 assert(isstruct(traversal_trimmed));
 assert(isfield(traversal_trimmed,'X'))

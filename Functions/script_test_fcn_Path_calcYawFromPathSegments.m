@@ -41,7 +41,7 @@ figure(fig_num*10); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
-clear all_paths
+clear test_paths
 for ith_path = 1:3
     % Pick first path as reference_traversal structure
     path_to_check = paths_array{ith_path};

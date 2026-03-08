@@ -1,5 +1,18 @@
 function [traversal_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAverageTraversalViaOrthoProjection(data,varargin)
+
+MATLABFLAG_PATH_FLAG_WARN_FINDAVERAGETRAVERSALVIAORTHO = getenv("MATLABFLAG_PATH_FLAG_WARN_FINDAVERAGETRAVERSALVIAORTHO");
+
+if isempty(MATLABFLAG_PATH_FLAG_WARN_FINDAVERAGETRAVERSALVIAORTHO)
+
+    warning('on','backtrace');
+    warning(['The function fcn_Path_findAverageTraversalViaOrthoProjection is being deprecated. ' ...
+        'Please use fcn_Path_findAveragePath instead.']);
+
+
+    setenv('MATLABFLAG_PATH_FLAG_WARN_FINDAVERAGETRAVERSALVIAORTHO','1');
+end
+
 % fcn_Path_findAverageTraversalViaOrthoProjection
 % finds the average traversal of several traversals by taking a reference
 % traversal or, if of a referemce traversal is not given, it uses as a
@@ -133,7 +146,6 @@ function [traversal_average, closestXs, closestYs, closestDistances] = ...
 % Need to clean up the code - lots of code "lint"
 
 %% Debugging and Input checks
-warning('The function fcn_Path_findAverageTraversalViaOrthoProjection is being deprecated. Please use fcn_Path_findAveragePath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -148,11 +160,11 @@ else
     % Check to see if we are externally setting debug mode to be "on"
     flag_do_debug = 0; % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
-    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
-    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
-    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
-        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
-        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    MATLABFLAG_PATH_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATH_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATH_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATH_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATH_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATH_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATH_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATH_FLAG_CHECK_INPUTS);
     end
 end
 
@@ -416,7 +428,7 @@ for ith_iteration =2:max_num_iterations
     newPathsNoJogs = cell(Npaths,1);
     for ith_path = 1:Npaths
         rawPath = newPaths{ith_path,1};
-        rawPathNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs(rawPath, -1);
+        rawPathNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs(rawPath, [], -1);
         newPathsNoJogs{ith_path,1} = rawPathNoJogs;
         if flag_do_debug
             set(h_updatedPlots(ith_path,1),'Xdata',rawPathNoJogs(:,1),'Ydata',rawPathNoJogs(:,2));

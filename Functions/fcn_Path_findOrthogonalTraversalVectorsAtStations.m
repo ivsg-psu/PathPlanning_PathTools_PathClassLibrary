@@ -1,6 +1,17 @@
 function [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalTraversalVectorsAtStations(station_queries,central_traversal, varargin)
 
+MATLABFLAG_PATH_FLAG_WARN_FINDORTHOTRAVERSALVECTORS = getenv("MATLABFLAG_PATH_FLAG_WARN_FINDORTHOTRAVERSALVECTORS");
+
+if isempty(MATLABFLAG_PATH_FLAG_WARN_FINDORTHOTRAVERSALVECTORS)
+
+    warning('on','backtrace');
+    warning(['The function fcn_Path_findOrthogonalTraversalVectorsAtStations is being deprecated. ' ...
+        'Please use fcn_Path_findOrthogonalPathVectorsAtStations instead.']);
+
+    setenv('MATLABFLAG_PATH_FLAG_WARN_FINDORTHOTRAVERSALVECTORS','1');
+end
+
 % fcn_Path_findOrthogonalTraversalVectorsAtStations
 % Given a central traversal and a set of stations along that traversal,
 % finds the unit normal vector on the central traveral at each station
@@ -109,8 +120,6 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 
 
 %% Debugging and Input checks
-warning('on','backtrace');
-warning('The function fcn_Path_findOrthogonalTraversalVectorsAtStations is being deprecated. Please use fcn_Path_findOrthogonalPathVectorsAtStations instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -125,11 +134,11 @@ else
     % Check to see if we are externally setting debug mode to be "on"
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
-    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
-    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
-    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
-        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
-        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    MATLABFLAG_PATH_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATH_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATH_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATH_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATH_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATH_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATH_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATH_FLAG_CHECK_INPUTS);
     end
 end
 

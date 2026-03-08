@@ -19,21 +19,21 @@ figure(fig_num); clf;
 paths_array = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
-clear all_traversals
+clear test_traversals
 for i_Path = 1:length(paths_array)
     traversal = ...
         fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
-    all_traversals.traversal{i_Path} = traversal;
+    test_traversals.traversal{i_Path} = traversal;
 end
 
-reference_traversal = all_traversals.traversal{2};
+reference_traversal = test_traversals.traversal{2};
 reference_station_points = (0:30:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
-    reference_station_points, reference_traversal, all_traversals,...
+    reference_station_points, reference_traversal, test_traversals,...
     flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
 
 % Make sure plot opened up
@@ -48,31 +48,31 @@ figure(fig_num); clf;
 paths_array = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
-clear all_traversals
+clear test_traversals
 for i_Path = 1:length(paths_array)
     traversal = ...
         fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
-    all_traversals.traversal{i_Path} = traversal;
+    test_traversals.traversal{i_Path} = traversal;
 end
 
-reference_traversal = all_traversals.traversal{1};
+reference_traversal = test_traversals.traversal{1};
 reference_station_points = (0:30:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
-    reference_station_points, reference_traversal, all_traversals,...
+    reference_station_points, reference_traversal, test_traversals,...
     flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
 
-reference_traversal = all_traversals.traversal{3};
+reference_traversal = test_traversals.traversal{3};
 reference_station_points = (0:10:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
-    reference_station_points, reference_traversal, all_traversals,...
+    reference_station_points, reference_traversal, test_traversals,...
     flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
 
 
@@ -88,20 +88,20 @@ figure(fig_num); clf;
 paths_array = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
-clear all_traversals
+clear test_traversals
 for i_Path = 1:length(paths_array)
     traversal = ...
         fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
-    all_traversals.traversal{i_Path} = traversal;
+    test_traversals.traversal{i_Path} = traversal;
 end
-reference_traversal = all_traversals.traversal{2};
+reference_traversal = test_traversals.traversal{2};
 reference_station_points = (0:10:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
-    reference_station_points, reference_traversal, all_traversals,...
+    reference_station_points, reference_traversal, test_traversals,...
     flag_rounding_type,search_radius,fig_num);
 
 % Make sure plot opened up
@@ -212,21 +212,21 @@ figure(fig_num); close(fig_num);
 paths_array = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
-clear all_traversals
+clear test_traversals
 for i_Path = 1:length(paths_array)
     traversal = ...
         fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
-    all_traversals.traversal{i_Path} = traversal;
+    test_traversals.traversal{i_Path} = traversal;
 end
 
-reference_traversal = all_traversals.traversal{2};
+reference_traversal = test_traversals.traversal{2};
 reference_station_points = (0:30:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
-    reference_station_points, reference_traversal, all_traversals,...
+    reference_station_points, reference_traversal, test_traversals,...
     flag_rounding_type,search_radius,[]);
 
 % Make sure plot did NOT open up
@@ -244,21 +244,21 @@ figure(fig_num); close(fig_num);
 paths_array = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
-clear all_traversals
+clear test_traversals
 for i_Path = 1:length(paths_array)
     traversal = ...
         fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
-    all_traversals.traversal{i_Path} = traversal;
+    test_traversals.traversal{i_Path} = traversal;
 end
 
-reference_traversal = all_traversals.traversal{2};
+reference_traversal = test_traversals.traversal{2};
 reference_station_points = (0:30:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
 
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
-    reference_station_points, reference_traversal, all_traversals,...
+    reference_station_points, reference_traversal, test_traversals,...
     flag_rounding_type,search_radius,-1);
 
 % Make sure plot did NOT open up
@@ -276,14 +276,14 @@ close(fig_num);
 paths_array = fcn_Path_fillSamplePaths;
 
 % Convert paths to traversal structures
-clear all_traversals
+clear test_traversals
 for i_Path = 1:length(paths_array)
     traversal = ...
         fcn_Path_convertPathToTraversalStructure(paths_array{i_Path});
-    all_traversals.traversal{i_Path} = traversal;
+    test_traversals.traversal{i_Path} = traversal;
 end
 
-reference_traversal = all_traversals.traversal{2};
+reference_traversal = test_traversals.traversal{2};
 reference_station_points = (0:30:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 40;
@@ -298,7 +298,7 @@ for ith_test = 1:Niterations
     % Call the function
     [closestXs, closestYs, closestDistances] = ...
         fcn_Path_convertTraversalXYtoSy(...
-        reference_station_points, reference_traversal, all_traversals,...
+        reference_station_points, reference_traversal, test_traversals,...
         flag_rounding_type,search_radius,[]);
 end
 slow_method = toc;
@@ -309,7 +309,7 @@ for ith_test = 1:Niterations
     % Call the function
     [closestXs, closestYs, closestDistances] = ...
         fcn_Path_convertTraversalXYtoSy(...
-        reference_station_points, reference_traversal, all_traversals,...
+        reference_station_points, reference_traversal, test_traversals,...
         flag_rounding_type,search_radius,-1);
 end
 fast_method = toc;

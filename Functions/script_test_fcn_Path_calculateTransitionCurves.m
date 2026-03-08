@@ -15,7 +15,7 @@ close all
 
 
 % Clear any old variables
-clear all_traversals
+clear test_traversals
 
 %% Basic Example
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -74,7 +74,7 @@ assert(isnumeric(closestYs));
 assert(isnumeric(closestDistances));
 
 % Check variable sizes
-NreferencePoints = 66;
+NreferencePoints = 63;
 assert(isequal(size(traversal_average.X),[NreferencePoints 1]));
 assert(isequal(size(traversal_average.Y),[NreferencePoints 1]));
 assert(isequal(size(traversal_average.Z),[NreferencePoints 1]));
@@ -147,7 +147,7 @@ assert(isnumeric(closestYs));
 assert(isnumeric(closestDistances));
 
 % Check variable sizes
-NreferencePoints = 66;
+NreferencePoints = 63;
 assert(isequal(size(traversal_average.X),[NreferencePoints 1]));
 assert(isequal(size(traversal_average.Y),[NreferencePoints 1]));
 assert(isequal(size(traversal_average.Z),[NreferencePoints 1]));
@@ -204,7 +204,7 @@ assert(isnumeric(closestYs));
 assert(isnumeric(closestDistances));
 
 % Check variable sizes
-NreferencePoints = 66;
+NreferencePoints = 63;
 assert(isequal(size(traversal_average.X),[NreferencePoints 1]));
 assert(isequal(size(traversal_average.Y),[NreferencePoints 1]));
 assert(isequal(size(traversal_average.Z),[NreferencePoints 1]));

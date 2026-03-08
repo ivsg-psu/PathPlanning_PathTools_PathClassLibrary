@@ -382,22 +382,22 @@ clf;
 axis equal
 
 % Clear any old variables
-clear all_traversals
+clear test_traversals
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 
 % Pick first path 1s reference_traversal structure
 reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
-all_traversals.traversal{1} = reference_traversal;
+test_traversals.traversal{1} = reference_traversal;
 
 
 % Plot the results? (Note: they are plotted below as well)
 if 1==0
     fig_num = 12;
-    fcn_Path_plotTraversalsYaw(all_traversals,fig_num);
+    fcn_Path_plotTraversalsYaw(test_traversals,fig_num);
     fig_num = 13;
-    fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+    fcn_Path_plotTraversalsXY(test_traversals,fig_num);
 end
 
 % Grab the "curve" of the path

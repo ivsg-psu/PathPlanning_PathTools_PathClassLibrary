@@ -3,6 +3,18 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
     second_path_point_index,...
     percent_along_length] = ...
     fcn_Path_snapPointOntoNearestTraversal(point, traversal, varargin)
+
+MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT = getenv("MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT");
+
+if isempty(MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT)
+
+    warning('on','backtrace');
+    warning(['The function fcn_Path_snapPointOntoNearestTraversal is being deprecated. ' ...
+        'Please use fcn_Path_snapPointOntoNearestPath instead.']);
+
+    setenv('MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT','1');
+end
+
 % fcn_Path_snapPointOntoNearestTraversal
 % Finds location on a traversal that is closest to a given point,
 % e.g. snapping the point onto the traversal.
@@ -87,7 +99,6 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 
 
 %% Debugging and Input checks
-warning('The function fcn_Path_snapPointOntoNearestTraversal is being deprecated. Please use fcn_Path_snapPointOntoNearestPath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -102,11 +113,11 @@ else
     % Check to see if we are externally setting debug mode to be "on"
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
-    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
-    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
-    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
-        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
-        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    MATLABFLAG_PATH_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATH_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATH_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATH_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATH_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATH_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATH_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATH_FLAG_CHECK_INPUTS);
     end
 end
 

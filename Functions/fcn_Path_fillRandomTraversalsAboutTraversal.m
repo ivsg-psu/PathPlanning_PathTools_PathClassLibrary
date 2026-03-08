@@ -1,4 +1,17 @@
 function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(reference_traversal, varargin)
+
+MATLABFLAG_PATH_FLAG_WARN_FILLRANDOMTRAVERSALS = getenv("MATLABFLAG_PATH_FLAG_WARN_FILLRANDOMTRAVERSALS");
+
+if isempty(MATLABFLAG_PATH_FLAG_WARN_FILLRANDOMTRAVERSALS)
+
+    warning('on','backtrace');
+    warning(['The function fcn_Path_fillRandomTraversalsAboutTraversal is being deprecated. ' ...
+        'Please use fcn_Path_fillRandomPathsAboutPath instead.']);
+
+
+    setenv('MATLABFLAG_PATH_FLAG_WARN_FILLRANDOMTRAVERSALS','1');
+end
+
 % fcn_Path_fillRandomTraversalsAboutTraversal
 % fills in random traversals about a reference traversal. Points are
 % generated via orthogonal projection using random normal distribution with
@@ -101,7 +114,6 @@ function random_traversals = fcn_Path_fillRandomTraversalsAboutTraversal(referen
 % (none)
 
 %% Debugging and Input checks
-warning('The function fcn_Path_fillRandomTraversalsAboutTraversal is being deprecated. Please use fcn_Path_fillRandomPathsAboutPath instead.');
 
 % Check if flag_max_speed set. This occurs if the fig_num variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
@@ -116,11 +128,11 @@ else
     % Check to see if we are externally setting debug mode to be "on"
     flag_do_debug = 0; % % % % Flag to plot the results for debugging
     flag_check_inputs = 1; % Flag to perform input checking
-    MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS");
-    MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG");
-    if ~isempty(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG)
-        flag_do_debug = str2double(MATLABFLAG_PATHCLASS_FLAG_DO_DEBUG);
-        flag_check_inputs  = str2double(MATLABFLAG_PATHCLASS_FLAG_CHECK_INPUTS);
+    MATLABFLAG_PATH_FLAG_CHECK_INPUTS = getenv("MATLABFLAG_PATH_FLAG_CHECK_INPUTS");
+    MATLABFLAG_PATH_FLAG_DO_DEBUG = getenv("MATLABFLAG_PATH_FLAG_DO_DEBUG");
+    if ~isempty(MATLABFLAG_PATH_FLAG_CHECK_INPUTS) && ~isempty(MATLABFLAG_PATH_FLAG_DO_DEBUG)
+        flag_do_debug = str2double(MATLABFLAG_PATH_FLAG_DO_DEBUG);
+        flag_check_inputs  = str2double(MATLABFLAG_PATH_FLAG_CHECK_INPUTS);
     end
 end
 
