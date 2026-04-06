@@ -61,6 +61,8 @@ function new_path = ...
 % 2025_07_01:
 % -- wrote the code originally - modified from
 % fcn_Path_newTraversalByStationResampling
+% 2026_04_06:
+% -- added code to handel 3D data
 
 % TO-DO
 % (none)
@@ -157,7 +159,15 @@ currentY = input_path(:,2);
 
 interp_X       = interp1(currentStations,currentX,new_stations,'linear','extrap');
 interp_Y       = interp1(currentStations,currentY,new_stations,'linear','extrap');
-new_path  = [interp_X, interp_Y];
+
+if size(input_path,2) > 2
+    currentY = input_path(:,3);
+    interp_Z = interp1(currentStations,currentY,new_stations,'linear','extrap');
+    new_path  = [interp_X, interp_Y, interp_Z];
+else
+    new_path  = [interp_X, interp_Y];
+end
+
 
 %% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
