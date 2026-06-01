@@ -8,7 +8,7 @@
 %  -- added assertions
 %  -- slight reformatting, including renaming segments to paths
 % 2023_08_09 by S. Brennan
-% -- Converted this function over to Path library from LoadWZ librar
+% - Converted this function over to Path library from LoadWZ librar
 
 %% clear the workspace
 close all
@@ -31,9 +31,9 @@ clear test_traversals
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Basic%20Example
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 %% Basic example 1: simple line segment with straight lines and positive radius
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 path_1 = [0 0; 4 4];
 path_2 = [4 1; 1 4];
@@ -54,7 +54,7 @@ number_of_points_on_curve = 50;
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -66,12 +66,12 @@ assert(isequal(round(angle_point1_radians,4),round(-pi/4,4)));
 assert(abs(angle_point2_radians - pi/4)<eps*1000);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 2: simple line segment with straight lines and negative radius
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 2\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 2\n',figNum);
+figure(figNum); clf;
 
 
 path_1 = [0 0; 4 4];
@@ -93,7 +93,7 @@ number_of_points_on_curve = 50;
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -103,12 +103,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 3: simple line segment with line changing direction 
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 path_1 = flipud([0 0; 4 4]); % <--- note direction change
 path_2 = flipud([4 1; 1 4]);  % <--- note direction change
@@ -129,7 +129,7 @@ number_of_points_on_curve = 50;
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -139,12 +139,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 4: simple line segment with line changing direction 
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 path_1 = flipud([0 0; 4 4]); % <--- note direction change
 path_2 = [4 1; 1 4]; 
@@ -165,7 +165,7 @@ number_of_points_on_curve = 50;
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -175,12 +175,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 5a: simple curve, outside fit
-fig_num = 100051;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 100051;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 th = linspace( pi/2, -pi/2, 100);
@@ -206,7 +206,7 @@ plot_text = 'Transition_Curve';
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -216,15 +216,15 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 5b: simple curve, inside fit
-fig_num = 100052;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 100052;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
-figure(fig_num);
+figure(figNum);
 clf;
 hold on;
 grid on;
@@ -253,7 +253,7 @@ plot_text = 'Transition_Curve';
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -263,15 +263,15 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 5c: simple curve, inside fit, other direction
-fig_num = 100053;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 100053;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
-figure(fig_num);
+figure(figNum);
 clf;
 hold on;
 grid on;
@@ -300,7 +300,7 @@ plot_text = 'Transition_Curve';
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -310,12 +310,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic example 5d: simple curve, inside fit, other direction, coarse
-fig_num = 100054;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 100054;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 th = linspace( pi/2, -pi/2, 5);
 Radius = 10;  %or whatever radius you want
@@ -340,7 +340,7 @@ plot_text = 'Transition_Curve';
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -350,12 +350,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %%  Basic example 6a: multiple intersections between the line segments 
-fig_num = 100061;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 100061;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 path_1 = [2 2; 5 8];
@@ -378,7 +378,7 @@ number_of_points_on_curve = 50;
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -388,12 +388,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %%  Basic example 6b: multiple intersections between the line segments 
-fig_num = 100062;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 100062;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 path_1 = [2 2; 5 8];
@@ -416,7 +416,7 @@ number_of_points_on_curve = 50;
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -426,12 +426,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %%  Basic example 7: multiple intersections between the line segments 
-fig_num = 10007;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10007;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 path_1 = [2 2; 5 8];
@@ -454,7 +454,7 @@ plot_text = '';
     plot_color,...
     plot_line_width,...
     plot_text,...
-    fig_num);
+    figNum);
 
 % Check the size of the vectors
 assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -464,12 +464,12 @@ assert(isscalar(angle_point1_radians(:,1)));
 assert(isscalar(angle_point2_radians(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% HARD example 8: line segments have infinite intersections for a period
-% fig_num = 10008;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10008;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % 
 % path_1 = [0 0; 4 4; 6 6; 10 5];
@@ -493,7 +493,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 %     plot_color,...
 %     plot_line_width,...
 %     plot_text,...
-%     fig_num);
+%     figNum);
 % 
 % % Check the size of the vectors
 % assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -503,15 +503,15 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % assert(length(angle_point2_radians(:,1))==1);
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Example for which code breaks
 % should get error: Lines are collinear, curve is not possible between them
 
-% fig_num = 10009;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10009;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % 
 % path_1 = [4 9; 4 5; 2 2];
@@ -534,7 +534,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 %     plot_color,...
 %     plot_line_width,...
 %     plot_text,...
-%     fig_num);
+%     figNum);
 % 
 % % Check the size of the vectors
 % assert(length(TransitionCurves(:,1))==number_of_points_on_curve);
@@ -544,7 +544,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % assert(length(angle_point2_radians(:,1))==1);
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -566,9 +566,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 path_1 = [0 0; 4 4];
 path_2 = [4 1; 1 4];
@@ -602,13 +602,13 @@ assert(abs(angle_point2_radians - pi/4)<eps*1000);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 path_1 = [0 0; 4 4];
 path_2 = [4 1; 1 4];
@@ -641,14 +641,14 @@ assert(isequal(round(angle_point1_radians,4),round(-pi/4,4)));
 assert(abs(angle_point2_radians - pi/4)<eps*1000);
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 path_1 = [0 0; 4 4];
 path_2 = [4 1; 1 4];
@@ -702,7 +702,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -718,7 +718,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases
@@ -742,7 +742,7 @@ assert(~any(figHandles==fig_num));
 %% FAIL CASES
 if 1==0
     %% Case where paths completely overlap
-    fig_num = 4500;
+    figNum = 4500;
     path_1 = [0 0; 4 4];
     path_2 = path_1;
     radius_of_curve = 1;
@@ -761,7 +761,7 @@ if 1==0
         plot_color,...
         plot_line_width,...
         plot_text,...
-        fig_num);
+        figNum);
 end
 
 

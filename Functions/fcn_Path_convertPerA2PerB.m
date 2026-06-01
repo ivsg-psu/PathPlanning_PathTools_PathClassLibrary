@@ -13,7 +13,7 @@ function B_values = ...
 %         fcn_Path_convertPerA2PerB(...
 %         start_A, start_B, ...
 %         vector_A, vector_B, A_values,...
-%         (fig_num))
+%         (figNum))
 %
 % INPUTS:
 %
@@ -36,7 +36,7 @@ function B_values = ...
 %
 %     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -65,7 +65,7 @@ function B_values = ...
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 6; % The largest Number of argument inputs to the function
@@ -91,9 +91,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -166,13 +166,13 @@ flag_do_plot = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp)
-        fig_num = temp;
+        figNum = temp;
         flag_do_plot = 1;
     end
 else
     if flag_do_debug
         fig = figure;
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plot = 1;
     end
 end
@@ -225,7 +225,7 @@ if flag_do_plot
     predicted_B_points = B_values.*vector_B + start_B;
 
     % check whether the figure already has data
-    h_fig = figure(fig_num);
+    h_fig = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(h_fig,'Children'))
         flag_rescale_axis = 1;

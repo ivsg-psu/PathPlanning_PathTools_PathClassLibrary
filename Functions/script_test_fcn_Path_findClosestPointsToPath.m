@@ -11,16 +11,16 @@
 
 % Revision history
 % 2021_01_09
-% -- added more comments
+% - added more comments
 
 
 close all;
 
 %% BASIC example - parallel lines, query is in middle area
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC example - parallel lines, query is in middle area');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Create a dummy central path and convert it to a traversal
 central_path = [0 0; 2 0];  
@@ -34,7 +34,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num); %#ok<*ASGLU>
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum); %#ok<*ASGLU>
 
 title(titleString, 'Interpreter','none');
 
@@ -58,13 +58,13 @@ assert(isequal(closestZs,[0; 0]));
 assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - angled line segment adjacent to endpoint query
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC example - angled line segment adjacent to endpoint query');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Create a dummy central path and convert it to a traversal
 central_path = [0 0; 2 0];  
@@ -79,7 +79,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -103,13 +103,13 @@ assert(isequal(closestZs,[0; 0]));
 assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - angled line segment adjacent to endpoint query but near-miss
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC example - angled line segment adjacent to endpoint query but near-miss');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Create a dummy central path and convert it to a traversal
 central_path = [0 0; 10 0];
@@ -122,7 +122,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -146,12 +146,12 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 % assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 %% BASIC example - angled line segment adjacent to startpoint query
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('BASIC example - angled line segment adjacent to startpoint query');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 central_path = [0 0; 10 0];
 
@@ -164,7 +164,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -188,12 +188,12 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 % assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 %% BASIC example - parallel line segment adjacent to startpoint query but near-miss
-fig_num = 10005;
+figNum = 10005;
 titleString = sprintf('BASIC example - parallel line segment adjacent to startpoint query but near-miss');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Create a dummy central path and convert it to a traversal
 central_path = [0 0; 10 0];
@@ -207,7 +207,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -231,13 +231,13 @@ assert(isequal(closestZs,[0; 0]));
 assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% AVERAGING examples - default setting
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('AVERAGING examples - default setting');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Set up cellArrayOfPaths
 close all
@@ -252,7 +252,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -276,16 +276,16 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 % assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 %%
 
 close all;
 
 %% NEGATIVE examples - default setting
-fig_num = 30001;
+figNum = 30001;
 titleString = sprintf('NEGATIVE examples - default setting');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Prep the example
 central_path = [-2 1; 1 4; 3 2];
@@ -299,7 +299,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -323,17 +323,17 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 % assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 %%
 
 close all;
 
 
 %% MULTICROSS examples - default setting
-fig_num = 40001;
+figNum = 40001;
 titleString = sprintf('MULTICROSS examples - default setting');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Setup
 central_path = [-2 1; 1 4; 3 2; 5 2; 6 3; 7 2];
@@ -347,7 +347,7 @@ flag_3D = 0;
 
 % Calculate the closest point and distance on the nearby path
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -371,16 +371,16 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 % assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 %%
 
 close all;
 
 %% REAL path example
-fig_num = 40001;
+figNum = 40001;
 titleString = sprintf('REAL path example');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 flag_yaw = 0;
 flag_3D = 0;
@@ -399,7 +399,7 @@ end
 % Calculate the closest point and distance on the nearby path
 central_path = cellArrayOfPaths{1};
 [closestXs,closestYs,closestZs,closestYaws] = ...
-    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,fig_num);
+    fcn_Path_findClosestPointsToPath(central_path,cellArrayOfPaths,flag_yaw,flag_3D,figNum);
 
 title(titleString, 'Interpreter','none');
 
@@ -423,7 +423,7 @@ assert(isequal(size(closestYaws),[NreferenceTraversal Ntraversals]));
 % assert(isequal(closestYaws,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -445,9 +445,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 
 % Setup
@@ -479,13 +479,13 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 % Setup
@@ -517,14 +517,14 @@ assert(isequal(size(closestYaws),[NreferenceTraversal 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 
 % Setup
@@ -561,7 +561,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -577,7 +577,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

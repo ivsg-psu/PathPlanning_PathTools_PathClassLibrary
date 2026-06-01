@@ -3,38 +3,38 @@
        
 % Revision history:
 % 2021_01_05
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- fixed naming convention on functions to reflect change from path to
+% - fixed naming convention on functions to reflect change from path to
 % traversal notation
 % 2021_01_08
-% -- more fixes
+% - more fixes
 % 2025_07_01 - S. Brennan
-% -- Removed traversal types, redid script/function based on
+% - Removed traversal types, redid script/function based on
 % plotTraversalXYWithVarianceBounds
 
 close all
 
 
 %% Test case 1: basic call for one trajectory
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
 
 % Call the function
-fcn_Path_plotPathXYWithVarianceBands(paths{1}, [], fig_num);
+fcn_Path_plotPathXYWithVarianceBands(paths{1}, [], figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Test case 2: advanced call for one trajectory - specify figure
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -42,15 +42,15 @@ std_deviation = [];
 
 % Call the function
 fcn_Path_plotPathXYWithVarianceBands(paths{1},...
-    std_deviation,fig_num);
+    std_deviation,figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case 3: advanced call for one trajectory - specify std_deviation
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -58,29 +58,29 @@ std_deviation = 1;
 
 % Call the function
 fcn_Path_plotPathXYWithVarianceBands(paths{1},...
-    std_deviation,fig_num);
+    std_deviation,figNum);
 
 title(sprintf('Standard deviation: %.0d meters',std_deviation));
 
-fig_num = 32;
+figNum = 32;
 std_deviation = 2;
 fcn_Path_plotPathXYWithVarianceBands(paths{1},...
-    std_deviation,fig_num);
+    std_deviation,figNum);
 title(sprintf('Standard deviation: %.0d meters',std_deviation));
 
-fig_num = 35;
+figNum = 35;
 std_deviation = 5;
 fcn_Path_plotPathXYWithVarianceBands(paths{1},...
-    std_deviation,fig_num);
+    std_deviation,figNum);
 title(sprintf('Standard deviation: %.0d meters',std_deviation));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case 4: advanced call for multiple trajectories
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -88,11 +88,11 @@ paths = fcn_Path_fillSamplePaths;
 std_deviation = 2;
 for i_Path = 1:3
     fcn_Path_plotPathXYWithVarianceBands(paths{i_Path},...
-        std_deviation,fig_num);
+        std_deviation,figNum);
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,9 +113,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -125,13 +125,13 @@ fcn_Path_plotPathXYWithVarianceBands(paths{1}, [], ([]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -141,14 +141,14 @@ fcn_Path_plotPathXYWithVarianceBands(paths{1}, [], (-1));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -173,7 +173,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -189,7 +189,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

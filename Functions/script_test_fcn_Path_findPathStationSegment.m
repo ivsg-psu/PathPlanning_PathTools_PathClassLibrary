@@ -7,24 +7,24 @@
 %      [path_trimmed,flag_outside_start, flag_outside_end] = ...
 %      fcn_Path_findPathStationSegment(...
 %      long_path, s_coord_start,s_coord_end, 
-%      (fig_num))
+%      (figNum))
 
 % Revision history:
 % 2021_01_09
-% -- updated name and types to take traversal inputs
-% -- added input checking
-% -- added flag_do_plots
+% - updated name and types to take traversal inputs
+% - added input checking
+% - added flag_do_plots
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with path types
-% -- Renamed function from fcn_Path_findTraversalStationSegment
+% - Removed traversal input type and replaced with path types
+% - Renamed function from fcn_Path_findTraversalStationSegment
 
 close all;
    
 %% BASIC example: demo of fcn_Path_findPathStationSegment
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC example: demo of fcn_Path_findPathStationSegment');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -34,7 +34,7 @@ s_coord_end   = 100;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -58,13 +58,13 @@ assert(flag_outside_start == 0);
 assert(flag_outside_end == 0);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: changing start and stop
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC example: changing start and stop');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -74,7 +74,7 @@ s_coord_end   = 100;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -98,13 +98,13 @@ assert(flag_outside_start == 0);
 assert(flag_outside_end == 0);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: tighter start and stop
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC example: tighter start and stop');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -114,7 +114,7 @@ s_coord_end   = 80;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -138,14 +138,14 @@ assert(flag_outside_start == 0);
 assert(flag_outside_end == 0);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: entire paths_array{1} 
 % because start is less than 0, end greater than max station
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('BASIC example: entire paths_array{1} ');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -155,7 +155,7 @@ s_coord_end   = 7000;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -179,7 +179,7 @@ assert(flag_outside_start == 1);
 assert(flag_outside_end == 1);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Degenerate cases start here
@@ -188,10 +188,10 @@ assert(isequal(get(gcf,'Number'),fig_num));
 close all;
 
 %% BASIC example: degenerate case where start = stop
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('BASIC example: degenerate case where start = stop');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -201,7 +201,7 @@ s_coord_end   = 70;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -225,14 +225,14 @@ assert(flag_outside_start == 0);
 assert(flag_outside_end == 0);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: beyond end of paths_array{1}
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('BASIC example: beyond end of paths_array{1}');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -242,7 +242,7 @@ s_coord_end   = 7000;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -266,13 +266,13 @@ assert(flag_outside_start == 0);
 assert(flag_outside_end == 1);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: before start of paths_array{1}
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('BASIC example: before start of paths_array{1}');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -282,7 +282,7 @@ s_coord_end   = 100;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -306,14 +306,14 @@ assert(flag_outside_start == 1);
 assert(flag_outside_end == 0);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: all stations before start
-fig_num = 20004;
+figNum = 20004;
 titleString = sprintf('BASIC example: all stations before start');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -323,7 +323,7 @@ s_coord_end   = -100;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -347,13 +347,13 @@ assert(flag_outside_start == 1);
 assert(flag_outside_end == 0);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: all stations beyond end
-fig_num = 20005;
+figNum = 20005;
 titleString = sprintf('BASIC example: all stations beyond end');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -363,7 +363,7 @@ s_coord_end   = 3000;
 
 [path_trimmed,flag_outside_start, flag_outside_end] = ...
     fcn_Path_findPathStationSegment(...
-    paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+    paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -387,7 +387,7 @@ assert(flag_outside_start == 0);
 assert(flag_outside_end == 1);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -409,9 +409,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -444,13 +444,13 @@ assert(flag_outside_end == 0);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -483,14 +483,14 @@ assert(flag_outside_end == 0);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -524,7 +524,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -540,7 +540,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases
@@ -566,10 +566,10 @@ if 1==0
     fprintf(1,'\n\nTHE FOLLOWING WILL INTENTIONALLY PRODUCE ERRORS OR WARNINGS\n');
 
     %% BASIC example: warning thrown because start and end are out of order
-    fig_num = 90001;
+    figNum = 90001;
     titleString = sprintf('BASIC example: warning thrown because start and end are out of order');
-    fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-    figure(fig_num); clf;
+    fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+    figure(figNum); clf;
 
     % Fill in sample paths (as a starter)
     paths_array = fcn_Path_fillSamplePaths;
@@ -582,7 +582,7 @@ if 1==0
 
     [path_trimmed,flag_outside_start, flag_outside_end] = ...
         fcn_Path_findPathStationSegment(...
-        paths_array{1}, s_coord_start,s_coord_end, (fig_num));
+        paths_array{1}, s_coord_start,s_coord_end, (figNum));
 
     title(titleString, 'Interpreter','none');
 
@@ -616,7 +616,7 @@ if 1==0
     assert(flag_outside_end == 0);
 
     % Make sure plot opened up
-    assert(isequal(get(gcf,'Number'),fig_num));
+    assert(isequal(get(gcf,'Number'),figNum));
 end
 
 %% Functions follow

@@ -5,7 +5,7 @@ function paths_array = fcn_Path_fillSamplePaths(varargin)
 %
 % FORMAT:
 %
-%       paths_array = fcn_Path_fillSamplePaths((path_number),(fig_num))
+%       paths_array = fcn_Path_fillSamplePaths((path_number),(figNum))
 %
 % INPUTS:
 %
@@ -15,7 +15,7 @@ function paths_array = fcn_Path_fillSamplePaths(varargin)
 %     only paths 1 to 3 will be filled. The paths beyond this are for
 %     very specific debugging operations.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -40,19 +40,19 @@ function paths_array = fcn_Path_fillSamplePaths(varargin)
 
 % Revision history:
 % 2020_11_12
-% -- wrote the code
+% - wrote the code
 % 2021_01_07
-% -- minor updates to comments
-% -- fixed errors in the header definition example
+% - minor updates to comments
+% - fixed errors in the header definition example
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -78,9 +78,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -122,14 +122,14 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
         fig = figure;  
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plots = 1;
     end
 end
@@ -532,7 +532,7 @@ end
 if flag_do_plots
     % Prep a figure location
     close all
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     grid minor;
@@ -545,7 +545,7 @@ if flag_do_plots
      
     % traversal_to_check = fcn_Path_convertPathToTraversalStructure(path_to_check);
     % all_traversals.traversal{i_path} = traversal_to_check;
-    % fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+    % fcn_Path_plotTraversalsXY(all_traversals,figNum);
 
 
 end

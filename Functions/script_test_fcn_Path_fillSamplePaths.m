@@ -3,20 +3,20 @@
 
 % Revision history
 % 2020_11_10
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- cleanup to include trajectories functions
+% - cleanup to include trajectories functions
 
 close all
 
 %% Test case 1: Basic call loading default paths
-fig_num = 10001;
-fprintf(1,'Figure %.0f: Test case 1: Basic call loading default paths\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: Test case 1: Basic call loading default paths\n',figNum);
+figure(figNum); clf;
 
 
 path_number = [];
-paths_array = fcn_Path_fillSamplePaths((path_number),(fig_num));
+paths_array = fcn_Path_fillSamplePaths((path_number),(figNum));
 
 % Check the variable type
 assert(iscell(paths_array));
@@ -25,15 +25,15 @@ assert(iscell(paths_array));
 assert(isequal(size(paths_array),[1 4]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Demo case 2: Show how to load specific paths
-fig_num = 10002;
-fprintf(1,'Figure %.0f: Demo case 2: Show how to load specific paths\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: Demo case 2: Show how to load specific paths\n',figNum);
+figure(figNum); clf;
 
 path_number = 2;
-paths_array = fcn_Path_fillSamplePaths((path_number),(fig_num));
+paths_array = fcn_Path_fillSamplePaths((path_number),(figNum));
 
 % Check the variable type
 assert(iscell(paths_array));
@@ -42,20 +42,20 @@ assert(iscell(paths_array));
 assert(isequal(size(paths_array),[1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Demo case 3: a test path for testing the conversions from XY to Sy
-fig_num = 10003;
-fprintf(1,'Figure %.0f: Demo case 3: a test path for testing the conversions from XY to Sy\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: Demo case 3: a test path for testing the conversions from XY to Sy\n',figNum);
+figure(figNum); clf;
 
 path_number = 4;
-paths_array = fcn_Path_fillSamplePaths((path_number),(fig_num));
+paths_array = fcn_Path_fillSamplePaths((path_number),(figNum));
 
 % Check the variable type
 assert(iscell(paths_array));
@@ -64,10 +64,10 @@ assert(iscell(paths_array));
 assert(isequal(size(paths_array),[1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -89,9 +89,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 path_number = 4;
 paths_array = fcn_Path_fillSamplePaths((path_number),([]));
@@ -104,13 +104,13 @@ assert(isequal(size(paths_array),[1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 path_number = 4;
 paths_array = fcn_Path_fillSamplePaths((path_number),(-1));
@@ -123,14 +123,14 @@ assert(isequal(size(paths_array),[1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 
 path_number = 4;
@@ -155,7 +155,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -171,7 +171,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

@@ -11,7 +11,7 @@ function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEn
 %      [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = ...
 %      fcn_Path_equalizePathLengths(...
 %            cellArrayOfUnequalPaths,...
-%            (fig_num));
+%            (figNum));
 %
 % INPUTS:
 %
@@ -21,7 +21,7 @@ function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEn
 %
 %     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -63,14 +63,14 @@ function [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEn
 % Revision history:
 %     
 % 2025_06_26  - S. Brennan
-% -- wrote the code originally 
+% - wrote the code originally 
 
 % TO DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -96,9 +96,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -129,7 +129,7 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
+        figNum = temp;
         flag_do_plots = 1;
     end
 end
@@ -226,7 +226,7 @@ if flag_do_plots
     % plot the final XY result
 
     % Prep the figure for plotting
-    temp_h = figure(fig_num);
+    temp_h = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
@@ -400,7 +400,7 @@ for ith_testPath = 1:Npaths
             % [closest_path_point,distances] = ...
             %     fcn_Path_findOrthogonalHitFromPathToPath(stations,...
             %     central_path,nearby_path,...
-            %     flag_rounding_type,search_radius,fig_num);
+            %     flag_rounding_type,search_radius,figNum);
 
             [~, distance] = ...
                 fcn_Path_findOrthogonalHitFromPathToPath(endStation,...
@@ -490,7 +490,7 @@ orthoToEnd = longest_pathVector*[0 1; -1 0];
 %         wall_start, wall_end,...
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_return_type), (flag_search_range_type), ...
-%         (tolerance), (fig_num))
+%         (tolerance), (figNum))
 
 [~, newEndLocations, wall_segment, ~, ~] = ...
     fcn_Path_findSensorHitOnWall(...

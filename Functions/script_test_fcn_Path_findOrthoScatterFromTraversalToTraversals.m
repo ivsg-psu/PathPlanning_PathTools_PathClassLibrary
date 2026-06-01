@@ -15,10 +15,10 @@
 close all;
 
 %% BASIC example: 2 parallel paths with lower one as the central traversal
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC example: 2 parallel paths with lower one as the central traversal');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 clear paths_array query_traversals all_traversals
 
@@ -49,7 +49,7 @@ reference_station_points = [3; 7]; %(0:1:reference_traversal.Station(end))';
 flag_rounding_type = 3;
 search_radius = 5;
 
-[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, query_traversals, flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, query_traversals, flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 % Check variable types
 assert(isnumeric(closestXs));
@@ -69,16 +69,16 @@ assert(isequal(round(closestYs,4),[ 2; 2]));
 assert(isequal(round(closestDistances,4),[ 2; 2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
 
 %% BASIC test: 2 parallel paths with upper one as the central traversal
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC test: 2 parallel paths with upper one as the central traversal');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 clear paths_array query_traversals all_traversals
 
@@ -110,7 +110,7 @@ flag_rounding_type = 3;
 search_radius = 5;
 
 % Call the function
-[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, query_traversals, flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, query_traversals, flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 % Check variable types
 assert(isnumeric(closestXs));
@@ -130,16 +130,16 @@ assert(isequal(round(closestYs,4),[ -2; -2]));
 assert(isequal(round(closestDistances,4),[ -2; -2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
 
 %% BASIC test: 3 parallel paths
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC test: 3 parallel paths');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 clear paths_array all_traversals
 
@@ -161,7 +161,7 @@ flag_rounding_type = 3;
 search_radius = 5;
 
 % Call the function
-[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 % Check variable types
 assert(isnumeric(closestXs));
@@ -181,17 +181,17 @@ assert(isequal(round(closestYs,4),[ 0     2     4;   0     2     4]));
 assert(isequal(round(closestDistances,4),[ -2     0     2;   -2     0     2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
 
 
 %% BASIC test: 4 parallel paths, one outside search radius
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('BASIC test: 4 parallel paths, one outside search radius');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 clear paths_array all_traversals
 
@@ -215,7 +215,7 @@ flag_rounding_type = 3;
 search_radius = 5;
 
 % Call the function
-[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals(reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 % Check variable types
 assert(isnumeric(closestXs));
@@ -235,7 +235,7 @@ assert(isequal(size(closestDistances),[NreferenceTraversal Ntraversals]));
 % assert(isequaln(round(closestDistances,4),[-2     0     2    NaN;  -2     0     2    NaN]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
@@ -243,10 +243,10 @@ fcn_INTERNAL_plotHistogram(closestDistances)
 
 
 %% REAL example: basic call
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('REAL example: basic call');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 clear paths_array all_traversals
 
@@ -265,7 +265,7 @@ reference_station_points = (0:10:reference_traversal.Station(end))';
 flag_rounding_type = 3; % Use average of projections at end points
 search_radius = 7;
 
-[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals( reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,fig_num); 
+[closestXs, closestYs, closestDistances] = fcn_Path_findOrthoScatterFromTraversalToTraversals( reference_station_points, reference_traversal, all_traversals, flag_rounding_type,search_radius,figNum); 
 
 
 % Check variable types
@@ -286,16 +286,16 @@ assert(isequal(size(closestDistances),[NreferenceTraversal Ntraversals]));
 % assert(isequal(closestDistances,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
 
 %% REAL example: basic call with finer resolution
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('REAL example: basic call with finer resolution');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 clear paths_array all_traversals
 
@@ -317,7 +317,7 @@ search_radius = 7;
 [closestXs, closestYs, closestDistances] = ...
        fcn_Path_findOrthoScatterFromTraversalToTraversals(...
        reference_station_points, reference_traversal, all_traversals,...
-       flag_rounding_type,search_radius,fig_num);
+       flag_rounding_type,search_radius,figNum);
 
 
 % Check variable types
@@ -338,7 +338,7 @@ assert(isequal(size(closestDistances),[NreferenceTraversal Ntraversals]));
 % assert(isequal(closestDistances,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
@@ -346,10 +346,10 @@ fcn_INTERNAL_plotHistogram(closestDistances)
 %% REAL example: basic call but with random weird traversal nearby
 % Used to teach the search radius criteria
 
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('REAL example: basic call but with random weird traversal nearby');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 weird_path = [100 20; 90 50; 100 70; 100 90];
 
@@ -379,7 +379,7 @@ search_radius = 10;
 [closestXs, closestYs, closestDistances] = ...
        fcn_Path_findOrthoScatterFromTraversalToTraversals(...
        reference_station_points, reference_traversal, all_traversals,...
-       flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+       flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 % Check variable types
 assert(isnumeric(closestXs));
@@ -399,7 +399,7 @@ assert(isequal(size(closestDistances),[NreferenceTraversal Ntraversals]));
 % assert(isequal(closestDistances,[0; 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Peform histogram?
 fcn_INTERNAL_plotHistogram(closestDistances)
@@ -424,9 +424,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% BASIC example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 clear paths_array all_traversals
 
@@ -471,13 +471,13 @@ assert(isequal(round(closestDistances,4),[ -2     0     2;   -2     0     2]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BASIC fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 clear paths_array all_traversals
@@ -523,14 +523,14 @@ assert(isequal(round(closestDistances,4),[ -2     0     2;   -2     0     2]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 clear paths_array all_traversals
 
@@ -575,7 +575,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -591,7 +591,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

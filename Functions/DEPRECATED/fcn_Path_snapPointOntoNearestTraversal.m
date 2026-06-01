@@ -2,10 +2,22 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
     first_path_point_index,...
     second_path_point_index,...
     percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, path, varargin)
-% fcn_Path_snapPointOntoNearestPath
-% Finds location on a path that is closest to a given point,
-% e.g. snapping the point onto the path.
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal, varargin)
+
+MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT = getenv("MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT");
+
+if isempty(MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT)
+
+    warning('on','backtrace');
+    warning(['The function fcn_Path_snapPointOntoNearestTraversal is being deprecated. ' ...
+        'Please use fcn_Path_snapPointOntoNearestPath instead.']);
+
+    setenv('MATLABFLAG_PATH_FLAG_WARN_SNAPPOINTONT','1');
+end
+
+% fcn_Path_snapPointOntoNearestTraversal
+% Finds location on a traversal that is closest to a given point,
+% e.g. snapping the point onto the traversal.
 % This function usually finds the orthogonal point on the path.
 % At times, the orthogonal point lies off the path at corners. In such
 % cases, the nearest neigbour is taken as the corner.
@@ -18,14 +30,15 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 %      first_path_point_index,...
 %      second_path_point_index,...
 %      percent_along_length] = ...
-%      fcn_Path_snapPointOntoNearestPath(point, path, (figNum))
+%      fcn_Path_snapPointOntoNearestTraversal(point, traversal, (figNum))
 %
 % INPUTS:
 %
 %      point: a 1x2 vector containing the [X Y] location of the point
 %
-%      path: a N x 2 or N x 3 set of coordinates representing the [X Y] or
-%      [X Y Z] coordinates, in sequence, of a path
+%      traversal: a structure with X, Y, and Station, and that each has an
+%      N x 1 vector within all of same length. Further, the Station field
+%      must be strictly increasing.
 %
 %     (OPTIONAL INPUTS)
 %
@@ -38,13 +51,13 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 % OUTPUTS:
 %
 %      closest_path_point: a 1x2 vector containing the [X Y] location of
-%      the nearest point on the path
+%      the nearest point on the traversal
 %
 %      s_coordinate: a scalar (1x1) representing the s-coordinate distance
-%      along the path
+%      along the traversal
 %
 %      path_point_yaw: a scalar (1x1) representing the yaw angle (rad) of
-%      the path segment in the path to which the point snapped.
+%      the path segment in the traversal to which the point snapped.
 %
 %      first_path_point_index: (1x1) scalar integer which is the index of
 %      starting the path segment to which the point snapped
@@ -61,7 +74,7 @@ function [closest_path_point,s_coordinate,path_point_yaw,....
 %
 % EXAMPLES:
 %
-% See the script: script_test_fcn_Path_snapPointOntoNearestPath
+% See the script: script_test_fcn_Path_snapPointOntoNearestTraversal
 % for a full test suite.
 %
 % This function was written on 2021_01_29 by Satya Prasad based on
@@ -136,7 +149,7 @@ if 0==flag_max_speed
         narginchk(2,MAX_NARGIN);
 
         % Check the Path variables
-        fcn_DebugTools_checkInputsToFunctions(path, 'path2or3D');
+        fcn_DebugTools_checkInputsToFunctions(traversal, 'traversal');
     end
 end
 
@@ -178,7 +191,10 @@ end
 %  5. If percentage of travel is not between 0 and 1 for both the segments,
 %  then choose the projected point as closest point from 1
 
-path_yaw = fcn_Path_calcYawFromPathSegments(path,-1);
+path = [traversal.X, traversal.Y];
+% Npoints = length(path(:,1));
+% path_station = traversal.Station;
+path_yaw = traversal.Yaw;
 
 [closest_path_point,s_coordinate,...
     first_path_point_index,...
@@ -297,17 +313,19 @@ if flag_do_plots
     grid on;
 
     % Plot the path
-    plot(path(:,1),path(:,2),'r.-','Linewidth',3,'Markersize',20,'DisplayName','Path');
+    plot(path(:,1),path(:,2),'r-','Linewidth',5);
+    plot(path(:,1),path(:,2),'ro','Markersize',20);
 
     axis equal;
 
     % Plot the query point
-    plot(point(:,1),point(:,2),'k.','MarkerSize',20,'DisplayName','Query point');
+    plot(point(:,1),point(:,2),'ko');
+    text(point(:,1),point(:,2),'Query point');
 
     % Plot the closest path points;
     plot(...
         path(first_path_point_index:second_path_point_index,1),...
-        path(first_path_point_index:second_path_point_index,2),'m.','MarkerSize',30,'DisplayName','Closest Endpoints');
+        path(first_path_point_index:second_path_point_index,2),'r*');
 
     % % Label the points with distances?
     % for i_point = 1:length(path(:,1))
@@ -323,9 +341,7 @@ if flag_do_plots
     % Connect closest point on path to query point
     plot(...
         [point(:,1) closest_path_point(:,1)],...
-        [point(:,2) closest_path_point(:,2)],'g-','Linewidth',2,'DisplayName','Connection');
-    
-    legend
+        [point(:,2) closest_path_point(:,2)],'g-','Linewidth',2);
 
 
 end % Ends the flag_do_plots if statement

@@ -32,7 +32,7 @@ end
 %            (num_points),...
 %            (flag_generate_random_stations),...
 %            (spatial_smoothness),...
-%            (fig_num));
+%            (figNum));
 %
 % INPUTS:
 %
@@ -71,7 +71,7 @@ end
 %      trajectory is too corsely sampled for a desired spatial smoothness,
 %      a warning will be given.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -100,22 +100,22 @@ end
 
 % Revision history:
 % 2021_01_03:
-% -- wrote the code originally
+% - wrote the code originally
 % 2021_01_07
-% -- added functionalized input checking
-% -- fixed typos in comments, plotting at end
+% - added functionalized input checking
+% - fixed typos in comments, plotting at end
 % 2021_01_09
-% -- fixed function calls that were misnamed due to class edits
-% -- updated dependencies
+% - fixed function calls that were misnamed due to class edits
+% - updated dependencies
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 7; % The largest Number of argument inputs to the function
@@ -141,9 +141,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -177,7 +177,7 @@ end
 %            (num_points),...
 %            (flag_generate_random_stations),...
 %            (spatial_smoothness),...
-%            (fig_num));
+%            (figNum));
 
 % Does the user want to specify standard deviation?
 std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal, -1); % the default standard deviation
@@ -232,8 +232,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -365,14 +365,14 @@ end
 if flag_do_plots
 
     % plot the final XY result
-    figure(fig_num);
+    figure(figNum);
     hold on;
 
     % Plot the reference trajectory first
     plot(reference_traversal.X,reference_traversal.Y,'b.-','Linewidth',4,'Markersize',20);
 
     % Plot the random results
-    fcn_Path_plotTraversalsXY(random_traversals,fig_num);
+    fcn_Path_plotTraversalsXY(random_traversals,figNum);
     title('Reference traversal and random traversals');
     xlabel('X [m]');
     ylabel('Y [m]');

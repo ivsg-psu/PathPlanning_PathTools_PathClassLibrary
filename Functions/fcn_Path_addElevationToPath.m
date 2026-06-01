@@ -7,7 +7,7 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 % FORMAT:
 %
 %      elevated_path = fcn_Path_addElevationToPath(path, ...
-%                      reference_elevated_path, (fig_num))
+%                      reference_elevated_path, (figNum))
 %
 % INPUTS:
 %
@@ -40,24 +40,24 @@ function elevated_path = fcn_Path_addElevationToPath(path, ...
 
 % Revision history:
 % 2021_03_06 - S. Brennan
-% -- wrote the code
+% - wrote the code
 % 2022_01_07 - S. Brennan
-% -- updated header to fix input definitions
+% - updated header to fix input definitions
 % 2022_08_20 - S. Brennan
-% -- allow empty figure argument to avoid plotting
+% - allow empty figure argument to avoid plotting
 % 2024_03_14 - S. Brennan
-% -- defaulted plotting view to 3D
+% - defaulted plotting view to 3D
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % 2025_06_23 - S. Brennan
-% -- Remove the for loop after fcn_Path_findSensorHitOnWall is implemented
-% -- Transition code to use fcn_Path_findSensorHitOnWall instead
+% - Remove the for loop after fcn_Path_findSensorHitOnWall is implemented
+% - Transition code to use fcn_Path_findSensorHitOnWall instead
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -83,9 +83,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -116,14 +116,14 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
         fig = figure;  
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plots = 1;
     end
 end
@@ -186,7 +186,7 @@ elevated_path = [path, closest_point_on_reference_path(:,3)];
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num)
+    figure(figNum)
     grid on
     hold on
     % Plot the path

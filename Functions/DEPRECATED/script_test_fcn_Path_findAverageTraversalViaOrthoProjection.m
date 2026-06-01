@@ -3,22 +3,22 @@
 
 % Revision history
 % 2020_11_10
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- lots of bug fixes as we demo for the team (lol)
+% - lots of bug fixes as we demo for the team (lol)
 % 2020_01_09
-% -- added more comments during clean-up
+% - added more comments during clean-up
 % 2021_12_27:
-% -- corrected dependencies in comments
+% - corrected dependencies in comments
 % 2022_01_03:
-% -- corrected typos in comments
-% -- fixed a bug where the Z value is not defined in loop
+% - corrected typos in comments
+% - fixed a bug where the Z value is not defined in loop
 % 2022_01_06:
-% -- refactored code, added weighted averaging to prevent iteration
+% - refactored code, added weighted averaging to prevent iteration
 % bouncing
 % 2025_06_26 - Sean Brennan
-% -- restructured test script to use function call for data loading
-% -- added assertion testing
+% - restructured test script to use function call for data loading
+% - added assertion testing
 
 
 %      [traversal_average, closestXs, closestYs, closestDistances] = ...
@@ -27,16 +27,16 @@
 %            (reference_traversal),...
 %            (num_iterations),
 %            (weight_for_averaging),
-%            (fig_num));
+%            (figNum));
 
 close all;
 
 
 %% BASIC call: showing path averaging via ortho projection
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC call: showing path averaging via ortho projection');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Load data
 data = fcn_INTERNAL_loadData;
@@ -51,13 +51,13 @@ exit_tolerance = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),...
-%                 (fig_num));
+%                 (figNum));
 [traversal_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAverageTraversalViaOrthoProjection(data,...
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),...
-    (fig_num));
+    (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -88,7 +88,7 @@ assert(isequal(size(closestDistances),[NreferencePoints length(data.traversal)])
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,9 +109,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Load data
 data = fcn_INTERNAL_loadData;
@@ -126,7 +126,7 @@ exit_tolerance = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),...
-%                 (fig_num));
+%                 (figNum));
 [traversal_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAverageTraversalViaOrthoProjection(data,...
     (stationInterval),...
@@ -162,13 +162,13 @@ assert(isequal(size(closestDistances),[NreferencePoints length(data.traversal)])
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Load data
 data = fcn_INTERNAL_loadData;
@@ -183,7 +183,7 @@ exit_tolerance = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),...
-%                 (fig_num));
+%                 (figNum));
 [traversal_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAverageTraversalViaOrthoProjection(data,...
     (stationInterval),...
@@ -219,14 +219,14 @@ assert(isequal(size(closestDistances),[NreferencePoints length(data.traversal)])
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Load data
 data = fcn_INTERNAL_loadData;
@@ -264,7 +264,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -280,7 +280,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

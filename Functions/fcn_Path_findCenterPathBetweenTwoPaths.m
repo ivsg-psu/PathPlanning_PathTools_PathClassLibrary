@@ -31,7 +31,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %
 %    [center_path, first_path_resampled, second_path_resampled] = ...
 %     fcn_Path_findCenterPathBetweenTwoPaths(...
-%     first_path,second_path,(flag_rounding_type),(search_radius),(fig_num))
+%     first_path,second_path,(flag_rounding_type),(search_radius),(figNum))
 %
 % INPUTS:
 %
@@ -79,7 +79,7 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 %      search_radius: the distance to project "from" to search for
 %      intersections with the "to" path (default is 10 meters).
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -116,20 +116,20 @@ function [center_path, first_path_resampled, second_path_resampled] = ...
 
 % Revision history:
 % 2023_09_04 by S. Brennan
-% -- first write of the code
+% - first write of the code
 % 2023_09_10 by S. Brennan
-% -- rewrote to allow for projections that miss each other, for example
+% - rewrote to allow for projections that miss each other, for example
 % cases where a short segment is adjacent to a long segment. uses ST2XY
 % and XY2ST methods.
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 5; % The largest Number of argument inputs to the function
@@ -155,9 +155,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -209,8 +209,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
@@ -564,7 +564,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Prep the figure for plotting
-    temp_h = figure(fig_num);
+    temp_h = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;

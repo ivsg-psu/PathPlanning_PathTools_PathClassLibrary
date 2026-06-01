@@ -3,20 +3,20 @@
 
 % Revision history
 % 2020_11_10
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- renamed function to change paths to traversals
+% - renamed function to change paths to traversals
 % 2020_01_09
-% -- added more comments during clean-up
+% - added more comments during clean-up
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
-% -- Renamed function from fcn_Path_findTraversalWithMostData
+% - Removed traversal input type and replaced with cell array of paths
+% - Renamed function from fcn_Path_findTraversalWithMostData
 
 %% BASIC Example: finding longest traversal
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC Example: finding longest path');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Call the function that fills in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -30,7 +30,7 @@ for i_Path = 1:length(paths)
 end
 
 % Call the function
-index_of_longest = fcn_Path_findPathWithMostData(cellArrayOfPaths, (fig_num));
+index_of_longest = fcn_Path_findPathWithMostData(cellArrayOfPaths, (figNum));
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -47,7 +47,7 @@ assert(isequal(index_of_longest,3));
 fprintf(1,'The longest path of the %.0d paths was path %.0d with %.0d elements\n',length(cellArrayOfPaths),index_of_longest,length(cellArrayOfPaths{index_of_longest}(:,1)));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,9 +68,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Call the function that fills in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -96,13 +96,13 @@ assert(isequal(index_of_longest,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 % Call the function that fills in sample paths (as a starter)
@@ -129,14 +129,14 @@ assert(isequal(index_of_longest,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Call the function that fills in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -168,7 +168,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -184,7 +184,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

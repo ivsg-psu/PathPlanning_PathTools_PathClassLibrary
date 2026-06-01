@@ -10,46 +10,46 @@
 close all;
 
 %% BASIC example 1 - simple horizontal line, default flag (1), no figure
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 path = [0 0; 4 0]; 
 
 % Call the function
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
-    fcn_Path_findPathOrthogonalVectors(path, [], fig_num);
+    fcn_Path_findPathOrthogonalVectors(path, [], figNum);
 
 % Make sure function worked
 assert(isequal(round(normal_unit_vectors_at_midpoints,4),[0 1]));
 assert(isequal(round(normal_unit_vectors_at_joints,4),[0 1; 0 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - simple horizontal line, default flag (1), with figure
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 path = [0 0; 4 0];  
 flag_rounding_type = 1; % Define the rounding type
 
 % Call the function
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
-    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, fig_num);
+    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, figNum);
 
 % Make sure function worked
 assert(isequal(round(normal_unit_vectors_at_midpoints,4),[0 1]));
 assert(isequal(round(normal_unit_vectors_at_joints,4),[0 1; 0 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - right-angled line segment - flag tests
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 path = [0 0; 2 0; 2 -2];
@@ -60,7 +60,7 @@ flag_rounding_type = 1; % Define the rounding type
 
 % Call the function
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
-    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, fig_num);
+    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, figNum);
 title('flag_rounding_type = 1','Interpreter','none');
 
 % Make sure function worked
@@ -73,7 +73,7 @@ flag_rounding_type = 2; % Define the rounding type
 
 % Call the function
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
-    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, fig_num);
+    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, figNum);
 title('flag_rounding_type = 2','Interpreter','none');
 
 % Make sure function worked
@@ -86,7 +86,7 @@ flag_rounding_type = 3; % Define the rounding type
 
 % Call the function
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
-    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, fig_num);
+    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, figNum);
 title('flag_rounding_type = 3','Interpreter','none');
 
 % Make sure function worked
@@ -99,7 +99,7 @@ flag_rounding_type = 4; % Define the rounding type
 
 % Call the function
 [normal_unit_vectors_at_midpoints, normal_unit_vectors_at_joints] = ...
-    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, fig_num);
+    fcn_Path_findPathOrthogonalVectors(path,flag_rounding_type, figNum);
 title('flag_rounding_type = 4','Interpreter','none');
 
 % Make sure function worked
@@ -110,12 +110,12 @@ sgtitle('Function: fcn_Path_findPathOrthogonalVectors, showing effect of flag_ro
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Real path examples
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 flag_rounding_type = 1; % Define the rounding type
 
@@ -124,13 +124,13 @@ paths = fcn_Path_fillSamplePaths;
 
 
 for i_Path = 1:3
-    temp_fig_num = fig_num + i_Path - 1;  % Define the figure
-    figure(temp_fig_num);
+    temp_figNum = figNum + i_Path - 1;  % Define the figure
+    figure(temp_figNum);
     clf;
     
     % Call the function
     [~, ~] = ...
-        fcn_Path_findPathOrthogonalVectors(paths{i_Path},flag_rounding_type, temp_fig_num);
+        fcn_Path_findPathOrthogonalVectors(paths{i_Path},flag_rounding_type, temp_figNum);
 end
 
 
@@ -154,9 +154,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 path = [0 0; 4 0];  
 flag_rounding_type = 1; % Define the rounding type
@@ -172,13 +172,13 @@ assert(isequal(round(normal_unit_vectors_at_joints,4),[0 1; 0 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 path = [0 0; 4 0];  
 flag_rounding_type = 1; % Define the rounding type
@@ -194,14 +194,14 @@ assert(isequal(round(normal_unit_vectors_at_joints,4),[0 1; 0 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 path = [0 0; 4 0];  
 flag_rounding_type = 1; % Define the rounding type
@@ -229,7 +229,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -245,7 +245,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

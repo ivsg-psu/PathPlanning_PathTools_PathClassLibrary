@@ -3,9 +3,9 @@
        
 % Revision history:
 % 2021_01_24
-% -- first write of the code
+% - first write of the code
 % 2025_07_01 - S. Brennan
-% -- removed traversal type to convert function to path type, using
+% - removed traversal type to convert function to path type, using
 % OffsetTraversalsABoutTraversal as template
 
 close all
@@ -13,15 +13,15 @@ close all
 
 %% Test case: basic call for one trajectory
 % NOTE: the function itself does not plot since not given a figure number
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 
 offsets = 2; 
-offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, [], fig_num);
+offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, [], figNum);
 
 % Check variable types
 assert(iscell(offset_paths));
@@ -35,19 +35,19 @@ for ith_path = 1:Noffsets
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: basic call for one trajectory - specify figure
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 
 offsets = 2; 
 flag_rounding_type = [];
-offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type, fig_num);
+offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type, figNum);
 
 % Check variable types
 assert(iscell(offset_paths));
@@ -61,12 +61,12 @@ for ith_path = 1:Noffsets
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: basic call for two trajectories 
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Fill in sample paths (as a starter)
@@ -77,7 +77,7 @@ paths_array = fcn_Path_fillSamplePaths;
 
 offsets = [2; -2]; 
 flag_rounding_type = [];
-offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets,  flag_rounding_type, fig_num);
+offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets,  flag_rounding_type, figNum);
 
 % Check variable types
 assert(iscell(offset_paths));
@@ -91,12 +91,12 @@ for ith_path = 1:Noffsets
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: show how "pinching" can happen
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Fill in sample paths (as a starter)
@@ -106,7 +106,7 @@ flag_rounding_type = [];
 % Grab the "curve" of the path
 path_curve = paths_array{1}(13:20,:);
 offsets = (-10:1:10)'; 
-offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  fig_num);
+offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  figNum);
 axis equal;
 
 % Check variable types
@@ -121,12 +121,12 @@ for ith_path = 1:Noffsets
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: Show how offsets can link lane markers
-fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Fill in sample paths (as a starter)
@@ -137,10 +137,10 @@ paths_incurve = paths_array{1}(30:end,:);
 path2 = [30 10; 25 44];
 
 offsets = 2; 
-offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_incurve, offsets, flag_rounding_type,  fig_num);
+offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_incurve, offsets, flag_rounding_type,  figNum);
 
 offsets_2 = [2; -2]; 
-offset_traversal_2 = fcn_Path_fillOffsetPathsAboutPath(path2, offsets_2, flag_rounding_type,  fig_num);
+offset_traversal_2 = fcn_Path_fillOffsetPathsAboutPath(path2, offsets_2, flag_rounding_type,  figNum);
 
 % % Find intersections
 % [right_intersection_points,...
@@ -173,13 +173,13 @@ for ith_path = 1:Noffsets
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Demonstration of effect of flag_rounding_type
-fig_num = 10006;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 angles = (-45:45)'*pi/180;
 path = 20*[cos(angles) sin(angles)];
@@ -191,7 +191,7 @@ for flag_rounding_type = 1:4
     hold on;
     grid on;
     axis equal;
-    offset_paths = fcn_Path_fillOffsetPathsAboutPath(path, offsets, flag_rounding_type,  fig_num);
+    offset_paths = fcn_Path_fillOffsetPathsAboutPath(path, offsets, flag_rounding_type,  figNum);
     title(sprintf('flag_rounding_type: %.0d',flag_rounding_type),'Interpreter','none');
 end
 sgtitle('Effect of flag_rounding_type','Interpreter','none');
@@ -209,7 +209,7 @@ for ith_path = 1:Noffsets
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -230,9 +230,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -258,13 +258,13 @@ end
 
 % Make sure plot opened up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -290,14 +290,14 @@ end
 
 % Make sure plot opened up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -330,7 +330,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -346,7 +346,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 close all
@@ -354,9 +354,9 @@ close all
 
 % %% Test case: basic call for one trajectory
 % % NOTE: the function itself does not plot since not given a figure number
-% fig_num = 10001;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10001;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -365,7 +365,7 @@ close all
 % 
 % 
 % offsets = 2; 
-% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, [], fig_num);
+% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, [], figNum);
 % 
 % % Check variable types
 % assert(isstruct(offset_paths));
@@ -389,12 +389,12 @@ close all
 % assert(isequal(size(offset_paths.traversal{1}.Yaw),[NreferencePoints-1 1]));
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 % 
 % %% Test case: basic call for one trajectory - specify figure
-% fig_num = 10002;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10002;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -404,7 +404,7 @@ close all
 % 
 % offsets = 2; 
 % flag_rounding_type = [];
-% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type, fig_num); %#ok<*NASGU>
+% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type, figNum); %#ok<*NASGU>
 % 
 % % Check variable types
 % assert(isstruct(offset_paths));
@@ -428,12 +428,12 @@ close all
 % assert(isequal(size(offset_paths.traversal{1}.Yaw),[NreferencePoints-1 1]));
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 % 
 % %% Test case: basic call for two trajectories 
-% fig_num = 10003;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10003;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % 
 % % Fill in sample paths (as a starter)
@@ -444,7 +444,7 @@ close all
 % 
 % offsets = [2; -2]; 
 % flag_rounding_type = [];
-% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets,  flag_rounding_type, fig_num);
+% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets,  flag_rounding_type, figNum);
 % 
 % % Check variable types
 % assert(isstruct(offset_paths));
@@ -468,12 +468,12 @@ close all
 % assert(isequal(size(offset_paths.traversal{1}.Yaw),[NreferencePoints-1 1]));
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 % 
 % %% Test case: show how "pinching" can happen
-% fig_num = 10004;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10004;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % 
 % % Fill in sample paths (as a starter)
@@ -486,7 +486,7 @@ close all
 % % Grab the "curve" of the path
 % paths_array{1} = fcn_Path_convertPathToTraversalStructure(paths_array{1}(13:20,:));
 % offsets = (-10:1:10)'; 
-% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  fig_num);
+% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  figNum);
 % axis equal;
 % 
 % % Check variable types
@@ -511,12 +511,12 @@ close all
 % assert(isequal(size(offset_paths.traversal{1}.Yaw),[NreferencePoints-1 1]));
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 % 
 % %% Test case: Show how offsets can link lane markers
-% fig_num = 10005;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10005;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % 
 % % Fill in sample paths (as a starter)
@@ -531,10 +531,10 @@ close all
 % second_traversal = fcn_Path_convertPathToTraversalStructure(path2);
 % 
 % offsets = 2; 
-% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  fig_num);
+% offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  figNum);
 % 
 % offsets_2 = [2; -2]; 
-% offset_traversal_2 = fcn_Path_fillOffsetPathsAboutPath(second_traversal, offsets_2, flag_rounding_type,  fig_num);
+% offset_traversal_2 = fcn_Path_fillOffsetPathsAboutPath(second_traversal, offsets_2, flag_rounding_type,  figNum);
 % 
 % % Find intersections
 % [right_intersection_points,...
@@ -576,13 +576,13 @@ close all
 % assert(isequal(size(offset_paths.traversal{1}.Yaw),[NreferencePoints-1 1]));
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 % 
 % 
 % %% Demonstration of effect of flag_rounding_type
-% fig_num = 10006;
-% fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-% figure(fig_num); clf;
+% figNum = 10006;
+% fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+% figure(figNum); clf;
 % 
 % angles = (-45:45)'*pi/180;
 % path = 20*[cos(angles) sin(angles)];
@@ -596,7 +596,7 @@ close all
 %     hold on;
 %     grid on;
 %     axis equal;
-%     offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  fig_num);
+%     offset_paths = fcn_Path_fillOffsetPathsAboutPath(paths_array{1}, offsets, flag_rounding_type,  figNum);
 %     title(sprintf('flag_rounding_type: %.0d',flag_rounding_type),'Interpreter','none');
 % end
 % sgtitle('Effect of flag_rounding_type','Interpreter','none');
@@ -624,7 +624,7 @@ close all
 % assert(isequal(size(offset_paths.traversal{1}.Yaw),[NreferencePoints-1 1]));
 % 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 % 
 % %% Fast Mode Tests
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -645,9 +645,9 @@ close all
 % fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 % 
 % %% Basic example - NO FIGURE
-% fig_num = 80001;
-% fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-% figure(fig_num); close(fig_num);
+% figNum = 80001;
+% fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+% figure(figNum); close(figNum);
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -682,13 +682,13 @@ close all
 % 
 % % Make sure plot opened up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 % 
 % 
 % %% Basic fast mode - NO FIGURE, FAST MODE
-% fig_num = 80002;
-% fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-% figure(fig_num); close(fig_num);
+% figNum = 80002;
+% fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+% figure(figNum); close(figNum);
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -723,14 +723,14 @@ close all
 % 
 % % Make sure plot opened up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 % 
 % 
 % %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-% fig_num = 80003;
-% fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-% figure(fig_num);
-% close(fig_num);
+% figNum = 80003;
+% fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+% figure(figNum);
+% close(figNum);
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -763,7 +763,7 @@ close all
 % 
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 % 
 % % Plot results as bar chart
 % figure(373737);
@@ -779,7 +779,7 @@ close all
 % 
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 
 
 %% BUG cases

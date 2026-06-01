@@ -4,7 +4,7 @@ function h = fcn_Path_plotPathsXY(cellArrayOfPaths,varargin)
 %
 % FORMAT:
 %
-%       h = fcn_Path_plotPathsXY(cellArrayOfPaths,(fig_num))
+%       h = fcn_Path_plotPathsXY(cellArrayOfPaths,(figNum))
 %
 % INPUTS:
 %
@@ -14,7 +14,7 @@ function h = fcn_Path_plotPathsXY(cellArrayOfPaths,varargin)
 %
 %     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -38,17 +38,17 @@ function h = fcn_Path_plotPathsXY(cellArrayOfPaths,varargin)
 
 % Revision history:
 % 2020_11_12
-% -- wrote the code
+% - wrote the code
 % 2021_01_06
-% -- added functions for input checking
+% - added functions for input checking
 % 2021_01_07
-% -- renamed function to show that cellArrayOfPaths being used, not paths
+% - renamed function to show that cellArrayOfPaths being used, not paths
 % 2021_12_10
-% -- updated header for clarity
+% - updated header for clarity
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- removed traversal type to convert function to path type, using
+% - removed traversal type to convert function to path type, using
 % fcn_Path_plotTraversalsXY as template
 
 % TO-DO
@@ -56,7 +56,7 @@ function h = fcn_Path_plotPathsXY(cellArrayOfPaths,varargin)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -82,9 +82,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -116,24 +116,24 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 1; % Default is to make a plot
-fig_num = [];
+figNum = [];
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
         fig = figure;
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plots = 1;
     end
 end
-if isempty(fig_num)
+if isempty(figNum)
     temp = figure;
-    fig_num = temp.Number;
+    figNum = temp.Number;
 end
 
 %% Main code
@@ -162,7 +162,7 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
 
     % Check to see if hold is already on. If it is not, set a flag to turn it
     % off after this function is over so it doesn't affect future plotting

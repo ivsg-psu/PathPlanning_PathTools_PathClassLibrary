@@ -5,7 +5,7 @@
 
 % Modification history:
 % 2025_06_19 - S. Brennan
-% -- first code write
+% - first code write
 
 close all
 %% Demonstration cases
@@ -21,13 +21,13 @@ close all
 % All demonstration case figures start with the number 1
 
 %% Demo of standard format checking
-fig_num = 10001;
-fprintf(1,'Figure: %.0f :Demo of short format checking\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure: %.0f :Demo of short format checking\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num   = fig_num;
+inputs.figNum   = figNum;
 inputs.start_A   = [0 0];
 inputs.start_B   = [0 10];
 inputs.vector_A   = [0 5];
@@ -43,19 +43,19 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Demo of long format checking
-fig_num = 10002;
-fprintf(1,'Figure: %.0f :Demo of long format checking\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure: %.0f :Demo of long format checking\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num   = fig_num;
+inputs.figNum   = figNum;
 inputs.start_A   = [0 0];
 inputs.start_B   = [0 10];
 inputs.vector_A   = [0 5];
@@ -74,19 +74,19 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Demo of negative values
-fig_num = 10003;
-fprintf(1,'Figure: %.0f : A and B as single vectors, vector A_values \n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure: %.0f : A and B as single vectors, vector A_values \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num   = fig_num;
+inputs.figNum   = figNum;
 inputs.start_A   = [-2 0];
 inputs.start_B   = [4 0];
 inputs.vector_A   = [4 0];
@@ -102,19 +102,19 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 
 %% Demo of parallel lines
-fig_num = 10004;
-fprintf(1,'Figure: %.0f :Demo of parallel lines \n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure: %.0f :Demo of parallel lines \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num   = fig_num;
+inputs.figNum   = figNum;
 inputs.start_A   = [0 0];
 inputs.start_B   = [0 5];
 inputs.vector_A   = [5 5];
@@ -130,19 +130,19 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 
 %% Demo of vectorized B inputs, A as a single vector
-fig_num = 10005;
-fprintf(1,'Figure: %.0f :Demo of vectorized B inputs, A as single vector\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure: %.0f :Demo of vectorized B inputs, A as single vector\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num   = fig_num;
+inputs.figNum   = figNum;
 inputs.start_A   = [0 0];
 inputs.start_B   = [0 5; -5 10; 0 15];
 inputs.vector_A   = [5 0];
@@ -158,18 +158,18 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Demo of vectorized A and B input pairs
-fig_num = 10006;
-fprintf(1,'Figure: %.0f :Demo of A and B vectors paired together\n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure: %.0f :Demo of A and B vectors paired together\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num   = fig_num;
+inputs.figNum   = figNum;
 inputs.start_A   = [0 0; 0 5;  -5 10; 5 15];
 inputs.start_B   = [0 1; -5 6; 0 11; -5 16];
 inputs.vector_A   = [5 0; 10 0; 5 0; 20 0];
@@ -185,7 +185,7 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
@@ -209,13 +209,13 @@ close all;
 
 %% Basic example - NO FIGURE
 
-fig_num = 80001;
-figure(fig_num);
-close(fig_num);
+figNum = 80001;
+figure(figNum);
+close(figNum);
 plotting.FigureExpected = 0;
 
 clear inputs
-inputs.fig_num   = [];
+inputs.figNum   = [];
 inputs.start_A   = [0 0; 0 5;  -5 10; 5 15];
 inputs.start_B   = [0 1; -5 6; 0 11; -5 16];
 inputs.vector_A   = [5 0; 10 0; 5 0; 20 0];
@@ -231,18 +231,18 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-figure(fig_num);
-close(fig_num);
+figNum = 80002;
+figure(figNum);
+close(figNum);
 plotting.FigureExpected = 0;
 
 clear inputs
-inputs.fig_num   = -1;
+inputs.figNum   = -1;
 inputs.start_A   = [0 0; 0 5;  -5 10; 5 15];
 inputs.start_B   = [0 1; -5 6; 0 11; -5 16];
 inputs.vector_A   = [5 0; 10 0; 5 0; 20 0];
@@ -258,14 +258,14 @@ actual.percentage_B = ...
     fcn_Path_convertPerA2PerB(...
     inputs.start_A, inputs.start_B, ...
     inputs.vector_A, inputs.vector_B, inputs.A_values,...
-    (inputs.fig_num));
+    (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+figure(figNum);
+close(figNum);
 
 inputs.start_A   = [0 0; 0 5;  -5 10; 5 15];
 inputs.start_B   = [0 1; -5 6; 0 11; -5 16];
@@ -276,7 +276,7 @@ inputs.A_values   = [0; 1; 0.5; 0.5];
 Niterations = 1000;
 
 % Do calculation without pre-calculation
-inputs.fig_num   = [];
+inputs.figNum   = [];
 tic;
 for ith_test = 1:Niterations
     % Call the function
@@ -284,12 +284,12 @@ for ith_test = 1:Niterations
         fcn_Path_convertPerA2PerB(...
         inputs.start_A, inputs.start_B, ...
         inputs.vector_A, inputs.vector_B, inputs.A_values,...
-        (inputs.fig_num));
+        (inputs.figNum));
 end
 slow_method = toc;
 
 % Do calculation with pre-calculation, FAST_MODE on
-inputs.fig_num   = -1;
+inputs.figNum   = -1;
 tic;
 for ith_test = 1:Niterations
     % Call the function
@@ -297,7 +297,7 @@ for ith_test = 1:Niterations
         fcn_Path_convertPerA2PerB(...
         inputs.start_A, inputs.start_B, ...
         inputs.vector_A, inputs.vector_B, inputs.A_values,...
-        (inputs.fig_num));
+        (inputs.figNum));
 
 end
 fast_method = toc;
@@ -314,7 +314,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -402,7 +402,7 @@ end
 
 % Make sure plot opened up
 if isfield(plotting,'FigureExpected') && plotting.FigureExpected==1
-    assert(isequal(get(gcf,'Number'),inputs.fig_num));
+    assert(isequal(get(gcf,'Number'),inputs.figNum));
 end
 
 end

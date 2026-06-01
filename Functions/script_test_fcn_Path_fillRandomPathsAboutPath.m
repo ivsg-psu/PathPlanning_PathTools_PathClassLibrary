@@ -3,13 +3,13 @@
        
 % Revision history:
 % 2021_01_03
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- cleared up function calls for traversals vs paths
+% - cleared up function calls for traversals vs paths
 % 2021_01_09
-% -- cleared up a few function names in the script
+% - cleared up a few function names in the script
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
+% - Removed traversal input type and replaced with cell array of paths
 close all
 
 
@@ -17,9 +17,9 @@ close all
 
 
 %% Test case: basic call for one trajectory
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -35,7 +35,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     emtpy_value,... % (flag_generate_random_stations),...
     emtpy_value,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 
 % Check variable types
 assert(iscell(random_paths));
@@ -48,12 +48,12 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: advanced call for one trajectory - specify figure
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -66,7 +66,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     emtpy_value,... % (flag_generate_random_stations),...
     emtpy_value,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 
 % Check variable types
 assert(iscell(random_paths));
@@ -79,12 +79,12 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: use same station points
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Fill in sample paths (as a starter)
@@ -99,7 +99,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     emtpy_value,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 
 % Check variable types
 assert(iscell(random_paths));
@@ -112,12 +112,12 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case: show effects of spatial smoothness with many trajectories
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -134,7 +134,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title('Spatial smoothness: 4 meters (below 3 generates warning)');
 
 % Check variable types
@@ -148,7 +148,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 subplot(2,2,2);
 spatial_smoothness = 8;  % Units are meters
@@ -159,7 +159,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
 
 % Check variable types
@@ -173,7 +173,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 subplot(2,2,3);
 spatial_smoothness = 20;  % Units are meters
@@ -184,7 +184,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
 % Check variable types
 assert(iscell(random_paths));
@@ -197,7 +197,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 subplot(2,2,4);
 spatial_smoothness = 40;  % Units are meters
@@ -208,7 +208,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('Spatial smoothness: %.0d meters',spatial_smoothness));
 % Check variable types
 assert(iscell(random_paths));
@@ -221,13 +221,13 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Test case: show effects of standard deviation
-fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Fill in sample paths (as a starter)
@@ -246,7 +246,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('Standard deviation: %.0d meters',std_deviation));
 
 % Check variable types
@@ -260,7 +260,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 subplot(3,1,2)
 std_deviation = 2;  % Units are meters
@@ -271,7 +271,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('Standard deviation: %.0d meters',std_deviation));
 
 % Check variable types
@@ -285,7 +285,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
@@ -298,7 +298,7 @@ random_paths = ...
     emtpy_value,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('Standard deviation: %.0d meters',std_deviation));
 
 % Check variable types
@@ -312,14 +312,14 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
 %% Test case: show effects of num_points
-fig_num = 10006;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -337,7 +337,7 @@ random_paths = ...
     num_points,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('num points: %.0d',num_points));
 
 % Check variable types
@@ -351,7 +351,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
@@ -364,7 +364,7 @@ random_paths = ...
     num_points,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('num points: %.0d',num_points));
 
 % Check variable types
@@ -378,7 +378,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 subplot(3,1,3);
@@ -390,7 +390,7 @@ random_paths = ...
     num_points,... % (num_points),...
     flag_generate_random_stations,... % (flag_generate_random_stations),...
     spatial_smoothness,... % (spatial_smoothness),...
-    fig_num);
+    figNum);
 title(sprintf('num points: %.0d',num_points));
 
 % Check variable types
@@ -404,7 +404,7 @@ for ith_path = 1:length(random_paths)
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -425,9 +425,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 
@@ -456,13 +456,13 @@ end
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -489,14 +489,14 @@ end
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -536,7 +536,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -552,7 +552,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

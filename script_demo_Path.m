@@ -2,52 +2,64 @@
 % This is a demonstration script to show the primary functionality of the
 % path class library.
 
-% Revision history:
+% REVISION HISTORY:
+%
 % As: script_demo_PathClassLibrary
 % 2022_08_19 S. Brennan, sbrennan@psu.edu
-% -- added clearing variable data on an example, as it gave errors
-% -- fixed errors with the station-averaging example
-% 2023_04_22 S. Brennan, sbrennan@psu.edu
-% -- updated loading conditions
-% -- improved comments and README.MD
-% 2023_06_05 S. Brennan, sbrennan@psu.edu""
-% -- cleaned up the workspace codes to use functions, work on MacOS
-% 2023_08_25 to 2-23_09_06 by S. Brennan
-% -- added examples of XY to St conversions, and vice versa
-% -- added tools to calculate the centerline of paths
-% 2024_03_14 by S. Brennan
-% -- added the fix to the intersection calculation code to allow
-% intersection options where the path segments are extended, not just the
-% sensor segment
-% -- deprecated fcn_Path_snapPointOntoNearestPath, replaced it with fcn_Path_snapPointToPathViaVectors
-% -- fixed 2D / 3D bugs in addElevation - this is still not working
-% correctly, but at least not throwing errors (it is close to correct, but
-% need assertion and careful testing)
-% -- fixed many of the scripts that were failing during the automated
-% script testing.
-% 2024_09_26 - Sean Brennan
-% -- Updated function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
-% 2024_05_15 - Aneesh Batchu
-% -- Found a bug in "fcn_Path_findProjectionHitOntoPath". A test case to
-% demonstrate the BUG was written in "script_test_fcn_Path_findProjectionHitOntoPath"
-% -- fixed in 2025_06_14 release
-% 2025_06_14 by S. Brennan
-% -- fixed small bug in fcn_Path_findProjectionHitOntoPath
-% -- updated DebugTools_v2024_12_18, then to v2024_06_24 after fixing bug
-% -- updated script_test_all_functions to latest version incl assertions
-% -- rewrote fcn_Path_findProjectionHitOntoPath to be fcn_Path_findSensorHitOnWall
-% -- extensively reworked and tested fcn_Path_findSensorHitOnWall. Found
-%    and fixed many latent bugs
-% -- Fixed to use the Debug libraray, not Path library, to check inputs on
-%    all functions
-% -- Added environmental variable methods for debugging.
-% -- Redid path averaging method via orthogonal projection. 
-% -- Removed non-working path averaging methods. 
-% 2025_07_06 - S. Brennan
-% -- Added weighted averaging option to fcn_Path_findAveragePath
-% -- Added more test cases to script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+% - Added clearing variable data on an example, as it gave errors
+% - Fixed errors with the station-averaging example
 %
-% 2025_08_02 - S. Brennan
+% 2023_04_22 S. Brennan, sbrennan@psu.edu
+% - Updated loading conditions
+% - Improved comments and README.MD
+%
+% 2023_06_05 S. Brennan, sbrennan@psu.edu""
+% - Cleaned up the workspace codes to use functions, work on MacOS
+%
+% 2023_08_25 to 2-23_09_06 by Sean Brennan, sbrennan@psu.edu
+% - Added examples of XY to St conversions, and vice versa
+% - Added tools to calculate the centerline of paths
+%
+% 2024_03_14 by Sean Brennan, sbrennan@psu.edu
+% - Added the fix to the intersection calculation code to allow
+%   % intersection options where the path segments are extended, not just 
+%   % the sensor segment
+% - Deprecated fcn_Path_snapPointOntoNearestPath, 
+%   % * replaced it with fcn_Path_snapPointToPathViaVectors
+% - Fixed some 2D / 3D bugs in addElevation
+%   % NOTE: this is still not working correctly, but at least not 
+%   % throwing errors (it is close to correct, but
+%   %  need assertion and careful testing)
+% - Fixed many of the scripts that were failing during the automated
+%   % script testing.
+%
+% 2024_09_26 - Sean Brennan
+% - Updated function fcn_INTERNAL_clearUtilitiesFromPathAndFolders
+%
+% 2024_05_15 - Aneesh Batchu
+% - Found a bug in "fcn_Path_findProjectionHitOntoPath". A test case to
+%   % demonstrate the BUG was written in 
+%   % "script_test_fcn_Path_findProjectionHitOntoPath"
+% - Fixed in 2025_06_14 release
+%
+% 2025_06_14 by Sean Brennan, sbrennan@psu.edu
+% - Fixed small bug in fcn_Path_findProjectionHitOntoPath
+% - Updated DebugTools_v2024_12_18, then to v2024_06_24 after fixing bug
+% - Updated script_test_all_functions to latest version incl assertions
+% - Rewrote fcn_Path_findProjectionHitOntoPath to be fcn_Path_findSensorHitOnWall
+% - Extensively reworked and tested fcn_Path_findSensorHitOnWall. Found
+%    and fixed many latent bugs
+% - Fixed to use the Debug libraray, not Path library, to check inputs on
+%    all functions
+% - Added environmental variable methods for debugging.
+% - Redid path averaging method via orthogonal projection. 
+% - Removed non-working path averaging methods. 
+%
+% 2025_07_06 by Sean Brennan, sbrennan@psu.edu
+% - Added weighted averaging option to fcn_Path_findAveragePath
+% - Added more test cases to script_test_fcn_Path_cleanPathFromForwardBackwardJogs
+%
+% 2025_08_02 by Sean Brennan, sbrennan@psu.edu
 % - In fcn_Path_calcDiffAnglesBetweenSegments
 %   % * Minor reordering of code steps to pass out edge lengths
 %   % * Allows speed up other codes using same values
@@ -55,9 +67,9 @@
 %   % * updated docstrings
 %   % * Removed fill of debug_fig_num, as this is in the new header
 % - In script_test_fcn_Path_calcDiffAnglesBetweenPathSegments
-%   % * added edgeLengths to variable testing
-%   % * renamed other variables to match inputs
-%   % * added a trival but problem test case from real-world data
+%   % * Added edgeLengths to variable testing
+%   % * Renamed other variables to match inputs
+%   % * Added a trival but problem test case from real-world data
 % - In fcn_Path_cleanPathFromForwardBackwardJogs
 %   % * Found a huge number of bugs from a real world test 
 %   % * (see bug test added to script)
@@ -76,7 +88,7 @@
 %   % * Updated docstrings accordingly
 %   % * Edited start/end values for file numbering, to cover entire range
 %
-% 2025_08_03 - S. Brennan
+% 2025_08_03 by Sean Brennan, sbrennan@psu.edu
 % - In fcn_Path_cleanPathFromForwardBackwardJogs
 %   % * Added jog angle threshold as variable input. 
 %   % * Need this for Bounded AStar library
@@ -91,16 +103,16 @@
 % (new release)
 %
 % As: script_demo_Path
-% 2025_11_13 - S. Brennan
-% - renamed this script
+% 2025_11_13 by Sean Brennan, sbrennan@psu.edu
+% - Renamed this script
 %   % * from: script_demo_PathClassLibrary
 %   % * to: script_demo_Path
 % - set up auto-loading of dependencies using new DebugTools features
 % - shut off calls to fcn_Path_plotTraversalsYaw (gives warnings)
-% - updated script_test_all_functions
-% - updated header flags for clearing path, to do fast checking without
+% - Updated script_test_all_functions
+% - Updated header flags for clearing path, to do fast checking without
 %   % skipping
-% - updated deprecation warnings so that they only show once:
+% - Updated deprecation warnings so that they only show once:
 %   % * fcn_Path_findIntersectionsBetweenTraversals
 %   % * fcn_Path_convertPathToTraversalStructure
 %   % * fcn_Path_fillOffsetTraversalsAboutTraversal
@@ -117,31 +129,45 @@
 %   % * fcn_Path_findTraversalWithMostData
 %   % * fcn_Path_newTraversalByStationResampling
 %   % * fcn_Path_findCenterlineVoteFromTraversalToTraversal
-% - renamed all global variables to _PATH_ instead of
+% - Renamed all global variables to _PATH_ instead of
 %   cat(2,'_PATH','CLASS_')
-% - fixed one instance where _GEOMETRY_ global variable used instead of 
+% - Fixed one instance where _GEOMETRY_ global variable used instead of 
 %   % _PATH_
-% - moved demo script to its own folder
-% - removed deprecated functions and scripts for clean-up into subfolder
-% - fixed minor errors in testing scripts. All pass currently.
+% - Moved demo script to its own folder
+% - Removed deprecated functions and scripts for clean-up into subfolder
+% - Fixed minor errors in testing scripts. All pass currently.
 % (new release)
+%
+% 2026_04_06 by Xinyu Cao, xfc5113@psu.edu
+% - In fcn_Path_newPathByStationResampling
+%   % * Added code to handle 3D data
+%
+% 2026_06_01 by Sean Brennan, sbrennan@psu.edu
+% - In script_demo_Path
+%  % * Cleaned up header comments to standard format
+%  % * Added code to automatically test the repo
+%  - In script_test_all_functions
+%  % * Deleted this function as it is now in Debug library
+% - Moved all deprecated functions into DEPRECATED subfolder
+% (new release)
+%
 
 
 % TO-DO:
-% 2024_03_14 - S. Brennan 
-% - fix addElevation. Seems to be giving wrong values
-% 2025_06_14 by S. Brennan
-% -- look at script_main_laneChange.m. Can clean this up by taking Guangwei's
+% 2024_03_14 by Sean Brennan, sbrennan@psu.edu 
+% - Fix addElevation. Seems to be giving wrong values
+% 2025_06_14 by Sean Brennan, sbrennan@psu.edu
+% - look at script_main_laneChange.m. Can clean this up by taking Guangwei's
 %    functions and adding them into these functions too
-% -- add a function to find where paths diverage, based on user-defined 
+% - add a function to find where paths diverage, based on user-defined 
 %    metric (e.g. a lane width)
-% -- add a function that finds where intersections and lange changes occur
+% - add a function that finds where intersections and lange changes occur
 %    within many paths by looking at change in yaw of individual paths
 %    relative to mean path
-% -- pull out the spatial smoothing of offsets within function: 
+% - pull out the spatial smoothing of offsets within function: 
 %    fcn_Path_fillRandomTraversalsAboutTraversal into another stand-alone
 %    function: fcn_Path_spatialLowPassFilter(path, smoothingDistance)
-% - 2025_11_13 by S. Brennan
+% - 2025_11_13 by Sean Brennan, sbrennan@psu.edu
 %   % * Need to update fcn_Path_plotTraversalsYaw to take XY inputs or cell
 %   %   % arrays of XY inputs
 
@@ -232,6 +258,11 @@ if ~exist('flag_PathClass_Folders_Initialized','var')
     this_project_folders = {'Functions','Data'};
     fcn_INTERNAL_initializeUtilities(library_name,library_folders,library_url,this_project_folders);  
     flag_PathClass_Folders_Initialized = 1;
+end
+
+%% Test the repo
+if 1==0
+	fcn_DebugTools_testRepoForRelease('_Path_');
 end
 
 

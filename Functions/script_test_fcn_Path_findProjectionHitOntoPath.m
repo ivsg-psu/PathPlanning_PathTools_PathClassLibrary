@@ -5,37 +5,37 @@
 
 % Modification history:
 % 2020_12_31 - S. Brennan
-% -- updated for new argument list
+% - updated for new argument list
 %
 % 2021_01_08 - S. Brennan
-% -- updated comments
+% - updated comments
 %
 % 2020_01_09 - S. Brennan
-% -- added more comments during clean-up
+% - added more comments during clean-up
 %
 % 2021_01_23 - S. Brennan
-% -- Added flag_search_type = 2 option, to allow multiple cross points to
+% - Added flag_search_type = 2 option, to allow multiple cross points to
 % be returned
-% -- Fixed bug with partially overlapping vectors not returning a result
-% -- Added path segment output so that we can ID which segment was hit
+% - Fixed bug with partially overlapping vectors not returning a result
+% - Added path segment output so that we can ID which segment was hit
 %
 % 2021_01_24 - S. Brennan
-% -- Fixed bug with overlapping colinear where two path segments identified
+% - Fixed bug with overlapping colinear where two path segments identified
 % when there is only one
 %
 % 2021_01_24 - S. Brennan
-% -- Added assertions to force checking
-% -- Added test cases for flag=3 flag=4 options
+% - Added assertions to force checking
+% - Added test cases for flag=3 flag=4 options
 %
 % 2024_05_15 - Aneesh Batchu
-% -- Added a BUG case
+% - Added a BUG case
 %
 % 2024_05_15 - S. Brennan
-% -- Organized sections
-% -- Added fast mode tests
-% -- Added full assertion tests on output variables
-% -- Added figure open/close assertions
-% -- Added automated assertion testing
+% - Organized sections
+% - Added fast mode tests
+% - Added full assertion tests on output variables
+% - Added figure open/close assertions
+% - Added automated assertion testing
 
 close all
 
@@ -81,13 +81,13 @@ close all
 % All demonstration case figures start with the number 1
 
 %% Demo of standard format checking
-fig_num = 10001;
-fprintf(1,'Figure: %.0f :Demo of short format checking\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure: %.0f :Demo of short format checking\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 15];
@@ -105,21 +105,21 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Demo of long format checking
-fig_num = 10002;
-fprintf(1,'Figure: %.0f :Demo of long format checking\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure: %.0f :Demo of long format checking\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 Nsolutions = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 15];
@@ -158,7 +158,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
@@ -204,13 +204,13 @@ close all;
 
 %% Single point intersection (2), flag (0), test 1 - a simple intersection
 
-fig_num = 20001;
-fprintf(1,'Figure: %.0f :Single point intersection (2), flag (0) - a simple intersection  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20001;
+fprintf(1,'Figure: %.0f :Single point intersection (2), flag (0) - a simple intersection  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 15];
@@ -228,20 +228,20 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Single point intersection (2), flag (0), test 2 - intersection through an acute vertex
 
-fig_num = 20002;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection through an acute vertex  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20002;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection through an acute vertex  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 5 10; 15 15];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 15];
@@ -259,20 +259,20 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Single point intersection (2), flag (0), test 3 - intersection through an obtuse vertex
 
-fig_num = 20003;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection through an obtuse vertex  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20003;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection through an obtuse vertex  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 5 10; 4 15];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 15];
@@ -290,20 +290,20 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Single point intersection (2), flag (0), test 4 -  intersection at start of sensor
 
-fig_num = 20004;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection at start of sensor  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20004;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection at start of sensor  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 10];
 inputs.sensor_vector_end   = [5 15];
@@ -321,20 +321,20 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Single point intersection (2), flag (0), test 5 -  intersection at end of sensor
 
-fig_num = 20005;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection at end of sensor  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20005;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection at end of sensor  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 5];
 inputs.sensor_vector_end   = [5 10];
@@ -352,7 +352,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -360,13 +360,13 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Single point intersection (2), flag (0), test 6 -  intersection at start of path
 
-fig_num = 20006;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection at start of path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20006;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0) - intersection at start of path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [0 0];
 inputs.sensor_vector_end   = [0 15];
@@ -384,20 +384,20 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Single point intersection (2), flag (0), test 7 -  intersection at end of path
 
-fig_num = 20007;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0), - intersection at end of path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 20007;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (0), - intersection at end of path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [10 0];
 inputs.sensor_vector_end   = [10 15];
@@ -415,7 +415,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -445,13 +445,13 @@ close all;
 
 %% Single point intersection (2), flag (1) -  using flag to find intersection beyond sensor range, one path
 
-fig_num = 21001;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection beyond sensor range, one path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 21001;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection beyond sensor range, one path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 5];
@@ -469,7 +469,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -477,13 +477,13 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Single point intersection (2), flag (1) -  using flag to find intersection before sensor range, one path
 
-fig_num = 21002;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, one path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 21002;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, one path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [5 15];
 inputs.sensor_vector_end   = [5 20];
@@ -501,7 +501,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -509,13 +509,13 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Single point intersection (2), flag (1) -  using flag to find intersection beyond sensor range, multi path
 
-fig_num = 21003;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection beyond sensor range, multi path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 21003;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection beyond sensor range, multi path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10; 0 15];
 inputs.sensor_vector_start = [5 0];
 inputs.sensor_vector_end   = [5 5];
@@ -533,7 +533,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -541,13 +541,13 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Single point intersection (2), flag (1) -  using flag to find intersection before sensor range, multi path
 
-fig_num = 21004;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, multi path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 21004;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (1), - using flag to find intersection before sensor range, multi path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10; 0 5];
 inputs.sensor_vector_start = [5 15];
 inputs.sensor_vector_end   = [5 20];
@@ -565,7 +565,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -621,13 +621,13 @@ close all;
 
 %% Single point intersection (2), flag (3) - intersection by extending path
 
-fig_num = 23004;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (3), - intersection by extending single path  \n',fig_num);
-figure(fig_num); clf;
+figNum = 23004;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (3), - intersection by extending single path  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10];
 inputs.sensor_vector_start = [15 0];
 inputs.sensor_vector_end   = [15 15];
@@ -645,7 +645,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -654,13 +654,13 @@ fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 %% Single point intersection (2), flag (3) - intersection by extending 2 paths
 
-fig_num = 23004;
-fprintf(1,'Figure: %.0f : Single point intersection (2), flag (3), - intersection by extending 2 paths  \n',fig_num);
-figure(fig_num); clf;
+figNum = 23004;
+fprintf(1,'Figure: %.0f : Single point intersection (2), flag (3), - intersection by extending 2 paths  \n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.path = [0 10; 10 10; 10 15; 5 20];
 inputs.sensor_vector_start = [15 0];
 inputs.sensor_vector_end   = [15 15];
@@ -678,7 +678,7 @@ actual = struct;
 [actual.distance, actual.location, actual.path_segment, actual.t, actual.u] = ...
     fcn_Path_findProjectionHitOntoPath(...
     inputs.path,inputs.sensor_vector_start,inputs.sensor_vector_end,...
-    inputs.flag_search_type,inputs.fig_num);
+    inputs.flag_search_type,inputs.figNum);
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -858,8 +858,8 @@ assert(isequal(path_segments,1));
 % close all;
 %
 % %% Non intersection (3), flag (0), test 1
-% fig_num = 30001;
-% figure(fig_num); clf;
+% figNum = 30001;
+% figure(figNum); clf;
 %
 % fprintf(1,'\nNon intersection (3), flag (0), test 1  \n');
 %
@@ -871,7 +871,7 @@ assert(isequal(path_segments,1));
 % [distance,location,path_segment, t, u] = ...
 %     fcn_Path_findProjectionHitOntoPath(...
 %     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_num);
+%     flag_search_type,figNum);
 % fcn_INTERNAL_printResults(distance,location);
 %
 %
@@ -888,7 +888,7 @@ assert(isequal(path_segments,1));
 % assert(all(isnan(location)));
 %
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 %
 %
 % %% Simple test - No intersection (for flag_search_type = 3)
@@ -2100,8 +2100,8 @@ assert(isequal(path_segments,1));
 %
 % %% BUG - infinite point intersection (4), flag (1), test 1 - should be infinite intersections
 %
-% fig_num = 91001;
-% figure(fig_num); clf;
+% figNum = 91001;
+% figure(figNum); clf;
 %
 % fprintf(1,'\n BUG - infinite point intersection (4), flag (1), test 1 - should be infinite intersections  \n');
 %
@@ -2113,7 +2113,7 @@ assert(isequal(path_segments,1));
 % [distance,location,path_segment, t, u] = ...
 %     fcn_Path_findProjectionHitOntoPath(...
 %     path,sensor_vector_start,sensor_vector_end,...
-%     flag_search_type,fig_num);
+%     flag_search_type,figNum);
 % fcn_INTERNAL_printResults(distance,location);
 %
 %
@@ -2130,7 +2130,7 @@ assert(isequal(path_segments,1));
 % % assert(isequal(round(location,4),[3.9286,10.0000]));
 %
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 %
 %
 %
@@ -2155,9 +2155,9 @@ assert(isequal(path_segments,1));
 %
 % %% Basic example - NO FIGURE
 %
-% fig_num = 80001;
-% figure(fig_num);
-% close(fig_num);
+% figNum = 80001;
+% figure(figNum);
+% close(figNum);
 %
 % fprintf(1,'\nSingle point intersection (2), flag (0), test 1  \n');
 %
@@ -2187,12 +2187,12 @@ assert(isequal(path_segments,1));
 %
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 %
 % %% Basic fast mode - NO FIGURE, FAST MODE
-% fig_num = 80002;
-% figure(fig_num);
-% close(fig_num);
+% figNum = 80002;
+% figure(figNum);
+% close(figNum);
 %
 % fprintf(1,'\nSingle point intersection (2), flag (0), test 1  \n');
 %
@@ -2222,13 +2222,13 @@ assert(isequal(path_segments,1));
 %
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 %
 %
 % %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-% fig_num = 80003;
-% figure(fig_num);
-% close(fig_num);
+% figNum = 80003;
+% figure(figNum);
+% close(figNum);
 %
 % fprintf(1,'\nSingle point intersection (2), flag (0), test 1  \n');
 %
@@ -2274,7 +2274,7 @@ assert(isequal(path_segments,1));
 %
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 
 %% fcn_INTERNAL_printResults
 function fcn_INTERNAL_printResults(distance,location)
@@ -2349,7 +2349,7 @@ end
 
 % Make sure plot opened up
 if isfield(plotting,'FigureExpected') && plotting.FigureExpected==1
-    assert(isequal(get(gcf,'Number'),inputs.fig_num));
+    assert(isequal(get(gcf,'Number'),inputs.figNum));
 end
 
 end

@@ -3,25 +3,25 @@
 
 % Revision history
 % 2020_11_10
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- lots of bug fixes as we demo for the team (lol)
+% - lots of bug fixes as we demo for the team (lol)
 % 2020_01_09
-% -- added more comments during clean-up
+% - added more comments during clean-up
 % 2021_12_27:
-% -- corrected dependencies in comments
+% - corrected dependencies in comments
 % 2022_01_03:
-% -- corrected typos in comments
-% -- fixed a bug where the Z value is not defined in loop
+% - corrected typos in comments
+% - fixed a bug where the Z value is not defined in loop
 % 2022_01_06:
-% -- refactored code, added weighted averaging to prevent iteration
+% - refactored code, added weighted averaging to prevent iteration
 % bouncing
 % 2025_06_26 - Sean Brennan
-% -- restructured test script to use function call for data loading
-% -- added assertion testing
+% - restructured test script to use function call for data loading
+% - added assertion testing
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
-% -- Renamed function from fcn_Path_findAverageTraversalViaOrthoProjection
+% - Removed traversal input type and replaced with cell array of paths
+% - Renamed function from fcn_Path_findAverageTraversalViaOrthoProjection
 % 2025_08_02 - S. Brennan
 % - In script_test_fcn_Path_findAveragePath
 %   % * Removed some of the assertion testing
@@ -34,16 +34,16 @@
 %            (reference_traversal),...
 %            (num_iterations),
 %            (weight_for_averaging),
-%            (fig_num));
+%            (figNum));
 
 close all;
 
 
 %% BASIC call: showing path averaging via ortho projection (station interval too large)
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC call: showing path averaging via ortho projection (station interval too large)');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Load data
 cellArrayOfPaths = fcn_INTERNAL_loadData;
@@ -59,13 +59,13 @@ exit_tolerance = []; averaging_weights = [];
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
 %                 (averaging_weights),...
-%                 (fig_num));
+%                 (figNum));
 [path_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),(averaging_weights),......
-    (fig_num));
+    (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -86,13 +86,13 @@ assert(isnumeric(closestDistances));
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC call: adding more iterations
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC call: adding more iterations');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Load data
 cellArrayOfPaths = fcn_INTERNAL_loadData;
@@ -108,13 +108,13 @@ averaging_weights = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
-%                 (fig_num));
+%                 (figNum));
 [path_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),(averaging_weights),......
-    (fig_num));
+    (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -135,13 +135,13 @@ assert(isequal(size(closestDistances),[NreferencePoints length(cellArrayOfPaths)
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC call: show effect of weights
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC call: show effect of weights');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Load data
 clear cellArrayOfPaths
@@ -161,14 +161,14 @@ averaging_weights = [];
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
 %                 (averaging_weights),...
-%                 (fig_num));
+%                 (figNum));
 subplot(2,1,1)
 [path_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),(averaging_weights),......
-    (fig_num));
+    (figNum));
 
 title('Default weights', 'Interpreter','none');
 
@@ -191,7 +191,7 @@ assert(isequal(size(closestDistances),[NreferencePoints length(cellArrayOfPaths)
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 subplot(2,1,2)
 averaging_weights = [0.9; 0.1];
@@ -200,7 +200,7 @@ averaging_weights = [0.9; 0.1];
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),(averaging_weights),......
-    (fig_num));
+    (figNum));
 
 title('90% weight on first', 'Interpreter','none');
 
@@ -223,7 +223,7 @@ assert(isequal(size(closestDistances),[NreferencePoints length(cellArrayOfPaths)
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,9 +244,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Load data
 cellArrayOfPaths = fcn_INTERNAL_loadData;
@@ -261,7 +261,7 @@ exit_tolerance = []; averaging_weights = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
-%                 (fig_num));
+%                 (figNum));
 [path_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
@@ -287,13 +287,13 @@ assert(isnumeric(closestDistances));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Load data
 cellArrayOfPaths = fcn_INTERNAL_loadData;
@@ -308,7 +308,7 @@ exit_tolerance = []; averaging_weights = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
-%                 (fig_num));
+%                 (figNum));
 [path_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
@@ -334,14 +334,14 @@ assert(isnumeric(closestDistances));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Load data
 cellArrayOfPaths = fcn_INTERNAL_loadData;
@@ -379,7 +379,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -395,7 +395,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases
@@ -415,10 +415,10 @@ assert(~any(figHandles==fig_num));
 % close all;
 
 %% BUG case: found during HSOV testing, 18 laps in Reber parking lot (default)
-fig_num = 90001;
+figNum = 90001;
 titleString = sprintf('BUG case: found during HSOV testing, 18 laps in Reber parking lot (default)');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Load data - 18 laps in Reber parking lot
 load('testData1_fcn_Path_findAveragePath.mat','paths');
@@ -436,13 +436,13 @@ averaging_weights = [];
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
-%                 (fig_num));
+%                 (figNum));
 [path_average, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),(averaging_weights),......
-    (fig_num));
+    (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -463,15 +463,15 @@ assert(isequal(size(closestDistances),[NreferencePoints length(cellArrayOfPaths)
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % BUG case: found during HSOV testing, 18 laps in Reber parking lot (iterative)
-fig_num = 90002;
+figNum = 90002;
 titleString = sprintf('BUG case: found during HSOV testing, 18 laps in Reber parking lot (iterative)');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Load data - 18 laps in Reber parking lot
 load('testData1_fcn_Path_findAveragePath.mat','paths');
@@ -489,13 +489,13 @@ averaging_weights = -1;
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),(averaging_weights),......
-%                 (fig_num));
+%                 (figNum));
 [path_average_iterative, closestXs, closestYs, closestDistances] = ...
     fcn_Path_findAveragePath(cellArrayOfPaths,...
     (stationInterval),...
     (max_num_iterations),...
     (exit_tolerance),(averaging_weights),......
-    (fig_num));
+    (figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -516,7 +516,7 @@ assert(isequal(size(closestDistances),[NreferencePoints length(cellArrayOfPaths)
 % Not possible - too many variables
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 % Compare results
 if 1==1
@@ -540,10 +540,10 @@ if 1==1
 end
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 90003;
-fprintf(1,'Figure: %.0f: Comparison of normal versus iterative timing\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 90003;
+fprintf(1,'Figure: %.0f: Comparison of normal versus iterative timing\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Load data - 18 laps in Reber parking lot
 load('testData1_fcn_Path_findAveragePath.mat','paths');

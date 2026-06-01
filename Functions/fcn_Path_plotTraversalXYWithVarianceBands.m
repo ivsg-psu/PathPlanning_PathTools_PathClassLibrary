@@ -7,7 +7,7 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 %      fcn_Path_plotTraversalXYWithVarianceBands(...
 %            reference_traversal,...
 %            (std_deviation),...
-%            (fig_num));
+%            (figNum));
 %
 % INPUTS:
 %
@@ -21,7 +21,7 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 %      to use the variance in angles along the reference_traversal
 %      multiplied by the average segment length in the reference traversal.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -49,22 +49,22 @@ function fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, varargin
 
 % Revision history:
 % 2021_01_05:
-% -- wrote the code originally
+% - wrote the code originally
 % 2021_01_08:
-% -- added input checking
+% - added input checking
 % 2022_01_03:
-% -- corrected dependency list of functions
-% -- broke out fcn_Path_plotTraversalXYWithUpperLowerBands into
+% - corrected dependency list of functions
+% - broke out fcn_Path_plotTraversalXYWithUpperLowerBands into
 % separate functionality (it is very useful for other functions!)
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -90,9 +90,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -131,12 +131,12 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 0; % Default is to NOT make a plot
-fig_num = [];
+figNum = [];
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
@@ -201,7 +201,7 @@ lower_traversal = fcn_Path_convertPathToTraversalStructure(bottom_path);
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    fcn_Path_plotTraversalXYWithUpperLowerBands( reference_traversal, upper_traversal, lower_traversal, fig_num);
+    fcn_Path_plotTraversalXYWithUpperLowerBands( reference_traversal, upper_traversal, lower_traversal, figNum);
 end
 
 if flag_do_debug

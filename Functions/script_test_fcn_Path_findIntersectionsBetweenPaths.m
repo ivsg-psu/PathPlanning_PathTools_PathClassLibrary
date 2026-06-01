@@ -5,10 +5,10 @@
 
 % Revision history:
 % 2021_01_23:
-% -- first write of the code
+% - first write of the code
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
-% -- Renamed function from fcn_Path_findIntersectionsBetweenTraversals
+% - Removed traversal input type and replaced with cell array of paths
+% - Renamed function from fcn_Path_findIntersectionsBetweenTraversals
 
 close all;
 
@@ -20,12 +20,12 @@ close all;
 %     fcn_Path_findIntersectionsBetweenPaths(...
 %     path_1,...
 %     path_2, ...
-%     fig_num)
+%     figNum)
 
 %% BASIC example 1 - perpendicular lines, intersection in middle
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -43,18 +43,18 @@ path_2 = [5 -5; 5 5];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example 2 - perpendicular lines, intersection in middle
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -72,16 +72,16 @@ path_2 = [5 -1; 5 1];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example 3 - parallel lines, no intersection
-fig_num = 3;
+figNum = 3;
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 0; 10 0];
@@ -99,16 +99,16 @@ path_2 = [0 5; 10 5];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example 4 - two crossings of 2 onto 1
-fig_num = 4;
+figNum = 4;
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 0; 7 2];
@@ -126,18 +126,18 @@ path_2 = [0 -1; 2 2;  5 -3];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example 3 - two crossings of 1 onto 2
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -156,18 +156,18 @@ path_2 = [0 0; 7 2];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - intersection at vertex of one traversal
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 2; 7 2];
@@ -185,18 +185,18 @@ path_2 = [0 -1; 2 2;  5 -3];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - intersection at vertex of both traversals
-fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Create a dummy path and convert it to path_1
 path_1 = [2 0; 2 2; 7 2];
@@ -214,18 +214,18 @@ path_2 = [0 -1; 2 2;  5 -3];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - intersection at both ends of one traversal
-fig_num = 10006;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -244,18 +244,18 @@ path_2 = [0 -1; 2 2;  4 -1];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - intersection at both ends of one traversal with two vertices
-fig_num = 10007;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10007;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 1; 1 0.5; 3 0.5; 3.5 1];
@@ -273,17 +273,17 @@ path_2 = [0 -1; 2 2;  4 -1];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 %% BASIC example - Loop of traversal 1 over same point twice
-fig_num = 10008;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10008;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 1; 2 0; 2 1; 0 0];
@@ -301,18 +301,18 @@ path_2 = [0 -1; 2 2;  4 -1];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - Loop of traversal 2 over same point twice
-fig_num = 10009;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10009;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -331,18 +331,18 @@ path_2 = [0 1; 2 0; 2 1; 0 0];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - Traversal 2 is on top of traversal 1 for an area
-fig_num = 10010;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10010;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -361,17 +361,17 @@ path_2 = [1 1; 2 0.5; 4 1; 5 3];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 %% BASIC example - Traversal 1 is on top of traversal 2 for an area
-fig_num = 10011;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10011;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Create a dummy path and convert it to path_1
 path_1 = [1 1; 2 0.5; 4 1; 5 3];
@@ -389,18 +389,18 @@ path_2 = [0 0; 8 2];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 
 %% BASIC example - Traversal 2 is on top of traversal 1 for two areas
-fig_num = 10012;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10012;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -419,17 +419,17 @@ path_2 = [1 1; 2 0.5; 4 1; 5 3; 6 1.5; 7 1.75; 9 1];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 %% BASIC example - Traversal 1 is on top of traversal 2 for two areas
-fig_num = 10013;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10013;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -448,17 +448,17 @@ path_2 = [0 0; 8 2];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
 %% BASIC example - Traversal 1 is same as Traversal 2 for many segments
-fig_num = 10014;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10014;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Create a dummy path and convert it to path_1
@@ -477,10 +477,10 @@ path_2 = [1 1; 2 0.5; 4 1; 5 3; 6 1.5; 7 1.75; 9 1; 10 0];
     fcn_Path_findIntersectionsBetweenPaths(...
     path_1,...
     path_2, ...
-    fig_num);
+    figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 print_results(intersection_points,s_coordinates_in_path_1,s_coordinates_in_path_2);
 
@@ -505,9 +505,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 0; 7 2];
@@ -529,13 +529,13 @@ path_2 = [0 -1; 2 2;  5 -3];
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 0; 7 2];
@@ -557,14 +557,14 @@ path_2 = [0 -1; 2 2;  5 -3];
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Create a dummy path and convert it to path_1
 path_1 = [0 0; 7 2];
@@ -607,7 +607,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -623,7 +623,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

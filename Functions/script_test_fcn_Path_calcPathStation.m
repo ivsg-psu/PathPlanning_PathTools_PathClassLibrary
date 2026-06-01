@@ -3,24 +3,24 @@
        
 % Revision history:
 % 2025_06_29
-% -- first write of the code, moving code set away from traversal(s)
+% - first write of the code, moving code set away from traversal(s)
 
 close all
 
 % FORMAT: 
-%       [stations, differences] = fcn_Path_calcPathStation(path,(fig_num))
+%       [stations, differences] = fcn_Path_calcPathStation(path,(figNum))
 
 %% BASIC example: demonstration of station calculations for a 2D path
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC example: demonstration of station calculations for a 2D path');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths 
 clear path
 path = [0 0; 5 0; 5 3];
  
-[stations, differences] = fcn_Path_calcPathStation(path,(fig_num));
+[stations, differences] = fcn_Path_calcPathStation(path,(figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -39,20 +39,20 @@ assert(isequal(stations,[0; 5; 8]));
 assert(isequal(differences,[0 0; 5 0; 0 3]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: demonstration of station calculations for a path
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC example: demonstration of station calculations for a 3D path');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 % Fill in sample paths 
 clear path
 path = [0 0 0; 5 0 0; 5 3 0; 5 3 2];
  
-[stations, differences] = fcn_Path_calcPathStation(path,(fig_num));
+[stations, differences] = fcn_Path_calcPathStation(path,(figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -71,13 +71,13 @@ assert(isequal(stations,[0; 5; 8; 10]));
 assert(isequal(differences,[0 0 0; 5 0 0; 0 3 0; 0 0 2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: demonstration of cell array of 2D paths
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC example: demonstration of cell array of 2D paths');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 % Fill in sample paths 
@@ -85,7 +85,7 @@ clear path
 path{1,1} = [0 0; 5 0; 5 3];
 path{2,1} = [-1 -1; 4 -1; 4 4; 4 5];
  
-[stations, differences] = fcn_Path_calcPathStation(path,(fig_num));
+[stations, differences] = fcn_Path_calcPathStation(path,(figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -110,13 +110,13 @@ assert(isequal(stations{2},[0; 5; 10; 11]));
 assert(isequal(differences{2},[0 0; 5 0; 0 5; 0 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: demonstration of cell array of 3D paths
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('BASIC example: demonstration of cell array of 3D paths');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 % Fill in sample paths 
@@ -124,7 +124,7 @@ clear path
 path{1,1} = [0 0 0; 5 0 0 ; 5 3 0; 5 3 2];
 path{2,1} = [-1 -1 0; 4 -1 0; 4 -1 2; 4 4 2; 4 5 2];
  
-[stations, differences] = fcn_Path_calcPathStation(path,(fig_num));
+[stations, differences] = fcn_Path_calcPathStation(path,(figNum));
 
 sgtitle(titleString, 'Interpreter','none');
 
@@ -149,13 +149,13 @@ assert(isequal(stations{2},[0; 5; 7; 12; 13]));
 assert(isequal(differences{2},[0 0 0; 5 0 0; 0 0 2; 0 5 0; 0 1 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% PATH example: demonstration of sample path
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('PATH example: demonstration of sample path');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 % Fill in sample paths 
@@ -163,7 +163,7 @@ clear path
 paths_array = fcn_Path_fillSamplePaths;
 path = paths_array{1}; % Pick first path as reference_traversal structure
 
-[stations, differences] = fcn_Path_calcPathStation(path,(fig_num));
+[stations, differences] = fcn_Path_calcPathStation(path,(figNum));
 
 % Check variable types
 assert(isnumeric(stations));
@@ -180,7 +180,7 @@ assert(isequal(size(differences),[Nstations dimensionOfPath]));
 % assert(isequal(differences,[0 0; 5 0; 0 3]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -201,9 +201,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths 
 clear path
@@ -227,13 +227,13 @@ assert(isequal(differences,[0 0; 5 0; 0 3]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths 
 clear path
@@ -257,14 +257,14 @@ assert(isequal(differences,[0 0; 5 0; 0 3]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths 
 clear path
@@ -290,7 +290,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -306,7 +306,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

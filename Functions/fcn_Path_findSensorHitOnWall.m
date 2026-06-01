@@ -16,7 +16,7 @@ function [distance,location,wall_segment, t, u] = ...
 %         wall_start, wall_end,...
 %         sensor_vector_start,sensor_vector_end,...
 %         (flag_search_return_type), (flag_search_range_type), ...
-%         (tolerance), (fig_num))
+%         (tolerance), (figNum))
 %
 % INPUTS:
 %
@@ -108,7 +108,7 @@ function [distance,location,wall_segment, t, u] = ...
 %      effect of tolerance is for when the sensor and wall are collinear -
 %      a negative tolerance will ALWAYS have the sensor "miss" the wall.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -151,45 +151,45 @@ function [distance,location,wall_segment, t, u] = ...
 % - fixed the incorrect location of the debug echo at top of the code
 % - fixed flag usage to decouple plotting with debugging
 % 2021_01_08
-% -- Added input check on wall type
+% - Added input check on wall type
 % 2021_01_23 - S. Brennan
-% -- Added flag_search_type = 2 option, to allow multiple cross points
+% - Added flag_search_type = 2 option, to allow multiple cross points
 % to be returned
-% -- Fixed bug with partially overlapping vectors not returning a
+% - Fixed bug with partially overlapping vectors not returning a
 % result
-% -- Added wall segment output so that we can ID which segment was hit
+% - Added wall segment output so that we can ID which segment was hit
 % 2021_01_24 - S. Brennan
-% -- Fixed bug with overlapping colinear where two wall segments
+% - Fixed bug with overlapping colinear where two wall segments
 % identified when there is only one
 % 2021_12_27 - S. Brennan
-% -- Added better comments on flags
+% - Added better comments on flags
 % 2024_03_14 - S. Brennan
-% -- Added better comments
-% -- Fixed bug where the figure plotting breaks if someone gives an
+% - Added better comments
+% - Fixed bug where the figure plotting breaks if someone gives an
 % empty figure number
-% -- Added flag 3 and 4 cases
+% - Added flag 3 and 4 cases
 % 2024_06_19 - S. Brennan
-% -- fixed tolerance issue with overlapping vertical lines
+% - fixed tolerance issue with overlapping vertical lines
 % 2025_06_14 - S. Brennan
-% -- added expanded plotting so not tight
-% -- added fast mode, global flags, better input checking
-% -- changed flag inputs to give more options and clearer usage
-% -- expanded out wall inputs and outputs to allow more general use
-% -- added tolerances
-% -- added "point wall" option, where if distance of wall_start to
+% - added expanded plotting so not tight
+% - added fast mode, global flags, better input checking
+% - changed flag inputs to give more options and clearer usage
+% - expanded out wall inputs and outputs to allow more general use
+% - added tolerances
+% - added "point wall" option, where if distance of wall_start to
 % wall_end less than tolerance, wall is treated as point.
-% -- added "point sensor" option, where if distance of
+% - added "point sensor" option, where if distance of
 % sensor_vector_start to sensor_vector_end less than tolerance,
 % sensor is treated as point.
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (nothing yet)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 8; % The largest Number of argument inputs to the function
@@ -215,9 +215,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -284,13 +284,13 @@ flag_do_plot = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp)
-        fig_num = temp;
+        figNum = temp;
         flag_do_plot = 1;
     end
 else
     if flag_do_debug
         fig = figure;
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plot = 1;
     end
 end
@@ -603,7 +603,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plot
     % check whether the figure already has data
-    h_fig = figure(fig_num);
+    h_fig = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(h_fig,'Children'))
         flag_rescale_axis = 1;

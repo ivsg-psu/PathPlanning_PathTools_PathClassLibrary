@@ -16,7 +16,7 @@ function [distance,location,path_segment, t, u] = ...
 %      [distance, location, path_segment, t, u] = ...
 %         fcn_Path_findProjectionHitOntoPath(path,...
 %         sensor_vector_start,sensor_vector_end,...
-%         (flag_search_type),(fig_num))
+%         (flag_search_type),(figNum))
 %
 % INPUTS:
 %
@@ -71,7 +71,7 @@ function [distance,location,path_segment, t, u] = ...
 %            same intersection, the segment number of the first segment is
 %            returned.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -114,29 +114,29 @@ function [distance,location,path_segment, t, u] = ...
 % - fixed the incorrect location of the debug echo at top of the code
 % - fixed flag usage to decouple plotting with debugging
 % 2021_01_08
-% -- Added input check on path type
+% - Added input check on path type
 % 2021_01_23 - S. Brennan
-% -- Added flag_search_type = 2 option, to allow multiple cross points
+% - Added flag_search_type = 2 option, to allow multiple cross points
 % to be returned
-% -- Fixed bug with partially overlapping vectors not returning a
+% - Fixed bug with partially overlapping vectors not returning a
 % result
-% -- Added path segment output so that we can ID which segment was hit
+% - Added path segment output so that we can ID which segment was hit
 % 2021_01_24 - S. Brennan
-% -- Fixed bug with overlapping colinear where two path segments
+% - Fixed bug with overlapping colinear where two path segments
 % identified when there is only one
 % 2021_12_27 - S. Brennan
-% -- Added better comments on flags
+% - Added better comments on flags
 % 2024_03_14 - S. Brennan
-% -- Added better comments
-% -- Fixed bug where the figure plotting breaks if someone gives an
+% - Added better comments
+% - Fixed bug where the figure plotting breaks if someone gives an
 % empty figure number
-% -- Added flag 3 and 4 cases
+% - Added flag 3 and 4 cases
 % 2024_05_14 - Aneesh Batchu
-% -- Added max speed options
+% - Added max speed options
 % 2025_06_23 - S. Brennan
-% -- changed dependency to only use findSensorHitOnWall
+% - changed dependency to only use findSensorHitOnWall
 % 2025_11_13 - S. Brennan
-% -- changed _GEOMETRY_ to _PATH_ in global variables
+% - changed _GEOMETRY_ to _PATH_ in global variables
 
 
 %% Set up for debugging
@@ -163,9 +163,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 34838; %#ok<NASGU>
+    debug_figNum = 34838; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %
@@ -207,13 +207,13 @@ if 4 <= nargin
     flag_search_type = varargin{1};
 end
 
-% Does user want to specify fig_num?
-fig_num = []; % Default is to have no figure
+% Does user want to specify figNum?
+figNum = []; % Default is to have no figure
 flag_do_plots = 0;
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp)
-        fig_num = temp;
+        figNum = temp;
         flag_do_plots = 1;
     end
 end
@@ -317,7 +317,7 @@ tolerance = [];
 if flag_do_plots
 
     % Set up the figure
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     axis equal;

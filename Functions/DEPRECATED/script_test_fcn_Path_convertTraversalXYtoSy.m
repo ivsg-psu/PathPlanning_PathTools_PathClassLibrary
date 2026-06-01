@@ -11,9 +11,9 @@ close all;
 
 
 %% Test case 1: basic call
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -34,15 +34,15 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversals,...
-    flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+    flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case 2: basic call with different reference
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -63,7 +63,7 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversals,...
-    flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+    flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 reference_traversal = test_traversals.traversal{3};
 reference_station_points = (0:10:reference_traversal.Station(end))';
@@ -73,16 +73,16 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversals,...
-    flag_rounding_type,search_radius,fig_num); %#ok<*ASGLU>
+    flag_rounding_type,search_radius,figNum); %#ok<*ASGLU>
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case 3: basic call 1 with finer resolution
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -102,15 +102,15 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversals,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Advanced testing example of fcn_Path_convertTraversalXYtoSy
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Set up data
 reference_path = [0 0; 1 1; 2 0];
@@ -132,7 +132,7 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % Repeat with different projection type
 flag_rounding_type = 4;
@@ -141,15 +141,15 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Another advanced test, with crossings
-fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Set up data
 reference_path = [0 0; 1 2; 2 0];
@@ -171,7 +171,7 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % Repeat with different projection type
 flag_rounding_type = 4;
@@ -180,10 +180,10 @@ search_radius = 40;
 [closestXs, closestYs, closestDistances] = ...
     fcn_Path_convertTraversalXYtoSy(...
     reference_station_points, reference_traversal, test_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,9 +204,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -231,13 +231,13 @@ search_radius = 40;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 % Fill in sample paths (as a starter)
@@ -263,14 +263,14 @@ search_radius = 40;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -316,7 +316,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -332,7 +332,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

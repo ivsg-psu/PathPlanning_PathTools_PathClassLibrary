@@ -17,7 +17,7 @@ function [intersection_points,...
 %       s_coordinates_in_path_2] = ...
 %        fcn_Path_findIntersectionsBetweenPaths(...
 %        path_1,path_2,...
-%        (fig_num));
+%        (figNum));
 %
 % INPUTS:
 %
@@ -31,7 +31,7 @@ function [intersection_points,...
 %
 %      (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -67,19 +67,19 @@ function [intersection_points,...
 
 % Revision history:
 % 2021_01_23:
-% -- first write of the code
+% - first write of the code
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
-% -- Renamed function from fcn_Path_findIntersectionsBetweenTraversals
+% - Removed traversal input type and replaced with cell array of paths
+% - Renamed function from fcn_Path_findIntersectionsBetweenTraversals
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 3; % The largest Number of argument inputs to the function
@@ -105,9 +105,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -141,14 +141,14 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
         fig = figure;  
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plots = 1;
     end
 end
@@ -325,7 +325,7 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     grid on;
@@ -334,7 +334,7 @@ if flag_do_plots
     clear data
     data{1} = path_1;
     data{2} = path_2;       
-    fcn_Path_plotPathsXY(data,fig_num);
+    fcn_Path_plotPathsXY(data,figNum);
     
     if ~isempty(intersection_points)
         % Plot the hit points

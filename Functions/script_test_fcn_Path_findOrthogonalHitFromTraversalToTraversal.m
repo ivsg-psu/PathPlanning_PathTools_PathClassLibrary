@@ -5,25 +5,25 @@
 
 % Revision history
 % 2020_11_10
-% -- first write of the code
+% - first write of the code
 % 2020_11_14
-% -- prep for Path class
+% - prep for Path class
 % 2020_12_25
-% -- include situation where central path and nearby path are the same
+% - include situation where central path and nearby path are the same
 % 2021_01_07
-% -- lots of bug fixes as we demo for the team (lol)
+% - lots of bug fixes as we demo for the team (lol)
 % 2021_01_09
-% -- added more comments during clean-up
+% - added more comments during clean-up
 % 2022_01_03
-% -- added more checks for positive and neg case distances
-% -- output negative distances if in negative direction
+% - added more checks for positive and neg case distances
+% - output negative distances if in negative direction
 
 close all;
 
 %% BASIC example: Parallel lines, query is in middle area
-fig_num = 10001;
-fprintf(1,'Figure %.0f: BASIC example: Parallel lines, query is in middle area\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: BASIC example: Parallel lines, query is in middle area\n',figNum);
+figure(figNum); clf;
 
 stations = 1; % Define the station
 
@@ -44,7 +44,7 @@ search_radius = 5;
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -63,12 +63,12 @@ assert(isequal(round(closest_path_point,4),[1     4]));
 assert(isequal(round(distances,4),[4])); %#ok<*NBRAK>
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: parallel lines, negative
-fig_num = 10002;
-fprintf(1,'Figure %.0f: BASIC example: parallel lines, negative\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: BASIC example: parallel lines, negative\n',figNum);
+figure(figNum); clf;
 
 stations = 1; % Define the station
 
@@ -88,7 +88,7 @@ search_radius = 5;
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -107,13 +107,13 @@ assert(isequal(round(closest_path_point,4),[1     -4]));
 assert(isequal(round(distances,4),[-4]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: angled line segment adjacent to endpoint query
-fig_num = 10003;
-fprintf(1,'Figure %.0f: BASIC example: angled line segment adjacent to endpoint query\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: BASIC example: angled line segment adjacent to endpoint query\n',figNum);
+figure(figNum); clf;
 
 stations = 1;
 central_path = [0 0; 2 0];
@@ -130,7 +130,7 @@ search_radius = 10;
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -149,13 +149,13 @@ assert(isequal(round(closest_path_point,4),[1.0000    5.5000]));
 assert(isequal(round(distances,4),[5.5000]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: angled line segment adjacent to endpoint query 
-fig_num = 10004;
-fprintf(1,'Figure %.0f: BASIC example: angled line segment adjacent to endpoint query \n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: BASIC example: angled line segment adjacent to endpoint query \n',figNum);
+figure(figNum); clf;
 
 stations = 10;
 central_path = [0 0; 10 0];
@@ -173,7 +173,7 @@ search_radius = 20;
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -192,13 +192,13 @@ assert(isequal(round(closest_path_point,4),[10     7]));
 assert(isequal(round(distances,4),[7]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: Angled line segment adjacent to startpoint query
-fig_num = 10005;
-fprintf(1,'Figure %.0f: BASIC example: Angled line segment adjacent to startpoint query\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: BASIC example: Angled line segment adjacent to startpoint query\n',figNum);
+figure(figNum); clf;
 
 stations = 0;
 central_path = [0 0; 10 0];
@@ -215,7 +215,7 @@ search_radius = 20;
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -234,14 +234,14 @@ assert(isequal(round(closest_path_point,4),[0    4.2308]));
 assert(isequal(round(distances,4),[4.2308]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: parallel line segment adjacent to startpoint query
 % Query point is right at start, so need to check it will not "miss"
-fig_num = 10006;
-fprintf(1,'Figure %.0f: BASIC example: parallel line segment adjacent to startpoint query\n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure %.0f: BASIC example: parallel line segment adjacent to startpoint query\n',figNum);
+figure(figNum); clf;
 
 stations = 0;
 central_path = [0 0; 10 0];
@@ -258,7 +258,7 @@ search_radius = 20;
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -277,14 +277,14 @@ assert(isequal(round(closest_path_point,4),[0     4]));
 assert(isequal(round(distances,4),[4]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: central path and nearby path are the same
 % We should get that the very first point is the station point
-fig_num = 10007;
-fprintf(1,'Figure %.0f: BASIC example: central path and nearby path are the same\n',fig_num);
-figure(fig_num); clf;
+figNum = 10007;
+fprintf(1,'Figure %.0f: BASIC example: central path and nearby path are the same\n',figNum);
+figure(figNum); clf;
 
 stations = 1;
 flag_rounding_type = 3;
@@ -300,7 +300,7 @@ nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -319,15 +319,15 @@ assert(isequal(round(closest_path_point,4),[0.7071    0.7071]));
 assert(isequal(round(distances,4),[0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: central path and query point do not hit anything
 % We should get NaN values
 
-fig_num = 10008;
-fprintf(1,'Figure %.0f: BASIC example: central path and query point do not hit anything\n',fig_num);
-figure(fig_num); clf;
+figNum = 10008;
+fprintf(1,'Figure %.0f: BASIC example: central path and query point do not hit anything\n',figNum);
+figure(figNum); clf;
 
 stations = 1;
 flag_rounding_type = 3;
@@ -343,7 +343,7 @@ nearby_traversal =  fcn_Path_convertPathToTraversalStructure(nearby_path);
 [closest_path_point,distances] = ...
     fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,...
     central_traversal,nearby_traversal,...
-    flag_rounding_type,search_radius,fig_num);
+    flag_rounding_type,search_radius,figNum);
 
 % title(titleString, 'Interpreter','none');
 
@@ -362,7 +362,7 @@ assert(isequal(size(distances),[1 1]));
 % assert(isequal(round(distances,4),[0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
@@ -370,9 +370,9 @@ assert(isequal(get(gcf,'Number'),fig_num));
 close all
 
 %% Showing flag_rounding_type
-fig_num = 20001;
-fprintf(1,'Figure %.0f: Showing flag_rounding_type\n',fig_num);
-figure(fig_num); clf;
+figNum = 20001;
+fprintf(1,'Figure %.0f: Showing flag_rounding_type\n',figNum);
+figure(figNum); clf;
 
 % Set up data
 central_path = [0 0; 1 1; 2 0];
@@ -389,7 +389,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via prior segment (default, flag=1)');
 
@@ -400,7 +400,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2)');
 
@@ -411,7 +411,7 @@ subplot(2,2,3)
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
@@ -422,17 +422,17 @@ subplot(2,2,4)
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via interpolation (flag=4)');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% NEGATIVE examples
-fig_num = 20002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 20002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Prep the example and workspace
 central_path = [-2 1; 1 4; 3 2];
@@ -449,7 +449,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via prior segment (default, flag=1)');
 
@@ -460,7 +460,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2)');
 
@@ -471,7 +471,7 @@ subplot(2,2,3);
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
@@ -482,17 +482,17 @@ subplot(2,2,4);
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging everywhere (flag=4)');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% AVERAGING examples with search radius limitation
-fig_num = 20003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 20003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Set up data
 central_path = [0 0; 1 1; 2 0];
@@ -509,7 +509,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via prior segment (default, flag=1), search radius limited to 1.5');
 
@@ -520,7 +520,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2), search radius limited to 1.5');
 
@@ -531,7 +531,7 @@ subplot(2,2,3);
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3), search radius limited to 1.5');
 
@@ -542,17 +542,17 @@ subplot(2,2,4);
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging everywhere (flag=4), search radius limited to 1.5');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% NEGATIVE examples with search radius limitation
-fig_num = 20004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 20004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Prep the example and workspace
 central_path = [-2 1; 1 4; 3 2];
@@ -569,7 +569,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via prior segment (default, flag=1)');
 
@@ -580,7 +580,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via following segment (flag=2)');
 
@@ -591,7 +591,7 @@ subplot(2,2,3);
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
@@ -602,20 +602,20 @@ subplot(2,2,4);
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Vertex projection via averaging everywhere (flag=4)');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %%
 close all;
 
 %% MULTICROSS examples
-fig_num = 30001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 30001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 search_radius = 1.5;
 
@@ -635,7 +635,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via prior segment (default)');
 
@@ -646,7 +646,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via following segment');
 
@@ -657,7 +657,7 @@ subplot(2,2,3);
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via averaging of prior and following segment only at apex');
 
@@ -669,12 +669,12 @@ subplot(2,2,4);
 % flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 [closest_path_point,distances] = ...
-    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, fig_num);
+    fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type, search_radius, figNum);
 print_results(stations,closest_path_point,distances);
 title('Multicross example using projection via averaging of prior and following segment always');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %%
@@ -682,9 +682,9 @@ assert(isequal(get(gcf,'Number'),fig_num));
 close all;
 
 %% Real path examples
-fig_num = 40001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 40001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in some dummy data
 paths_array = fcn_Path_fillSamplePaths;
@@ -708,12 +708,12 @@ for i_Path = 1:length(paths_array)
     nearby_traversal  = data.traversal{i_Path};
 
     [closest_path_point,distances] = ...
-        fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type,30,fig_num); %#ok<ASGLU>
+        fcn_Path_findOrthogonalHitFromTraversalToTraversal(stations,central_traversal,nearby_traversal,flag_rounding_type,30,figNum); %#ok<ASGLU>
 end
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
@@ -736,9 +736,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 
 stations = 1;
@@ -772,13 +772,13 @@ assert(isequal(round(distances,4),[5.5000]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 stations = 1;
@@ -812,14 +812,14 @@ assert(isequal(round(distances,4),[5.5000]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 
 stations = 1;
@@ -859,7 +859,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -875,7 +875,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

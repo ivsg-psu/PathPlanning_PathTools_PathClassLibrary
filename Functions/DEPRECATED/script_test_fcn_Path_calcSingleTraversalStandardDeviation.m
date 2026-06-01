@@ -1,101 +1,56 @@
-% script_test_fcn_Path_plotTraversalXYWithVarianceBands
-% Tests fcn_Path_plotTraversalXYWithVarianceBands
+% script_test_fcn_Path_calcSingleTraversalStandardDeviation.m
+% Tests fcn_Path_calcSingleTraversalStandardDeviation
        
 % Revision history:
 %      2021_01_05
 %      -- first write of the code
 %      2021_01_07
-%      -- fixed naming convention on functions to reflect change from path to
-%      traversal notation
-%      2021_01_08
-%      -- more fixes
+%      -- minor clean-up of comments
 
 close all
 
 
+
+
+
 %% Test case 1: basic call for one trajectory
 figNum = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
-figure(figNum); clf;
+fprintf(1,'Figure %.0f: Basic demo 1 \n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
+paths_array = fcn_Path_fillSamplePaths;
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, [], figNum);
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal, (figNum));
+
+% Check variable types
+assert(isnumeric(std_deviation));
+
+% Check variable sizes
+assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),figNum));
-
 
 %% Test case 2: advanced call for one trajectory - specify figure
 figNum = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
-figure(figNum); clf;
+fprintf(1,'Figure %.0f: Basic demo 2 \n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
+paths_array = fcn_Path_fillSamplePaths;
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-std_deviation = [];
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
-    std_deviation,figNum);
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal, (figNum));
 
-% Make sure plot opened up
-assert(isequal(get(gcf,'Number'),figNum));
+% Check variable types
+assert(isnumeric(std_deviation));
 
-%% Test case 3: advanced call for one trajectory - specify std_deviation
-figNum = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
-figure(figNum); clf;
-
-% Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
-% Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
-
-std_deviation = 1;
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
-    std_deviation,figNum);
-title(sprintf('Standard deviation: %.0d meters',std_deviation));
-
-figNum = 32;
-std_deviation = 2;
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
-    std_deviation,figNum);
-title(sprintf('Standard deviation: %.0d meters',std_deviation));
-
-figNum = 35;
-std_deviation = 5;
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
-    std_deviation,figNum);
-title(sprintf('Standard deviation: %.0d meters',std_deviation));
-
-% Make sure plot opened up
-assert(isequal(get(gcf,'Number'),figNum));
-
-%% Test case 4: advanced call for multiple trajectories
-figNum = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
-figure(figNum); clf;
-
-% Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
-% Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
-
-std_deviation = 2;
-for i_Path = 1:3
-    reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{i_Path});
-    fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
-        std_deviation,figNum);
-end
+% Check variable sizes
+assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot opened up
 assert(isequal(get(gcf,'Number'),figNum));
@@ -124,12 +79,17 @@ fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
 figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
+paths_array = fcn_Path_fillSamplePaths;
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, [], []);
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal,[]);
+
+% Check variable types
+assert(isnumeric(std_deviation));
+
+% Check variable sizes
+assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -142,12 +102,17 @@ fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
 figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
+paths_array = fcn_Path_fillSamplePaths;
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
-fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, [], -1);
+std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal,-1);
+
+% Check variable types
+assert(isnumeric(std_deviation));
+
+% Check variable sizes
+assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -161,10 +126,9 @@ figure(figNum);
 close(figNum);
 
 % Fill in sample paths (as a starter)
-paths = fcn_Path_fillSamplePaths;
-
+paths_array = fcn_Path_fillSamplePaths;
 % Pick first path 1s reference_traversal structure
-reference_traversal = fcn_Path_convertPathToTraversalStructure(paths{1});
+reference_traversal = fcn_Path_convertPathToTraversalStructure(paths_array{1});
 
 Niterations = 100;
 
@@ -172,7 +136,7 @@ Niterations = 100;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, [], []);
+    std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal,[]);
 end
 slow_method = toc;
 
@@ -180,7 +144,7 @@ slow_method = toc;
 tic;
 for ith_test = 1:Niterations
     % Call the function
-    fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal, [], -1);
+    std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal,-1);
 end
 fast_method = toc;
 

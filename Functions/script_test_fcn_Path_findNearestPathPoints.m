@@ -7,24 +7,24 @@
 
 % Revision history:   
 % 2023_06_02 by sbrennan@psu.edu
-% -- first write of the code
+% - first write of the code
 
 
 close all;
 
 %% BASIC example: Small path with single query point
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = [0.8 0.4];
 pathXY = [0 0; 1 0; 2 0; 2 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXY, fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXY, figNum);
 fprintf(1,'Figure: %d,\n\t\t Closest point index is: %.0d %.2f\n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 title('fcn_Path_findNearestPathPoints: tested with a single point query in 2D','Interpreter','none');
 
 % Check variable types
@@ -37,22 +37,22 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 assert(isequal(closest_path_point_indicies,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: Small path with two query points
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = [0.8 0.4; 1.6 0.8];
 pathXY = [0 0; 1 0; 2 0; 2 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXY,fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXY,figNum);
 title('fcn_Path_findNearestPathPoints: tested with two point queries in 2D','Interpreter','none');
 fprintf(1,'Figure: %d,\n\t\t Closest point index is: %.0d %.2f\n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 
 % Check variable types
 assert(isnumeric(closest_path_point_indicies));
@@ -64,13 +64,13 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 assert(isequal(closest_path_point_indicies,[2; 4]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: Small path with many query points
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = rand(20,2);
 query_points(:,1)=query_points(:,1)*4-1;
@@ -79,9 +79,9 @@ query_points(:,2)=query_points(:,2)*3-1.5;
 pathXY = [0 0; 1 0; 2 0; 2 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXY,fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXY,figNum);
 fprintf(1,'Figure: %d,\n\t\t Closest point index is: %.0d %.2f\n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 title('fcn_Path_findNearestPathPoints: tested with many point queries in 2D','Interpreter','none');
 
 % Check variable types
@@ -94,7 +94,7 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 % assert(isequal(closest_path_point_indicies,[2; 4]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,20 +110,20 @@ assert(isequal(get(gcf,'Number'),fig_num));
 
 
 %% BASIC example 3D: simple 3D snapping onto a vertex
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = [0.8 1.3 2.1];
 pathXYZ = [0 0 0; 0.5 0.2 0.4; 0.9 0.9 0.8; 3 0 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXYZ,fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXYZ,figNum);
 title('fcn_Path_findNearestPathPoints: tested with single point queries in 3D','Interpreter','none');
 
 fprintf(1,'Figure: %d, Closest point index is: %.0d \n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 view(3);
 
 % Check variable types
@@ -136,24 +136,24 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 assert(isequal(closest_path_point_indicies, 3 ));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example 3D: simple 3D snapping onto a vertex
-fig_num = 20002;
+figNum = 20002;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = [2 1.3 2.1];
 pathXYZ = [0 0 0; 0.5 0.2 0.4; 0.9 0.9 0.8; 3 0 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXYZ,fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXYZ,figNum);
 title('fcn_Path_findNearestPathPoints: tested with single point queries in 3D','Interpreter','none');
 xlabel('X'); ylabel('Y'); zlabel('Z');
 
 fprintf(1,'Figure: %d, Closest point index is: %.0d \n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 view(3);
 
 % Check variable types
@@ -166,24 +166,24 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 assert(isequal(closest_path_point_indicies,3));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example 3D: simple 3D snapping with two query points
-fig_num = 20003;
+figNum = 20003;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = [0.8 1.3 2.1; 2 1.3 2.1];
 pathXYZ = [0 0 0; 0.5 0.2 0.4; 0.9 0.9 0.8; 3 0 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXYZ,fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXYZ,figNum);
 title('fcn_Path_findNearestPathPoints: tested with single point queries in 3D','Interpreter','none');
 xlabel('X'); ylabel('Y'); zlabel('Z');
 
 fprintf(1,'Figure: %d, Closest point index is: %.0d \n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 view(3);
 
 % Check variable types
@@ -196,13 +196,13 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 assert(isequal(closest_path_point_indicies,[3;3]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example 3: Small path with many query points
-fig_num = 20004;
+figNum = 20004;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 query_points = rand(20,3);
 query_points(:,1)=query_points(:,1)*5-2.5;
@@ -212,13 +212,13 @@ query_points(:,3)=query_points(:,2)*3-1.5;
 pathXYZ = [0 0 0; 0.5 0.2 0.4; 0.9 0.9 0.8; 3 0 1];
 
 closest_path_point_indicies = ...
-    fcn_Path_findNearestPathPoints(query_points, pathXYZ,fig_num);
+    fcn_Path_findNearestPathPoints(query_points, pathXYZ,figNum);
 title('fcn_Path_findNearestPathPoints: tested with single point queries in 3D','Interpreter','none');
 xlabel('X'); ylabel('Y'); zlabel('Z');
 
 
 fprintf(1,'Figure: %d, Closest point index is: %.0d \n',...
-    fig_num, closest_path_point_indicies(1,1));
+    figNum, closest_path_point_indicies(1,1));
 view(3);
 
 % Check variable types
@@ -231,7 +231,7 @@ assert(isequal(size(closest_path_point_indicies),[length(query_points(:,1)) 1]))
 % assert(isequal(closest_path_point_indicies,3));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -253,9 +253,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 query_points = [0.8 0.4; 1.6 0.8];
 pathXY = [0 0; 1 0; 2 0; 2 1];
@@ -274,13 +274,13 @@ assert(isequal(closest_path_point_indicies,[2; 4]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 query_points = [0.8 0.4; 1.6 0.8];
 pathXY = [0 0; 1 0; 2 0; 2 1];
@@ -299,14 +299,14 @@ assert(isequal(closest_path_point_indicies,[2; 4]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 query_points = [0.8 0.4; 1.6 0.8];
 pathXY = [0 0; 1 0; 2 0; 2 1];
@@ -336,7 +336,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -352,7 +352,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

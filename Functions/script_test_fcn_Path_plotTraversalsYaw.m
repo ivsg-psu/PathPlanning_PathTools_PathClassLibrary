@@ -3,25 +3,25 @@
 
 % Revision history:
 % 2020_11_12 - S. Brennan
-% -- first wrote the code
+% - first wrote the code
 % 
 % 2021_01_06 - S. Brennan
-% -- a bit more comments, renamed function to be traversals, not path
+% - a bit more comments, renamed function to be traversals, not path
 % 
 % 2021_01_07 - S. Brennan
-% -- fixed typos in arguments for function calls, based on recent edits 
+% - fixed typos in arguments for function calls, based on recent edits 
 % 
 % 2024_03_14 - S. Brennan
-% -- added clear assertions, moved data loading into test sections
+% - added clear assertions, moved data loading into test sections
 
 close all
 
 
 %% Basic demo
 
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in some dummy data
 paths = fcn_Path_fillSamplePaths;
@@ -32,15 +32,15 @@ for i_traveral = 1:3
     data.traversal{i_traveral} = traversal;
 end
 
-fcn_Path_plotTraversalsYaw(data, (fig_num));
+fcn_Path_plotTraversalsYaw(data, (figNum));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Show that can specify a figure
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 % Fill in some dummy data
@@ -53,10 +53,10 @@ for i_traveral = 1:3
     data.traversal{i_traveral} = traversal;
 end
 
-fcn_Path_plotTraversalsYaw(data, (fig_num));
+fcn_Path_plotTraversalsYaw(data, (figNum));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,9 +77,9 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 % 
 % %% Basic example - NO FIGURE
-% fig_num = 80001;
-% fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-% figure(fig_num); close(fig_num);
+% figNum = 80001;
+% fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+% figure(figNum); close(figNum);
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -95,13 +95,13 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % 
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 % 
 % 
 % %% Basic fast mode - NO FIGURE, FAST MODE
-% fig_num = 80002;
-% fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-% figure(fig_num); close(fig_num);
+% figNum = 80002;
+% fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+% figure(figNum); close(figNum);
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -117,14 +117,14 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % 
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 % 
 % 
 % %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-% fig_num = 80003;
-% fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-% figure(fig_num);
-% close(fig_num);
+% figNum = 80003;
+% fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+% figure(figNum);
+% close(figNum);
 % 
 % % Fill in sample paths (as a starter)
 % paths_array = fcn_Path_fillSamplePaths;
@@ -150,7 +150,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % 
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 % 
 % % Plot results as bar chart
 % figure(373737);
@@ -166,7 +166,7 @@ assert(isequal(get(gcf,'Number'),fig_num));
 % 
 % % Make sure plot did NOT open up
 % figHandles = get(groot, 'Children');
-% assert(~any(figHandles==fig_num));
+% assert(~any(figHandles==figNum));
 
 
 %% BUG cases

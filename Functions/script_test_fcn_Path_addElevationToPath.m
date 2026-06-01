@@ -69,9 +69,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 point = [0.5 0.2; 1.4 1.3];
 reference_elevated_path = [0 0 0.1; 1 0 0.2; 2 0 0.3; 2 1 0.4];
@@ -79,13 +79,13 @@ elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, []);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 point = [0.5 0.2; 1.4 1.3];
 reference_elevated_path = [0 0 0.1; 1 0 0.2; 2 0 0.3; 2 1 0.4];
@@ -93,13 +93,13 @@ elevated_path = fcn_Path_addElevationToPath(point, reference_elevated_path, -1);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 point = [0.5 0.2; 1.4 1.3];
 reference_elevated_path = [0 0 0.1; 1 0 0.2; 2 0 0.3; 2 1 0.4];
@@ -107,7 +107,7 @@ reference_elevated_path = [0 0 0.1; 1 0 0.2; 2 0 0.3; 2 1 0.4];
 Niterations = 100;
 
 % Do calculation without pre-calculation
-fig_num = [];
+figNum = [];
 tic;
 for ith_test = 1:Niterations
     % Call the function
@@ -116,7 +116,7 @@ end
 slow_method = toc;
 
 % Do calculation with pre-calculation, FAST_MODE on
-fig_num = -1;
+figNum = -1;
 tic;
 for ith_test = 1:Niterations
     % Call the function
@@ -126,7 +126,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -140,7 +140,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

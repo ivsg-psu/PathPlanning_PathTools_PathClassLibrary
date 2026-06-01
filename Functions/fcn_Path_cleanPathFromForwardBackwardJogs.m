@@ -47,9 +47,9 @@ function pathWithNoJogs = fcn_Path_cleanPathFromForwardBackwardJogs...
 
 % Revision history:
 % 2021_01_09:
-% -- wrote the code originally
+% - wrote the code originally
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_08_02 - S. Brennan
 % - In fcn_Path_cleanPathFromForwardBackwardJogs
 %   % * Found a huge number of bugs from a real world test 

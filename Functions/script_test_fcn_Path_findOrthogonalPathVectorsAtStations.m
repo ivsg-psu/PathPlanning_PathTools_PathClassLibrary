@@ -6,25 +6,25 @@
 
 % Revision history
 % 2020_12_31
-% -- first write of the code
+% - first write of the code
 % 2021_01_09
-% -- added more comments during clean-up
+% - added more comments during clean-up
 % 2022_01_03
-% -- added assertion tests
+% - added assertion tests
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- Typo fixes in docstrings
+% - Typo fixes in docstrings
 % 2025_07_06 - S. Brennan
-% -- Added test to see if station is strictly increasing. Otherwise,
+% - Added test to see if station is strictly increasing. Otherwise,
 % interpolation will fail
 
 close all;
 
 %% BASIC example - simple horizontal line
-fig_num = 10001;
-fprintf(1,'Figure %.0f: BASIC example - simple horizontal line\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: BASIC example - simple horizontal line\n',figNum);
+figure(figNum); clf;
 
 stations = 1; % Define the station
 flag_rounding_type = 1; % Define the rounding type
@@ -36,19 +36,19 @@ central_path = [0 0; 4 0];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num); %#ok<*ASGLU>
+    stations,central_path,flag_rounding_type,figNum); %#ok<*ASGLU>
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[ 1 0]));
 assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - simple horizontal line with flag type 4
-fig_num = 10002;
-fprintf(1,'Figure %.0f: BASIC example - simple horizontal line with flag type 4\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: BASIC example - simple horizontal line with flag type 4\n',figNum);
+figure(figNum); clf;
 
 stations = linspace(0,4,10)'; % Define the stations
 flag_rounding_type = 4; % Define the rounding type
@@ -61,20 +61,20 @@ central_path = [0 0; 4 0];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num); 
+    stations,central_path,flag_rounding_type,figNum); 
 
 % Make sure function worked
 % assert(isequal(round(unit_normal_vector_start,4),[ 1 0]));
 % assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: angled line segment - flag 1
-fig_num = 10003;
-fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 1\n',figNum);
+figure(figNum); clf;
 
 stations = 2;
 flag_rounding_type = 1; % Define the rounding type
@@ -86,20 +86,20 @@ central_path = [0 0; 2 0; 2 -2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[2 0]));
 assert(isequal(round(unit_normal_vector_end,4),[ 2 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: angled line segment - flag 2
-fig_num = 10004;
-fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 2\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 2\n',figNum);
+figure(figNum); clf;
 
 stations = 2;
 flag_rounding_type = 2; % Define the rounding type
@@ -110,20 +110,20 @@ central_path = [0 0; 2 0; 2 -2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[2 0]));
 assert(isequal(round(unit_normal_vector_end,4),[ 3 0]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: angled line segment - flag 3
-fig_num = 10005;
-fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 3\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 3\n',figNum);
+figure(figNum); clf;
 
 stations = 2;
 flag_rounding_type = 3; % Define the rounding type
@@ -134,20 +134,20 @@ central_path = [0 0; 2 0; 2 -2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[2 0]));
 assert(isequal(round(unit_normal_vector_end,4),[2.7071 .7071]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: angled line segment - flag 4
-fig_num = 10005;
-fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 4\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: BASIC example: angled line segment - flag 4\n',figNum);
+figure(figNum); clf;
 
 stations = 2;
 flag_rounding_type = 4; % Define the rounding type
@@ -158,21 +158,21 @@ central_path = [0 0; 2 0; 2 -2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[2 0]));
 assert(isequal(round(unit_normal_vector_end,4),[2.7071 .7071]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
 %% BASIC example - angled line segment adjacent to endpoint 
-fig_num = 10006;
-fprintf(1,'Figure %.0f: BASIC example - angled line segment adjacent to endpoint \n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure %.0f: BASIC example - angled line segment adjacent to endpoint \n',figNum);
+figure(figNum); clf;
 
 stations = 2*2^0.5;
 flag_rounding_type = 1; % Define the rounding type
@@ -183,20 +183,20 @@ central_path = [0 0; 2 2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[     2     2]));
 assert(isequal(round(unit_normal_vector_end,4),  [1.2929    2.7071]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example - angled line segment adjacent to startpoint
-fig_num = 10007;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10007;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 stations = 0;
 flag_rounding_type = 1; % Define the rounding type
@@ -207,20 +207,20 @@ central_path = [0 0; 2 2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[      0    0]));
 assert(isequal(round(unit_normal_vector_end,4),  [-0.7071    0.7071]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% AVERAGING examples
-fig_num = 10008;
-fprintf(1,'Figure %.0f: AVERAGING examples\n',fig_num);
-figure(fig_num); clf;
+figNum = 10008;
+fprintf(1,'Figure %.0f: AVERAGING examples\n',figNum);
+figure(figNum); clf;
 
 % Set up data
 % close all
@@ -240,7 +240,7 @@ subplot(1,4,1);
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Using prior segment (default, flag=1)');
 axis equal
 xlim([-1 3]);
@@ -252,14 +252,14 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 % flag_rounding_type = 3;  % use averagae projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-%fig_num = 12;  % Define the figure
+%figNum = 12;  % Define the figure
 subplot(1,4,2);
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Using following segment (flag=2)');
 axis equal
 xlim([-1 3]);
@@ -272,14 +272,14 @@ legend off
 flag_rounding_type = 3;  % use average projection of prior and following segment, only at endpoints
 % flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
-% fig_num = 13;  % Define the figure
+% figNum = 13;  % Define the figure
 subplot(1,4,3);
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Averaging only at vertex (flag=3)');
 axis equal
 xlim([-1 3]);
@@ -293,13 +293,13 @@ legend off
 flag_rounding_type = 4;  % use average projection of prior and following segments always, with interpolation
 
 subplot(1,4,4);
-% fig_num = 14;  % Define the figure
+% figNum = 14;  % Define the figure
 
 % Calculate the unit normal vectors at given stations and put results into
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Continous averaging (flag=4)');
 axis equal
 xlim([-1 3]);
@@ -310,14 +310,14 @@ sgtitle('Comparison of projection types');
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
 %% NEGATIVE examples
-fig_num = 10009;
-fprintf(1,'Figure %.0f: NEGATIVE examples\n',fig_num);
-figure(fig_num); clf;
+figNum = 10009;
+fprintf(1,'Figure %.0f: NEGATIVE examples\n',figNum);
+figure(figNum); clf;
 
 % Prep the example and workspace
 % close all;
@@ -336,7 +336,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 subplot(2,2,1)
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Vertex projection via prior segment (default, flag=1)');
 
 % NEGATIVE example 2 - using following
@@ -350,7 +350,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 subplot(2,2,2);
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Vertex projection via following segment (flag=2)');
 
 % NEGATIVE example 3 - using average at apex only
@@ -364,7 +364,7 @@ flag_rounding_type = 3;  % use average projection of prior and following segment
 subplot(2,2,3);
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Vertex projection via averaging prior and following segment at vertex (flag=3)');
 
 % NEGATIVE example 4 - using average always
@@ -378,18 +378,18 @@ flag_rounding_type = 4;  % use average projection of prior and following segment
 subplot(2,2,4)
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Vertex projection via averaging everywhere (flag=4)');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 
 %% MULTICROSS examples
-fig_num = 10010;
-fprintf(1,'Figure %.0f: MULTICROSS examples\n',fig_num);
-figure(fig_num); clf;
+figNum = 10010;
+fprintf(1,'Figure %.0f: MULTICROSS examples\n',figNum);
+figure(figNum); clf;
 
 % Setup
 central_path = [-2 1; 1 4; 3 2; 5 2; 6 3; 7 2];
@@ -410,7 +410,7 @@ flag_rounding_type = 1;  % use orthogonal projection of prior segment
 subplot(2,2,1);
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Multicross example using projection via prior segment (default)');
 
 % MULTICROSS example 2 - using following
@@ -424,7 +424,7 @@ flag_rounding_type = 2;  % use orthogonal projection of following segment
 subplot(2,2,2);
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Multicross example using projection via following segment');
 
 % MULTICROSS example 3 - using average at apex only
@@ -438,7 +438,7 @@ flag_rounding_type = 3;  % use average projection of prior and following segment
 subplot(2,2,3);
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Multicross example using projection via averaging of prior and following segment only at apex');
 
 
@@ -453,16 +453,16 @@ flag_rounding_type = 4;  % use average projection of prior and following segment
 subplot(2,2,4);
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 title('Multicross example using projection via averaging of prior and following segment always');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - poorly formed path
-fig_num = 10011;
-fprintf(1,'Figure %.0f: BASIC example - poorly formed path\n',fig_num);
-figure(fig_num); clf;
+figNum = 10011;
+fprintf(1,'Figure %.0f: BASIC example - poorly formed path\n',figNum);
+figure(figNum); clf;
 
 stations = [1.5; 1.6; 1.7];
 flag_rounding_type = 1; % Define the rounding type
@@ -473,7 +473,7 @@ central_path = [0 0; 1 1; 1 1; 2 2];
 % the figure.
 [unit_normal_vector_start, unit_normal_vector_end] = ...
     fcn_Path_findOrthogonalPathVectorsAtStations(...
-    stations,central_path,flag_rounding_type,fig_num);
+    stations,central_path,flag_rounding_type,figNum);
 
 % Make sure function worked
 assert(isequal(round(unit_normal_vector_start,4),[...
@@ -486,16 +486,16 @@ assert(isequal(round(unit_normal_vector_end,4),  [...
     0.4950    1.9092]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %%
 
 close all;
 
 %% Real path examples
-fig_num = 20001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 20001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in some dummy data
 paths = fcn_Path_fillSamplePaths;
@@ -510,17 +510,17 @@ stations = (0:step_size:central_path_stations(end))';
 stations = unique(stations);
 
 for i_Path = 1:3
-    temp_fig_num = fig_num - 1 +i_Path;  % Define the figure
+    temp_figNum = figNum - 1 +i_Path;  % Define the figure
     
     % Calculate the unit normal vectors at given stations and put results into
     % the figure.
     [unit_normal_vector_start, unit_normal_vector_end] = ...
         fcn_Path_findOrthogonalPathVectorsAtStations(...
-        stations,central_path,flag_rounding_type,temp_fig_num);
+        stations,central_path,flag_rounding_type,temp_figNum);
 end
 
 % % Make sure plot opened up
-% assert(isequal(get(gcf,'Number'),fig_num));
+% assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -541,9 +541,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 stations = 1; % Define the station
 flag_rounding_type = 1; % Define the rounding type
@@ -564,13 +564,13 @@ assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 stations = 1; % Define the station
 flag_rounding_type = 1; % Define the rounding type
@@ -591,14 +591,14 @@ assert(isequal(round(unit_normal_vector_end,4),[ 1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 stations = 1; % Define the station
 flag_rounding_type = 1; % Define the rounding type
@@ -631,7 +631,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -647,7 +647,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

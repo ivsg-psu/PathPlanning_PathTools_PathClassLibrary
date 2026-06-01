@@ -31,7 +31,7 @@ end
 %                 (stationInterval),...
 %                 (max_num_iterations),...
 %                 (exit_tolerance),...
-%                 (fig_num));
+%                 (figNum));
 %
 % INPUTS:
 %
@@ -58,7 +58,7 @@ end
 %      exit_tolerance: the allowable tolerance to make the looping exit
 %      before the max_num_iterations is reached. Default is 0.1 meters.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -109,45 +109,45 @@ end
 % Revision history:
 %     
 % 2020_11_15  - S. Brennan
-% -- wrote the code originally - lots of bugs
+% - wrote the code originally - lots of bugs
 % 2020_12_25  - S. Brennan
-% -- added more comments
+% - added more comments
 % 2021_01_01  - S. Brennan
-% -- fixed the errors with interpolation
-% -- fixed the bug with the end point truncating toward start
+% - fixed the errors with interpolation
+% - fixed the bug with the end point truncating toward start
 % 2021_01_06  - S. Brennan
-% -- added functions for input checking
+% - added functions for input checking
 % 2021_01_07  - S. Brennan
-% -- deleted unused functions
-% -- renamed function to reflect the traversal output, not path
+% - deleted unused functions
+% - renamed function to reflect the traversal output, not path
 % 2021_01_09:  - S. Brennan
-% -- corrected terminology in comments
-% -- fixed the input argument notation to be traversals
+% - corrected terminology in comments
+% - fixed the input argument notation to be traversals
 % 2021_12_27:  - S. Brennan
-% -- corrected dependencies in comments
+% - corrected dependencies in comments
 % 2022_01_03:  - S. Brennan
-% -- corrected typos in comments
-% -- fixed a bug where the Z value is not defined in loop
+% - corrected typos in comments
+% - fixed a bug where the Z value is not defined in loop
 % 2022_01_06:  - S. Brennan
-% -- refactored code, added weighted averaging to prevent iteration
+% - refactored code, added weighted averaging to prevent iteration
 %     bouncing
 % 2022_01_10:  - S. Brennan
-% -- shut off debugging commentsclose
+% - shut off debugging commentsclose
 % 2024_03_14 - S. Brennan
-% -- shut off traversal_average.Station calculation as it is giving wrong
+% - shut off traversal_average.Station calculation as it is giving wrong
 % length
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
-% -- Added use of fcn_Path_equalizePathLengths to fix lengths
-% -- Updated the input definition list
-% -- Full rewrite of the function
+% - Updated debugging and input checks
+% - Added use of fcn_Path_equalizePathLengths to fix lengths
+% - Updated the input definition list
+% - Full rewrite of the function
 
 % TO DO
 % Need to clean up the code - lots of code "lint"
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 5; % The largest Number of argument inputs to the function
@@ -173,9 +173,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; 
+    debug_figNum = 999978; 
 else
-    debug_fig_num = []; 
+    debug_figNum = []; 
 end
 
 %% check input arguments?
@@ -242,8 +242,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -272,7 +272,7 @@ end
 
 % Set up debug figure by plotting the inputs
 if flag_do_debug
-    figure(debug_fig_num)
+    figure(debug_figNum)
     clf;
     hold on;
     axis equal
@@ -293,7 +293,7 @@ end
 %      [cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = ...
 %      fcn_Path_equalizePathLengths(...
 %            cellArrayOfUnequalPaths,...
-%            (fig_num));
+%            (figNum));
 [cellArrayOfEqualizedPaths, ~, ~, ~] = ...
       fcn_Path_equalizePathLengths(...
             allPaths,...
@@ -304,7 +304,7 @@ end
 [cellArrayOfEquidistantPaths, cellArrayOfEquidistantStations] = fcn_INTERNAL_resamplePaths(cellArrayOfEqualizedPaths, stationInterval); 
 
 if flag_do_debug
-    figure(debug_fig_num)
+    figure(debug_figNum)
     h_updatedPlots = zeros(Npaths,1);
     for ith_path = 1:Npaths
         h_updatedPlots(ith_path,1) = plot(cellArrayOfEquidistantPaths{ith_path}(:,1), cellArrayOfEquidistantPaths{ith_path}(:,2),'.-',...
@@ -378,7 +378,7 @@ for ith_iteration =2:max_num_iterations
 
     % Show user what we are doing?        
     if flag_do_debug
-        figure(debug_fig_num)
+        figure(debug_figNum)
         title(sprintf('Iteration: %.0f',ith_iteration))
         fprintf(1,'Averaging paths via iteration: %.0d / %.0d \n',ith_iteration,max_num_iterations);
         fprintf(1,'\tInitial maximum station: %.2f  \n',previousMaxStation);    
@@ -536,7 +536,7 @@ if flag_do_plots
     % plot the final XY result
 
     % Prep the figure for plotting
-    temp_h = figure(fig_num);
+    temp_h = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;
@@ -695,7 +695,7 @@ allDistances = cell(Npaths,1);
 for jth_path = 1:Npaths
     % FORMAT:
     %    St_points = fcn_Path_convertXY2St(referencePath,XY_points,...
-    %    (flag_rounding_type), (fig_num));
+    %    (flag_rounding_type), (figNum));
     St_points = fcn_Path_convertXY2St(reference_path,cellArrayOfPaths{jth_path},...
         ([]), (-1));
     allDistances{jth_path} = real(St_points(:,2));

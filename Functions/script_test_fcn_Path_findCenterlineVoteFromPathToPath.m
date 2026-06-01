@@ -2,20 +2,20 @@
 % Tests the following:
 %    [centerline_points_projected,unit_vectors_orthogonal] = ...
 %     fcn_Path_findCenterlineVoteFromPathToPath(...
-%     from_path,to_path,(flag_rounding_type),(search_radius),(fig_num))
+%     from_path,to_path,(flag_rounding_type),(search_radius),(figNum))
 
 % Revision history:
 % 2023_09_04 by S. Brennan
-% -- first write of the code
+% - first write of the code
 
 close all;
 
 
 %% Basic demonstration of fcn_Path_findCenterlineVoteFromPathToPath
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('Finds the center projected from one path toward another');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 from_path = [0 0; 1 1; 2 1; 3 4];
 to_path   = from_path + ones(length(from_path(:,1)),1)*[0 1];
@@ -27,7 +27,7 @@ flag_project_full_distance = 0;
 
 [centerline_points_projected,unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromPathToPath(...
-    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (fig_num));
+    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
@@ -40,13 +40,13 @@ assert(isequal(size(centerline_points_projected),[Nfrom 2]));
 assert(isequal(size(unit_vectors_orthogonal),[Nfrom 2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic demonstration of fcn_Path_findCenterlineVoteFromPathToPath
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('Shows that if the serach distance is too small, nothing is returned');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 from_path = [0 0; 1 1; 2 1; 3 4];
 to_path   = from_path + ones(length(from_path(:,1)),1)*[0 1];
@@ -58,7 +58,7 @@ flag_project_full_distance = 0;
 
 [centerline_points_projected,unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromPathToPath(...
-    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (fig_num));
+    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
@@ -71,13 +71,13 @@ assert(isequal(size(centerline_points_projected),[Nfrom 2]));
 assert(isequal(size(unit_vectors_orthogonal),[Nfrom 2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Basic demonstration 3 of fcn_Path_findCenterlineVoteFromPathToPath
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('Swap from and to paths to show how that full projection returns mapping of 1 onto 2');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 
 from_path = [0 0; 1 1; 2 1; 3 4];
@@ -90,7 +90,7 @@ flag_project_full_distance = 1;
 
 [centerline_points_projected,unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromPathToPath(...
-    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (fig_num));
+    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
@@ -103,13 +103,13 @@ assert(isequal(size(centerline_points_projected),[Nfrom 2]));
 assert(isequal(size(unit_vectors_orthogonal),[Nfrom 2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Call the center calculation function
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('Shows the center calculation for realistic path');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths = fcn_Path_fillSamplePaths;
@@ -122,7 +122,7 @@ flag_project_full_distance = 0;
 
 [centerline_points_projected,unit_vectors_orthogonal] = ...
     fcn_Path_findCenterlineVoteFromPathToPath(...
-    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (fig_num));
+    from_path,to_path,(flag_rounding_type),(search_radius),(flag_project_full_distance), (figNum));
 title(titleString, 'Interpreter','none');
 
 % Check variable types
@@ -135,7 +135,7 @@ assert(isequal(size(centerline_points_projected),[Nfrom 2]));
 assert(isequal(size(unit_vectors_orthogonal),[Nfrom 2]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,9 +156,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 from_path = [0 0; 1 1; 2 1; 3 4];
 to_path   = from_path + ones(length(from_path(:,1)),1)*[0 1];
@@ -183,13 +183,13 @@ assert(isequal(size(unit_vectors_orthogonal),[Nfrom 2]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 from_path = [0 0; 1 1; 2 1; 3 4];
 to_path   = from_path + ones(length(from_path(:,1)),1)*[0 1];
@@ -214,14 +214,14 @@ assert(isequal(size(unit_vectors_orthogonal),[Nfrom 2]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 from_path = [0 0; 1 1; 2 1; 3 4];
 to_path   = from_path + ones(length(from_path(:,1)),1)*[0 1];
@@ -255,7 +255,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -271,7 +271,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

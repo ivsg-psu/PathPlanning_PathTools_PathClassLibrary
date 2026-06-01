@@ -9,10 +9,10 @@ close all;
 
 
 %% BASIC example: - start at zero
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC example: start at zero');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
@@ -23,7 +23,7 @@ interval = 5;
 new_stations    = (0:interval:5)';
 
 % Call the function
-new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, figNum);
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -50,14 +50,14 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 assert(isequal(round(new_traversal.X,4),[0; 5]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: start at one
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC example: start at one');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); 
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); 
 
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
@@ -68,7 +68,7 @@ interval = 5;
 new_stations    = (1:interval:6)';
 
 % Call the function
-new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, figNum);
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -95,13 +95,13 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 assert(isequal(round(new_traversal.X,4),[1; 6]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: first point before start
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC example: first point before start');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); 
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); 
 
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
@@ -112,7 +112,7 @@ interval = 5;
 new_stations    = (-5:interval:0)';
 
 % Call the function
-new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, figNum);
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -139,14 +139,14 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 assert(isequal(round(new_traversal.X,4),new_stations));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example: perfect overlap
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('BASIC example: perfect overlap');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num);
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum);
 
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
@@ -157,7 +157,7 @@ interval = 10;
 new_stations    = (0:interval:20)';
 
 % Call the function
-new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, figNum);
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -184,13 +184,13 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 assert(isequal(round(new_traversal.X,4),new_stations));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example: none on traversal
-fig_num = 10005;
+figNum = 10005;
 titleString = sprintf('BASIC example: none on traversal');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num);
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum);
 
 % Fill in sample paths (as a starter)
 basic_path = [0 0; 10 0; 20 0];
@@ -201,7 +201,7 @@ interval = 5;
 new_stations    = (-10:interval:-5)';
 
 % Call the function
-new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, figNum);
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -228,13 +228,13 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 assert(isequal(round(new_traversal.X,4),new_stations));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% ADVANCED test: using a real traversal
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('ADVANCED test: using a real traversal');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num);
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -245,7 +245,7 @@ interval = 10;
 new_stations    = (0:interval:input_traversal.Station(end))';
 
 % Call the function
-new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, fig_num);
+new_traversal = fcn_Path_newTraversalByStationResampling(input_traversal, new_stations, figNum);
 
 % Update title
 title(titleString, 'Interpreter','none');
@@ -269,7 +269,7 @@ assert(isequal(size(new_traversal.Station),[NreferencePoints 1]));
 assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -290,9 +290,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -325,13 +325,13 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 % Fill in sample paths (as a starter)
@@ -365,14 +365,14 @@ assert(isequal(size(new_traversal.Yaw),[NreferencePoints-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -402,7 +402,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -418,7 +418,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

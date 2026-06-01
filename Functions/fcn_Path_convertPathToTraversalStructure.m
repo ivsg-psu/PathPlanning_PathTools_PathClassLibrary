@@ -16,7 +16,7 @@ end
 %
 % FORMAT: 
 %
-%       traversal = fcn_Path_convertPathToTraversalStructure(path,(fig_num))
+%       traversal = fcn_Path_convertPathToTraversalStructure(path,(figNum))
 %
 % INPUTS:
 %
@@ -43,7 +43,7 @@ end
 %
 %      (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -67,27 +67,27 @@ end
 
 % Revision history:
 % 2020_11_12
-% -- wrote the code
+% - wrote the code
 % 2021_01_06
-% -- added functions for input checking
-% -- added figure variable input option for yaw plotting
-% -- cleaned up unnecessary yaw calculation (which was wrong!)
+% - added functions for input checking
+% - added figure variable input option for yaw plotting
+% - cleaned up unnecessary yaw calculation (which was wrong!)
 % 2021_01_07
-% -- changed input to path type, not X, Y separately
-% -- cleaned up comments
-% -- fixed error in comment about Yaw being front-padded. It is an
+% - changed input to path type, not X, Y separately
+% - cleaned up comments
+% - fixed error in comment about Yaw being front-padded. It is an
 % (N-1) x 1 vector now, not N x 1.
 % 2021_03_20
-% -- changed input checking to allow 3D path types
-% -- fixed possible bug in diff calculation
+% - changed input checking to allow 3D path types
+% - fixed possible bug in diff calculation
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -113,9 +113,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -147,14 +147,14 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
         fig = figure;  
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plots = 1;
     end
 end
@@ -203,12 +203,12 @@ traversal.Yaw = ...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % plot the final XY result
-    figure(fig_num); 
+    figure(figNum); 
     data.traversal{1} = traversal;
 
     % Plot the XY plot
     subplot(2,1,1);    
-    fcn_Path_plotTraversalsXY(data,fig_num);
+    fcn_Path_plotTraversalsXY(data,figNum);
     hold on;
     xlabel('X [m]');
     ylabel('Y [m]');

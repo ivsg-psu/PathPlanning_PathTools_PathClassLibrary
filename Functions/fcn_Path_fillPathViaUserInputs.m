@@ -1,4 +1,4 @@
-function pathXY = fcn_Path_fillPathViaUserInputs(fig_num, varargin)
+function pathXY = fcn_Path_fillPathViaUserInputs(figNum, varargin)
 % fcn_Path_fillPathViaUserInputs
 % A function for the user to click on the figure to generate XY path.
 % Points are collected and plotted until the user double clicks. If the
@@ -7,11 +7,11 @@ function pathXY = fcn_Path_fillPathViaUserInputs(fig_num, varargin)
 %
 % FORMAT: 
 %
-%      pathXY = fcn_Path_fillPathViaUserInputs(fig_num)
+%      pathXY = fcn_Path_fillPathViaUserInputs(figNum)
 %
 % INPUTS:
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -34,20 +34,20 @@ function pathXY = fcn_Path_fillPathViaUserInputs(fig_num, varargin)
 
 % Revision history:
 % 2020_10_15
-% -- wrote the code
+% - wrote the code
 % 2021_01_10
-% -- added interactive capability
-% -- added ability to call the plot repeatedly
-% -- allow points to be deleted
+% - added interactive capability
+% - added ability to call the plot repeatedly
+% - allow points to be deleted
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -73,9 +73,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -102,8 +102,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
 %     temp = varargin{end};
 %     if ~isempty(temp) % Did the user NOT give an empty figure number?
-%         fig_num = temp;
-%         figure(fig_num);
+%         figNum = temp;
+%         figure(figNum);
 %         flag_do_plots = 1;
 %     end
 % end
@@ -134,7 +134,7 @@ end
 
 if isempty(callback_type)
     % Make a new figure, initializing all data and handles within
-    fcn_Path_fillPathViaUserInputs_startPlot(fig_num);
+    fcn_Path_fillPathViaUserInputs_startPlot(figNum);
     UserData = get(gcf,'UserData');
     while UserData.flag_is_done == 0
         % Wait for the figure to be done
@@ -268,7 +268,7 @@ end
 %                           |___/ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    %     figure(fig_num);
+    %     figure(figNum);
     %     hold on;
     %     grid on;
     %     plot(pathXY(:,1),pathXY(:,2),'r.','Markersize',20);
@@ -293,7 +293,7 @@ end
 % See: https://patorjk.com/software/taag/#p=display&f=Big&t=Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%§
 
-function fcn_Path_fillPathViaUserInputs_startPlot(fig_num)
+function fcn_Path_fillPathViaUserInputs_startPlot(figNum)
 % Decide the number of points to use (maximum), initialize data and values
 num_points = 1000;
 data = nan*ones(num_points,2);
@@ -301,7 +301,7 @@ next_point = 1;
 % pathXY = [0 0; 0 1];
 
 % Set up the figure
-current_fig = figure(fig_num);
+current_fig = figure(figNum);
 
 % Plot empty data
 h_plot = plot(data(:,1),data(:,2),'.-','Markersize',20,'Linewidth',2);

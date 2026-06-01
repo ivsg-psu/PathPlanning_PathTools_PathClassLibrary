@@ -11,16 +11,16 @@
 close all
 
 %% Test case 1: Basic call with one path
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 % Pick first path as reference_traversal structure
 path_to_check = paths_array{1};
 
-yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num); 
+yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,figNum); 
 
 % Check the variable type
 assert(isnumeric(yaw_angles));
@@ -29,14 +29,14 @@ assert(isnumeric(yaw_angles));
 assert(isequal(size(yaw_angles),[length(path_to_check(:,1))-1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Test case 2: Multiple paths
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
-figure(fig_num*10); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
+figure(figNum*10); clf;
 
 
 % Fill in sample paths (as a starter)
@@ -46,7 +46,7 @@ for ith_path = 1:3
     % Pick first path as reference_traversal structure
     path_to_check = paths_array{ith_path};
     
-    yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num);
+    yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,figNum);
 
     % Check the variable type
     assert(isnumeric(yaw_angles));
@@ -56,16 +56,16 @@ for ith_path = 1:3
 end
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case 3: basic call with degenerate path
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 path_to_check = [1 1; 0 0];
-yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,fig_num);
+yaw_angles = fcn_Path_calcYawFromPathSegments(path_to_check,figNum);
 
 % Check the variable type
 assert(isnumeric(yaw_angles));
@@ -74,7 +74,7 @@ assert(isnumeric(yaw_angles));
 assert(isequal(size(yaw_angles),[length(path_to_check(:,1))-1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -96,9 +96,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -116,13 +116,13 @@ assert(isequal(size(yaw_angles),[length(path_to_check(:,1))-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -140,14 +140,14 @@ assert(isequal(size(yaw_angles),[length(path_to_check(:,1))-1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -175,7 +175,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -191,7 +191,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

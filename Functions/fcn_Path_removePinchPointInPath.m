@@ -12,7 +12,7 @@ function [path_no_pinch_point] = ...
 %     [path_no_pinch_point] = ...
 %         fcn_Path_removePinchPointInPath(...
 %         path_with_pinch_point
-%        (fig_num));
+%        (figNum));
 %
 % INPUTS:
 %
@@ -22,7 +22,7 @@ function [path_no_pinch_point] = ...
 %
 %     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -49,19 +49,19 @@ function [path_no_pinch_point] = ...
 
 % Revision history:
 % 2021_01_23:
-% -- first write of the code
+% - first write of the code
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
-% -- Renamed function from fcn_Path_removePinchPointInTraversal
+% - Removed traversal input type and replaced with cell array of paths
+% - Renamed function from fcn_Path_removePinchPointInTraversal
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -87,9 +87,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -120,8 +120,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -246,7 +246,7 @@ end % Ends check to see if there are at least 3 segments
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     hold on;
     grid on;
 
@@ -254,7 +254,7 @@ if flag_do_plots
     clear data
     data{1} = path_with_pinch_point;
     data{2} = path_no_pinch_point;
-    fcn_Path_plotPathsXY(data,fig_num);
+    fcn_Path_plotPathsXY(data,figNum);
 
     legend('Original path with pinch point', 'Traversal with no pinch');
 end % Ends the flag_do_plot if statement

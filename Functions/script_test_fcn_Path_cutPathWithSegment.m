@@ -3,11 +3,11 @@
 % This function was written on 2023_08_26 by S. Brennan, sbrennan@psu.edu
 % FORMAT:
 %
-%    [cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(fig_num));
+%    [cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(figNum));
 
 % Revision history:
 % 2023_09_26 by S. Brennan
-% -- first write of the code
+% - first write of the code
 
 close all;
 
@@ -29,14 +29,14 @@ close all;
 
 %% BASIC example
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 10001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 2; 1 2];
 
-[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(fig_num));
+[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(figNum));
 
 expected_cut_path_before = [0 -1;0 2];
 expected_cut_path_after  = [0 2;0 5];
@@ -44,18 +44,18 @@ assert(max(sum((expected_cut_path_before - cut_path_before).^2,2).^0.5)<1E-10);
 assert(max(sum((expected_cut_path_after - cut_path_after).^2,2).^0.5)<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - cut line on end
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 10002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 5; 1 5];
 
-[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(fig_num));
+[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(figNum));
 
 expected_cut_path_before = [0 -1;0 5];
 expected_cut_path_after  = [0 5];
@@ -63,18 +63,18 @@ assert(max(sum((expected_cut_path_before - cut_path_before).^2,2).^0.5)<1E-10);
 assert(max(sum((expected_cut_path_after - cut_path_after).^2,2).^0.5)<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - cut line on start
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10003;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 10003;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 -1; 1 -1];
 
-[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(fig_num));
+[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(figNum));
 
 expected_cut_path_before = [0 -1];
 expected_cut_path_after  = [0 -1; 0 5];
@@ -82,18 +82,18 @@ assert(max(sum((expected_cut_path_before - cut_path_before).^2,2).^0.5)<1E-10);
 assert(max(sum((expected_cut_path_after - cut_path_after).^2,2).^0.5)<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - cut line that misses
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10004;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 10004;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 6; 1 6];
 
-[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(fig_num));
+[cut_path_before, cut_path_after] = fcn_Path_cutPathWithSegment(pathToCut,cutting_segment,(figNum));
 
 expected_cut_path_before = [];
 expected_cut_path_after  = [];
@@ -102,7 +102,7 @@ assert(isempty(cut_path_after));
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -123,9 +123,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 2; 1 2];
@@ -139,13 +139,13 @@ assert(max(sum((expected_cut_path_after - cut_path_after).^2,2).^0.5)<1E-10);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 2; 1 2];
@@ -160,14 +160,14 @@ assert(max(sum((expected_cut_path_after - cut_path_after).^2,2).^0.5)<1E-10);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 pathToCut = [0 -1; 0 5];
 cutting_segment = [-1 2; 1 2];
@@ -194,7 +194,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -210,7 +210,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

@@ -42,7 +42,7 @@ end
 %      [closestXs, closestYs, closestDistances] = ...
 %        fcn_Path_convertTraversalXYtoSy(...
 %        reference_station_points, reference_traversal, all_traversals,...
-%        (flag_rounding_type),(search_radius),(fig_num));
+%        (flag_rounding_type),(search_radius),(figNum));
 %
 % INPUTS:
 %
@@ -89,7 +89,7 @@ end
 %      look (default is 3 times the differences in station lengths within
 %      all_traversals )
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -129,25 +129,25 @@ end
 
 % Revision history:
 % 2021_03_21:
-% -- first write of the code moving this functionality out of
+% - first write of the code moving this functionality out of
 % fcn_Path_findOrthoScatterFromTraversalToTraversals.m
 % 2022_01_07:
-% -- edited header to rename:
+% - edited header to rename:
 % fcn_Path_findOrthoScatterFromTraversalToTraversals to
 % fcn_Path_FindOrthogonalHitFromTraversalToTraversal
 % 2023_04_30:
-% -- improved plotting by showing XY and Sy side-by-side
-% -- edited header to make it more clear that this is NOT XY to Sy
+% - improved plotting by showing XY and Sy side-by-side
+% - edited header to make it more clear that this is NOT XY to Sy
 % converter to use.
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 6; % The largest Number of argument inputs to the function
@@ -173,9 +173,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -230,8 +230,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -296,7 +296,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
 
-    figure(fig_num);
+    figure(figNum);
     clf;
 
     subplot(1,2,1);
@@ -311,7 +311,7 @@ if flag_do_plots
     plot(reference_traversal.X,reference_traversal.Y,'k.-','Linewidth',3,'Markersize',25);
 
     % Plot the paths
-    h_plots = fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+    h_plots = fcn_Path_plotTraversalsXY(all_traversals,figNum);
     colors = zeros(length(h_plots),3);
     for ith_plot = 1:length(h_plots)
         set(h_plots(ith_plot),'LineWidth',3)
@@ -358,7 +358,7 @@ if flag_do_plots
 
     % For debugging
     if 1== flag_do_debug  % The following plots the XY results
-        figure(fig_num+1);
+        figure(figNum+1);
         clf;
         hold on;
         grid on;
@@ -371,7 +371,7 @@ if flag_do_plots
         plot(reference_traversal.X,reference_traversal.Y,'k.-','Linewidth',3,'Markersize',25);
 
         % Plot the paths
-        fcn_Path_plotTraversalsXY(all_traversals,fig_num);
+        fcn_Path_plotTraversalsXY(all_traversals,figNum);
 
         % Plot the station points
         % Find the unit normal vectors at each of the station points

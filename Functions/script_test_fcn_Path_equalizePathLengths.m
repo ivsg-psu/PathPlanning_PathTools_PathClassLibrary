@@ -3,22 +3,22 @@
 
 % Revision history
 % 2025_06_26 - Sean Brennan
-% -- first write of the code
+% - first write of the code
 
 close all;
 
 
 %% BASIC CALL: Very simple example where first segment is reference
-fig_num = 10001;
+figNum = 10001;
 titleString = sprintf('BASIC CALL: Very simple example where first segment is reference');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [1 4; 10 4];
 cellArrayOfUnequalPaths{2,1} = [0 2; 7 2];
 cellArrayOfUnequalPaths{3,1} = [3 0; 6 0];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -48,19 +48,19 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC CALL: Very simple example where second segment is reference
-fig_num = 10002;
+figNum = 10002;
 titleString = sprintf('BASIC CALL: Very simple example where second segment is reference');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [0 4; 7 4];
 cellArrayOfUnequalPaths{2,1} = [1 2; 10 2];
 cellArrayOfUnequalPaths{3,1} = [3 0; 6 0];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -90,19 +90,19 @@ assert(isequal(bestStartIndex,1));
 assert(isequal(bestEndIndex,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC CALL: Very simple example where third segment is reference
-fig_num = 10003;
+figNum = 10003;
 titleString = sprintf('BASIC CALL: Very simple example where third segment is reference');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [0 4; 7 4];
 cellArrayOfUnequalPaths{2,1} = [3 2; 6 2];
 cellArrayOfUnequalPaths{3,1} = [1 0; 10 0];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -132,19 +132,19 @@ assert(isequal(bestStartIndex,1));
 assert(isequal(bestEndIndex,3));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC CALL: Angled paths
-fig_num = 10004;
+figNum = 10004;
 titleString = sprintf('BASIC CALL: Angled paths');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [1 4; 10 6];
 cellArrayOfUnequalPaths{2,1} = [0 2; 7 2];
 cellArrayOfUnequalPaths{3,1} = [3 0; 6 -1];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -174,19 +174,19 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC CALL: Multisegmented, angled paths
-fig_num = 10005;
+figNum = 10005;
 titleString = sprintf('BASIC CALL: Multisegmented, angled paths');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [-5 3; 1 4; 10 6];
 cellArrayOfUnequalPaths{2,1} = [-6 5; 0 2; 7 2];
 cellArrayOfUnequalPaths{3,1} = [-4 1; 3 0; 6 -1];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -216,19 +216,19 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC CALL: Best end is not same as least changed
-fig_num = 10006;
+figNum = 10006;
 titleString = sprintf('BASIC CALL: Best end is not same as least changed');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [0 5; 0 10];
 cellArrayOfUnequalPaths{2,1} = [2 0; 2 9];
 cellArrayOfUnequalPaths{3,1} = [4 1; 4 7];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -258,19 +258,19 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,1));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC CALL: No ends hit each other
-fig_num = 10007;
+figNum = 10007;
 titleString = sprintf('BASIC CALL: No ends hit each other');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [0 5; 0 10; -0.5 10.9];
 cellArrayOfUnequalPaths{2,1} = [2 0; 2 10; 2 11];
 cellArrayOfUnequalPaths{3,1} = [4 1; 4 10; 4.5 10.9];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -300,20 +300,20 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC CALL: All ends hit each other
-fig_num = 10008;
+figNum = 10008;
 titleString = sprintf('BASIC CALL: All ends hit each other');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [0 5; 0 10; 0.5 11.1];
 cellArrayOfUnequalPaths{2,1} = [2 0; 2 10; 2 11];
 cellArrayOfUnequalPaths{3,1} = [4 1; 4 10; 3.5 11.1];
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -343,20 +343,20 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC CALL: Two of three ends hit each other
-fig_num = 10009;
+figNum = 10009;
 titleString = sprintf('BASIC CALL: Two of three ends hit each other');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths{1,1} = [0 5; 0 10; -0.5 10.9]; % Does not hit any
 cellArrayOfUnequalPaths{2,1} = [2 0; 2 10; 2 11]; % Does not hit any
 cellArrayOfUnequalPaths{3,1} = [4 1; 4 10; 4 10.9]; % Hits all
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -386,17 +386,17 @@ assert(isequal(bestStartIndex,2));
 assert(isequal(bestEndIndex,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% ADVANCED CALL: using a realistic test path
-fig_num = 20001;
+figNum = 20001;
 titleString = sprintf('ADVANCED CALL: using a realistic test path');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 cellArrayOfUnequalPaths = fcn_INTERNAL_loadData;
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -426,7 +426,7 @@ assert(isequal(bestStartIndex,1));
 assert(isequal(bestEndIndex,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% Fast Mode Tests
@@ -448,9 +448,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: FAST mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 cellArrayOfUnequalPaths{1,1} = [0 4; 7 4];
 cellArrayOfUnequalPaths{2,1} = [3 2; 6 2];
@@ -485,13 +485,13 @@ assert(isequal(bestEndIndex,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 cellArrayOfUnequalPaths{1,1} = [0 4; 7 4];
 cellArrayOfUnequalPaths{2,1} = [3 2; 6 2];
@@ -526,14 +526,14 @@ assert(isequal(bestEndIndex,3));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 cellArrayOfUnequalPaths{1,1} = [0 4; 7 4];
 cellArrayOfUnequalPaths{2,1} = [3 2; 6 2];
@@ -560,7 +560,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -576,7 +576,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases
@@ -597,15 +597,15 @@ close all;
 fprintf(1,'Figure: 9XXXXXX: BUG mode cases\n');
 
 %% Bug found when processing HSOV data
-fig_num = 90001;
+figNum = 90001;
 titleString = sprintf('BUG mode: Bug found when processing HSOV data');
-fprintf(1,'Figure %.0f: %s\n',fig_num, titleString);
-figure(fig_num); clf;
+fprintf(1,'Figure %.0f: %s\n',figNum, titleString);
+figure(figNum); clf;
 
 load('testData1_fcn_Path_equalizePathLengths','cellArrayOfPaths');
 cellArrayOfUnequalPaths = cellArrayOfPaths;
 
-[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(fig_num));
+[cellArrayOfEqualizedPaths, leastExtensionIndex, bestStartIndex, bestEndIndex] = fcn_Path_equalizePathLengths(cellArrayOfUnequalPaths,(figNum));
 
 title(titleString, 'Interpreter','none');
 
@@ -635,7 +635,7 @@ assert(isequal(size(bestEndIndex),[1 1]));
 % assert(isequal(bestEndIndex,2));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Functions follow
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -3,10 +3,10 @@
 
 % Revision history
 % 2020_01_09
-% -- first write of the code
-% -- need to add more test cases
+% - first write of the code
+% - need to add more test cases
 % 2025_06_30
-% -- testing more with real-world cases
+% - testing more with real-world cases
 % 2025_08_02
 % - Added Bug Test Case 90004
 %   * BUG - real-world example that was not previously working

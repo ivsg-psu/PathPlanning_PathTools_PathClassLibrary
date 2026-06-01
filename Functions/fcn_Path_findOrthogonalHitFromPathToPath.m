@@ -22,7 +22,7 @@ function [closest_path_points,closest_distances] = ...
 %      [closest_path_points,s_coordinate] = ...
 %        fcn_Path_findOrthogonalHitFromPathToPath(...
 %        query_stations,central_path,nearby_path,...
-%        (flag_rounding_type),(search_radius),(fig_num));
+%        (flag_rounding_type),(search_radius),(figNum));
 %
 % INPUTS:
 %
@@ -71,7 +71,7 @@ function [closest_path_points,closest_distances] = ...
 %      3 times the length of the total station length in the
 %      central_trajectory)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -103,34 +103,34 @@ function [closest_path_points,closest_distances] = ...
 
 % Revision history:
 % 2020_11_14:
-% -- first write of the code
+% - first write of the code
 % 2020_12_25:
-% -- changed plot style for situation where query overlaps the central
+% - changed plot style for situation where query overlaps the central
 % path (so have different line styles)
-% -- fixed a bug where the index was being used, instead of station, to
+% - fixed a bug where the index was being used, instead of station, to
 % define a search area
-% -- isolated plotting functionality from debugging functionality
+% - isolated plotting functionality from debugging functionality
 % 2021_01_07
-% -- updated the name to fix path notation to traversal or traversals
+% - updated the name to fix path notation to traversal or traversals
 % 2021_01_09
-% -- added input argument checking
-% -- converted all internal SXY variables to traversals
-% -- updated dependencies
+% - added input argument checking
+% - converted all internal SXY variables to traversals
+% - updated dependencies
 % 2021_12_27
-% -- changed name to singular traversal since code only works with one
+% - changed name to singular traversal since code only works with one
 % traversal at a time
 % 2022_01_03
-% -- found a bug in the constrainted search functionality,
-% -- updated plotting function to show both positive and neg vectors
-% -- fixed typo in variable name
-% -- fixed inequality which was cause of bug
-% -- made distance outputs positive and neg, based on directionality
+% - found a bug in the constrainted search functionality,
+% - updated plotting function to show both positive and neg vectors
+% - fixed typo in variable name
+% - fixed inequality which was cause of bug
+% - made distance outputs positive and neg, based on directionality
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
-% -- Fixed bug where empty input arguments do not use defaults
+% - Updated debugging and input checks
+% - Fixed bug where empty input arguments do not use defaults
 % 2025_07_01 - S. Brennan
-% -- Removed traversal input type and replaced with cell array of paths
-% -- Renamed function from
+% - Removed traversal input type and replaced with cell array of paths
+% - Renamed function from
 % fcn_Path_findOrthogonalHitFromTraversalToTraversal
 
 % TO-DO
@@ -138,7 +138,7 @@ function [closest_path_points,closest_distances] = ...
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 6; % The largest Number of argument inputs to the function
@@ -164,9 +164,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -240,8 +240,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 end
@@ -389,7 +389,7 @@ closest_distances = distances_of_hits;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
     % Prep the figure for plotting
-    temp_h = figure(fig_num);
+    temp_h = figure(figNum);
     flag_rescale_axis = 0;
     if isempty(get(temp_h,'Children'))
         flag_rescale_axis = 1;

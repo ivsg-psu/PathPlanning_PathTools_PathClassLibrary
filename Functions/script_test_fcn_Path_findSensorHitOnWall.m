@@ -6,12 +6,12 @@
 
 % Modification history:
 % 2020_12_31 - S. Brennan
-% -- Updated for new release
-% -- Organized sections
-% -- Added fast mode tests
-% -- Added full assertion tests on output variables
-% -- Added figure open/close assertions
-% -- Added automated assertion testing
+% - Updated for new release
+% - Organized sections
+% - Added fast mode tests
+% - Added full assertion tests on output variables
+% - Added figure open/close assertions
+% - Added automated assertion testing
 
 close all
 
@@ -65,13 +65,13 @@ close all
 % All demonstration case figures start with the number 1
 
 %% Demo of standard format checking
-fig_num = 10001;
-fprintf(1,'Figure: %.0f :Demo of short format checking\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure: %.0f :Demo of short format checking\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.wall_start = [0 10];
 inputs.wall_end   = [10 10];
 inputs.sensor_vector_start = [5 0];
@@ -94,21 +94,21 @@ actual = struct;
     inputs.wall_start, inputs.wall_end,...
     inputs.sensor_vector_start,inputs.sensor_vector_end,...
     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-    (inputs.tolerance), (inputs.fig_num));
+    (inputs.tolerance), (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
 
 %% Demo of long format checking
-fig_num = 10002;
-fprintf(1,'Figure: %.0f :Demo of long format checking\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure: %.0f :Demo of long format checking\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 Nsolutions = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.wall_start = [0 10];
 inputs.wall_end   = [10 10];
 
@@ -153,7 +153,7 @@ actual = struct;
     inputs.wall_start, inputs.wall_end,...
     inputs.sensor_vector_start,inputs.sensor_vector_end,...
     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-    (inputs.tolerance), (inputs.fig_num));
+    (inputs.tolerance), (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -197,11 +197,11 @@ for ith_return = 1:length(return_flags)
 
             % Build the figure number
             fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
-            fig_num = str2double(fig_string);
+            figNum = str2double(fig_string);
             plotting.FigureExpected = 1;
 
             % Build the test cases
-            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(figNum);
 
             for ith_testCase = 1:length(testCases)
 
@@ -226,7 +226,7 @@ for ith_return = 1:length(return_flags)
                     inputs.wall_start, inputs.wall_end,...
                     inputs.sensor_vector_start,inputs.sensor_vector_end,...
                     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-                    (inputs.tolerance), (inputs.fig_num));
+                    (inputs.tolerance), (inputs.figNum));
 
                 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
                 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -276,11 +276,11 @@ for ith_return = 1:length(return_flags)
 
             % Build the figure number
             fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
-            fig_num = str2double(fig_string);
+            figNum = str2double(fig_string);
             plotting.FigureExpected = 1;
 
             % Build the test cases
-            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(figNum);
 
             for ith_testCase = 1:length(testCases)
 
@@ -307,7 +307,7 @@ for ith_return = 1:length(return_flags)
                     inputs.wall_start, inputs.wall_end,...
                     inputs.sensor_vector_start,inputs.sensor_vector_end,...
                     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-                    (inputs.tolerance), (inputs.fig_num));
+                    (inputs.tolerance), (inputs.figNum));
 
                 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
                 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -358,11 +358,11 @@ for ith_return = 1:length(return_flags)
 
             % Build the figure number
             fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
-            fig_num = str2double(fig_string);
+            figNum = str2double(fig_string);
             plotting.FigureExpected = 1;
 
             % Build the test cases
-            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(figNum);
 
             for ith_testCase = 1:length(testCases)
 
@@ -387,7 +387,7 @@ for ith_return = 1:length(return_flags)
                     inputs.wall_start, inputs.wall_end,...
                     inputs.sensor_vector_start,inputs.sensor_vector_end,...
                     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-                    (inputs.tolerance), (inputs.fig_num));
+                    (inputs.tolerance), (inputs.figNum));
 
                 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
                 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -443,11 +443,11 @@ for ith_return = 1:length(return_flags)
 
             % Build the figure number
             fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
-            fig_num = str2double(fig_string);
+            figNum = str2double(fig_string);
             plotting.FigureExpected = 1;
 
             % Build the test cases
-            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(figNum);
 
             for ith_testCase = 1:length(testCases)
 
@@ -472,7 +472,7 @@ for ith_return = 1:length(return_flags)
                     inputs.wall_start, inputs.wall_end,...
                     inputs.sensor_vector_start,inputs.sensor_vector_end,...
                     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-                    (inputs.tolerance), (inputs.fig_num));
+                    (inputs.tolerance), (inputs.figNum));
 
                 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
                 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -529,11 +529,11 @@ for ith_return = 1:length(return_flags)
 
             % Build the figure number
             fig_string = sprintf('%.0f%.0f%.0f%.0f%.0f',intersectionTestType, thisReturn,thisRange,thisTolerance,thisCase);
-            fig_num = str2double(fig_string);
+            figNum = str2double(fig_string);
             plotting.FigureExpected = 1;
 
             % Build the test cases
-            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num);
+            testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(figNum);
 
             for ith_testCase = 1:length(testCases)
 
@@ -558,7 +558,7 @@ for ith_return = 1:length(return_flags)
                     inputs.wall_start, inputs.wall_end,...
                     inputs.sensor_vector_start,inputs.sensor_vector_end,...
                     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-                    (inputs.tolerance), (inputs.fig_num));
+                    (inputs.tolerance), (inputs.figNum));
 
                 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
                 %fcn_INTERNAL_printResults(actual.distance,actual.location);
@@ -590,13 +590,13 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f :Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f :Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 plotting.FigureExpected = 0;
 
 clear inputs
-inputs.fig_num = [];
+inputs.figNum = [];
 inputs.wall_start = [0 0; -3  3; 15 15; 7 7; 11 11;  7 3; 0 10; 10 16; 18 18; 20 0; 5.9 6; 13 14];
 inputs.wall_end   = [5 0;  3 -3; 15 10; 9 9; 11 11; -1 7; 5 15; 14 16; 20 20; 20 0; 4 7;   13 10];
 inputs.sensor_vector_start = [0 0];
@@ -621,23 +621,23 @@ actual = struct;
     inputs.wall_start, inputs.wall_end,...
     inputs.sensor_vector_start,inputs.sensor_vector_end,...
     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-    (inputs.tolerance), (inputs.fig_num));
+    (inputs.tolerance), (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f :Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f :Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 plotting.FigureExpected = 0;
 
 clear inputs
-inputs.fig_num = -1;
+inputs.figNum = -1;
 inputs.wall_start = [0 0; -3  3; 15 15; 7 7; 11 11;  7 3; 0 10; 10 16; 18 18; 20 0; 5.9 6; 13 14];
 inputs.wall_end   = [5 0;  3 -3; 15 10; 9 9; 11 11; -1 7; 5 15; 14 16; 20 20; 20 0; 4 7;   13 10];
 inputs.sensor_vector_start = [0 0];
@@ -662,20 +662,20 @@ actual = struct;
     inputs.wall_start, inputs.wall_end,...
     inputs.sensor_vector_start,inputs.sensor_vector_end,...
     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-    (inputs.tolerance), (inputs.fig_num));
+    (inputs.tolerance), (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 inputs.wall_start = [0 0; -3  3; 15 15; 7 7; 11 11;  7 3; 0 10; 10 16; 18 18; 20 0; 5.9 6; 13 14];
 inputs.wall_end   = [5 0;  3 -3; 15 10; 9 9; 11 11; -1 7; 5 15; 14 16; 20 20; 20 0; 4 7;   13 10];
@@ -688,7 +688,7 @@ inputs.tolerance = [];
 Niterations = 100;
 
 % Do calculation without pre-calculation
-inputs.fig_num = [];
+inputs.figNum = [];
 tic;
 for ith_test = 1:Niterations
     % Call the function
@@ -698,12 +698,12 @@ for ith_test = 1:Niterations
         inputs.wall_start, inputs.wall_end,...
         inputs.sensor_vector_start,inputs.sensor_vector_end,...
         (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-        (inputs.tolerance), (inputs.fig_num)); %#ok<STRNU>
+        (inputs.tolerance), (inputs.figNum)); %#ok<STRNU>
 end
 slow_method = toc;
 
 % Do calculation with pre-calculation, FAST_MODE on
-inputs.fig_num = -1;
+inputs.figNum = -1;
 tic;
 for ith_test = 1:Niterations
     % Call the function
@@ -713,7 +713,7 @@ for ith_test = 1:Niterations
         inputs.wall_start, inputs.wall_end,...
         inputs.sensor_vector_start,inputs.sensor_vector_end,...
         (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-        (inputs.tolerance), (inputs.fig_num)); %#ok<STRNU>
+        (inputs.tolerance), (inputs.figNum)); %#ok<STRNU>
 
 end
 fast_method = toc;
@@ -730,7 +730,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases
@@ -751,13 +751,13 @@ close all;
 
 %% BUG - infinite point intersection (4), flag (1), test 1 - should be infinite intersections
 
-fig_num = 90001;
-fprintf(1,'Figure: %.0f : known BUG (solved?)\n',fig_num);
-figure(fig_num); clf;
+figNum = 90001;
+fprintf(1,'Figure: %.0f : known BUG (solved?)\n',figNum);
+figure(figNum); clf;
 plotting.FigureExpected = 1;
 
 clear inputs
-inputs.fig_num = fig_num;
+inputs.figNum = figNum;
 inputs.wall_start = [0 10];
 inputs.wall_end   = [10 10];
 inputs.sensor_vector_start = [13 10];
@@ -780,7 +780,7 @@ actual = struct;
     inputs.wall_start, inputs.wall_end,...
     inputs.sensor_vector_start,inputs.sensor_vector_end,...
     (inputs.flag_search_return_type), (inputs.flag_search_range_type), ...
-    (inputs.tolerance), (inputs.fig_num));
+    (inputs.tolerance), (inputs.figNum));
 
 fcn_INTERNAL_checkTestCases(inputs, expected, actual, plotting)
 
@@ -887,15 +887,15 @@ end
 
 % Make sure plot opened up
 if isfield(plotting,'FigureExpected') && plotting.FigureExpected==1
-    assert(isequal(get(gcf,'Number'),inputs.fig_num));
+    assert(isequal(get(gcf,'Number'),inputs.figNum));
 end
 
 end
 
 %% fcn_INTERNAL_plotTestCases
-function fcn_INTERNAL_plotTestCases(fig_num, wall_starts, wall_ends, testCases)
+function fcn_INTERNAL_plotTestCases(figNum, wall_starts, wall_ends, testCases)
 % Plot all the test case results
-figure(fig_num);
+figure(figNum);
 clf; hold on;
 axis equal;
 grid on;
@@ -938,9 +938,9 @@ end
 end
 
 %% fcn_INTERNAL_fillTestCases
-function testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(fig_num)
+function testCases = fcn_INTERNAL_fillTestCasesVerticalArrowSensors(figNum)
 
-temp = sprintf('%.0d',fig_num);
+temp = sprintf('%.0d',figNum);
 
 
 %%%%%%%%%%%%
@@ -1514,7 +1514,7 @@ for jth_yStart = 1:length(all_yStarts)
         testCases(ith_case).flag_search_return_type = flag_search_return_type;
         testCases(ith_case).flag_search_range_type = flag_search_range_type;
         testCases(ith_case).tolerance = tolerance;
-        testCases(ith_case).fig_num = fig_num;
+        testCases(ith_case).figNum = figNum;
 
         % Fill in expected values
         switch firstFigureNumber
@@ -1823,7 +1823,7 @@ for jth_yStart = 1:length(all_yStarts)
     end
 end
 
-fcn_INTERNAL_plotTestCases(fig_num, wall_starts, wall_ends, testCases);
+fcn_INTERNAL_plotTestCases(figNum, wall_starts, wall_ends, testCases);
 
 end % Ends fcn_INTERNAL_fillTestCases
 

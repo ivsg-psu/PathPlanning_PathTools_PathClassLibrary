@@ -3,27 +3,27 @@
        
 % Revision history:
 % 2021_01_05
-% -- first write of the code
+% - first write of the code
 % 2021_01_07
-% -- minor clean-up of comments
+% - minor clean-up of comments
 % 2021_01_07:
-% -- fixed typos in comments, and in header
+% - fixed typos in comments, and in header
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- Rewrote function without traversal type inputs
+% - Rewrote function without traversal type inputs
 
 close all
 
 %% Test case 1: basic call for one trajectory
-fig_num = 10001;
-fprintf(1,'Figure %.0f: Basic demo 1 \n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 10001;
+fprintf(1,'Figure %.0f: Basic demo 1 \n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 
-std_deviation = fcn_Path_calcSinglePathStandardDeviation(paths_array{1}, (fig_num));
+std_deviation = fcn_Path_calcSinglePathStandardDeviation(paths_array{1}, (figNum));
 
 % Check variable types
 assert(isnumeric(std_deviation));
@@ -32,17 +32,17 @@ assert(isnumeric(std_deviation));
 assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Test case 2: advanced call for one trajectory - specify figure
-fig_num = 10002;
-fprintf(1,'Figure %.0f: Basic demo 2 \n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 10002;
+fprintf(1,'Figure %.0f: Basic demo 2 \n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
 
-std_deviation = fcn_Path_calcSinglePathStandardDeviation(paths_array{1}, (fig_num));
+std_deviation = fcn_Path_calcSinglePathStandardDeviation(paths_array{1}, (figNum));
 
 % Check variable types
 assert(isnumeric(std_deviation));
@@ -51,7 +51,7 @@ assert(isnumeric(std_deviation));
 assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,9 +72,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -89,13 +89,13 @@ assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -110,14 +110,14 @@ assert(isequal(size(std_deviation),[1 1]));
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 % Fill in sample paths (as a starter)
 paths_array = fcn_Path_fillSamplePaths;
@@ -142,7 +142,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -158,7 +158,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases

@@ -28,7 +28,7 @@ function [TransitionCurves, ...
 %         (plot_color),...
 %         (plot_line_width),...
 %         (plot_text),...
-%         (fig_num))
+%         (figNum))
 %
 % INPUTS:
 %
@@ -57,7 +57,7 @@ function [TransitionCurves, ...
 %      plot_text: text to be shown on the plot in the form of a string (eg.
 %      'Transition curve 1') in the color defined by plot_color
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -103,52 +103,52 @@ function [TransitionCurves, ...
 
 % Revision history:
 % 2023_07_17 by V. Wagh
-% -- start writing function
+% - start writing function
 % 2023_07_21 by V. Wagh
-% -- added inputs of direction for both line segments
-% -- added outputs of intersection points and angles
-% -- used atan2 to get the transition curve
+% - added inputs of direction for both line segments
+% - added outputs of intersection points and angles
+% - used atan2 to get the transition curve
 % 2023_07_27 by X. Cao
-% -- fixed the angle calculation bugs in atan2
+% - fixed the angle calculation bugs in atan2
 % 2023_07_30 by V. Wagh
-% -- added the plot_color, plot_line_width and plot_text as optional inputs
-% -- removed segment1 and 2 directions as inputs
+% - added the plot_color, plot_line_width and plot_text as optional inputs
+% - removed segment1 and 2 directions as inputs
 % 2023_07_31 to 2023_08_02 by S. Brennan
-% -- minor reformatting of comments
-% -- renamed "line_segment" to "path" throughout as the code was written
+% - minor reformatting of comments
+% - renamed "line_segment" to "path" throughout as the code was written
 % for collections of line segments (paths), not for just line segments
-% -- switched angle_point1_radians, angle_point2_radians instead of degrees
+% - switched angle_point1_radians, angle_point2_radians instead of degrees
 % as MATLAB default is to use radians for all angle calculations. Also, it
 % appeared that the code was actually giving radians, not degrees (BUG!)
-% -- fixed bug where the line segments at start/end were not converted into
+% - fixed bug where the line segments at start/end were not converted into
 % unit vectors before multiplying by a distance, which would have caused
 % severe errors.
-% -- fixed bug where the cross-product was giving the wrong angle if angles
+% - fixed bug where the cross-product was giving the wrong angle if angles
 % were larger than 90 degrees. Required use of both cross and dot product,
 % and functionalized this
-% -- functionalized creation of unit vectors
-% -- fixed lots of the plotting to make it cleaner
-% -- removed the offset calculation from path library, and instead moved it
+% - functionalized creation of unit vectors
+% - fixed lots of the plotting to make it cleaner
+% - removed the offset calculation from path library, and instead moved it
 % internal as sub-function as the Path library was using an offset option
 % (from vertex) that isn't the same as a true offset
-% -- found that, for concave path areas, the intersection calculations were
+% - found that, for concave path areas, the intersection calculations were
 % wrong. Fixed this bug by calculating intersections one segment at a time.
 % This required significant for loops and could be improved with
 % optimization, but would require a rewrite of core path library functions
 % (not hard, just not urgent)
 % 2023_08_09 by S. Brennan
-% -- Converted this function over to Path library from LoadWZ library
+% - Converted this function over to Path library from LoadWZ library
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_02 - S. Brennan
-% -- Removed dependency on traversal types
+% - Removed dependency on traversal types
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 8; % The largest Number of argument inputs to the function
@@ -174,9 +174,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -255,8 +255,8 @@ fig_debug = [];
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
@@ -680,10 +680,10 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if flag_do_plots == 1 % only plot if the user has given a fig_num
+if flag_do_plots == 1 % only plot if the user has given a figNum
 
     %preparing the figure
-    figure(fig_num);
+    figure(figNum);
     clf;
     hold on;
     grid on;

@@ -1,71 +1,78 @@
-function  index_of_longest = fcn_Path_findTraversalWithMostData(data, varargin)
+function std_deviation = fcn_Path_calcSingleTraversalStandardDeviation(reference_traversal, varargin)
 
-MATLABFLAG_PATH_FLAG_WARN_FINDTRAVERSALWITHMOSTDATA = getenv("MATLABFLAG_PATH_FLAG_WARN_FINDTRAVERSALWITHMOSTDATA");
+MATLABFLAG_PATH_FLAG_WARN_CALCSINGLETRAVERSALSTD = getenv("MATLABFLAG_PATH_FLAG_WARN_CALCSINGLETRAVERSALSTD");
 
-if isempty(MATLABFLAG_PATH_FLAG_WARN_FINDTRAVERSALWITHMOSTDATA)
+if isempty(MATLABFLAG_PATH_FLAG_WARN_CALCSINGLETRAVERSALSTD)
 
     warning('on','backtrace');
-    warning(['The function fcn_Path_findTraversalWithMostData is being deprecated. ' ...
-        'Please use fcn_Path_findPathWithMostData instead.']);
+    warning(['The function fcn_Path_calcSingleTraversalStandardDeviation is being deprecated. ' ...
+        'Please use fcn_Path_calcSinglePathStandardDeviation instead.']);
 
-
-    setenv('MATLABFLAG_PATH_FLAG_WARN_FINDTRAVERSALWITHMOSTDATA','1');
+    setenv('MATLABFLAG_PATH_FLAG_WARN_CALCSINGLETRAVERSALSTD','1');
 end
 
-% fcn_Path_findTraversalWithMostData.m
-% finds the traversal index with the most amount of data (determined as the
-% most elements in the X array)
+% fcn_Path_calcSingleTraversalStandardDeviation
+% calculates the standard deviation in the offsets of a single traversal by
+% analyzing the variance in angles along a reference_traversal, then
+% multiplying these by the average segment length in the reference
+% traversal. The resulting standard deviation approximates the
+% variance in lateral offset that occurs at the end of each segment, versus
+% a line projected from the previous segment.
 %
 % FORMAT:
 %
-%      index_of_longest = fcn_Path_findTraversalWithMostData(data, (fig_num))
+%      std_deviation = ...
+%      fcn_Path_calcSingleTraversalStandardDeviation(...
+%            reference_traversal,...
+%            (figNum));
 %
 % INPUTS:
 %
-%      data: a structure containing subfields of X in the
-%      following form
-%           data.traversal{i_path}.X
-%      Note that i_path denotes an array of paths. Each path will be
-%      compared separately
+%      reference_traversal: the traversal that is being used for randomly
+%      generating all the other traversals
 %
 %     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
-%     check process verbose.
+%     check process verbose..
 %
 % OUTPUTS:
 %
-%      index: the index of the traversal with the most data
+%      std_deviation: the standard deviation in the offset of the traversal
 %
 % DEPENDENCIES:
 %
 %      fcn_DebugTools_checkInputsToFunctions
+%      fcn_Path_calcDiffAnglesBetweenPathSegments
+%      fcn_Path_plotTraversalXYWithVarianceBands
 %
 % EXAMPLES:
 %
-%       See the script: script_test_fcn_Path_findTraversalWithMostData.m
-%       for a full test suite.
+%     See the script: script_test_fcn_Path_calcSingleTraversalStandardDeviation
+%     for a full test suite.
 %
-% This function was written on 2020_11_12 by S. Brennan
+% This function was written on 2021_01_05 by S. Brennan
 % Questions or comments? sbrennan@psu.edu
 
 % Revision history:
-% 2020_11_12
-% - wrote the code
-% 2021_01_02
-% - added more checks to traversal type
+% 2021_01_05:
+% - wrote the code originally
+% 2021_01_06:
+% - added functions for input checking
+% 2021_01_07:
+% - fixed typos in comments, and in header
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 
 % TO-DO
 % (none)
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 2; % The largest Number of argument inputs to the function
@@ -91,9 +98,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -113,8 +120,8 @@ if 0==flag_max_speed
         % Are there the right number of inputs?
         narginchk(1,MAX_NARGIN);
 
-        % Check the data input
-        fcn_DebugTools_checkInputsToFunctions(data, 'traversals');
+        % Check the reference_traversal input
+        fcn_DebugTools_checkInputsToFunctions(reference_traversal, 'traversal');
     end
 end
 
@@ -123,18 +130,20 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin) 
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
-        fig_debug = 4848; %#ok<NASGU>
+        fig = figure;  
+        figNum = fig.Number;
+        flag_do_plots = 1;
     end
 end
 
 
-%% Solve for the circle
+%% Main code starts here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   __  __       _
 %  |  \/  |     (_)
@@ -145,15 +154,26 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% choose the initial reference path, choose the path with most data points
-data_length = zeros(1,length(data.traversal));
-for i_path = 1:length(data.traversal)
-    data_length(i_path) = length(data.traversal{i_path}.X);
-end
-[~,index_of_longest] = max(data_length);
+% Standard deviation: this is calculated by the standard deviation in path
+% angles times the mean segment length. The reason for this is that this
+% distance represents the average deviation laterally, right or left, of
+% each segment. This is a good first guess to produce paths of similar
+% curviness to the original path.
+
+% FIll in useful variables
+X_reference = reference_traversal.X;
+Y_reference = reference_traversal.Y;
+Station_reference = reference_traversal.Station;
+reference_path = [X_reference Y_reference];
+
+% Calculate angle changes between points
+diff_angles = fcn_Path_calcDiffAnglesBetweenPathSegments(reference_path);
+std_angles = std(diff_angles);
+mean_segment_length = mean(diff(Station_reference));
+std_deviation = std_angles*mean_segment_length;
 
 
-%% Any debugging?
+%% Plot the results (for debugging)?
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   _____       _
 %  |  __ \     | |
@@ -165,13 +185,21 @@ end
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    % Nothing in here yet
+
+    % Plot the results
+    fcn_Path_plotTraversalXYWithVarianceBands(reference_traversal,...
+    std_deviation,figNum);
+    title(sprintf('Standard deviation found to be: %.2f',std_deviation));
+    xlabel('X [m]');
+    ylabel('Y [m]'); 
+    
 end
 
 if flag_do_debug
     fprintf(1,'ENDING function: %s, in file: %s\n\n',st(1).name,st(1).file);
 end
-end
+
+end % Ends main function
 
 
 %% Functions follow

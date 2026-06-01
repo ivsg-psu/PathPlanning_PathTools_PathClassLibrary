@@ -9,7 +9,7 @@ function fcn_Path_plotPathXYWithUpperLowerBands(middle_path, upper_path, lower_p
 %            middle_path,...
 %            upper_path,...
 %            lower_path,...
-%            (fig_num));
+%            (figNum));
 %
 % INPUTS:
 %
@@ -25,7 +25,7 @@ function fcn_Path_plotPathXYWithUpperLowerBands(middle_path, upper_path, lower_p
 %
 %     (OPTIONAL INPUTS)
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and as well makes the input
@@ -49,11 +49,11 @@ function fcn_Path_plotPathXYWithUpperLowerBands(middle_path, upper_path, lower_p
 
 % Revision history:
 % 2022_01_03:
-% -- wrote the code originally, using fcn_Path_plotTraversalXYWithVarianceBands
+% - wrote the code originally, using fcn_Path_plotTraversalXYWithVarianceBands
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- Removed traversal types, redid script/function based on
+% - Removed traversal types, redid script/function based on
 % plotTraversalXYWithUpperLowerBounds
 
 % TO-DO
@@ -61,7 +61,7 @@ function fcn_Path_plotPathXYWithUpperLowerBands(middle_path, upper_path, lower_p
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -87,9 +87,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -141,24 +141,24 @@ end
 
 % Does user want to show the plots?
 flag_do_plots = 1; % Default is to make a plot
-fig_num = [];
+figNum = [];
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
     if flag_do_debug
         fig = figure;
-        fig_num = fig.Number;
+        figNum = fig.Number;
         flag_do_plots = 1;
     end
 end
-if isempty(fig_num)
+if isempty(figNum)
     temp = figure;
-    fig_num = temp.Number;
+    figNum = temp.Number;
 end
 
 %% Main code
@@ -191,7 +191,7 @@ bottom_path = [X_lower, Y_lower];
 if flag_do_plots
 
     % plot the final XY result
-    figure(fig_num);
+    figure(figNum);
 
     % Check to see if the hold was on?
     flag_hold_was_off = 0;

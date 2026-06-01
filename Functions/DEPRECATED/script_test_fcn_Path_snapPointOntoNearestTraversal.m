@@ -1,5 +1,5 @@
-% script_test_fcn_Path_snapPointOntoNearestPath.m
-% This is a script to exercise the function: fcn_Path_snapPointOntoNearestPath.m
+% script_test_fcn_Path_snapPointOntoNearestTraversal.m
+% This is a script to exercise the function: fcn_Path_snapPointOntoNearestTraversal.m
 % This function was written on 2021_03_06 by Satya Prasad, szm888@psu.edu
 
 % Revision history:
@@ -14,11 +14,12 @@ figure(figNum); clf;
 
 point = [0.5 0.2];
 pathXY = [0 0; 1 0; 2 0; 2 1];
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
-
+figNum = 111;
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     figNum, closest_path_point(1,1),closest_path_point(1,2),...
@@ -32,12 +33,12 @@ figure(figNum); clf;
 
 point = [1.4 1.3]; % Define the query point
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 % Snap the point onto the path
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',figNum);
@@ -57,12 +58,12 @@ figure(figNum); clf;
 
 point = [1.5 1];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 % Snap the point onto the path
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',figNum);
@@ -82,12 +83,12 @@ figure(figNum); clf;
 
 point = [0.9 1.4]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 % Snap the point onto the path
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',figNum);
@@ -106,12 +107,12 @@ figure(figNum); clf;
 
 point = [1 0.5]; 
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 1.5 0.6; 3 0]; % Define an XY path
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 % Snap the point onto the path
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 
 % Print results to the workspace
 fprintf(1,'Figure: %d\n',figNum);
@@ -130,11 +131,15 @@ figure(figNum); clf;
 
 point = [-0.5 0.2];
 pathXY = [0 0; 1 0; 2 0; 2 1];
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
+% [closest_path_point,s_coordinate] = ...
+%     fcn_Path_snapPointOntoNearestTraversal(point, path,fignum);
+% fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',fignum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     figNum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -148,11 +153,11 @@ figure(figNum); clf;
 
 point = [4 0.2];
 pathXY = [0 0; 1 0; 2 0];
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     figNum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -165,11 +170,11 @@ figure(figNum); clf;
 
 point = [0.8 1.3];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum); %#ok<*ASGLU>
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum); %#ok<*ASGLU>
 fprintf(1,'Figure: %d,\n\t\t Closest point is: %.2f %.2f \n\t\t Matched to the path segment given by indices %d and %d, \n\t\t S-coordinate is: %.2f, \n\t\t percent_along_length is: %.2f\n',...
     figNum, closest_path_point(1,1),closest_path_point(1,2),...
     first_path_point_index,second_path_point_index, ...
@@ -244,13 +249,13 @@ figure(figNum);
 
 plot(path1(:,1),path1(:,2),'r-o');
 text(path1(1,1),path1(1,2),'Start');
-pathXY = path1;
-
+traversal = fcn_Path_convertPathToTraversalStructure(path1);
 % Create a query
+figNum = 2222;
 point = [75 45];
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,figNum);
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,figNum);
 fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',figNum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 
 
@@ -270,13 +275,13 @@ for i_test = 1:Ntests
     rand_y = rand(npoints,1);
     
     pathXY = [cumsum(rand_x),cumsum(rand_y)];
-    
+    traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
     point = mean(pathXY,1);
     
     temp_figNum = figNum -1 + i_test;
     [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
         second_path_point_index,percent_along_length] = ...
-        fcn_Path_snapPointOntoNearestPath(point, pathXY,temp_figNum);
+        fcn_Path_snapPointOntoNearestTraversal(point, traversal,temp_figNum);
     fprintf(1,'Figure: %d, Closest point is: %.2f %.2f, S-coordinate is: %.2f \n',figNum, closest_path_point(1,1),closest_path_point(1,2), s_coordinate);
 end
 
@@ -308,11 +313,11 @@ figure(figNum); close(figNum);
 
 point = [0.8 1.3];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,[]); %#ok<*ASGLU>
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,[]); %#ok<*ASGLU>
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -326,11 +331,11 @@ figure(figNum); close(figNum);
 
 point = [0.8 1.3];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
     second_path_point_index,percent_along_length] = ...
-    fcn_Path_snapPointOntoNearestPath(point, pathXY,-1); %#ok<*ASGLU>
+    fcn_Path_snapPointOntoNearestTraversal(point, traversal,-1); %#ok<*ASGLU>
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
@@ -345,7 +350,7 @@ close(figNum);
 
 point = [0.8 1.3];
 pathXY = [0 0; 0.5 0.2; 0.9 0.9; 3 0];
-
+traversal = fcn_Path_convertPathToTraversalStructure(pathXY);
 
 Niterations = 100;
 
@@ -355,7 +360,7 @@ for ith_test = 1:Niterations
     % Call the function
     [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
         second_path_point_index,percent_along_length] = ...
-        fcn_Path_snapPointOntoNearestPath(point, pathXY,[]); %#ok<*ASGLU>
+        fcn_Path_snapPointOntoNearestTraversal(point, traversal,[]); %#ok<*ASGLU>
 end
 slow_method = toc;
 
@@ -365,7 +370,7 @@ for ith_test = 1:Niterations
     % Call the function
     [closest_path_point,s_coordinate,path_point_yaw,first_path_point_index,...
         second_path_point_index,percent_along_length] = ...
-        fcn_Path_snapPointOntoNearestPath(point, pathXY,-1); %#ok<*ASGLU>
+        fcn_Path_snapPointOntoNearestTraversal(point, traversal,-1); %#ok<*ASGLU>
 end
 fast_method = toc;
 

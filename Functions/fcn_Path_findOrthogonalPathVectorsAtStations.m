@@ -11,7 +11,7 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %      [unit_normal_vector_start, unit_normal_vector_end] = ...
 %        fcn_Path_findOrthogonalPathVectorsAtStations(...
 %        station_queries,central_path,...
-%        (flag_rounding_type),(fig_num));
+%        (flag_rounding_type),(figNum));
 %
 % INPUTS:
 %
@@ -54,7 +54,7 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 %          projections are interpolated from their prior and subsequent
 %          vectors.
 %
-%     fig_num: a figure number to plot results. If set to -1, skips any
+%     figNum: a figure number to plot results. If set to -1, skips any
 %     input checking or debugging, no figures will be generated, and sets
 %     up code to maximize speed. As well, if given, this forces the
 %     variable types to be displayed as output and makes the input
@@ -85,26 +85,26 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 
 % Revision history:
 % 2020_12_31:
-% -- first write of the code via modification from
+% - first write of the code via modification from
 % fcn_Path_FindOrthogonalHitFromPathToPath
 % 2021_01_07
-% -- renamed to transition from path to traversal notation
+% - renamed to transition from path to traversal notation
 % 2021_12_27:
-% -- corrected dependencies in comments
+% - corrected dependencies in comments
 % 2023_04_29:
-% -- added capability for interpolated results at endpoints that are
+% - added capability for interpolated results at endpoints that are
 % undefined, using imaginary inputs. See flag type 5.
 % 2023_08_27:
-% -- fixed bug when many points are filled with the first or last
+% - fixed bug when many points are filled with the first or last
 % vector, when previous version of code could only handle one point
-% -- Cleaned up input checking a bit, allowing empty inputs and using
+% - Cleaned up input checking a bit, allowing empty inputs and using
 % narginchk
 % 2025_06_23 - S. Brennan
-% -- Updated debugging and input checks
+% - Updated debugging and input checks
 % 2025_07_01 - S. Brennan
-% -- Typo fixes in docstrings
+% - Typo fixes in docstrings
 % 2025_07_06 - S. Brennan
-% -- Added test to see if station is strictly increasing. Otherwise,
+% - Added test to see if station is strictly increasing. Otherwise,
 % interpolation will fail.
 
 % TO-DO
@@ -113,7 +113,7 @@ function [unit_normal_vector_start, unit_normal_vector_end] = ...
 
 %% Debugging and Input checks
 
-% Check if flag_max_speed set. This occurs if the fig_num variable input
+% Check if flag_max_speed set. This occurs if the figNum variable input
 % argument (varargin) is given a number of -1, which is not a valid figure
 % number.
 MAX_NARGIN = 4; % The largest Number of argument inputs to the function
@@ -139,9 +139,9 @@ end
 if flag_do_debug
     st = dbstack; %#ok<*UNRCH>
     fprintf(1,'STARTING function: %s, in file: %s\n',st(1).name,st(1).file);
-    debug_fig_num = 999978; %#ok<NASGU>
+    debug_figNum = 999978; %#ok<NASGU>
 else
-    debug_fig_num = []; %#ok<NASGU>
+    debug_figNum = []; %#ok<NASGU>
 end
 
 %% check input arguments?
@@ -189,8 +189,8 @@ flag_do_plots = 0; % Default is to NOT show plots
 if (0==flag_max_speed) && (MAX_NARGIN == nargin)
     temp = varargin{end};
     if ~isempty(temp) % Did the user NOT give an empty figure number?
-        fig_num = temp;
-        figure(fig_num);
+        figNum = temp;
+        figure(figNum);
         flag_do_plots = 1;
     end
 else
@@ -361,7 +361,7 @@ unit_normal_vector_end   = [X_central_at_stations Y_central_at_stations] + norma
 %                           |___/
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if flag_do_plots
-    figure(fig_num);
+    figure(figNum);
     hold on;
     grid on;
 

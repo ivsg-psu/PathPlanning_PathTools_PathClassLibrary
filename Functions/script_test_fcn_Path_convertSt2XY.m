@@ -4,7 +4,7 @@
 
 % Revision history:
 % 2023_08_26 by S. Brennan
-% -- first write of the code
+% - first write of the code
 
 
 
@@ -26,9 +26,9 @@ close all;
 
 %% BASIC example
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10001;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10001;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 
 XY_expected_solution = [0 1];
@@ -36,123 +36,123 @@ St_points_input = [1 1];
 referencePath = [-1 0; 1 0];
 flag_snap_type = 1;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 %% BASIC example
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10002;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10002;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 XY_expected_solution = [0 1];
 St_points_input = [1 1]./(2^0.5);
 referencePath = [0 0; 2 2];
 flag_snap_type = 1;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example
 % A simple line segment, a simple query, zero distance in rear segments
-fig_num = 10003;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10003;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 XY_expected_solution = [0 -1];
 St_points_input = [1 -1];
 referencePath = [-1 0; 1 0];
 flag_snap_type = 1;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example
 % A simple line segment, a complex number in rear segments
-fig_num = 10004;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10004;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 XY_expected_solution = [-2 -1];
 St_points_input = [-1 -1+1i];
 referencePath = [-1 0; 1 0];
 flag_snap_type = 1;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - FLAG 1, use the prior segment
 % A 90-degree line segment, a simple query, zero distance in rear segments
-fig_num = 10005;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10005;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 XY_expected_solution = [ 2 1];
 St_points_input = [2 1-1i];
 referencePath = [-1 0; 1 0; 1 -1];
 flag_snap_type = 1;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example  - FLAG 2
 % A 90-degree line segment, a simple query, zero distance in rear segments
-fig_num = 10006;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10006;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 XY_expected_solution = [ 2 1];
 St_points_input = [2 1+1i];
 referencePath = [-1 0; 1 0; 1 -1];
 flag_snap_type = 2;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - FLAG 3
 % A 90-degree line segment, a simple query, zero distance in rear segments
-fig_num = 10007;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10007;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 XY_expected_solution = [ 2 1];
 St_points_input = [2 2^0.5];
 referencePath = [-1 0; 1 0; 1 -1];
 flag_snap_type = 3;
 
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points_input, flag_snap_type,figNum);
 
 assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example - many points, flag of 1
-fig_num = 10008;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10008;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % A 90-degree line segment with multiple surrounding queries
 XY_points = [-2 1; -1 1; 0 1; 1 1; 2 1; 2 0; 2 -1; 2 -2; 1 -2; 0 -2; 0 -1; -1 -1; -2 -1; -2 0];
@@ -164,7 +164,7 @@ subplot(1,2,1);
 hold on;
 grid on;
 axis equal;
-St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
+St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,figNum);
 title('St coordinates');
 assert(length(St_points(:,1))==length(XY_points(:,1)));
 
@@ -174,19 +174,19 @@ subplot(1,2,2);
 hold on;
 grid on;
 axis equal;
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,figNum);
 plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
 title('XY coordinates');
 
 assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% BASIC example - many points, flag of 2
-fig_num = 10009;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10009;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % A 90-degree line segment with multiple surrounding queries
 XY_points = [-2 1; -1 1; 0 1; 1 1; 2 1; 2 0; 2 -1; 2 -2; 1 -2; 0 -2; 0 -1; -1 -1; -2 -1; -2 0];
@@ -198,7 +198,7 @@ subplot(1,2,1);
 hold on;
 grid on;
 axis equal;
-St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
+St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,figNum);
 title('St coordinates');
 assert(length(St_points(:,1))==length(XY_points(:,1)));
 
@@ -208,7 +208,7 @@ subplot(1,2,2);
 hold on;
 grid on;
 axis equal;
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,figNum);
 plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
 title('XY coordinates');
 
@@ -216,13 +216,13 @@ assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 
 %% BASIC example - many points, flag of 3
-fig_num = 10010;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10010;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 % A 90-degree line segment with multiple surrounding queries
 XY_points = [-2 1; -1 1; 0 1; 1 1; 2 1; 2 0; 2 -1; 2 -2; 1 -2; 0 -2; 0 -1; -1 -1; -2 -1; -2 0];
@@ -234,7 +234,7 @@ subplot(1,2,1);
 hold on;
 grid on;
 axis equal;
-St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,fig_num);
+St_points = fcn_Path_convertXY2St(referencePath,XY_points, flag_snap_type,figNum);
 title('St coordinates');
 assert(length(St_points(:,1))==length(XY_points(:,1)));
 
@@ -243,7 +243,7 @@ subplot(1,2,2);
 hold on;
 grid on;
 axis equal;
-XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,fig_num);
+XY_points_calculated = fcn_Path_convertSt2XY(referencePath,St_points, flag_snap_type,figNum);
 plot(XY_points_calculated(:,1),XY_points_calculated(:,2),'bo','MarkerSize',20);
 title('XY coordinates');
 
@@ -251,12 +251,12 @@ assert(abs(sum(sum((XY_points_calculated - XY_points).^2,2)))<1E-10);
 
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Illustrative example of fcn_Path_convertSt2XY
-fig_num = 10011;
-fprintf(1,'Figure %.0f: basic demo 1\n',fig_num);
-figure(fig_num); clf;
+figNum = 10011;
+fprintf(1,'Figure %.0f: basic demo 1\n',figNum);
+figure(figNum); clf;
 
 St_points = [2 -1; 3 0; 3.5 0.4; 4 0; 4.5 -0.5; 5 -0.4];
 referencePath = [-3 -3; -1 -0.5; 0.5 0; 3 3];
@@ -283,7 +283,7 @@ plot(referencePath(:,1),referencePath(:,2),'r.-','LineWidth',3,'MarkerSize',20)
 title('XY coordinates');
 
 % Make sure plot opened up
-assert(isequal(get(gcf,'Number'),fig_num));
+assert(isequal(get(gcf,'Number'),figNum));
 
 %% Fast Mode Tests
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,9 +304,9 @@ close all;
 fprintf(1,'Figure: 8XXXXXX: Demo of fast mode cases\n');
 
 %% Basic example - NO FIGURE
-fig_num = 80001;
-fprintf(1,'Figure: %.0f: Demo of fast mode, empty fig_num\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80001;
+fprintf(1,'Figure: %.0f: Demo of fast mode, empty figNum\n',figNum);
+figure(figNum); close(figNum);
 
 XY_expected_solution = [0 1];
 St_points_input = [1 1]./(2^0.5);
@@ -319,13 +319,13 @@ assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Basic fast mode - NO FIGURE, FAST MODE
-fig_num = 80002;
-fprintf(1,'Figure: %.0f: Demo of fast mode, fig_num=-1\n',fig_num);
-figure(fig_num); close(fig_num);
+figNum = 80002;
+fprintf(1,'Figure: %.0f: Demo of fast mode, figNum=-1\n',figNum);
+figure(figNum); close(figNum);
 
 
 XY_expected_solution = [0 1];
@@ -339,14 +339,14 @@ assert(abs(sum((XY_points_calculated - XY_expected_solution).^2,2))<1E-10);
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% Compare speeds of pre-calculation versus post-calculation versus a fast variant
-fig_num = 80003;
-fprintf(1,'Figure: %.0f: Fast mode comparisons\n',fig_num);
-figure(fig_num);
-close(fig_num);
+figNum = 80003;
+fprintf(1,'Figure: %.0f: Fast mode comparisons\n',figNum);
+figure(figNum);
+close(figNum);
 
 
 XY_expected_solution = [0 1];
@@ -375,7 +375,7 @@ fast_method = toc;
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 % Plot results as bar chart
 figure(373737);
@@ -391,7 +391,7 @@ ylabel('Execution time (Milliseconds)')
 
 % Make sure plot did NOT open up
 figHandles = get(groot, 'Children');
-assert(~any(figHandles==fig_num));
+assert(~any(figHandles==figNum));
 
 
 %% BUG cases
